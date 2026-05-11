@@ -503,6 +503,7 @@ function drawMist(canvas, col, dead, sizeBoost) {
 }
 
 // ── ENEMY SPRITE RENDERER ─────────────────────────────────────────────────────
+var deathParticles = null, deathParticlesKey = -1;
 function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   var ctx = canvas.getContext('2d');
   var W = canvas.width, H = canvas.height;
@@ -534,11 +535,12 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
     scaleY = 1 - Math.sin(hprog * Math.PI) * 0.18;
   }
 
-  // Death deflate: squish vertically to flat over 2 seconds, spread horizontally
+  // Death pop: brief scale-up burst at the moment of death
   if (dead) {
-    var dp = Math.min(1, deathAge / 2000);
-    scaleY = Math.max(0.04, 1 - dp * 0.96);
-    scaleX = 1 + dp * 0.45;
+    var popT = Math.min(1, deathAge / 150);
+    var popScale = 1 + Math.sin(popT * Math.PI) * 0.18;
+    scaleX = popScale;
+    scaleY = popScale;
   }
 
   ctx.save();
@@ -560,31 +562,42 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   ctx.filter = 'none';
   ctx.shadowBlur = 0;
 
-  // Sad face on death
+  // Particle disintegration on death
   if (dead) {
-    var faceAlpha = Math.min(1, deathAge / 350) * deathFade;
-    var faceSize = drawW * 0.5;
-    var fx = dx + drawW / 2;
-    var fy = dy + drawH * 0.36;
-    var eyeR = faceSize * 0.09;
-    var eyeOffX = faceSize * 0.23;
-
-    ctx.save();
-    ctx.globalAlpha = faceAlpha;
-    ctx.fillStyle = 'rgba(15,15,15,0.88)';
-    // Left eye
-    ctx.beginPath(); ctx.arc(fx - eyeOffX, fy, eyeR, 0, Math.PI * 2); ctx.fill();
-    // Right eye
-    ctx.beginPath(); ctx.arc(fx + eyeOffX, fy, eyeR, 0, Math.PI * 2); ctx.fill();
-    // Frown — control point below endpoints makes the curve bow down
-    ctx.beginPath();
-    ctx.moveTo(fx - faceSize * 0.24, fy + faceSize * 0.26);
-    ctx.quadraticCurveTo(fx, fy + faceSize * 0.44, fx + faceSize * 0.24, fy + faceSize * 0.26);
-    ctx.strokeStyle = 'rgba(15,15,15,0.88)';
-    ctx.lineWidth = faceSize * 0.06;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-    ctx.restore();
+    if (deathParticlesKey !== enemyDeathTime) {
+      deathParticlesKey = enemyDeathTime;
+      deathParticles = [];
+      var pColors = ['rgba(200,230,255,0.9)','rgba(180,215,255,0.85)','rgba(220,240,255,0.9)','rgba(160,200,240,0.8)','rgba(255,255,255,0.92)','rgba(190,210,250,0.88)'];
+      for (var pi = 0; pi < 24; pi++) {
+        var pa = (pi / 24) * Math.PI * 2 + (Math.random() - 0.5) * 0.7;
+        var ps = 55 + Math.random() * 155;
+        deathParticles.push({
+          x0: cx + (Math.random() - 0.5) * drawW * 0.6,
+          y0: cy + (Math.random() - 0.5) * drawH * 0.6,
+          vx: Math.cos(pa) * ps,
+          vy: Math.sin(pa) * ps - 45,
+          pw: drawW * (0.04 + Math.random() * 0.09),
+          ph: drawH * (0.025 + Math.random() * 0.055),
+          rot0: Math.random() * Math.PI * 2,
+          rotV: (Math.random() - 0.5) * 7,
+          col: pColors[Math.floor(Math.random() * pColors.length)]
+        });
+      }
+    }
+    var pdt = deathAge / 1000;
+    for (var pi = 0; pi < deathParticles.length; pi++) {
+      var p = deathParticles[pi];
+      var ppx = p.x0 + p.vx * pdt;
+      var ppy = p.y0 + p.vy * pdt + 0.5 * 190 * pdt * pdt;
+      var ppr = p.rot0 + p.rotV * pdt;
+      ctx.save();
+      ctx.globalAlpha = deathFade * 0.88;
+      ctx.translate(ppx, ppy);
+      ctx.rotate(ppr);
+      ctx.fillStyle = p.col;
+      ctx.fillRect(-p.pw / 2, -p.ph / 2, p.pw, p.ph);
+      ctx.restore();
+    }
   }
 
   ctx.restore();
@@ -654,7 +667,7 @@ var ENEMY_TYPES = [
 //
 // Scaling: continuous floor index across entire realm
 //   floorHp(f)    = ceil(10 * 1.6^(f-1))   f = 1-based absolute floor number
-//   floorSouls(f) = ceil(floorHp / 10)
+//   floorSouls(f) = ceil(floorHp / 5)
 //   Elite hp      = ceil(last floor hp of that level * 2.5)
 //
 // Navigation:
@@ -690,13 +703,13 @@ function floorHp(level, floor){
   return Math.ceil(10 * Math.pow(1.6, af-1));
 }
 function floorSouls(level, floor){
-  return Math.ceil(floorHp(level, floor) / 10);
+  return Math.ceil(floorHp(level, floor) / 5);
 }
 function eliteHp(level){
   return Math.ceil(floorHp(level, FLOORS_PER_LEVEL) * 2.5);
 }
 function eliteSouls(level){
-  return Math.ceil(eliteHp(level) / 10);
+  return Math.ceil(eliteHp(level) / 5);
 }
 function floorDmgMin(hp){ return Math.max(1, Math.round(hp * 0.08)); }
 function floorDmgMax(hp){ return Math.max(1, Math.round(hp * 0.14)); }
