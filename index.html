@@ -516,7 +516,7 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   if (dead) {
     if (!enemyDeathTime) enemyDeathTime = t;
     deathAge = t - enemyDeathTime;
-    deathFade = Math.max(0, 1 - deathAge / 550);
+    deathFade = Math.max(0, 1 - deathAge / 300);
     if (deathFade <= 0) return;
   }
 
@@ -539,12 +539,12 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
 
   // Death pop then deflate: brief burst then squish to nothing
   if (dead) {
-    if (deathAge <= 130) {
-      var popT = deathAge / 130;
+    if (deathAge <= 70) {
+      var popT = deathAge / 70;
       var popScale = 1 + Math.sin(popT * Math.PI) * 0.2;
       scaleX = popScale; scaleY = popScale;
     } else {
-      var defT = Math.min(1, (deathAge - 130) / 370);
+      var defT = Math.min(1, (deathAge - 70) / 200);
       var defEase = defT * defT;
       scaleX = 1 + defEase * 0.35;
       scaleY = Math.max(0, 1 - defEase);
@@ -1131,10 +1131,10 @@ function onEnemyDeath(){
           addLore('All floors cleared. Click the elite chamber to face it...');
         }
       }
-      setTimeout(spawnEnemy,720);
+      setTimeout(spawnEnemy,100);
     } else {
       // Same floor, next enemy
-      setTimeout(spawnEnemy,720);
+      setTimeout(spawnEnemy,100);
     }
   }
 
