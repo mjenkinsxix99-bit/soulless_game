@@ -9,10 +9,10 @@
 html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Georgia, serif; overflow: hidden; }
 #game { display: flex; flex-direction: column; height: 100vh; }
 #topbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; }
-.title { font-size: 27px; letter-spacing: 4px; color: #b8a9f0; }
+.title { font-size: 27px; letter-spacing: 4px; color: #d0c4ff; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
 #souls-display { text-align: center; }
-#souls-display .num { font-size: 33px; color: #c9baff; font-weight: bold; }
-#souls-display .lbl { font-size: 14px; color: #443366; letter-spacing: 2px; text-transform: uppercase; }
+#souls-display .num { font-size: 33px; color: #ffffff; font-weight: bold; text-shadow: 0 0 8px rgba(200,180,255,0.9), 0 0 18px rgba(160,120,255,0.5); }
+#souls-display .lbl { font-size: 14px; color: #c0b0f0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 6px rgba(150,120,240,0.4); }
 #stage-info { text-align: right; }
 #stage-name { font-size: 18px; color: #d4a843; letter-spacing: 1px; }
 #stage-desc { font-size: 15px; color: #443366; font-style: italic; }
@@ -23,17 +23,17 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #right { border-left: 1px solid #1e1845; }
 .ph { font-size: 14px; letter-spacing: 3px; color: #332255; text-transform: uppercase; border-bottom: 1px solid #1a1535; padding-bottom: 4px; margin-bottom: 10px; }
 .ph.gap { margin-top: 16px; }
-.ucard { border: 1px solid #111128; border-radius: 5px; padding: 11px 12px; margin-bottom: 9px; cursor: default; opacity: 0.35; background: #0e0e1e; transition: border-color 0.15s, background 0.15s; }
-.ucard.can { border-color: #2a1e55; opacity: 1; cursor: pointer; }
-.ucard.can:hover { border-color: #5544aa; background: #141430; }
-.ucard.bought { border-color: #1e1845; opacity: 0.55; }
-.ucard .un { font-size: 16px; color: #b0a0e8; margin-bottom: 2px; }
-.ucard .ud { font-size: 15px; color: #554488; font-style: italic; line-height: 1.4; }
-.ucard .uc { font-size: 15px; color: #997722; margin-top: 3px; }
-.ucard .ulvl { font-size: 13px; color: #665599; }
-.ucard .ms-btn { margin-top: 7px; padding-top: 6px; border-top: 1px solid #1a1535; font-size: 13px; color: #332244; display: flex; align-items: center; gap: 5px; cursor: default; position: relative; }
-.ucard .ms-btn .ms-icon { color: #3a2255; font-size: 11px; }
-.ucard .ms-btn .ms-tip { margin-left: auto; font-size: 12px; color: #221133; letter-spacing: 1px; }
+.ucard { border: 1px solid #c8bca0; border-radius: 5px; padding: 11px 12px; margin-bottom: 9px; cursor: default; opacity: 0.5; background: #f0e8b8; transition: border-color 0.2s, background 0.2s, box-shadow 0.3s; }
+.ucard.can { border-color: #d4a843; opacity: 1; cursor: pointer; background: #ffffff; box-shadow: 0 0 10px rgba(212,168,67,0.55), 0 0 20px rgba(212,168,67,0.25); }
+.ucard.can:hover { border-color: #f0c040; background: #fffdf8; box-shadow: 0 0 16px rgba(212,168,67,0.85), 0 0 30px rgba(212,168,67,0.45); }
+.ucard.bought { border-color: #b5a040; opacity: 0.7; background: #f0e8b8; }
+.ucard .un { font-size: 16px; color: #1a1a1a; margin-bottom: 2px; }
+.ucard .ud { font-size: 15px; color: #333333; font-style: italic; line-height: 1.4; }
+.ucard .uc { font-size: 15px; color: #7a6010; margin-top: 3px; }
+.ucard .ulvl { font-size: 13px; color: #555555; }
+.ucard .ms-btn { margin-top: 7px; padding-top: 6px; border-top: 1px solid #c8b870; font-size: 13px; color: #666666; display: flex; align-items: center; gap: 5px; cursor: default; position: relative; }
+.ucard .ms-btn .ms-icon { color: #8a7030; font-size: 11px; }
+.ucard .ms-btn .ms-tip { margin-left: auto; font-size: 12px; color: #888866; letter-spacing: 1px; }
 #lore-log { font-size: 15px; color: #443366; font-style: italic; }
 .lore-line { margin-bottom: 5px; line-height: 1.5; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; position: relative; background: radial-gradient(ellipse at center, #0d0820 0%, #07070f 70%); overflow: hidden; }
@@ -98,15 +98,22 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #minimap-panel { width:100%;flex-shrink:0;padding:8px 14px;border-top:1px solid #1e1845;background:#08080e;overflow-x:auto;white-space:nowrap; }
 #minimap-inner { display:inline-flex;gap:4px;align-items:center;padding:4px 0; }
 .mm-group { display:inline-flex;gap:2px;align-items:center;margin-right:6px; }
-.mm-cell { display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:4px;font-size:9px;font-family:Georgia,serif;cursor:pointer;border:1px solid #1e1845;color:#443366;background:#0a0a14;flex-shrink:0;transition:border-color 0.15s,background 0.15s; }
-.mm-cell.done { border-color:#2a1e55;color:#7766aa;background:#0e0e1e; }
-.mm-cell.done:hover { border-color:#5544aa;background:#141430; }
-.mm-cell.current { border-color:#aa66ff;color:#cc99ff;background:#1a0a30;box-shadow:0 0 8px rgba(170,102,255,0.4); }
-.mm-cell.locked { opacity:0.25;cursor:default; }
+.mm-cell { display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:4px;font-size:9px;font-family:Georgia,serif;cursor:pointer;border:1px solid rgba(210,185,120,0.3);color:rgba(230,210,150,0.5);background:rgba(255,240,180,0.05);flex-shrink:0;transition:border-color 0.15s,background 0.15s; }
+.mm-cell.done { border-color:#7a6c28;color:#9b8a3a;background:#141000; }
+.mm-cell.done:hover { border-color:#a08840;background:#1e1800; }
+.mm-cell.current { border-color:#ffd700;color:#ffd700;background:#1a1400;animation:pulse-gold 1.5s ease-in-out infinite; }
+.mm-cell.locked { opacity:0.18;cursor:default; }
 .mm-cell.elite { border-radius:50%;width:26px;height:26px;font-size:8px; }
-.mm-cell.elite.done { border-color:#d4a843;color:#d4a843;background:#1a1000; }
-.mm-cell.elite.current { border-color:#ffe566;color:#ffe566;background:#221500;box-shadow:0 0 10px rgba(255,220,50,0.5); }
+.mm-cell.elite.done { border-color:#7a6c28;color:#9b8a3a;background:#141000; }
+.mm-cell.elite.current { border-color:#ffd700;color:#ffd700;background:#1a1400;animation:pulse-gold 1.5s ease-in-out infinite; }
 .mm-sep { width:1px;height:20px;background:#1e1845;margin:0 2px;flex-shrink:0; }
+@keyframes pulse-gold { 0%,100%{box-shadow:0 0 5px rgba(255,215,0,0.35);} 50%{box-shadow:0 0 12px rgba(255,215,0,0.85),0 0 22px rgba(255,215,0,0.4);} }
+.tab-bar { display:flex; gap:0; margin-bottom:12px; border-bottom:1px solid #1e1845; }
+.tab-btn { background:transparent; border:none; border-bottom:2px solid transparent; color:#554477; font-family:Georgia,serif; font-size:12px; letter-spacing:2px; text-transform:uppercase; padding:6px 14px; cursor:pointer; transition:color 0.15s,border-color 0.15s; margin-bottom:-1px; }
+.tab-btn:hover { color:#9980dd; }
+.tab-btn.active { color:#d4a843; border-bottom-color:#d4a843; }
+.tab-pane { display:none; }
+.tab-pane.active { display:block; }
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #1e1845; border-radius: 2px; }
@@ -127,10 +134,22 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
   <div id="main">
     <div id="left">
-      <div class="ph">Upgrades</div>
-      <div id="upgrade-list"></div>
-      <div class="ph gap">Lore</div>
-      <div id="lore-log"></div>
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
+        <button class="tab-btn" data-tab="stats">Stats</button>
+      </div>
+      <div id="tab-upgrades" class="tab-pane active">
+        <div id="upgrade-list"></div>
+        <div class="ph gap">Lore</div>
+        <div id="lore-log"></div>
+      </div>
+      <div id="tab-stats" class="tab-pane">
+        <div class="ph">Entity Stats</div>
+        <div class="stat-row"><span>Damage</span><span class="sv" id="es-dmg">8–12</span></div>
+        <div class="stat-row"><span>Max HP</span><span class="sv" id="es-hp">100</span></div>
+        <div class="stat-row"><span>Auto attack</span><span class="sv" id="es-auto">—</span></div>
+        <div class="stat-row"><span>Lifesteal</span><span class="sv" id="es-vamp">—</span></div>
+      </div>
     </div>
     <div id="battlefield">
       <div id="combat-zone">
@@ -184,11 +203,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div class="kill-row"><span>Elite</span><span class="kv" id="kp-elite">locked</span></div>
       <div class="ph gap">Form</div>
       <div id="traits-row"></div>
-      <div class="ph gap">Entity Stats</div>
-      <div class="stat-row"><span>Damage</span><span class="sv" id="es-dmg">8–12</span></div>
-      <div class="stat-row"><span>Max HP</span><span class="sv" id="es-hp">100</span></div>
-      <div class="stat-row"><span>Auto attack</span><span class="sv" id="es-auto">—</span></div>
-      <div class="stat-row"><span>Lifesteal</span><span class="sv" id="es-vamp">—</span></div>
     </div>
   </div>
 
@@ -1048,9 +1062,9 @@ function buildUpgrades(){
   var el=document.getElementById('upgrade-list'); el.innerHTML='';
   REP_UPGRADES.forEach(function(u){
     if(!u.vis()) return;
-    var cost=repCost(u), can=souls>=cost;
+    var cost=repCost(u), can=souls>=cost, bought=u.level>0;
     var d=document.createElement('div');
-    d.className='ucard'+(can?' can':'');
+    d.className='ucard'+(can?' can':'')+(bought&&!can?' bought':'');
     d.innerHTML='<div class="un">'+u.name+(u.level>0?' <span class="ulvl">('+u.level+')</span>':'')+'</div>'
       +'<div class="ud">'+u.desc()+'</div>'
       +'<div class="uc">'+fmt(cost)+' souls</div>'
@@ -1204,6 +1218,16 @@ buildMinimap();
 spawnEnemy();
 addLore('You are nothing. Not even darkness has your shape.');
 requestAnimationFrame(gameLoop);
+
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var tab=btn.getAttribute('data-tab');
+    document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+  });
+});
 
 })();
 </script>
