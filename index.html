@@ -95,8 +95,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #mok.ready:hover { background: rgba(212,168,67,0.1); }
 
 /* MINIMAP */
-#minimap-panel { width:100%;flex-shrink:0;padding:8px 14px;border-top:1px solid #1e1845;background:#08080e;overflow-x:auto;white-space:nowrap; }
-#minimap-inner { display:inline-flex;gap:4px;align-items:center;padding:4px 0; }
+#minimap-panel { width:100%;flex-shrink:0;padding:8px 14px;border-top:1px solid #1e1845;background:#08080e; }
+#minimap-inner { display:flex;gap:6px;align-items:center;justify-content:center;padding:4px 0; }
 .mm-group { display:inline-flex;gap:2px;align-items:center;margin-right:6px; }
 .mm-cell { display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:4px;font-size:9px;font-family:Georgia,serif;cursor:pointer;border:1px solid rgba(210,185,120,0.3);color:rgba(230,210,150,0.5);background:rgba(255,240,180,0.05);flex-shrink:0;transition:border-color 0.15s,background 0.15s; }
 .mm-cell.done { border-color:#7a6c28;color:#9b8a3a;background:#141000; }
@@ -671,7 +671,7 @@ var currentEnemyTypeIdx=0;
 
 var stage=0, traits={sex:null,adds:[],aff:null,outfit:null};
 var pending={}, mstage=0, evReady=false;
-var EV_THRESH=[100,500,2000,10000];
+var EV_THRESH=[500000,500,2000,10000];
 var SNAMES=['Ether','Wraith','Nascent Being','Ascendant'];
 var SDESCS=['Shapeless. Hungry.','A form emerges.','Soul and substance entwine.','Between god and monster.'];
 var dirtyU=true, lastRebuildU=0;
@@ -755,56 +755,47 @@ function buildMinimap(){
   var inner=document.getElementById('minimap-inner');
   inner.innerHTML='';
 
-  for(var lv=1; lv<=LEVELS_PER_REALM; lv++){
-    var grp=document.createElement('div'); grp.className='mm-group';
-
-    // label
-    var lbl=document.createElement('div');
-    lbl.style.cssText='font-size:8px;color:#332255;letter-spacing:1px;margin-bottom:2px;text-align:center;font-family:Georgia,serif;';
-    lbl.textContent='LVL '+lv;
-    grp.appendChild(lbl);
-
-    var row=document.createElement('div');
-    row.style.cssText='display:flex;gap:2px;align-items:center;';
-
-    for(var fl=1; fl<=11; fl++){
-      var isElite=(fl===11);
-      var done   = floorDone(lv,fl);
-      var cur    = (lv===curLevel && fl===curFloor);
-      var locked = !floorUnlocked(lv,fl);
-
-      var cell=document.createElement('div');
-      var cls='mm-cell';
-      if(isElite) cls+=' elite';
-      if(done)    cls+=' done';
-      else if(cur) cls+=' current';
-      else if(locked) cls+=' locked';
-      cell.className=cls;
-      cell.textContent=isElite?'★':fl;
-      cell.title='Level '+lv+', '+(isElite?'Elite':'Floor '+fl);
-
-      if(!locked){
-        (function(l,f){
-          cell.addEventListener('click',function(){
-            navigateTo(l,f);
-          });
-        })(lv,fl);
-      }
-      row.appendChild(cell);
-    }
-    grp.appendChild(row);
-    inner.appendChild(grp);
-    if(lv<LEVELS_PER_REALM){
-      var sep=document.createElement('div'); sep.className='mm-sep';
-      inner.appendChild(sep);
+  // Build flat linear sequence of all rooms
+  var rooms=[];
+  for(var lv=1;lv<=LEVELS_PER_REALM;lv++){
+    for(var fl=1;fl<=11;fl++){
+      rooms.push({level:lv,floor:fl,isElite:fl===11});
     }
   }
 
-  // scroll current into view
-  var cur2=inner.querySelector('.mm-cell.current');
-  if(cur2){
-    var panel=document.getElementById('minimap-panel');
-    panel.scrollLeft=cur2.offsetLeft-panel.offsetWidth/2+cur2.offsetWidth/2;
+  // Find current room index
+  var curIdx=0;
+  for(var i=0;i<rooms.length;i++){
+    if(rooms[i].level===curLevel&&rooms[i].floor===curFloor){curIdx=i;break;}
+  }
+
+  // Show 7 rooms centered on current
+  var start=Math.max(0,curIdx-3);
+  var end=start+6;
+  if(end>=rooms.length){end=rooms.length-1;start=Math.max(0,end-6);}
+
+  for(var j=start;j<=end;j++){
+    var r=rooms[j];
+    var done=floorDone(r.level,r.floor);
+    var cur=(r.level===curLevel&&r.floor===curFloor);
+    var locked=!floorUnlocked(r.level,r.floor);
+
+    var cell=document.createElement('div');
+    var cls='mm-cell';
+    if(r.isElite) cls+=' elite';
+    if(cur)       cls+=' current';
+    else if(done) cls+=' done';
+    else if(locked) cls+=' locked';
+    cell.className=cls;
+    cell.textContent=r.isElite?'★':r.floor;
+    cell.title='Level '+r.level+', '+(r.isElite?'Elite':'Floor '+r.floor);
+
+    if(!locked){
+      (function(l,f){
+        cell.addEventListener('click',function(){navigateTo(l,f);});
+      })(r.level,r.floor);
+    }
+    inner.appendChild(cell);
   }
 }
 
@@ -957,31 +948,24 @@ function onEnemyDeath(){
       document.getElementById('click-hint').textContent='Void Realm complete!';
       return;
     }
-    // Advance to next level, floor 1
-    curLevel++;
-    curFloor=1;
-    floorWins=0;
-    if(curLevel>highestLevel){highestLevel=curLevel;highestFloor=1;}
-    setTimeout(spawnEnemy,1200);
+    // Unlock next level — wait for player to click
+    var nextLevel=curLevel+1;
+    if(nextLevel>highestLevel){highestLevel=nextLevel;highestFloor=1;}
+    addLore('Click the next room to continue your hunt.');
 
   } else {
     // Normal floor win
     floorWins++;
     if(floorWins>=WINS_PER_FLOOR){
-      // Floor complete — advance to next floor
-      floorWins=0;
+      // Floor complete — unlock next room, wait for player to click
       var nextFloor=curFloor+1;
       if(nextFloor<=FLOORS_PER_LEVEL){
-        curFloor=nextFloor;
-        if(curLevel===highestLevel && curFloor>highestFloor) highestFloor=curFloor;
-        addLore('Floor '+curFloor+' reached.');
-        setTimeout(spawnEnemy,800);
+        if(curLevel===highestLevel&&nextFloor>highestFloor) highestFloor=nextFloor;
+        addLore('Floor '+curFloor+' cleared. Click the next room to advance.');
       } else {
         // All 10 floors done — unlock elite
-        curFloor=11;
         if(curLevel===highestLevel) highestFloor=11;
-        addLore('All floors cleared. The elite stirs...');
-        setTimeout(spawnEnemy,1000);
+        addLore('All floors cleared. Click the elite chamber to face it...');
       }
     } else {
       // Same floor, next enemy
