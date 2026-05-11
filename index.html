@@ -49,6 +49,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .hp-fill.entity-hp { background: #6655aa; }
 .hp-fill.enemy-hp { background: #336633; }
 .hp-fill.enemy-hp.elite { background: #aa8833; }
+.hp-fill.timer-fill { background: #33aa33; }
 .hp-numbers { display: flex; justify-content: space-between; font-size: 14px; color: #443366; margin-top: 2px; }
 .canvas-wrap { position: relative; overflow: hidden; }
 #enemy-canvas { cursor: crosshair; display: block; background: transparent; }
@@ -146,9 +147,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div id="tab-stats" class="tab-pane">
         <div class="ph">Entity Stats</div>
         <div class="stat-row"><span>Damage</span><span class="sv" id="es-dmg">8–12</span></div>
-        <div class="stat-row"><span>Max HP</span><span class="sv" id="es-hp">100</span></div>
         <div class="stat-row"><span>Auto attack</span><span class="sv" id="es-auto">—</span></div>
-        <div class="stat-row"><span>Lifesteal</span><span class="sv" id="es-vamp">—</span></div>
+        <div class="stat-row"><span>Enemy drain</span><span class="sv" id="es-vamp">—</span></div>
       </div>
     </div>
     <div id="battlefield">
@@ -157,10 +157,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <div class="cname entity-label">The Entity</div>
           <div class="canvas-wrap">
             <canvas id="entity-canvas" width="220" height="220"></canvas>
-          </div>
-          <div class="hp-wrap">
-            <div class="hp-track"><div class="hp-fill entity-hp" id="entity-hp-bar" style="width:100%"></div></div>
-            <div class="hp-numbers"><span id="entity-hp-cur">100</span><span id="entity-hp-max">/ 100</span></div>
           </div>
         </div>
         <div id="vs">vs</div>
@@ -174,6 +170,10 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
             <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
             <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
           </div>
+          <div class="hp-wrap" id="elite-timer-wrap" style="display:none;margin-top:4px;">
+            <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
+            <div class="hp-numbers"><span id="elite-timer-label" style="color:#33aa33;font-size:13px;">20s</span><span style="color:#33aa33;font-size:13px;">DPS check</span></div>
+          </div>
         </div>
       </div>
       <div id="click-hint">click the enemy to attack</div>
@@ -183,9 +183,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       </div>
       <button id="evb">✦ TRANSCEND ✦</button>
       <div id="reform-msg">
-        <div class="rm-title">Dispersed</div>
-        <div class="rm-sub">Your form dissolves... but the void remembers.</div>
-        <button id="reform-btn">Reform</button>
+        <div class="rm-title">Oh No! Get stronger uwu!</div>
+        <div class="rm-sub">Too slow. The elite endures. Return to floor 10.</div>
+        <button id="reform-btn">Return</button>
       </div>
       <div id="float-layer"></div>
     </div>
@@ -290,7 +290,6 @@ var wispImgLoaded = false;
 wispImg.onload = function(){ wispImgLoaded = true; };
 
 // ── ENTITY IMAGE RENDERER ─────────────────────────────────────────────────────
-var entityDeathTime = 0;
 var enemyDeathTime  = 0;
 var attackFlashTime = 0;
 var hitFlashTime    = 0;
@@ -309,12 +308,9 @@ for(var _si=0;_si<12;_si++){
 }
 
 function entityExpression() {
-  var pct = entityMaxHp > 0 ? entityHp / entityMaxHp : 1;
   var now = Date.now();
   if (now - attackFlashTime < 400) return 'angry';
-  if (pct <= 0.20) return 'scared';
-  if (pct >= 0.75) return 'happy';
-  return 'neutral';
+  return 'happy';
 }
 
 function drawEntityCanvas(t) {
@@ -325,13 +321,7 @@ function drawEntityCanvas(t) {
 
   if (!entityImgLoaded) return;
 
-  // death fade
   var deathFade = 1;
-  if (entityDead) {
-    if (!entityDeathTime) entityDeathTime = t;
-    deathFade = Math.max(0, 1 - (t - entityDeathTime) / 2000);
-    if (deathFade <= 0) return;
-  }
 
   var iw = entityImg.naturalWidth, ih = entityImg.naturalHeight;
   var drawH = Math.min(H * 0.9, H - 10);
@@ -659,14 +649,14 @@ function floorSpeed(level, floor){
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 var souls=0, totalSouls=0;
-var entityHp=10, entityMaxHp=10;
 var entityDmgMin=3, entityDmgMax=5;
 var firstKillDone={};
 
 var enemyHp=0, enemyMaxHp=0;
 var enemyDmgMin=0, enemyDmgMax=0, enemySpeed=2000, enemySoulReward=0;
-var lastEnemyAttack=0, lastAutoAttack=0, lastDrainTick=0;
-var combatActive=false, entityDead=false, enemyDead=false;
+var lastAutoAttack=0, lastDrainTick=0;
+var combatActive=false, enemyDead=false;
+var eliteTimerStart=0;
 var currentEnemyTypeIdx=0;
 
 var stage=0, traits={sex:null,adds:[],aff:null,outfit:null};
@@ -841,12 +831,21 @@ function spawnEnemy(){
   enemySoulReward = elite ? eliteSouls(lv) : floorSouls(lv,fl);
   enemySpeed   = elite ? Math.max(800, Math.round(2000-(absFloor(lv,10))*11)) : floorSpeed(lv,fl);
 
-  lastEnemyAttack=Date.now()+1200;
   enemyDead=false; enemyDeathTime=0; combatActive=true;
 
   document.getElementById('crown').style.display=elite?'block':'none';
   document.getElementById('enemy-hp-bar').className='hp-fill enemy-hp'+(elite?' elite':'');
   document.getElementById('enemy-name-label').className='cname '+(elite?'elite-label':'enemy-label');
+
+  if(elite){
+    eliteTimerStart=Date.now();
+    document.getElementById('elite-timer-wrap').style.display='';
+    document.getElementById('elite-timer-bar').style.width='100%';
+    document.getElementById('elite-timer-label').textContent='20s';
+  } else {
+    eliteTimerStart=0;
+    document.getElementById('elite-timer-wrap').style.display='none';
+  }
 
   updateEnemyPanel();
   updateProgressLabel();
@@ -896,7 +895,7 @@ function updateEnemyPanel(){
 
 // ── COMBAT ────────────────────────────────────────────────────────────────────
 function entityAttack(isAuto){
-  if(!combatActive||enemyDead||entityDead) return;
+  if(!combatActive||enemyDead) return;
   attackFlashTime=Date.now();
   var bonus=isAuto?Math.floor(totalDps*autoAttackInterval/1000):clickDmgBonus;
   var dmg=rnd(entityDmgMin+entityDmgBonus+bonus, entityDmgMax+entityDmgBonus+bonus);
@@ -907,19 +906,10 @@ function entityAttack(isAuto){
   if(enemyHp<=0) onEnemyDeath();
 }
 
-function enemyAttack(){
-  if(!combatActive||enemyDead||entityDead) return;
-  hitFlashTime=Date.now();
-  var dmg=rnd(enemyDmgMin,enemyDmgMax);
-  entityHp=Math.max(0,entityHp-dmg);
-  var pp=floatPos('entity-canvas');
-  spawnFloat('-'+fmtHp(dmg),'ndamage',pp.x,pp.y);
-  updateHpBars();
-  if(entityHp<=0) onEntityDeath();
-}
 
 function onEnemyDeath(){
-  combatActive=false; enemyDead=true;
+  combatActive=false; enemyDead=true; eliteTimerStart=0;
+  document.getElementById('elite-timer-wrap').style.display='none';
   souls+=enemySoulReward; totalSouls+=enemySoulReward;
   document.getElementById('soul-count').textContent=fmt(souls);
   checkLore(); checkEvolution(); dirtyU=true;
@@ -978,34 +968,23 @@ function onEnemyDeath(){
   updateProgressLabel();
 }
 
-function onEntityDeath(){
-  combatActive=false; entityDead=true; entityHp=0;
-  entityDeathTime=Date.now(); hitFlashTime=0; attackFlashTime=0;
-  updateHpBars();
-  document.getElementById('reform-msg').classList.add('show');
-  addLore('Your form scatters. The void holds your memory.');
-
-  // If died on elite, push back to floor 10
-  if(isEliteFight()){
-    curFloor=10;
-    floorWins=0;
-    addLore('The elite endures. Return to floor 10 and grow stronger.');
-    buildMinimap();
-  }
+function onEliteDpsCheckFail(){
+  combatActive=false; eliteTimerStart=0;
+  hitFlashTime=0; attackFlashTime=0;
+  document.getElementById('elite-timer-wrap').style.display='none';
+  curFloor=10; floorWins=0;
+  addLore('Too slow. The elite endures. Returning to floor 10...');
+  buildMinimap();
+  setTimeout(spawnEnemy,600);
 }
 
 function reform(){
-  entityHp=entityMaxHp; entityDead=false;
   document.getElementById('reform-msg').classList.remove('show');
-  updateHpBars();
   setTimeout(spawnEnemy,600);
 }
 
 function updateHpBars(){
-  document.getElementById('entity-hp-bar').style.width=Math.max(0,entityHp/entityMaxHp*100)+'%';
   document.getElementById('enemy-hp-bar').style.width=Math.max(0,enemyHp/enemyMaxHp*100)+'%';
-  document.getElementById('entity-hp-cur').textContent=fmtHp(entityHp);
-  document.getElementById('entity-hp-max').textContent='/ '+fmtHp(entityMaxHp);
   document.getElementById('enemy-hp-cur').textContent=fmtHp(enemyHp);
   document.getElementById('enemy-hp-max').textContent='/ '+fmtHp(enemyMaxHp);
 }
@@ -1033,7 +1012,7 @@ var REP_UPGRADES=[
     apply:function(){totalDps+=75;},
     vis:function(){return REP_UPGRADES[2].level>=1;}},
   {id:'dv',name:'Divine Hunger', cost:5000,  costScale:1.07, level:0,
-    desc:function(){return '+0.03% enemy HP/s lifesteal';},
+    desc:function(){return '+0.03% enemy HP/s drain';},
     apply:function(){enemyHpDrainPct+=0.0003;},
     vis:function(){return REP_UPGRADES[3].level>=1;}},
   {id:'vs',name:'Void Sense',    cost:20000, costScale:1.07, level:0,
@@ -1081,7 +1060,6 @@ function buildUpgrades(){
 
 function updateEntityStatsPanel(){
   document.getElementById('es-dmg').textContent=(entityDmgMin+entityDmgBonus+clickDmgBonus)+'–'+(entityDmgMax+entityDmgBonus+clickDmgBonus);
-  document.getElementById('es-hp').textContent=fmtHp(entityMaxHp);
   document.getElementById('es-auto').textContent=autoAttackEnabled?(fmt(Math.floor(totalDps*autoAttackInterval/1000))+' dmg / '+(autoAttackInterval/1000).toFixed(1)+'s'):'—';
   document.getElementById('es-vamp').textContent=enemyHpDrainPct>0?(+(enemyHpDrainPct*100).toFixed(4))+'% HP/s':'—';
 }
@@ -1149,7 +1127,7 @@ document.getElementById('mo').addEventListener('click',function(e){if(e.target==
 
 // ── INPUT ─────────────────────────────────────────────────────────────────────
 document.getElementById('enemy-canvas').addEventListener('click',function(){
-  if(!entityDead) entityAttack(false);
+  entityAttack(false);
 });
 document.getElementById('reform-btn').addEventListener('click',reform);
 
@@ -1158,19 +1136,25 @@ function gameLoop(){
   requestAnimationFrame(gameLoop);
   var now=Date.now();
 
-  if(combatActive&&!entityDead&&!enemyDead){
-    if(now-lastEnemyAttack>=enemySpeed){lastEnemyAttack=now;enemyAttack();}
+  if(combatActive&&!enemyDead){
     if(autoAttackEnabled&&def()&&firstKillDone[def().id]&&now-lastAutoAttack>=autoAttackInterval){
       lastAutoAttack=now;entityAttack(true);
     }
-    if(enemyHpDrainPct>0&&!enemyDead){
+    if(enemyHpDrainPct>0){
       var drainAmt=enemyHpDrainPct*enemyMaxHp*(now-lastDrainTick)/1000;
       lastDrainTick=now;
       enemyHp=Math.max(0,enemyHp-drainAmt);
-      entityHp=Math.min(entityMaxHp,entityHp+drainAmt);
       updateHpBars();
       if(enemyHp<=0) onEnemyDeath();
     } else { lastDrainTick=now; }
+    if(isEliteFight()&&eliteTimerStart>0){
+      var elapsed=now-eliteTimerStart;
+      var pct=Math.max(0,1-elapsed/20000);
+      document.getElementById('elite-timer-bar').style.width=(pct*100)+'%';
+      var secs=Math.ceil((20000-elapsed)/1000);
+      document.getElementById('elite-timer-label').textContent=Math.max(0,secs)+'s';
+      if(pct<=0) onEliteDpsCheckFail();
+    }
   }
 
   drawEntityCanvas(now);
