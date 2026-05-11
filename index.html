@@ -516,7 +516,7 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   if (dead) {
     if (!enemyDeathTime) enemyDeathTime = t;
     deathAge = t - enemyDeathTime;
-    deathFade = Math.max(0, 1 - deathAge / 2000);
+    deathFade = Math.max(0, 1 - deathAge / 550);
     if (deathFade <= 0) return;
   }
 
@@ -537,12 +537,18 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
     scaleY = 1 - Math.sin(hprog * Math.PI) * 0.18;
   }
 
-  // Death pop: brief scale-up burst at the moment of death
+  // Death pop then deflate: brief burst then squish to nothing
   if (dead) {
-    var popT = Math.min(1, deathAge / 150);
-    var popScale = 1 + Math.sin(popT * Math.PI) * 0.18;
-    scaleX = popScale;
-    scaleY = popScale;
+    if (deathAge <= 130) {
+      var popT = deathAge / 130;
+      var popScale = 1 + Math.sin(popT * Math.PI) * 0.2;
+      scaleX = popScale; scaleY = popScale;
+    } else {
+      var defT = Math.min(1, (deathAge - 130) / 370);
+      var defEase = defT * defT;
+      scaleX = 1 + defEase * 0.35;
+      scaleY = Math.max(0, 1 - defEase);
+    }
   }
 
   ctx.save();
@@ -807,6 +813,7 @@ function fmtCoin(n){
 function spawnSoulCoins(){
   var d=def(); if(!d) return;
   var ec=d.color; var r=ec[0],g=ec[1],b=ec[2]; var cs=r+','+g+','+b;
+  var lr=Math.min(r+90,255), lg=Math.min(g+90,255), lb=Math.min(b+90,255);
   var ecv=document.getElementById('enemy-canvas');
   var scEl=document.getElementById('soul-count');
   if(!ecv||!scEl) return;
@@ -814,45 +821,56 @@ function spawnSoulCoins(){
   var sx=er.left+er.width*0.5, sy=er.top+er.height*0.5;
   var ex=sr.left+sr.width*0.5, ey=sr.top+sr.height*0.5;
   var count=3;
-  var base=Math.floor(enemySoulReward/count), rem=enemySoulReward%count;
-  var vals=[];
-  for(var v=0;v<count;v++) vals.push(base+(v<rem?1:0));
+  var POP_DUR=280, PAUSE_DUR=750, FLY_DUR=420;
   for(var i=0;i<count;i++){
     (function(idx){
-      var ox=(Math.random()-0.5)*70, oy=(Math.random()-0.5)*50;
-      var fx=sx+ox, fy=sy+oy;
+      var angle=(idx/count)*Math.PI*2+(Math.random()-0.5)*0.8;
+      var dist=45+Math.random()*35;
+      var pauseX=sx+Math.cos(angle)*dist, pauseY=sy+Math.sin(angle)*dist;
+      var cpx=(pauseX+ex)*0.5+(Math.random()-0.5)*60;
+      var cpy=(pauseY+ey)*0.5-55;
       var coin=document.createElement('div');
-      coin.style.cssText='position:fixed;width:38px;height:38px;border-radius:50%;'
-        +'background:rgba('+cs+',0.18);border:2px solid rgba('+cs+',0.9);'
-        +'box-shadow:0 0 8px rgba('+cs+',0.9),0 0 18px rgba('+cs+',0.45);'
-        +'pointer-events:none;z-index:9999;left:'+fx+'px;top:'+fy+'px;'
-        +'transform:translate(-50%,-50%);opacity:0;'
-        +'display:flex;align-items:center;justify-content:center;';
-      var lbl=document.createElement('span');
-      lbl.textContent=fmtCoin(vals[idx]);
-      lbl.style.cssText='font-size:9px;font-family:Georgia,serif;font-weight:bold;letter-spacing:0;'
-        +'color:rgba('+Math.min(r+80,255)+','+Math.min(g+80,255)+','+Math.min(b+80,255)+',1);'
-        +'text-shadow:0 0 4px rgba('+cs+',0.8);line-height:1;pointer-events:none;';
-      coin.appendChild(lbl);
+      coin.style.cssText='position:fixed;width:34px;height:34px;border-radius:50%;'
+        +'background:radial-gradient(circle at 35% 30%,rgba('+lr+','+lg+','+lb+',0.55),rgba('+cs+',0.12));'
+        +'border:2px solid rgba('+lr+','+lg+','+lb+',0.95);'
+        +'box-shadow:0 0 10px rgba('+cs+',1),0 0 22px rgba('+cs+',0.85),0 0 42px rgba('+cs+',0.5),inset 0 0 10px rgba(255,255,255,0.25);'
+        +'pointer-events:none;z-index:9999;left:'+sx+'px;top:'+sy+'px;'
+        +'transform:translate(-50%,-50%) scale(0);opacity:0;';
       document.body.appendChild(coin);
-      var delay=idx*80+Math.random()*30;
-      var dur=500+Math.random()*150;
+      var startDelay=idx*90;
       setTimeout(function(){
-        coin.style.opacity='1';
         var t0=Date.now();
-        var cpx=(fx+ex)*0.5+(Math.random()-0.5)*100;
-        var cpy=(fy+ey)*0.5-60;
         function tick(){
-          var t=Math.min(1,(Date.now()-t0)/dur);
-          var e=t<0.5?2*t*t:-1+(4-2*t)*t;
-          var mt=1-e;
-          var cx2=mt*mt*fx+2*mt*e*cpx+e*e*ex;
-          var cy2=mt*mt*fy+2*mt*e*cpy+e*e*ey;
-          var sc=t>0.75?Math.max(0.05,1-(t-0.75)*4):1;
-          coin.style.left=cx2+'px'; coin.style.top=cy2+'px';
-          coin.style.transform='translate(-50%,-50%) scale('+sc+')';
-          if(t<1){ requestAnimationFrame(tick); }
-          else{
+          var elapsed=Date.now()-t0;
+          if(elapsed<POP_DUR){
+            var tp=elapsed/POP_DUR;
+            var ep=tp<0.5?2*tp*tp:-1+(4-2*tp)*tp;
+            var sc=0.1+ep*1.15;
+            var px=sx+(pauseX-sx)*ep, py=sy+(pauseY-sy)*ep;
+            coin.style.left=px+'px'; coin.style.top=py+'px';
+            coin.style.transform='translate(-50%,-50%) scale('+sc+')';
+            coin.style.opacity=''+(0.3+ep*0.7);
+            requestAnimationFrame(tick);
+          } else if(elapsed<POP_DUR+PAUSE_DUR){
+            var tp2=(elapsed-POP_DUR)/PAUSE_DUR;
+            var bob=Math.sin(tp2*Math.PI*2.5)*3;
+            var glowPulse=1+Math.sin(tp2*Math.PI*4)*0.06;
+            coin.style.left=pauseX+'px'; coin.style.top=(pauseY+bob)+'px';
+            coin.style.transform='translate(-50%,-50%) scale('+glowPulse+')';
+            coin.style.opacity='1';
+            requestAnimationFrame(tick);
+          } else if(elapsed<POP_DUR+PAUSE_DUR+FLY_DUR){
+            var tf=(elapsed-POP_DUR-PAUSE_DUR)/FLY_DUR;
+            var ef=tf<0.5?2*tf*tf:-1+(4-2*tf)*tf;
+            var mt=1-ef;
+            var cx2=mt*mt*pauseX+2*mt*ef*cpx+ef*ef*ex;
+            var cy2=mt*mt*pauseY+2*mt*ef*cpy+ef*ef*ey;
+            var sc2=ef>0.7?Math.max(0.02,1-(ef-0.7)/0.3):1;
+            coin.style.left=cx2+'px'; coin.style.top=cy2+'px';
+            coin.style.transform='translate(-50%,-50%) scale('+sc2+')';
+            coin.style.opacity=''+(1-ef*0.6);
+            requestAnimationFrame(tick);
+          } else {
             if(coin.parentNode) coin.parentNode.removeChild(coin);
             if(idx===count-1){
               var scount=document.getElementById('soul-count');
@@ -862,7 +880,7 @@ function spawnSoulCoins(){
           }
         }
         requestAnimationFrame(tick);
-      },delay);
+      }, startDelay);
     })(i);
   }
 }
@@ -1113,10 +1131,10 @@ function onEnemyDeath(){
           addLore('All floors cleared. Click the elite chamber to face it...');
         }
       }
-      setTimeout(spawnEnemy,600);
+      setTimeout(spawnEnemy,720);
     } else {
       // Same floor, next enemy
-      setTimeout(spawnEnemy,600);
+      setTimeout(spawnEnemy,720);
     }
   }
 
