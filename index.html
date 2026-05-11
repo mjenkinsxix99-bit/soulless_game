@@ -799,6 +799,11 @@ function floatPos(id){
   var f=document.getElementById('float-layer').getBoundingClientRect();
   return{x:c.left-f.left+c.width/2-10, y:c.top-f.top+40};
 }
+function fmtCoin(n){
+  if(n>=1000000) return Math.round(n/100000)/10+'M';
+  if(n>=1000) return Math.round(n/100)/10+'k';
+  return ''+n;
+}
 function spawnSoulCoins(){
   var d=def(); if(!d) return;
   var ec=d.color; var r=ec[0],g=ec[1],b=ec[2]; var cs=r+','+g+','+b;
@@ -808,26 +813,35 @@ function spawnSoulCoins(){
   var er=ecv.getBoundingClientRect(); var sr=scEl.getBoundingClientRect();
   var sx=er.left+er.width*0.5, sy=er.top+er.height*0.5;
   var ex=sr.left+sr.width*0.5, ey=sr.top+sr.height*0.5;
-  var count=7;
+  var count=3;
+  var base=Math.floor(enemySoulReward/count), rem=enemySoulReward%count;
+  var vals=[];
+  for(var v=0;v<count;v++) vals.push(base+(v<rem?1:0));
   for(var i=0;i<count;i++){
     (function(idx){
-      var ox=(Math.random()-0.5)*60, oy=(Math.random()-0.5)*60;
+      var ox=(Math.random()-0.5)*70, oy=(Math.random()-0.5)*50;
       var fx=sx+ox, fy=sy+oy;
-      var sz=7+Math.random()*5;
       var coin=document.createElement('div');
-      coin.style.cssText='position:fixed;width:'+sz+'px;height:'+sz+'px;border-radius:50%;'
-        +'background:rgba('+cs+',0.9);'
-        +'box-shadow:0 0 6px rgba('+cs+',0.9),0 0 14px rgba('+cs+',0.5);'
+      coin.style.cssText='position:fixed;width:38px;height:38px;border-radius:50%;'
+        +'background:rgba('+cs+',0.18);border:2px solid rgba('+cs+',0.9);'
+        +'box-shadow:0 0 8px rgba('+cs+',0.9),0 0 18px rgba('+cs+',0.45);'
         +'pointer-events:none;z-index:9999;left:'+fx+'px;top:'+fy+'px;'
-        +'transform:translate(-50%,-50%);opacity:0;';
+        +'transform:translate(-50%,-50%);opacity:0;'
+        +'display:flex;align-items:center;justify-content:center;';
+      var lbl=document.createElement('span');
+      lbl.textContent=fmtCoin(vals[idx]);
+      lbl.style.cssText='font-size:9px;font-family:Georgia,serif;font-weight:bold;letter-spacing:0;'
+        +'color:rgba('+Math.min(r+80,255)+','+Math.min(g+80,255)+','+Math.min(b+80,255)+',1);'
+        +'text-shadow:0 0 4px rgba('+cs+',0.8);line-height:1;pointer-events:none;';
+      coin.appendChild(lbl);
       document.body.appendChild(coin);
-      var delay=idx*55+Math.random()*30;
-      var dur=460+Math.random()*180;
+      var delay=idx*80+Math.random()*30;
+      var dur=500+Math.random()*150;
       setTimeout(function(){
         coin.style.opacity='1';
         var t0=Date.now();
-        var cpx=(fx+ex)*0.5+(Math.random()-0.5)*90;
-        var cpy=(fy+ey)*0.5-50;
+        var cpx=(fx+ex)*0.5+(Math.random()-0.5)*100;
+        var cpy=(fy+ey)*0.5-60;
         function tick(){
           var t=Math.min(1,(Date.now()-t0)/dur);
           var e=t<0.5?2*t*t:-1+(4-2*t)*t;
