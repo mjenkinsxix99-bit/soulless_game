@@ -272,6 +272,7 @@ wispImg.onload = function(){ wispImgLoaded = true; };
 
 // ── ENTITY IMAGE RENDERER ─────────────────────────────────────────────────────
 var entityDeathTime = 0;
+var enemyDeathTime  = 0;
 var attackFlashTime = 0;
 var hitFlashTime    = 0;
 
@@ -490,6 +491,48 @@ function drawMist(canvas, col, dead, sizeBoost) {
     ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI*2); ctx.fill();
   });
 }
+
+// ── ENEMY SPRITE RENDERER ─────────────────────────────────────────────────────
+function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  if (!imgLoaded) return;
+
+  var deathFade = 1;
+  if (dead) {
+    if (!enemyDeathTime) enemyDeathTime = t;
+    deathFade = Math.max(0, 1 - (t - enemyDeathTime) / 2000);
+    if (deathFade <= 0) return;
+  }
+
+  var iw = img.naturalWidth, ih = img.naturalHeight;
+  var drawH = Math.min(H * 0.9, H - 10);
+  var drawW = drawH * (iw / ih);
+  var dx = (W - drawW) / 2;
+  var float = Math.sin(t * (floatSpeed || 0.0013)) * 6;
+  var dy = (H - drawH) / 2 + float;
+
+  ctx.save();
+  ctx.globalAlpha = deathFade;
+  if (elite) {
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 22;
+  }
+  ctx.drawImage(img, dx, dy, drawW, drawH);
+  ctx.restore();
+}
+
+function drawWispSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,wispImg,wispImgLoaded,0.0018); }
+function drawShadeSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,shadeImg,shadeImgLoaded,0.0013); }
+function drawSpecterSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,specterImg,specterImgLoaded,0.0015); }
+function drawHauntSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,hauntImg,hauntImgLoaded,0.0011); }
+function drawWraithSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,wraithImg,wraithImgLoaded,0.0016); }
+function drawShiverSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,shiverImg,shiverImgLoaded,0.0009); }
+function drawGhoulSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,ghoulImg,ghoulImgLoaded,0.0010); }
+function drawPhlegmSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,phlegmImg,phlegmImgLoaded,0.0007); }
+function drawBansheeSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,bansheeImg,bansheeImgLoaded,0.0014); }
+function drawDemonSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,demonImg,demonImgLoaded,0.0008); }
 
 // ── ENEMY TYPES ───────────────────────────────────────────────────────────────
 var ENEMY_TYPES = [
@@ -811,7 +854,7 @@ function spawnEnemy(){
   enemySpeed   = elite ? Math.max(800, Math.round(2000-(absFloor(lv,10))*11)) : floorSpeed(lv,fl);
 
   lastEnemyAttack=Date.now()+1200;
-  enemyDead=false; combatActive=true;
+  enemyDead=false; enemyDeathTime=0; combatActive=true;
 
   document.getElementById('crown').style.display=elite?'block':'none';
   document.getElementById('enemy-hp-bar').className='hp-fill enemy-hp'+(elite?' elite':'');
