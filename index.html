@@ -1194,6 +1194,22 @@ var REP_UPGRADES=[
     desc:function(){return '+900 damage per second';},
     apply:function(){totalDps+=900;},
     vis:function(){return REP_UPGRADES[4].level>=1;}},
+  {id:'fm',name:'Feeding Mask',  cost:100000, costScale:1.06, level:0,
+    desc:function(){return '+3,500 damage per second';},
+    apply:function(){totalDps+=3500;},
+    vis:function(){return REP_UPGRADES[5].level>=1;}},
+  {id:'bb',name:'Bitter Bite',   cost:400000, costScale:1.07, level:0,
+    desc:function(){return '+10,500 damage per second';},
+    apply:function(){totalDps+=10500;},
+    vis:function(){return REP_UPGRADES[6].level>=1;}},
+  {id:'as',name:'Angelic Seduction', cost:2500000, costScale:1.06, level:0,
+    desc:function(){return '+47,500 damage per second';},
+    apply:function(){totalDps+=47500;},
+    vis:function(){return REP_UPGRADES[7].level>=1;}},
+  {id:'ee',name:'Elemental Ecstasy', cost:10000000, costScale:1.07, level:0,
+    desc:function(){return '+225,000 damage per second';},
+    apply:function(){totalDps+=225000;},
+    vis:function(){return REP_UPGRADES[8].level>=1;}},
 ];
 
 function buildUpgrades(){
