@@ -290,9 +290,10 @@ var wispImgLoaded = false;
 wispImg.onload = function(){ wispImgLoaded = true; };
 
 // ── ENTITY IMAGE RENDERER ─────────────────────────────────────────────────────
-var enemyDeathTime  = 0;
-var attackFlashTime = 0;
-var hitFlashTime    = 0;
+var enemyDeathTime    = 0;
+var enemyHitFlashTime = 0;
+var attackFlashTime   = 0;
+var hitFlashTime      = 0;
 
 // Sparkle pool
 var entitySparkles = [];
@@ -508,10 +509,11 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   ctx.clearRect(0, 0, W, H);
   if (!imgLoaded) return;
 
-  var deathFade = 1;
+  var deathFade = 1, deathAge = 0;
   if (dead) {
     if (!enemyDeathTime) enemyDeathTime = t;
-    deathFade = Math.max(0, 1 - (t - enemyDeathTime) / 2000);
+    deathAge = t - enemyDeathTime;
+    deathFade = Math.max(0, 1 - deathAge / 2000);
     if (deathFade <= 0) return;
   }
 
@@ -519,16 +521,72 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   var drawH = Math.min(H * 0.9, H - 10);
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
-  var float = Math.sin(t * (floatSpeed || 0.0013)) * 6;
+  var float = dead ? 0 : Math.sin(t * (floatSpeed || 0.0013)) * 6;
   var dy = (H - drawH) / 2 + float;
+  var cx = W / 2, cy = dy + drawH / 2;
+
+  // Hit squish: stretch wide, squish tall
+  var scaleX = 1, scaleY = 1;
+  var hitAge = t - enemyHitFlashTime;
+  if (!dead && hitAge < 300) {
+    var hprog = hitAge / 300;
+    scaleX = 1 + Math.sin(hprog * Math.PI) * 0.14;
+    scaleY = 1 - Math.sin(hprog * Math.PI) * 0.18;
+  }
+
+  // Death deflate: squish vertically to flat over 2 seconds, spread horizontally
+  if (dead) {
+    var dp = Math.min(1, deathAge / 2000);
+    scaleY = Math.max(0.04, 1 - dp * 0.96);
+    scaleX = 1 + dp * 0.45;
+  }
 
   ctx.save();
   ctx.globalAlpha = deathFade;
+  ctx.translate(cx, cy);
+  ctx.scale(scaleX, scaleY);
+  ctx.translate(-cx, -cy);
+
+  // White flash on hit
+  if (!dead && hitAge < 220) {
+    var hf = 1 - hitAge / 220;
+    ctx.filter = 'brightness(' + (1 + hf * 5) + ') saturate(' + (1 - hf * 0.8) + ')';
+  }
   if (elite) {
     ctx.shadowColor = '#ffd700';
     ctx.shadowBlur = 22;
   }
   ctx.drawImage(img, dx, dy, drawW, drawH);
+  ctx.filter = 'none';
+  ctx.shadowBlur = 0;
+
+  // Sad face on death
+  if (dead) {
+    var faceAlpha = Math.min(1, deathAge / 350) * deathFade;
+    var faceSize = drawW * 0.5;
+    var fx = dx + drawW / 2;
+    var fy = dy + drawH * 0.36;
+    var eyeR = faceSize * 0.09;
+    var eyeOffX = faceSize * 0.23;
+
+    ctx.save();
+    ctx.globalAlpha = faceAlpha;
+    ctx.fillStyle = 'rgba(15,15,15,0.88)';
+    // Left eye
+    ctx.beginPath(); ctx.arc(fx - eyeOffX, fy, eyeR, 0, Math.PI * 2); ctx.fill();
+    // Right eye
+    ctx.beginPath(); ctx.arc(fx + eyeOffX, fy, eyeR, 0, Math.PI * 2); ctx.fill();
+    // Frown — control point below endpoints makes the curve bow down
+    ctx.beginPath();
+    ctx.moveTo(fx - faceSize * 0.24, fy + faceSize * 0.26);
+    ctx.quadraticCurveTo(fx, fy + faceSize * 0.44, fx + faceSize * 0.24, fy + faceSize * 0.26);
+    ctx.strokeStyle = 'rgba(15,15,15,0.88)';
+    ctx.lineWidth = faceSize * 0.06;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.restore();
+  }
+
   ctx.restore();
 }
 
@@ -820,7 +878,11 @@ function spawnEnemy(){
     // elite is always the boss of this level (type index = level-1)
     currentEnemyTypeIdx = lv-1;
   } else {
-    currentEnemyTypeIdx = enemyPool[Math.floor(Math.random()*enemyPool.length)];
+    // All regular types (0-8) spawn on any floor; Demon (9) only on level 10
+    var regularPool = [];
+    for (var rpi = 0; rpi < ENEMY_TYPES.length - 1; rpi++) regularPool.push(rpi);
+    if (lv >= 10) regularPool.push(9);
+    currentEnemyTypeIdx = regularPool[Math.floor(Math.random() * regularPool.length)];
   }
 
   var hp = elite ? eliteHp(lv) : floorHp(lv,fl);
@@ -900,6 +962,7 @@ function entityAttack(isAuto){
   var bonus=isAuto?Math.floor(totalDps*autoAttackInterval/1000):clickDmgBonus;
   var dmg=rnd(entityDmgMin+entityDmgBonus+bonus, entityDmgMax+entityDmgBonus+bonus);
   enemyHp=Math.max(0,enemyHp-dmg);
+  enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
   spawnFloat('-'+fmtHp(dmg),'edamage',pp.x,pp.y);
   updateHpBars();
