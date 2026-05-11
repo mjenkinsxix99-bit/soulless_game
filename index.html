@@ -62,6 +62,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .dmg-float.edamage { color: #9980dd; }
 .dmg-float.ndamage { color: #cc5555; }
 @keyframes floatup { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-55px)} }
+@keyframes soul-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
+.soul-pulse { display:inline-block; animation: soul-pulse 0.35s ease-out; }
 #reform-msg { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.78); align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
 #reform-msg.show { display: flex; }
 .rm-title { font-size: 27px; color: #9070e0; letter-spacing: 3px; }
@@ -562,24 +564,28 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   ctx.filter = 'none';
   ctx.shadowBlur = 0;
 
-  // Particle disintegration on death
+  // Bubble pop on death — small circles in enemy colour
   if (dead) {
     if (deathParticlesKey !== enemyDeathTime) {
       deathParticlesKey = enemyDeathTime;
       deathParticles = [];
-      var pColors = ['rgba(200,230,255,0.9)','rgba(180,215,255,0.85)','rgba(220,240,255,0.9)','rgba(160,200,240,0.8)','rgba(255,255,255,0.92)','rgba(190,210,250,0.88)'];
-      for (var pi = 0; pi < 24; pi++) {
-        var pa = (pi / 24) * Math.PI * 2 + (Math.random() - 0.5) * 0.7;
-        var ps = 55 + Math.random() * 155;
+      var ec = def() ? def().color : [200,220,255];
+      var er=ec[0], eg=ec[1], eb=ec[2];
+      var pColors = [
+        'rgba('+er+','+eg+','+eb+',0.85)',
+        'rgba('+Math.min(er+60,255)+','+Math.min(eg+60,255)+','+Math.min(eb+60,255)+',0.9)',
+        'rgba('+Math.round(er*0.55+115)+','+Math.round(eg*0.55+115)+','+Math.round(eb*0.55+115)+',0.88)',
+        'rgba(255,255,255,0.8)'
+      ];
+      for (var pi = 0; pi < 22; pi++) {
+        var pa = (pi / 22) * Math.PI * 2 + (Math.random() - 0.5) * 0.7;
+        var ps = 60 + Math.random() * 140;
         deathParticles.push({
-          x0: cx + (Math.random() - 0.5) * drawW * 0.6,
-          y0: cy + (Math.random() - 0.5) * drawH * 0.6,
+          x0: cx + (Math.random() - 0.5) * drawW * 0.5,
+          y0: cy + (Math.random() - 0.5) * drawH * 0.5,
           vx: Math.cos(pa) * ps,
-          vy: Math.sin(pa) * ps - 45,
-          pw: drawW * (0.04 + Math.random() * 0.09),
-          ph: drawH * (0.025 + Math.random() * 0.055),
-          rot0: Math.random() * Math.PI * 2,
-          rotV: (Math.random() - 0.5) * 7,
+          vy: Math.sin(pa) * ps - 40,
+          r: 3 + Math.random() * 4.5,
           col: pColors[Math.floor(Math.random() * pColors.length)]
         });
       }
@@ -589,13 +595,17 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
       var p = deathParticles[pi];
       var ppx = p.x0 + p.vx * pdt;
       var ppy = p.y0 + p.vy * pdt + 0.5 * 190 * pdt * pdt;
-      var ppr = p.rot0 + p.rotV * pdt;
       ctx.save();
-      ctx.globalAlpha = deathFade * 0.88;
-      ctx.translate(ppx, ppy);
-      ctx.rotate(ppr);
+      ctx.globalAlpha = deathFade * 0.9;
+      ctx.beginPath();
+      ctx.arc(ppx, ppy, p.r, 0, Math.PI * 2);
       ctx.fillStyle = p.col;
-      ctx.fillRect(-p.pw / 2, -p.ph / 2, p.pw, p.ph);
+      ctx.fill();
+      // bubble highlight
+      ctx.beginPath();
+      ctx.arc(ppx - p.r * 0.3, ppy - p.r * 0.35, p.r * 0.38, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.fill();
       ctx.restore();
     }
   }
@@ -788,6 +798,73 @@ function floatPos(id){
   var c=document.getElementById(id).getBoundingClientRect();
   var f=document.getElementById('float-layer').getBoundingClientRect();
   return{x:c.left-f.left+c.width/2-10, y:c.top-f.top+40};
+}
+function fmtCoin(n){
+  if(n>=1000000) return Math.round(n/100000)/10+'M';
+  if(n>=1000) return Math.round(n/100)/10+'k';
+  return ''+n;
+}
+function spawnSoulCoins(){
+  var d=def(); if(!d) return;
+  var ec=d.color; var r=ec[0],g=ec[1],b=ec[2]; var cs=r+','+g+','+b;
+  var ecv=document.getElementById('enemy-canvas');
+  var scEl=document.getElementById('soul-count');
+  if(!ecv||!scEl) return;
+  var er=ecv.getBoundingClientRect(); var sr=scEl.getBoundingClientRect();
+  var sx=er.left+er.width*0.5, sy=er.top+er.height*0.5;
+  var ex=sr.left+sr.width*0.5, ey=sr.top+sr.height*0.5;
+  var count=3;
+  var base=Math.floor(enemySoulReward/count), rem=enemySoulReward%count;
+  var vals=[];
+  for(var v=0;v<count;v++) vals.push(base+(v<rem?1:0));
+  for(var i=0;i<count;i++){
+    (function(idx){
+      var ox=(Math.random()-0.5)*70, oy=(Math.random()-0.5)*50;
+      var fx=sx+ox, fy=sy+oy;
+      var coin=document.createElement('div');
+      coin.style.cssText='position:fixed;width:38px;height:38px;border-radius:50%;'
+        +'background:rgba('+cs+',0.18);border:2px solid rgba('+cs+',0.9);'
+        +'box-shadow:0 0 8px rgba('+cs+',0.9),0 0 18px rgba('+cs+',0.45);'
+        +'pointer-events:none;z-index:9999;left:'+fx+'px;top:'+fy+'px;'
+        +'transform:translate(-50%,-50%);opacity:0;'
+        +'display:flex;align-items:center;justify-content:center;';
+      var lbl=document.createElement('span');
+      lbl.textContent=fmtCoin(vals[idx]);
+      lbl.style.cssText='font-size:9px;font-family:Georgia,serif;font-weight:bold;letter-spacing:0;'
+        +'color:rgba('+Math.min(r+80,255)+','+Math.min(g+80,255)+','+Math.min(b+80,255)+',1);'
+        +'text-shadow:0 0 4px rgba('+cs+',0.8);line-height:1;pointer-events:none;';
+      coin.appendChild(lbl);
+      document.body.appendChild(coin);
+      var delay=idx*80+Math.random()*30;
+      var dur=500+Math.random()*150;
+      setTimeout(function(){
+        coin.style.opacity='1';
+        var t0=Date.now();
+        var cpx=(fx+ex)*0.5+(Math.random()-0.5)*100;
+        var cpy=(fy+ey)*0.5-60;
+        function tick(){
+          var t=Math.min(1,(Date.now()-t0)/dur);
+          var e=t<0.5?2*t*t:-1+(4-2*t)*t;
+          var mt=1-e;
+          var cx2=mt*mt*fx+2*mt*e*cpx+e*e*ex;
+          var cy2=mt*mt*fy+2*mt*e*cpy+e*e*ey;
+          var sc=t>0.75?Math.max(0.05,1-(t-0.75)*4):1;
+          coin.style.left=cx2+'px'; coin.style.top=cy2+'px';
+          coin.style.transform='translate(-50%,-50%) scale('+sc+')';
+          if(t<1){ requestAnimationFrame(tick); }
+          else{
+            if(coin.parentNode) coin.parentNode.removeChild(coin);
+            if(idx===count-1){
+              var scount=document.getElementById('soul-count');
+              scount.classList.add('soul-pulse');
+              setTimeout(function(){ scount.classList.remove('soul-pulse'); },380);
+            }
+          }
+        }
+        requestAnimationFrame(tick);
+      },delay);
+    })(i);
+  }
 }
 function def(){ return ENEMY_TYPES[currentEnemyTypeIdx]; }
 function isEliteFight(){ return curFloor===11; }
@@ -985,6 +1062,7 @@ function entityAttack(isAuto){
 
 function onEnemyDeath(){
   combatActive=false; enemyDead=true; eliteTimerStart=0;
+  spawnSoulCoins();
   document.getElementById('elite-timer-wrap').style.display='none';
   souls+=enemySoulReward; totalSouls+=enemySoulReward;
   document.getElementById('soul-count').textContent=fmt(souls);
