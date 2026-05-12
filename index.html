@@ -559,7 +559,7 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   }
 
   var iw = img.naturalWidth, ih = img.naturalHeight;
-  var drawH = Math.min(H * 0.9, H - 10);
+  var drawH = elite ? Math.min(H * 0.96, H - 4) : Math.min(H * 0.78, H - 10);
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
   var float = dead ? 0 : Math.sin(t * (floatSpeed || 0.0013)) * 6;
@@ -595,14 +595,42 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   ctx.scale(scaleX, scaleY);
   ctx.translate(-cx, -cy);
 
+  // Golden halo for elites — drawn before sprite so it sits behind/above
+  if (elite && !dead) {
+    var haloPulse = Math.sin(t * 0.003) * 0.5 + 0.5;
+    var haloRx = drawW * 0.44;
+    var haloRy = haloRx * 0.26;
+    var haloYpos = dy + drawH * 0.06; // top of character area
+    ctx.save();
+    ctx.globalAlpha = (0.75 + haloPulse * 0.25) * deathFade;
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 5 + haloPulse * 3;
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 20 + haloPulse * 18;
+    ctx.beginPath();
+    ctx.ellipse(W / 2, haloYpos, haloRx, haloRy, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    // inner bright ring
+    ctx.globalAlpha = (0.35 + haloPulse * 0.2) * deathFade;
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.ellipse(W / 2, haloYpos, haloRx * 0.78, haloRy * 0.78, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // White flash on hit
   if (!dead && hitAge < 220) {
     var hf = 1 - hitAge / 220;
     ctx.filter = 'brightness(' + (1 + hf * 5) + ') saturate(' + (1 - hf * 0.8) + ')';
+  } else if (elite && !dead) {
+    // Gold tint for elites
+    ctx.filter = 'sepia(0.55) saturate(3.5) hue-rotate(8deg) brightness(1.2)';
   }
   if (elite) {
     ctx.shadowColor = '#ffd700';
-    ctx.shadowBlur = 22;
+    ctx.shadowBlur = 28 + Math.sin(t * 0.003) * 8;
   }
   ctx.drawImage(img, dx, dy, drawW, drawH);
   ctx.filter = 'none';
