@@ -747,43 +747,43 @@ function drawDemonSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,demonImg,demonImgL
 
 // ── ENEMY TYPES ───────────────────────────────────────────────────────────────
 var ENEMY_TYPES = [
-  { id:'wisp',    name:'Lost Wisp',       subtitle:'a wandering soul',
+  { id:'wisp',    name:'Lost Wisp',       simpleName:'Wisp',    subtitle:'a wandering soul',
     hp:30,  dmgMin:3,  dmgMax:5,  speed:2000, souls:5,
     eliteHp:140, eliteDmgMin:10, eliteDmgMax:16, eliteSouls:30,
     color:[200,255,200] },
-  { id:'shade',   name:'Hollow Shade',    subtitle:'a husk of what once was',
+  { id:'shade',   name:'Hollow Shade',    simpleName:'Shade',   subtitle:'a husk of what once was',
     hp:120, dmgMin:12, dmgMax:18, speed:2200, souls:20,
     eliteHp:500, eliteDmgMin:35, eliteDmgMax:55, eliteSouls:120,
     color:[120,120,230] },
-  { id:'specter', name:'Weeping Specter', subtitle:'wept until nothing was left',
+  { id:'specter', name:'Weeping Specter', simpleName:'Specter', subtitle:'wept until nothing was left',
     hp:400, dmgMin:35, dmgMax:55, speed:1800, souls:75,
     eliteHp:1600, eliteDmgMin:100, eliteDmgMax:150, eliteSouls:450,
     color:[220,120,220] },
-  { id:'haunt', name:'Hateful Haunt', subtitle:'fury given no form',
+  { id:'haunt', name:'Hateful Haunt',     simpleName:'Haunt',   subtitle:'fury given no form',
     hp:1200, dmgMin:80, dmgMax:120, speed:1600, souls:250,
     eliteHp:4500, eliteDmgMin:220, eliteDmgMax:320, eliteSouls:1500,
     color:[220,40,40] },
-  { id:'wraith', name:'Wailing Wraith', subtitle:'bound and screaming',
+  { id:'wraith', name:'Wailing Wraith',   simpleName:'Wraith',  subtitle:'bound and screaming',
     hp:3500, dmgMin:180, dmgMax:260, speed:1500, souls:800,
     eliteHp:14000, eliteDmgMin:500, eliteDmgMax:700, eliteSouls:5000,
     color:[180,200,255] },
-  { id:'shiver', name:'Shivering Shade', subtitle:'cold that remembers being alive',
+  { id:'shiver', name:'Shivering Shade',  simpleName:'Shade',   subtitle:'cold that remembers being alive',
     hp:10000, dmgMin:400, dmgMax:600, speed:1400, souls:2500,
     eliteHp:40000, eliteDmgMin:1100, eliteDmgMax:1600, eliteSouls:15000,
     color:[160,200,255] },
-  { id:'ghoul', name:'Glaring Ghoul', subtitle:'hollow hunger, endless reach',
+  { id:'ghoul', name:'Glaring Ghoul',     simpleName:'Ghoul',   subtitle:'hollow hunger, endless reach',
     hp:28000, dmgMin:900, dmgMax:1300, speed:1300, souls:7500,
     eliteHp:110000, eliteDmgMin:2500, eliteDmgMax:3500, eliteSouls:45000,
     color:[120,220,120] },
-  { id:'phlegm', name:'Phlegm Phantom', subtitle:'rot given will',
+  { id:'phlegm', name:'Phlegm Phantom',   simpleName:'Phantom', subtitle:'rot given will',
     hp:80000, dmgMin:2000, dmgMax:3000, speed:1200, souls:22000,
     eliteHp:320000, eliteDmgMin:6000, eliteDmgMax:8500, eliteSouls:130000,
     color:[140,200,80] },
-  { id:'banshee', name:'Bereft Banshee', subtitle:'a scream with no end',
+  { id:'banshee', name:'Bereft Banshee',  simpleName:'Banshee', subtitle:'a scream with no end',
     hp:220000, dmgMin:5000, dmgMax:7500, speed:1100, souls:65000,
     eliteHp:880000, eliteDmgMin:16000, eliteDmgMax:22000, eliteSouls:400000,
     color:[220,230,160] },
-  { id:'demon', name:'Dispatched Demon', subtitle:'sent from somewhere worse',
+  { id:'demon', name:'Dispatched Demon',  simpleName:'Demon',   subtitle:'sent from somewhere worse',
     hp:650000, dmgMin:14000, dmgMax:20000, speed:1000, souls:200000,
     eliteHp:2600000, eliteDmgMin:45000, eliteDmgMax:65000, eliteSouls:1200000,
     color:[220,40,40] },
@@ -1183,7 +1183,7 @@ function updateProgressLabel(){
   var elite=isEliteFight();
   var d=def()||ENEMY_TYPES[curLevel-1];
   if(elite){
-    document.getElementById('prog-label').textContent='Elite '+d.name+' — defeat to advance';
+    document.getElementById('prog-label').textContent=d.name+' — defeat to advance';
     document.getElementById('prog-bar').style.width='100%';
   } else {
     document.getElementById('prog-label').textContent=
@@ -1195,7 +1195,7 @@ function updateProgressLabel(){
 function updateEnemyPanel(){
   var d=def(); if(!d) return;
   var elite=isEliteFight();
-  var en=elite?('Elite '+d.name):d.name;
+  var en=elite?d.name:d.simpleName;
   document.getElementById('enemy-name-label').textContent=en;
   document.getElementById('kp-killed').textContent=floorWins;
   document.getElementById('kp-left').textContent=elite?'—':Math.max(0,WINS_PER_FLOOR-floorWins);
