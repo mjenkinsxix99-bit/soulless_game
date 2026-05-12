@@ -53,7 +53,15 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .canvas-wrap { position: relative; overflow: hidden; }
 #enemy-canvas { display: block; background: transparent; }
 #entity-canvas { cursor: default; display: block; background: transparent; }
-#crown { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); font-size: 36px; display: none; pointer-events: none; filter: drop-shadow(0 0 8px #d4a843); }
+#crown { position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+  width: 100px; height: 28px; border-radius: 50%; display: none; pointer-events: none;
+  border: 4px solid #ffd700;
+  box-shadow: 0 0 14px #ffd700, 0 0 30px rgba(255,215,0,0.7), 0 0 55px rgba(255,215,0,0.35), inset 0 0 10px rgba(255,215,0,0.25);
+  animation: halo-pulse 1.8s ease-in-out infinite; }
+@keyframes halo-pulse {
+  0%,100% { box-shadow: 0 0 14px #ffd700, 0 0 30px rgba(255,215,0,0.7), 0 0 55px rgba(255,215,0,0.35); }
+  50%      { box-shadow: 0 0 22px #ffd700, 0 0 50px rgba(255,215,0,0.9), 0 0 90px rgba(255,215,0,0.5); }
+}
 #vs { font-size: 21px; color: #1e1535; letter-spacing: 2px; font-style: italic; flex-shrink: 0; width: 60px; text-align: center; }
 #click-hint { font-size: 15px; color: #8877aa; letter-spacing: 3px; text-transform: uppercase; }
 #float-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -199,7 +207,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <div class="cname enemy-label" id="enemy-name-label">Lost Wisp</div>
           <div class="canvas-wrap" style="position:relative;">
             <canvas id="enemy-canvas" width="220" height="220"></canvas>
-            <div id="crown">♛</div>
+            <div id="crown"></div>
           </div>
           <div class="hp-wrap">
             <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
