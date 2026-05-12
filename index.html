@@ -148,12 +148,20 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .mm-nav:hover { color:#ffd700; background:rgba(212,168,67,0.18); text-shadow:0 0 14px rgba(255,215,0,0.9); }
 .mm-nav:disabled { color:#2a2030; text-shadow:none; background:transparent; border-color:rgba(60,40,80,0.3); cursor:default; }
 
-/* New-floor bouncing red arrow */
-#mm-new-arrow { display:none; position:absolute; left:50%; transform:translateX(-50%);
-  top:-6px; font-size:22px; color:#ff2222;
+/* Next-available floor cell highlight */
+.mm-cell.next-available { border-color:#ff4444; color:#ff6666;
+  background:rgba(255,40,40,0.1);
+  box-shadow:0 0 10px rgba(255,40,40,0.6),0 0 22px rgba(255,40,40,0.3);
+  animation:pulse-red 1.2s ease-in-out infinite; }
+@keyframes pulse-red { 0%,100%{box-shadow:0 0 8px rgba(255,40,40,0.5);} 50%{box-shadow:0 0 18px rgba(255,40,40,0.9),0 0 34px rgba(255,40,40,0.4);} }
+
+/* New-floor bouncing red arrow — offset right of centre to point at next cell */
+#mm-new-arrow { display:none; position:absolute;
+  left:calc(50% + 54px); transform:translateX(-50%);
+  top:-28px; font-size:28px; color:#ff2222;
   text-shadow:0 0 10px rgba(255,40,40,0.9),0 0 22px rgba(255,40,40,0.5);
-  animation:mm-drop 0.6s ease-in-out infinite alternate; pointer-events:none; z-index:10; }
-@keyframes mm-drop { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(6px)} }
+  animation:mm-drop 0.55s ease-in-out infinite alternate; pointer-events:none; z-index:10; }
+@keyframes mm-drop { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(8px)} }
 
 /* Minimap panel repositioned inside battlefield */
 #minimap-panel { position:relative; flex-shrink:0; padding:6px 14px; background:transparent; margin-top:4px; }
@@ -771,9 +779,8 @@ var ENEMY_TYPES = [
 var FLOORS_PER_LEVEL = 10;
 var LEVELS_PER_REALM = 10;
 var WINS_PER_FLOOR   = 10;
-var minimapViewStart = 0;  // first room index shown in minimap window
-var MINIMAP_VISIBLE  = 7;  // how many cells to show at once
-var minimapNewFloor  = false; // triggers the bouncing red arrow
+var MINIMAP_VISIBLE  = 7;
+var minimapNewFloor  = false;
 
 // Location state
 var curLevel = 1;   // 1-10
@@ -973,33 +980,35 @@ function buildMinimap(){
   var cellsEl=document.getElementById('mm-cells');
   cellsEl.innerHTML='';
 
-  // Build flat linear sequence of all rooms
+  // Flat room list
   var rooms=[];
   for(var lv=1;lv<=LEVELS_PER_REALM;lv++){
-    for(var fl=1;fl<=11;fl++){
-      rooms.push({level:lv,floor:fl,isElite:fl===11});
-    }
+    for(var fl=1;fl<=11;fl++) rooms.push({level:lv,floor:fl,isElite:fl===11});
   }
 
-  // Find current room index
+  // Current room index
   var curIdx=0;
   for(var i=0;i<rooms.length;i++){
     if(rooms[i].level===curLevel&&rooms[i].floor===curFloor){curIdx=i;break;}
   }
 
-  // Keep current room in view — if curIdx is outside the window, re-center
-  if(curIdx < minimapViewStart || curIdx >= minimapViewStart + MINIMAP_VISIBLE){
-    minimapViewStart = Math.max(0, curIdx - Math.floor(MINIMAP_VISIBLE/2));
+  // Previous and next navigable rooms
+  var prevRoom=null, nextRoom=null;
+  for(var i=curIdx-1;i>=0;i--){
+    if(floorUnlocked(rooms[i].level,rooms[i].floor)){prevRoom=rooms[i];break;}
   }
-  // Clamp view
-  var maxStart = Math.max(0, rooms.length - MINIMAP_VISIBLE);
-  minimapViewStart = Math.min(minimapViewStart, maxStart);
+  for(var i=curIdx+1;i<rooms.length;i++){
+    if(floorUnlocked(rooms[i].level,rooms[i].floor)){nextRoom=rooms[i];break;}
+  }
 
-  var start = minimapViewStart;
-  var end   = Math.min(rooms.length-1, start + MINIMAP_VISIBLE - 1);
+  // Current floor pinned to centre (index 3 of 7)
+  var start=Math.max(0,curIdx-3);
+  var end=Math.min(rooms.length-1,start+MINIMAP_VISIBLE-1);
+  // Keep exactly MINIMAP_VISIBLE cells if possible
+  if(end-start<MINIMAP_VISIBLE-1) start=Math.max(0,end-MINIMAP_VISIBLE+1);
 
   cellsEl.style.display='flex';
-  cellsEl.style.gap='5px';
+  cellsEl.style.gap='8px';
   cellsEl.style.alignItems='center';
 
   for(var j=start;j<=end;j++){
@@ -1007,9 +1016,9 @@ function buildMinimap(){
     var done=floorDone(r.level,r.floor);
     var cur=(r.level===curLevel&&r.floor===curFloor);
     var locked=!floorUnlocked(r.level,r.floor);
+    var isNext=(nextRoom&&r.level===nextRoom.level&&r.floor===nextRoom.floor);
 
-    // Level separator
-    if(r.floor===1 && j>start){
+    if(r.floor===1&&j>start){
       var sep=document.createElement('div');
       sep.className='mm-sep';
       cellsEl.appendChild(sep);
@@ -1018,8 +1027,9 @@ function buildMinimap(){
     var cell=document.createElement('div');
     var cls='mm-cell';
     if(r.isElite) cls+=' elite';
-    if(cur)       cls+=' current';
-    else if(done) cls+=' done';
+    if(cur)         cls+=' current';
+    else if(isNext) cls+=' next-available';
+    else if(done)   cls+=' done';
     else if(locked) cls+=' locked';
     cell.className=cls;
     cell.textContent=r.isElite?'★':r.floor;
@@ -1027,31 +1037,24 @@ function buildMinimap(){
 
     if(!locked){
       (function(l,f){
-        cell.addEventListener('click',function(){navigateTo(l,f);});
+        cell.addEventListener('click',function(){
+          minimapNewFloor=false;
+          navigateTo(l,f);
+        });
       })(r.level,r.floor);
     }
     cellsEl.appendChild(cell);
   }
 
-  // Update nav arrow disabled state
+  // Stash nav targets on buttons; disable when nothing to go to
   var prevBtn=document.getElementById('mm-prev');
   var nextBtn=document.getElementById('mm-next');
-  if(prevBtn) prevBtn.disabled=(minimapViewStart===0);
-  if(nextBtn) nextBtn.disabled=(minimapViewStart>=maxStart);
+  if(prevBtn){prevBtn._room=prevRoom; prevBtn.disabled=!prevRoom;}
+  if(nextBtn){nextBtn._room=nextRoom; nextBtn.disabled=!nextRoom;}
 
-  // New-floor indicator
+  // Red arrow: show above minimap pointing to next available floor
   var arrowEl=document.getElementById('mm-new-arrow');
-  if(arrowEl) arrowEl.style.display=minimapNewFloor?'block':'none';
-}
-
-function minimapScroll(delta){
-  var rooms=[];
-  for(var lv=1;lv<=LEVELS_PER_REALM;lv++){
-    for(var fl=1;fl<=11;fl++) rooms.push(1);
-  }
-  var maxStart=Math.max(0,rooms.length-MINIMAP_VISIBLE);
-  minimapViewStart=Math.max(0,Math.min(maxStart,minimapViewStart+delta));
-  buildMinimap();
+  if(arrowEl) arrowEl.style.display=(minimapNewFloor&&nextRoom)?'block':'none';
 }
 
 function navigateTo(level, floor){
@@ -1573,14 +1576,16 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
   });
 });
 
-// Minimap nav arrow buttons
-document.getElementById('mm-prev').addEventListener('click',function(){ minimapScroll(-1); });
-document.getElementById('mm-next').addEventListener('click',function(){ minimapScroll(1); });
-
-// Dismiss new-floor arrow on any minimap click
-document.getElementById('mm-cells').addEventListener('click',function(){
+// Minimap nav arrows: both navigate the entity (not just scroll the view)
+document.getElementById('mm-prev').addEventListener('click',function(){
+  var r=this._room; if(!r) return;
   minimapNewFloor=false;
-  buildMinimap();
+  navigateTo(r.level,r.floor);
+});
+document.getElementById('mm-next').addEventListener('click',function(){
+  var r=this._room; if(!r) return;
+  minimapNewFloor=false;
+  navigateTo(r.level,r.floor);
 });
 
 })();
