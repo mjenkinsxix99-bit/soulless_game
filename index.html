@@ -19,8 +19,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #stage-desc { font-size: 15px; color: #443366; font-style: italic; }
 #main { display: flex; flex: 1; overflow: hidden; }
 #left, #right { width: 300px; flex-shrink: 0; padding: 16px 14px; background: #08080e; overflow-y: auto; }
-#left { width: 320px; }
-#left { border-right: 1px solid #1e1845; }
+#left { width: 370px; border-right: 1px solid #1e1845; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 0; }
 #right { border-left: 1px solid #1e1845; }
 .ph { font-size: 14px; letter-spacing: 3px; color: #332255; text-transform: uppercase; border-bottom: 1px solid #1a1535; padding-bottom: 4px; margin-bottom: 10px; }
 .ph.gap { margin-top: 16px; }
@@ -35,13 +34,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard .ms-btn { margin-top: 7px; padding-top: 6px; border-top: 1px solid #c8b870; font-size: 13px; color: #666666; display: flex; align-items: center; gap: 5px; cursor: default; position: relative; }
 .ucard .ms-btn .ms-icon { color: #8a7030; font-size: 11px; }
 .ucard .ms-btn .ms-tip { margin-left: auto; font-size: 12px; color: #888866; letter-spacing: 1px; }
-#battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; }
+#battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 20px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 16px; }
 #bg-canvas { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0; }
 #combat-oval { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-  width:920px; height:560px; border-radius:50%;
-  background:radial-gradient(ellipse at center, rgba(0,0,0,0.94) 18%, rgba(0,0,0,0.78) 40%, rgba(0,0,0,0.45) 62%, transparent 78%);
-  pointer-events:none; z-index:0; }
-#combat-zone { display: flex; align-items: flex-end; justify-content: center; gap: 0; width: 100%; position:relative; z-index:1; }
+  width:410px; height:410px; border-radius:50%;
+  background:radial-gradient(circle at center, rgba(0,0,0,0.96) 30%, rgba(0,0,0,0.82) 55%, rgba(0,0,0,0.5) 72%, transparent 88%);
+  pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
+#enemy-zone { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:8px; z-index:2; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cname { font-size: 19px; font-weight: bold; letter-spacing: 2px; color: #9988cc; text-transform: uppercase; }
 .cname.entity-label { color: #b8aaee; text-shadow: 0 0 8px rgba(180,160,255,0.5); }
@@ -133,17 +132,19 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #1e1845; border-radius: 2px; }
 
-/* Upgrade list: shows ~6 cards then scrolls */
-#upgrade-list { max-height: 610px; overflow-y: auto; padding-right: 4px; scroll-behavior: smooth; }
+/* Upgrade list scrolls within the right panel */
+#upgrade-list { overflow-y: auto; padding-right: 4px; scroll-behavior: smooth; }
+/* Entity display in left panel */
+#left-entity { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
 
-/* Spirit Slash soul-prompt arrow — right of the card, pointing left */
+/* Spirit Slash soul-prompt arrow — left of the card, pointing right */
 .ss-card-wrap { position:relative; display:flex; align-items:center; }
 .ss-card-wrap .ucard { flex:1; }
-.ss-prompt { display:none; font-size:52px; color:#d4a843; margin-left:10px; line-height:1;
+.ss-prompt { display:none; font-size:52px; color:#d4a843; margin-right:10px; line-height:1;
   text-shadow:0 0 14px rgba(212,168,67,1),0 0 30px rgba(212,168,67,0.6);
   animation:ss-bounce-h 0.55s ease-in-out infinite alternate; pointer-events:none; flex-shrink:0; }
 .ss-prompt.show { display:block; }
-@keyframes ss-bounce-h { 0%{transform:translateX(8px)} 100%{transform:translateX(-4px)} }
+@keyframes ss-bounce-h { 0%{transform:translateX(-8px)} 100%{transform:translateX(4px)} }
 
 /* Minimap nav arrows */
 .mm-nav { background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.35);
@@ -189,49 +190,33 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
   <div id="main">
     <div id="left">
-      <div class="tab-bar">
-        <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
-        <button class="tab-btn" data-tab="stats">Stats</button>
-      </div>
-      <div id="tab-upgrades" class="tab-pane active">
-        <div id="upgrade-list"></div>
-      </div>
-      <div id="tab-stats" class="tab-pane">
-        <div class="ph">Entity Stats</div>
-        <div class="stat-row"><span>Damage</span><span class="sv" id="es-dmg">8–12</span></div>
-        <div class="stat-row"><span>Auto attack</span><span class="sv" id="es-auto">—</span></div>
-        <div class="stat-row"><span>Enemy drain</span><span class="sv" id="es-vamp">—</span></div>
+      <div id="left-entity">
+        <div class="cname entity-label">The Entity</div>
+        <div class="canvas-wrap">
+          <canvas id="entity-canvas" width="330" height="330"></canvas>
+        </div>
+        <div class="hp-wrap" style="visibility:hidden">
+          <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
+          <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
+        </div>
       </div>
     </div>
     <div id="battlefield">
       <canvas id="bg-canvas"></canvas>
-      <div id="combat-zone">
-        <div id="combat-oval"></div>
-        <div class="combatant">
-          <div class="cname entity-label">The Entity</div>
-          <div class="canvas-wrap">
-            <canvas id="entity-canvas" width="330" height="330"></canvas>
-          </div>
-          <div class="hp-wrap" style="visibility:hidden">
-            <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
-            <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
-          </div>
+      <div id="combat-oval"></div>
+      <div id="enemy-zone">
+        <div class="cname enemy-label" id="enemy-name-label">Lost Wisp</div>
+        <div class="canvas-wrap" style="position:relative;">
+          <canvas id="enemy-canvas" width="330" height="330"></canvas>
+          <div id="crown"></div>
         </div>
-        <div id="vs">vs</div>
-        <div class="combatant">
-          <div class="cname enemy-label" id="enemy-name-label">Lost Wisp</div>
-          <div class="canvas-wrap" style="position:relative;">
-            <canvas id="enemy-canvas" width="330" height="330"></canvas>
-            <div id="crown"></div>
-          </div>
-          <div class="hp-wrap">
-            <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
-            <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
-          </div>
-          <div class="hp-wrap" id="elite-timer-wrap" style="display:none;margin-top:4px;">
-            <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
-            <div class="hp-numbers"><span id="elite-timer-label" style="color:#33aa33;font-size:13px;">20s</span><span style="color:#33aa33;font-size:13px;">DPS check</span></div>
-          </div>
+        <div class="hp-wrap">
+          <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
+          <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
+        </div>
+        <div class="hp-wrap" id="elite-timer-wrap" style="display:none;margin-top:4px;">
+          <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
+          <div class="hp-numbers"><span id="elite-timer-label" style="color:#33aa33;font-size:13px;">20s</span><span style="color:#33aa33;font-size:13px;">DPS check</span></div>
         </div>
       </div>
       <div id="click-hint">click the enemy to attack</div>
@@ -257,19 +242,27 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div id="float-layer"></div>
     </div>
     <div id="right">
-      <div class="ph">Current Foe</div>
-      <div id="enemy-title" style="font-size: 20px;color:#88aa88;margin-bottom:3px;letter-spacing:1px;">Lost Wisp</div>
-      <div id="enemy-subtitle" style="font-size: 15px;color:#336633;font-style:italic;margin-bottom:12px;">a wandering soul</div>
-      <div class="stat-row"><span>HP</span><span class="sv good" id="ri-hp">30</span></div>
-      <div class="stat-row"><span>Damage</span><span class="sv good" id="ri-dmg">3–5</span></div>
-      <div class="stat-row"><span>Attack speed</span><span class="sv good" id="ri-spd">2.0s</span></div>
-      <div class="stat-row"><span>Soul reward</span><span class="sv good" id="ri-souls">5</span></div>
-      <div class="ph gap">Progress</div>
-      <div class="kill-row"><span>Defeated</span><span class="kv" id="kp-killed">0</span></div>
-      <div class="kill-row"><span>Remaining</span><span class="kv" id="kp-left">10</span></div>
-      <div class="kill-row"><span>Elite</span><span class="kv" id="kp-elite">locked</span></div>
-      <div class="ph gap">Form</div>
-      <div id="traits-row"></div>
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
+        <button class="tab-btn" data-tab="stats">Stats</button>
+      </div>
+      <div id="tab-upgrades" class="tab-pane active">
+        <div id="upgrade-list"></div>
+      </div>
+      <div id="tab-stats" class="tab-pane">
+        <div class="ph">Entity Stats</div>
+        <div class="stat-row"><span>Damage</span><span class="sv" id="es-dmg">8–12</span></div>
+        <div class="stat-row"><span>Auto attack</span><span class="sv" id="es-auto">—</span></div>
+        <div class="stat-row"><span>Enemy drain</span><span class="sv" id="es-vamp">—</span></div>
+        <div class="ph gap">Enemy Defeats</div>
+        <div id="enemy-defeats-list"></div>
+        <div class="ph gap">Progress</div>
+        <div class="kill-row"><span>Defeated</span><span class="kv" id="kp-killed">0</span></div>
+        <div class="kill-row"><span>Remaining</span><span class="kv" id="kp-left">10</span></div>
+        <div class="kill-row"><span>Elite</span><span class="kv" id="kp-elite">locked</span></div>
+        <div class="ph gap">Form</div>
+        <div id="traits-row"></div>
+      </div>
     </div>
   </div>
 
@@ -832,6 +825,7 @@ function floorSpeed(level, floor){
 var souls=0, totalSouls=0;
 var entityDmgMin=3, entityDmgMax=5;
 var firstKillDone={};
+var killCounts={};
 
 var enemyHp=0, enemyMaxHp=0;
 var enemyDmgMin=0, enemyDmgMax=0, enemySpeed=2000, enemySoulReward=0;
@@ -1098,9 +1092,12 @@ function spawnEnemy(){
   var sz=elite?480:330;
   ecv.width=sz; ecv.height=sz;
   ecv.style.width=sz+'px'; ecv.style.height=sz+'px';
-  // hp-wrap width follows its respective canvas width
-  var enemyCombatant=ecv.closest('.combatant');
-  if(enemyCombatant){enemyCombatant.querySelectorAll('.hp-wrap').forEach(function(w){w.style.width=sz+'px';});}
+  // hp-wrap width follows the canvas width
+  document.getElementById('enemy-zone').querySelectorAll('.hp-wrap').forEach(function(w){w.style.width=sz+'px';});
+  // resize the circle to enshroud the canvas
+  var circleSize=sz+80;
+  var oval=document.getElementById('combat-oval');
+  oval.style.width=circleSize+'px'; oval.style.height=circleSize+'px';
   // Pick enemy type
   if(elite){
     // elite is always the boss of this level (type index = level-1)
@@ -1169,18 +1166,28 @@ function updateEnemyPanel(){
   var d=def(); if(!d) return;
   var elite=isEliteFight();
   var en=elite?('Elite '+d.name):d.name;
-  document.getElementById('enemy-title').textContent=en;
-  document.getElementById('enemy-subtitle').textContent=d.subtitle;
   document.getElementById('enemy-name-label').textContent=en;
-  document.getElementById('ri-hp').textContent=fmtHp(enemyMaxHp);
-  document.getElementById('ri-dmg').textContent=fmtHp(enemyDmgMin)+'–'+fmtHp(enemyDmgMax);
-  document.getElementById('ri-spd').textContent=(enemySpeed/1000).toFixed(1)+'s';
-  document.getElementById('ri-souls').textContent=fmt(enemySoulReward);
   document.getElementById('kp-killed').textContent=floorWins;
   document.getElementById('kp-left').textContent=elite?'—':Math.max(0,WINS_PER_FLOOR-floorWins);
   document.getElementById('kp-elite').textContent=
     defeatedElites.indexOf(curLevel-1)>=0?'beaten':
     (floorDone(curLevel,10)?'ready':'locked');
+}
+
+function updateEnemyDefeatsPanel(){
+  var el=document.getElementById('enemy-defeats-list'); if(!el) return;
+  el.innerHTML='';
+  ENEMY_TYPES.forEach(function(e){
+    var count=killCounts[e.id]||0;
+    if(count===0) return;
+    var row=document.createElement('div');
+    row.className='kill-row';
+    row.innerHTML='<span>'+e.name+'</span><span class="kv">'+fmt(count)+'</span>';
+    el.appendChild(row);
+  });
+  if(el.children.length===0){
+    el.innerHTML='<div style="font-size:13px;color:#332255;font-style:italic;padding:4px 0;">No defeats yet</div>';
+  }
 }
 
 // ── COMBAT ────────────────────────────────────────────────────────────────────
@@ -1210,6 +1217,8 @@ function onEnemyDeath(){
   if(!firstKillDone[d.id]){
     firstKillDone[d.id]=true;
   }
+  killCounts[d.id]=(killCounts[d.id]||0)+1;
+  updateEnemyDefeatsPanel();
 
   if(isEliteFight()){
     // Elite beaten — add this level's enemy type to the pool
@@ -1441,11 +1450,11 @@ function buildUpgrades(){
     if(u.id==='ss'){
       var wrap=document.createElement('div');
       wrap.className='ss-card-wrap';
-      wrap.appendChild(d);
       var arrow=document.createElement('div');
       arrow.className='ss-prompt'+(showSsArrow?' show':'');
-      arrow.textContent='⮜'; // ⮜ bold left arrow
+      arrow.textContent='⮞'; // ⮞ bold right arrow, left of card
       wrap.appendChild(arrow);
+      wrap.appendChild(d);
       el.appendChild(wrap);
     } else {
       el.appendChild(d);
