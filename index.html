@@ -19,7 +19,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #stage-desc { font-size: 15px; color: #443366; font-style: italic; }
 #main { display: flex; flex: 1; overflow: hidden; }
 #left, #right { width: 300px; flex-shrink: 0; padding: 16px 14px; background: #08080e; overflow-y: auto; }
-#left { width: 370px; border-right: 1px solid #1e1845; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 0; }
+#left { width: 370px; border-right: 1px solid #1e1845; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 0; background: #000; }
 #right { border-left: 1px solid #1e1845; }
 .ph { font-size: 14px; letter-spacing: 3px; color: #332255; text-transform: uppercase; border-bottom: 1px solid #1a1535; padding-bottom: 4px; margin-bottom: 10px; }
 .ph.gap { margin-top: 16px; }
@@ -36,11 +36,11 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard .ms-btn .ms-tip { margin-left: auto; font-size: 12px; color: #888866; letter-spacing: 1px; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 20px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 16px; }
 #bg-canvas { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0; }
-#combat-oval { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+#combat-oval { position:absolute; left:50%; top:42%; transform:translate(-50%,-50%);
   width:410px; height:410px; border-radius:50%;
-  background:radial-gradient(circle at center, rgba(0,0,0,0.96) 30%, rgba(0,0,0,0.82) 55%, rgba(0,0,0,0.5) 72%, transparent 88%);
+  background:radial-gradient(circle at center, rgba(0,0,0,0.92) 20%, rgba(0,0,0,0.75) 42%, rgba(0,0,0,0.35) 62%, rgba(0,0,0,0.08) 78%, transparent 90%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
-#enemy-zone { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:8px; z-index:2; }
+#enemy-zone { position:absolute; left:50%; top:42%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:8px; z-index:2; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cname { font-size: 19px; font-weight: bold; letter-spacing: 2px; color: #9988cc; text-transform: uppercase; }
 .cname.entity-label { color: #b8aaee; text-shadow: 0 0 8px rgba(180,160,255,0.5); }
@@ -191,7 +191,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="main">
     <div id="left">
       <div id="left-entity">
-        <div class="cname entity-label">The Entity</div>
+        <div id="entity-stage-label" class="cname entity-label">You are Ether.</div>
         <div class="canvas-wrap">
           <canvas id="entity-canvas" width="330" height="330"></canvas>
         </div>
@@ -1482,6 +1482,7 @@ function updateTraitsRow(){
   if(traits.outfit)tr.innerHTML+=pill(traits.outfit);
   document.getElementById('stage-name').textContent=SNAMES[stage];
   document.getElementById('stage-desc').textContent=SDESCS[stage];
+  document.getElementById('entity-stage-label').textContent='You are '+SNAMES[stage]+'.';
 }
 document.getElementById('evb').addEventListener('click',function(){
   mstage=stage;pending={};evReady=false;
