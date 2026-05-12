@@ -34,15 +34,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard .ms-btn { margin-top: 7px; padding-top: 6px; border-top: 1px solid #c8b870; font-size: 13px; color: #666666; display: flex; align-items: center; gap: 5px; cursor: default; position: relative; }
 .ucard .ms-btn .ms-icon { color: #8a7030; font-size: 11px; }
 .ucard .ms-btn .ms-tip { margin-left: auto; font-size: 12px; color: #888866; letter-spacing: 1px; }
-#lore-log { font-size: 15px; color: #443366; font-style: italic; }
-.lore-line { margin-bottom: 5px; line-height: 1.5; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; position: relative; background: radial-gradient(ellipse at center, #0d0820 0%, #07070f 70%); overflow: hidden; }
-#combat-zone { display: flex; align-items: center; justify-content: center; gap: 0; width: 100%; }
+#combat-zone { display: flex; align-items: flex-end; justify-content: center; gap: 0; width: 100%; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.cname { font-size: 15px; letter-spacing: 2px; color: #554488; text-transform: uppercase; }
-.cname.entity-label { color: #6655aa; }
-.cname.enemy-label { color: #446644; }
-.cname.elite-label { color: #aa8833; }
+.cname { font-size: 19px; font-weight: bold; letter-spacing: 2px; color: #9988cc; text-transform: uppercase; }
+.cname.entity-label { color: #b8aaee; text-shadow: 0 0 8px rgba(180,160,255,0.5); }
+.cname.enemy-label { color: #88cc88; text-shadow: 0 0 8px rgba(100,200,100,0.4); }
+.cname.elite-label { color: #d4a843; text-shadow: 0 0 8px rgba(212,168,67,0.5); }
 .hp-wrap { width: 230px; }
 .hp-track { height: 7px; background: #111128; border-radius: 4px; overflow: hidden; border: 1px solid #1e1845; }
 .hp-fill { height: 100%; border-radius: 4px; transition: width 0.15s; }
@@ -50,13 +48,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .hp-fill.enemy-hp { background: #336633; }
 .hp-fill.enemy-hp.elite { background: #aa8833; }
 .hp-fill.timer-fill { background: #33aa33; }
-.hp-numbers { display: flex; justify-content: space-between; font-size: 14px; color: #443366; margin-top: 2px; }
+.hp-numbers { display: flex; justify-content: space-between; font-size: 14px; color: #8877aa; margin-top: 2px; }
 .canvas-wrap { position: relative; overflow: hidden; }
-#enemy-canvas { cursor: crosshair; display: block; background: transparent; }
+#enemy-canvas { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='40' viewBox='0 0 32 40'%3E%3Cpath d='M4,2 L4,26 L9,19 L13,31 L16.5,29.5 L12.5,17.5 L20,17.5 Z' fill='%23d4a843' stroke='%23000000' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M4,2 L4,26 L9,19 L13,31 L16.5,29.5 L12.5,17.5 L20,17.5 Z' fill='none' stroke='%23ffd700' stroke-width='0.5' stroke-linejoin='round'/%3E%3C/svg%3E") 4 2, pointer; display: block; background: transparent; }
 #entity-canvas { cursor: default; display: block; background: transparent; }
 #crown { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); font-size: 36px; display: none; pointer-events: none; filter: drop-shadow(0 0 8px #d4a843); }
 #vs { font-size: 21px; color: #1e1535; letter-spacing: 2px; font-style: italic; flex-shrink: 0; width: 60px; text-align: center; }
-#click-hint { font-size: 15px; color: #332255; letter-spacing: 3px; text-transform: uppercase; }
+#click-hint { font-size: 15px; color: #8877aa; letter-spacing: 3px; text-transform: uppercase; }
 #float-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 .dmg-float { position: absolute; font-size: 20px; font-weight: bold; pointer-events: none; animation: floatup 0.9s ease-out forwards; }
 .dmg-float.edamage { color: #9980dd; }
@@ -71,12 +69,12 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #reform-btn { padding: 8px 24px; border: 1px solid #6655aa; color: #b0a0e8; background: transparent; font-family: Georgia,serif; font-size: 18px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
 #reform-btn:hover { background: rgba(102,85,170,0.15); }
 #prog-area { text-align: center; }
-#prog-label { font-size: 15px; color: #332255; letter-spacing: 2px; margin-bottom: 4px; }
+#prog-label { font-size: 15px; color: #9988bb; letter-spacing: 2px; margin-bottom: 4px; }
 #prog-track { width: 340px; height: 4px; background: #111128; border-radius: 3px; overflow: hidden; border: 1px solid #1e1845; margin: 0 auto; }
 #prog-bar { height: 100%; background: #6655aa; border-radius: 3px; transition: width 0.3s; width: 0%; }
 #evb { display: none; padding: 8px 20px; background: transparent; border: 1px solid #d4a843; color: #d4a843; font-family: Georgia,serif; font-size: 16px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
 #evb:hover { background: rgba(212,168,67,0.1); }
-.stat-row { display: flex; justify-content: space-between; font-size: 15px; color: #443366; padding: 3px 0; border-bottom: 1px solid #0f0f1e; }
+.stat-row { display: flex; justify-content: space-between; font-size: 15px; color: #776699; padding: 3px 0; border-bottom: 1px solid #0f0f1e; }
 .stat-row .sv { color: #7766aa; }
 .stat-row .sv.good { color: #88aa88; }
 .kill-row { display: flex; justify-content: space-between; font-size: 15px; color: #443366; padding: 3px 0; }
@@ -120,6 +118,36 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #1e1845; border-radius: 2px; }
+
+/* Upgrade list: shows ~6 cards then scrolls */
+#upgrade-list { max-height: 610px; overflow-y: auto; padding-right: 4px; scroll-behavior: smooth; }
+
+/* Spirit Slash soul-prompt arrow */
+#ss-arrow { display:none; text-align:center; margin-bottom:4px; font-size:28px; color:#d4a843;
+  text-shadow:0 0 10px rgba(212,168,67,0.9),0 0 22px rgba(212,168,67,0.5);
+  animation:ss-bounce 0.7s ease-in-out infinite alternate; pointer-events:none; }
+@keyframes ss-bounce { 0%{transform:translateY(-4px)} 100%{transform:translateY(6px)} }
+
+/* Minimap nav arrows */
+.mm-nav { background:transparent; border:none; color:#d4a843; font-size:22px; cursor:pointer;
+  padding:0 6px; font-family:Georgia,serif; transition:color 0.15s,text-shadow 0.15s;
+  text-shadow:0 0 6px rgba(212,168,67,0.4); flex-shrink:0; }
+.mm-nav:hover { color:#ffd700; text-shadow:0 0 10px rgba(255,215,0,0.8); }
+.mm-nav:disabled { color:#2a2030; text-shadow:none; cursor:default; }
+
+/* New-floor bouncing red arrow */
+#mm-new-arrow { display:none; position:absolute; left:50%; transform:translateX(-50%);
+  top:-6px; font-size:22px; color:#ff2222;
+  text-shadow:0 0 10px rgba(255,40,40,0.9),0 0 22px rgba(255,40,40,0.5);
+  animation:mm-drop 0.6s ease-in-out infinite alternate; pointer-events:none; z-index:10; }
+@keyframes mm-drop { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(6px)} }
+
+/* Minimap panel repositioned inside battlefield */
+#minimap-panel { position:relative; flex-shrink:0; padding:6px 14px; background:transparent; margin-top:4px; }
+#minimap-inner { display:flex;gap:6px;align-items:center;justify-content:center;padding:4px 0; }
+
+/* Entity canvas spacer to align canvases at same bottom level */
+.canvas-spacer { height: 42px; }
 </style>
 </head>
 <body>
@@ -142,9 +170,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button class="tab-btn" data-tab="stats">Stats</button>
       </div>
       <div id="tab-upgrades" class="tab-pane active">
+        <div id="ss-arrow">&#8659;</div>
         <div id="upgrade-list"></div>
-        <div class="ph gap">Lore</div>
-        <div id="lore-log"></div>
       </div>
       <div id="tab-stats" class="tab-pane">
         <div class="ph">Entity Stats</div>
@@ -160,6 +187,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <div class="canvas-wrap">
             <canvas id="entity-canvas" width="220" height="220"></canvas>
           </div>
+          <div class="canvas-spacer"></div>
         </div>
         <div id="vs">vs</div>
         <div class="combatant">
@@ -182,6 +210,15 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div id="prog-area">
         <div id="prog-label">Lost Wisp 0 / 10</div>
         <div id="prog-track"><div id="prog-bar"></div></div>
+      </div>
+      <!-- MINIMAP moved here, near level/floor info -->
+      <div id="minimap-panel">
+        <div id="mm-new-arrow">&#8659;</div>
+        <div id="minimap-inner">
+          <button class="mm-nav" id="mm-prev" title="Scroll left">&#10092;</button>
+          <div id="mm-cells"></div>
+          <button class="mm-nav" id="mm-next" title="Scroll right">&#10093;</button>
+        </div>
       </div>
       <button id="evb">✦ TRANSCEND ✦</button>
       <div id="reform-msg">
@@ -208,10 +245,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
   </div>
 
-  <!-- MINIMAP -->
-  <div id="minimap-panel">
-    <div id="minimap-inner"></div>
-  </div>
 </div>
 <div id="mo">
   <div id="modal">
@@ -697,6 +730,9 @@ var ENEMY_TYPES = [
 var FLOORS_PER_LEVEL = 10;
 var LEVELS_PER_REALM = 10;
 var WINS_PER_FLOOR   = 10;
+var minimapViewStart = 0;  // first room index shown in minimap window
+var MINIMAP_VISIBLE  = 7;  // how many cells to show at once
+var minimapNewFloor  = false; // triggers the bouncing red arrow
 
 // Location state
 var curLevel = 1;   // 1-10
@@ -753,17 +789,6 @@ var SNAMES=['Ether','Wraith','Nascent Being','Ascendant'];
 var SDESCS=['Shapeless. Hungry.','A form emerges.','Soul and substance entwine.','Between god and monster.'];
 var dirtyU=true, lastRebuildU=0;
 
-var LORE=["You are nothing. Not even darkness has your shape.",
-  "A warmth drifts past. Someone's last thought.",
-  "You pull. It resists. You pull harder.",
-  "Their memories dissolve into you. Sweetly.",
-  "You begin to feel something like hunger.",
-  "Shades drift toward you. They know what you're becoming.",
-  "You dream of hands.",
-  "Form is a cage. But cages keep things in as much as out.",
-  "You could stop. You won't."];
-var loreAt=[1,10,30,80,200,500,1500,5000,15000];
-var loreIdx=0;
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function fmt(n){
@@ -789,18 +814,6 @@ function fmtHp(n){
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 function repCost(u){return u.cost;}
 
-function addLore(txt){
-  var el=document.getElementById('lore-log');
-  var d=document.createElement('div'); d.className='lore-line';
-  d.textContent='"'+txt+'"';
-  el.insertBefore(d,el.firstChild);
-  while(el.children.length>9) el.removeChild(el.lastChild);
-}
-function checkLore(){
-  while(loreIdx<loreAt.length&&totalSouls>=loreAt[loreIdx]){
-    addLore(LORE[loreIdx]); loreIdx++;
-  }
-}
 function spawnFloat(text,cls,x,y){
   var fl=document.getElementById('float-layer');
   var d=document.createElement('div'); d.className='dmg-float '+cls;
@@ -916,8 +929,8 @@ function floorUnlocked(level, floor){
 }
 
 function buildMinimap(){
-  var inner=document.getElementById('minimap-inner');
-  inner.innerHTML='';
+  var cellsEl=document.getElementById('mm-cells');
+  cellsEl.innerHTML='';
 
   // Build flat linear sequence of all rooms
   var rooms=[];
@@ -933,16 +946,33 @@ function buildMinimap(){
     if(rooms[i].level===curLevel&&rooms[i].floor===curFloor){curIdx=i;break;}
   }
 
-  // Show 7 rooms centered on current
-  var start=Math.max(0,curIdx-3);
-  var end=start+6;
-  if(end>=rooms.length){end=rooms.length-1;start=Math.max(0,end-6);}
+  // Keep current room in view — if curIdx is outside the window, re-center
+  if(curIdx < minimapViewStart || curIdx >= minimapViewStart + MINIMAP_VISIBLE){
+    minimapViewStart = Math.max(0, curIdx - Math.floor(MINIMAP_VISIBLE/2));
+  }
+  // Clamp view
+  var maxStart = Math.max(0, rooms.length - MINIMAP_VISIBLE);
+  minimapViewStart = Math.min(minimapViewStart, maxStart);
+
+  var start = minimapViewStart;
+  var end   = Math.min(rooms.length-1, start + MINIMAP_VISIBLE - 1);
+
+  cellsEl.style.display='flex';
+  cellsEl.style.gap='5px';
+  cellsEl.style.alignItems='center';
 
   for(var j=start;j<=end;j++){
     var r=rooms[j];
     var done=floorDone(r.level,r.floor);
     var cur=(r.level===curLevel&&r.floor===curFloor);
     var locked=!floorUnlocked(r.level,r.floor);
+
+    // Level separator
+    if(r.floor===1 && j>start){
+      var sep=document.createElement('div');
+      sep.className='mm-sep';
+      cellsEl.appendChild(sep);
+    }
 
     var cell=document.createElement('div');
     var cls='mm-cell';
@@ -959,8 +989,28 @@ function buildMinimap(){
         cell.addEventListener('click',function(){navigateTo(l,f);});
       })(r.level,r.floor);
     }
-    inner.appendChild(cell);
+    cellsEl.appendChild(cell);
   }
+
+  // Update nav arrow disabled state
+  var prevBtn=document.getElementById('mm-prev');
+  var nextBtn=document.getElementById('mm-next');
+  if(prevBtn) prevBtn.disabled=(minimapViewStart===0);
+  if(nextBtn) nextBtn.disabled=(minimapViewStart>=maxStart);
+
+  // New-floor indicator
+  var arrowEl=document.getElementById('mm-new-arrow');
+  if(arrowEl) arrowEl.style.display=minimapNewFloor?'block':'none';
+}
+
+function minimapScroll(delta){
+  var rooms=[];
+  for(var lv=1;lv<=LEVELS_PER_REALM;lv++){
+    for(var fl=1;fl<=11;fl++) rooms.push(1);
+  }
+  var maxStart=Math.max(0,rooms.length-MINIMAP_VISIBLE);
+  minimapViewStart=Math.max(0,Math.min(maxStart,minimapViewStart+delta));
+  buildMinimap();
 }
 
 function navigateTo(level, floor){
@@ -1048,7 +1098,7 @@ function updateProgressLabel(){
     document.getElementById('prog-bar').style.width='100%';
   } else {
     document.getElementById('prog-label').textContent=
-      'Level '+curLevel+' · Floor '+curFloor+' — '+floorWins+' / '+WINS_PER_FLOOR;
+      'Level '+curLevel+' · Floor '+curFloor+' — '+Math.min(floorWins,WINS_PER_FLOOR)+' / '+WINS_PER_FLOOR;
     document.getElementById('prog-bar').style.width=(floorWins/WINS_PER_FLOOR*100)+'%';
   }
 }
@@ -1092,12 +1142,11 @@ function onEnemyDeath(){
   document.getElementById('elite-timer-wrap').style.display='none';
   souls+=enemySoulReward; totalSouls+=enemySoulReward;
   document.getElementById('soul-count').textContent=fmt(souls);
-  checkLore(); checkEvolution(); dirtyU=true;
+  checkEvolution(); dirtyU=true;
 
   var d=def();
   if(!firstKillDone[d.id]){
     firstKillDone[d.id]=true;
-    addLore('A '+d.name+' falls. The next comes automatically.');
   }
 
   if(isEliteFight()){
@@ -1111,17 +1160,14 @@ function onEnemyDeath(){
         enemyPool.push(nextType);
       }
     }
-    addLore('The elite '+d.name+' falls. A new darkness stirs.');
 
     if(curLevel>=LEVELS_PER_REALM){
-      addLore('All prey consumed. The void stretches wider.');
       document.getElementById('click-hint').textContent='Void Realm complete!';
       return;
     }
     // Unlock next level — wait for player to click
     var nextLevel=curLevel+1;
-    if(nextLevel>highestLevel){highestLevel=nextLevel;highestFloor=1;}
-    addLore('Click the next room to continue your hunt.');
+    if(nextLevel>highestLevel){highestLevel=nextLevel;highestFloor=1;minimapNewFloor=true;}
 
   } else {
     // Normal floor win
@@ -1131,12 +1177,10 @@ function onEnemyDeath(){
       var nextFloor=curFloor+1;
       if(floorWins===WINS_PER_FLOOR){
         if(nextFloor<=FLOORS_PER_LEVEL){
-          if(curLevel===highestLevel&&nextFloor>highestFloor) highestFloor=nextFloor;
-          addLore('Floor '+curFloor+' cleared. Click the next room to advance.');
+          if(curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; minimapNewFloor=true; }
         } else {
           // All 10 floors done — unlock elite
-          if(curLevel===highestLevel&&highestFloor<11) highestFloor=11;
-          addLore('All floors cleared. Click the elite chamber to face it...');
+          if(curLevel===highestLevel&&highestFloor<11){ highestFloor=11; minimapNewFloor=true; }
         }
       }
       setTimeout(spawnEnemy,100);
@@ -1156,7 +1200,6 @@ function onEliteDpsCheckFail(){
   hitFlashTime=0; attackFlashTime=0;
   document.getElementById('elite-timer-wrap').style.display='none';
   curFloor=10; floorWins=0;
-  addLore('Too slow. The elite endures. Returning to floor 10...');
   buildMinimap();
   setTimeout(spawnEnemy,600);
 }
@@ -1326,7 +1369,6 @@ function buildUpgrades(){
             u.cost=Math.ceil(u.cost*u.costScale);
           }
           u.level++; u.apply();
-          addLore(u.name+' — your essence deepens.');
           dirtyU=true; updateEntityStatsPanel();
           document.getElementById('soul-count').textContent=fmt(souls);
           setHint();
@@ -1396,8 +1438,6 @@ document.getElementById('mok').addEventListener('click',function(){
   if(mstage===1){traits.aff=pending.aff;if(traits.adds.indexOf(pending.add2)<0)traits.adds.push(pending.add2);}
   if(mstage===2){traits.outfit=pending.outfit;}
   stage++;
-  var msgs=['Form crashes over you. You have a shape now.','The second skin tears. Something older emerges.','You stand at the threshold.'];
-  addLore(msgs[mstage]||'You become more.');
   document.getElementById('mo').className='';
   document.getElementById('evb').style.display='none';
   updateTraitsRow(); dirtyU=true;
@@ -1453,7 +1493,11 @@ function gameLoop(){
   else { tickMist(enemyDead); drawMist(ecv,def()?def().color:[200,255,200],enemyDead,1); }
 
   if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;}
-  checkLore();
+  // Spirit Slash soul-prompt: show gothic arrow when 5+ souls and not yet purchased
+  var ssArrow=document.getElementById('ss-arrow');
+  if(ssArrow){
+    ssArrow.style.display=(souls>=5&&REP_UPGRADES[0].level===0)?'block':'none';
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -1463,7 +1507,6 @@ updateEntityStatsPanel();
 updateTraitsRow();
 buildMinimap();
 spawnEnemy();
-addLore('You are nothing. Not even darkness has your shape.');
 requestAnimationFrame(gameLoop);
 
 document.querySelectorAll('.tab-btn').forEach(function(btn){
@@ -1474,6 +1517,16 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
   });
+});
+
+// Minimap nav arrow buttons
+document.getElementById('mm-prev').addEventListener('click',function(){ minimapScroll(-1); });
+document.getElementById('mm-next').addEventListener('click',function(){ minimapScroll(1); });
+
+// Dismiss new-floor arrow on any minimap click
+document.getElementById('mm-cells').addEventListener('click',function(){
+  minimapNewFloor=false;
+  buildMinimap();
 });
 
 })();
