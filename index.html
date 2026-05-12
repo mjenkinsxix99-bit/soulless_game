@@ -29,9 +29,16 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard .ud { font-size: 15px; color: #333333; font-style: italic; line-height: 1.4; }
 .ucard .uc { font-size: 15px; color: #7a6010; margin-top: 3px; }
 .ucard .ulvl { font-size: 13px; color: #555555; }
-.ucard .ms-btn { margin-top: 7px; padding-top: 6px; border-top: 1px solid #c8b870; font-size: 13px; color: #666666; display: flex; align-items: center; gap: 5px; cursor: default; position: relative; }
-.ucard .ms-btn .ms-icon { color: #8a7030; font-size: 11px; }
-.ucard .ms-btn .ms-tip { margin-left: auto; font-size: 12px; color: #888866; letter-spacing: 1px; }
+.ucard .ms-row { display:flex; gap:3px; margin-top:8px; padding-top:7px; border-top:1px solid #c8b870; }
+.ms-box { flex:1; height:20px; border-radius:3px; border:1px solid #2a2010; background:rgba(30,20,10,0.35); cursor:not-allowed; position:relative; transition:background 0.2s,border-color 0.2s,box-shadow 0.2s; }
+.ms-box.avail { cursor:pointer; animation:ms-pulse 1.3s ease-in-out infinite; }
+.ms-box.lit { cursor:default; }
+@keyframes ms-pulse { 0%,100%{box-shadow:0 0 4px var(--ms-c,rgba(255,255,255,0.5));} 50%{box-shadow:0 0 10px var(--ms-c,rgba(255,255,255,0.85)),0 0 20px var(--ms-c,rgba(255,255,255,0.35));} }
+#ms-tooltip { display:none; position:fixed; z-index:200; background:#0d0d1e; border:1px solid #4433aa; border-radius:6px; padding:8px 12px; font-family:Georgia,serif; font-size:13px; color:#c0b0ff; pointer-events:none; max-width:220px; box-shadow:0 0 16px rgba(100,60,200,0.5); line-height:1.5; }
+#ms-tooltip .mst-title { font-size:14px; color:#d4a843; letter-spacing:1px; margin-bottom:3px; }
+#ms-tooltip .mst-req { color:#887755; font-size:12px; }
+#ms-tooltip .mst-eff { color:#88aa88; font-size:13px; margin-top:2px; }
+#ms-tooltip .mst-status { color:#554488; font-size:12px; margin-top:3px; font-style:italic; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0; }
 #combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
@@ -870,6 +877,7 @@ var dirtyU=true, lastRebuildU=0;
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function fmt(n){
   n=Math.floor(n);
+  if(!isFinite(n)) return '∞';
   if(n>=1e33) return(n/1e33).toFixed(2)+'Dc';
   if(n>=1e30) return(n/1e30).toFixed(2)+'No';
   if(n>=1e27) return(n/1e27).toFixed(2)+'Oc';
@@ -1316,127 +1324,153 @@ var autoAttackEnabled=false, autoAttackInterval=3000;
 var entityDmgBonus=0;
 var clickDmgBonus=0, totalDps=0, enemyHpDrainPct=0;
 
+var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
+var MS_MULT=[7,7,7,7,7,7,7,7,7,666];
+var MS_LABELS=['I','II','III','IV','V','VI','VII','VIII','IX','X'];
+var MS_COLORS=['#ffffff','#f8f0e0','#f5e6c0','#f0d888','#e8cc55','#e0bb30','#d8aa18','#cf9a08','#c88a00','#d4a843'];
+var MS_LIT_BG=['rgba(255,255,255,0.35)','rgba(248,240,224,0.35)','rgba(245,230,192,0.35)','rgba(240,216,136,0.35)','rgba(232,204,85,0.35)','rgba(224,187,48,0.35)','rgba(216,170,24,0.35)','rgba(207,154,8,0.35)','rgba(200,138,0,0.35)','rgba(212,168,67,0.38)'];
+var MS_GLOW=['rgba(255,255,255,0.8)','rgba(248,240,224,0.8)','rgba(245,230,192,0.8)','rgba(240,216,136,0.8)','rgba(232,204,85,0.8)','rgba(224,187,48,0.8)','rgba(216,170,24,0.8)','rgba(207,154,8,0.8)','rgba(200,138,0,0.8)','rgba(255,215,0,0.95)'];
+
+function getPurchMult(level){
+  if(level<200) return 1;
+  var crossings=Math.floor(level/100)-1;
+  var thousandMults=Math.floor(level/1000);
+  var regularMults=crossings-thousandMults;
+  return Math.pow(13,regularMults)*Math.pow(999,thousandMults);
+}
+function getMileMult(u){
+  var m=1;
+  for(var i=0;i<10;i++){ if(u.milestones[i]) m*=MS_MULT[i]; }
+  return m;
+}
+function recalcStats(){
+  clickDmgBonus=0; totalDps=0; enemyHpDrainPct=0; autoAttackEnabled=false;
+  REP_UPGRADES.forEach(function(u){
+    if(u.level===0) return;
+    var mm=getMileMult(u), pm=getPurchMult(u.level), eff=u.level*u.perLevel*mm*pm;
+    if(u.type==='click') clickDmgBonus+=eff;
+    else if(u.type==='drain') enemyHpDrainPct+=eff;
+    else { totalDps+=eff; if(u.id==='dh') autoAttackEnabled=true; }
+  });
+}
+
+var _msTip=null;
+function showMsTip(evt,u,i){
+  var tip=document.getElementById('ms-tooltip');
+  if(!tip) return;
+  var lit=u.milestones[i], avail=u.level>=MS_THRESH[i];
+  var multLabel=i===9?'x666':'x7';
+  var typeLabel=u.type==='click'?'Click Damage':u.type==='drain'?'HP Drain':'DPS';
+  tip.querySelector('.mst-title').textContent='Milestone '+MS_LABELS[i];
+  tip.querySelector('.mst-req').textContent='Requires '+MS_THRESH[i]+' purchases';
+  tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
+  tip.querySelector('.mst-status').textContent=lit?'Active':avail?'Click to activate':'Locked';
+  tip.style.display='block';
+  positionMsTip(evt);
+}
+function positionMsTip(evt){
+  var tip=document.getElementById('ms-tooltip'); if(!tip) return;
+  var x=evt.clientX+14, y=evt.clientY-60;
+  if(x+230>window.innerWidth) x=evt.clientX-234;
+  if(y<4) y=4;
+  tip.style.left=x+'px'; tip.style.top=y+'px';
+}
+function hideMsTip(){
+  var tip=document.getElementById('ms-tooltip'); if(tip) tip.style.display='none';
+}
+
+function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
 var REP_UPGRADES=[
-  {id:'ss',name:'Spirit Slash',  cost:5,     costScale:1.20, level:0,
+  {id:'ss',name:'Spirit Slash',  cost:5,     costScale:1.20, level:0, type:'click',  perLevel:1,
     desc:function(){return '+1 damage per click';},
-    apply:function(){clickDmgBonus+=1;},
-    vis:function(){return true;}},
-  {id:'dh',name:'Deeper Hunger', cost:50,    costScale:1.06, level:0,
+    vis:function(){return true;}, milestones:mkMs()},
+  {id:'dh',name:'Deeper Hunger', cost:50,    costScale:1.06, level:0, type:'dps',    perLevel:5,
     desc:function(){return '+5 damage per second';},
-    apply:function(){totalDps+=5; if(this.level===1) autoAttackEnabled=true;},
-    vis:function(){return REP_UPGRADES[0].level>=1;}},
-  {id:'sr',name:'Soul Resonance',cost:300,   costScale:1.09, level:0,
+    vis:function(){return REP_UPGRADES[0].level>=1;}, milestones:mkMs()},
+  {id:'sr',name:'Soul Resonance',cost:300,   costScale:1.09, level:0, type:'dps',    perLevel:20,
     desc:function(){return '+20 damage per second';},
-    apply:function(){totalDps+=20;},
-    vis:function(){return REP_UPGRADES[1].level>=1;}},
-  {id:'sl',name:'Spectral Lure', cost:1000,  costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[1].level>=1;}, milestones:mkMs()},
+  {id:'sl',name:'Spectral Lure', cost:1000,  costScale:1.07, level:0, type:'dps',    perLevel:75,
     desc:function(){return '+75 damage per second';},
-    apply:function(){totalDps+=75;},
-    vis:function(){return REP_UPGRADES[2].level>=1;}},
-  {id:'dv',name:'Divine Hunger', cost:5000,  costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[2].level>=1;}, milestones:mkMs()},
+  {id:'dv',name:'Divine Hunger', cost:5000,  costScale:1.07, level:0, type:'drain',  perLevel:0.0003,
     desc:function(){return '+0.03% enemy HP/s drain';},
-    apply:function(){enemyHpDrainPct+=0.0003;},
-    vis:function(){return REP_UPGRADES[3].level>=1;}},
-  {id:'vs',name:'Void Sense',    cost:20000, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[3].level>=1;}, milestones:mkMs()},
+  {id:'vs',name:'Void Sense',    cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
     desc:function(){return '+900 damage per second';},
-    apply:function(){totalDps+=900;},
-    vis:function(){return REP_UPGRADES[4].level>=1;}},
-  {id:'fm',name:'Feeding Mask',  cost:100000, costScale:1.06, level:0,
+    vis:function(){return REP_UPGRADES[4].level>=1;}, milestones:mkMs()},
+  {id:'fm',name:'Feeding Mask',  cost:100000, costScale:1.06, level:0, type:'dps',   perLevel:3500,
     desc:function(){return '+3,500 damage per second';},
-    apply:function(){totalDps+=3500;},
-    vis:function(){return REP_UPGRADES[5].level>=1;}},
-  {id:'bb',name:'Bitter Bite',   cost:400000, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[5].level>=1;}, milestones:mkMs()},
+  {id:'bb',name:'Bitter Bite',   cost:400000, costScale:1.07, level:0, type:'dps',   perLevel:10500,
     desc:function(){return '+10,500 damage per second';},
-    apply:function(){totalDps+=10500;},
-    vis:function(){return REP_UPGRADES[6].level>=1;}},
-  {id:'as',name:'Angelic Seduction', cost:2500000, costScale:1.06, level:0,
+    vis:function(){return REP_UPGRADES[6].level>=1;}, milestones:mkMs()},
+  {id:'as',name:'Angelic Seduction', cost:2500000, costScale:1.06, level:0, type:'dps', perLevel:47500,
     desc:function(){return '+47,500 damage per second';},
-    apply:function(){totalDps+=47500;},
-    vis:function(){return REP_UPGRADES[7].level>=1;}},
-  {id:'ee',name:'Elemental Ecstasy', cost:15000000, costScale:1.06, level:0,
+    vis:function(){return REP_UPGRADES[7].level>=1;}, milestones:mkMs()},
+  {id:'ee',name:'Elemental Ecstasy', cost:15000000, costScale:1.06, level:0, type:'dps', perLevel:200000,
     desc:function(){return '+200,000 damage per second';},
-    apply:function(){totalDps+=200000;},
-    vis:function(){return REP_UPGRADES[8].level>=1;}},
-  {id:'pf',name:'Piercing Fear',    cost:100000000, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[8].level>=1;}, milestones:mkMs()},
+  {id:'pf',name:'Piercing Fear',    cost:100000000, costScale:1.07, level:0, type:'dps', perLevel:950000,
     desc:function(){return '+950,000 damage per second';},
-    apply:function(){totalDps+=950000;},
-    vis:function(){return REP_UPGRADES[9].level>=1;}},
-  {id:'cd',name:'Crushing Desire',  cost:800000000, costScale:1.08, level:0,
+    vis:function(){return REP_UPGRADES[9].level>=1;}, milestones:mkMs()},
+  {id:'cd',name:'Crushing Desire',  cost:800000000, costScale:1.08, level:0, type:'dps', perLevel:4000000,
     desc:function(){return '+4,000,000 damage per second';},
-    apply:function(){totalDps+=4000000;},
-    vis:function(){return REP_UPGRADES[10].level>=1;}},
-  {id:'cs',name:'Chaotic Strike',   cost:6500000000, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[10].level>=1;}, milestones:mkMs()},
+  {id:'cs',name:'Chaotic Strike',   cost:6500000000, costScale:1.07, level:0, type:'dps', perLevel:20000000,
     desc:function(){return '+20,000,000 damage per second';},
-    apply:function(){totalDps+=20000000;},
-    vis:function(){return REP_UPGRADES[11].level>=1;}},
-  {id:'md',name:'Mortal Deception', cost:50000000000, costScale:1.06, level:0,
+    vis:function(){return REP_UPGRADES[11].level>=1;}, milestones:mkMs()},
+  {id:'md',name:'Mortal Deception', cost:50000000000, costScale:1.06, level:0, type:'dps', perLevel:70000000,
     desc:function(){return '+70,000,000 damage per second';},
-    apply:function(){totalDps+=70000000;},
-    vis:function(){return REP_UPGRADES[12].level>=1;}},
-  {id:'sg',name:'Sinful Gaze',      cost:425000000000, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[12].level>=1;}, milestones:mkMs()},
+  {id:'sg',name:'Sinful Gaze',      cost:425000000000, costScale:1.07, level:0, type:'dps', perLevel:450000000,
     desc:function(){return '+450,000,000 damage per second';},
-    apply:function(){totalDps+=450000000;},
-    vis:function(){return REP_UPGRADES[13].level>=1;}},
-  {id:'ah',name:'Anima Harvest',    cost:3800000000000, costScale:1.08, level:0,
+    vis:function(){return REP_UPGRADES[13].level>=1;}, milestones:mkMs()},
+  {id:'ah',name:'Anima Harvest',    cost:3800000000000, costScale:1.08, level:0, type:'dps', perLevel:3000000000,
     desc:function(){return '+3,000,000,000 damage per second';},
-    apply:function(){totalDps+=3000000000;},
-    vis:function(){return REP_UPGRADES[14].level>=1;}},
-  {id:'sk',name:'Searing Spark',    cost:35000000000000, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[14].level>=1;}, milestones:mkMs()},
+  {id:'sk',name:'Searing Spark',    cost:35000000000000, costScale:1.07, level:0, type:'dps', perLevel:20000000000,
     desc:function(){return '+20,000,000,000 damage per second';},
-    apply:function(){totalDps+=20000000000;},
-    vis:function(){return REP_UPGRADES[15].level>=1;}},
-  {id:'cp',name:'Corrupt Psyche',   cost:330000000000000, costScale:1.06, level:0,
+    vis:function(){return REP_UPGRADES[15].level>=1;}, milestones:mkMs()},
+  {id:'cp',name:'Corrupt Psyche',   cost:330000000000000, costScale:1.06, level:0, type:'dps', perLevel:125000000000,
     desc:function(){return '+125,000,000,000 damage per second';},
-    apply:function(){totalDps+=125000000000;},
-    vis:function(){return REP_UPGRADES[16].level>=1;}},
-  {id:'st',name:'Spirit Target',    cost:3e15, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[16].level>=1;}, milestones:mkMs()},
+  {id:'st',name:'Spirit Target',    cost:3e15, costScale:1.07, level:0, type:'dps', perLevel:800000000000,
     desc:function(){return '+800,000,000,000 damage per second';},
-    apply:function(){totalDps+=800000000000;},
-    vis:function(){return REP_UPGRADES[17].level>=1;}},
-  {id:'sb',name:'Soul Blast',       cost:25e15, costScale:1.08, level:0,
+    vis:function(){return REP_UPGRADES[17].level>=1;}, milestones:mkMs()},
+  {id:'sb',name:'Soul Blast',       cost:25e15, costScale:1.08, level:0, type:'dps', perLevel:5000000000000,
     desc:function(){return '+5,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=5000000000000;},
-    vis:function(){return REP_UPGRADES[18].level>=1;}},
-  {id:'dm',name:'Doom',             cost:300e15, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[18].level>=1;}, milestones:mkMs()},
+  {id:'dm',name:'Doom',             cost:300e15, costScale:1.07, level:0, type:'dps', perLevel:50000000000000,
     desc:function(){return '+50,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=50000000000000;},
-    vis:function(){return REP_UPGRADES[19].level>=1;}},
-  {id:'nt',name:'Night Terror',     cost:10e18, costScale:1.06, level:0,
+    vis:function(){return REP_UPGRADES[19].level>=1;}, milestones:mkMs()},
+  {id:'nt',name:'Night Terror',     cost:10e18, costScale:1.06, level:0, type:'dps', perLevel:1e15,
     desc:function(){return '+1,000,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=1e15;},
-    vis:function(){return REP_UPGRADES[20].level>=1;}},
-  {id:'ir',name:'Infernal Rage',    cost:325e18, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[20].level>=1;}, milestones:mkMs()},
+  {id:'ir',name:'Infernal Rage',    cost:325e18, costScale:1.07, level:0, type:'dps', perLevel:30e15,
     desc:function(){return '+30,000,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=30e15;},
-    vis:function(){return REP_UPGRADES[21].level>=1;}},
-  {id:'td',name:'Tainted Dreams',   cost:15e21, costScale:1.08, level:0,
+    vis:function(){return REP_UPGRADES[21].level>=1;}, milestones:mkMs()},
+  {id:'td',name:'Tainted Dreams',   cost:15e21, costScale:1.08, level:0, type:'dps', perLevel:950e15,
     desc:function(){return '+950,000,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=950e15;},
-    vis:function(){return REP_UPGRADES[22].level>=1;}},
-  {id:'mf',name:'Manifestation',    cost:4.75e24, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[22].level>=1;}, milestones:mkMs()},
+  {id:'mf',name:'Manifestation',    cost:4.75e24, costScale:1.07, level:0, type:'dps', perLevel:200e18,
     desc:function(){return '+200,000,000,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=200e18;},
-    vis:function(){return REP_UPGRADES[23].level>=1;}},
-  {id:'bs',name:'Brimstone',        cost:2e27, costScale:1.06, level:0,
+    vis:function(){return REP_UPGRADES[23].level>=1;}, milestones:mkMs()},
+  {id:'bs',name:'Brimstone',        cost:2e27, costScale:1.06, level:0, type:'dps', perLevel:75e21,
     desc:function(){return '+75,000,000,000,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=75e21;},
-    vis:function(){return REP_UPGRADES[24].level>=1;}},
-  {id:'ct',name:'Chaos Tide',       cost:325e27, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[24].level>=1;}, milestones:mkMs()},
+  {id:'ct',name:'Chaos Tide',       cost:325e27, costScale:1.07, level:0, type:'dps', perLevel:850e21,
     desc:function(){return '+850,000,000,000,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=850e21;},
-    vis:function(){return REP_UPGRADES[25].level>=1;}},
-  {id:'rn',name:'Ragefire Nova',    cost:12e30, costScale:1.08, level:0,
+    vis:function(){return REP_UPGRADES[25].level>=1;}, milestones:mkMs()},
+  {id:'rn',name:'Ragefire Nova',    cost:12e30, costScale:1.08, level:0, type:'dps', perLevel:32e24,
     desc:function(){return '+32,000,000,000,000,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=32e24;},
-    vis:function(){return REP_UPGRADES[26].level>=1;}},
-  {id:'ac',name:'Abyssal Call',     cost:780e30, costScale:1.07, level:0,
+    vis:function(){return REP_UPGRADES[26].level>=1;}, milestones:mkMs()},
+  {id:'ac',name:'Abyssal Call',     cost:780e30, costScale:1.07, level:0, type:'dps', perLevel:675e24,
     desc:function(){return '+675,000,000,000,000,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=675e24;},
-    vis:function(){return REP_UPGRADES[27].level>=1;}},
-  {id:'bf',name:'Balefire',         cost:99e33, costScale:1.06, level:0,
+    vis:function(){return REP_UPGRADES[27].level>=1;}, milestones:mkMs()},
+  {id:'bf',name:'Balefire',         cost:99e33, costScale:1.06, level:0, type:'dps', perLevel:50e27,
     desc:function(){return '+50,000,000,000,000,000,000,000,000,000 damage per second';},
-    apply:function(){totalDps+=50e27;},
-    vis:function(){return REP_UPGRADES[28].level>=1;}},
+    vis:function(){return REP_UPGRADES[28].level>=1;}, milestones:mkMs()},
 ];
 
 function buildUpgrades(){
@@ -1446,16 +1480,49 @@ function buildUpgrades(){
     var cost=repCost(u), can=souls>=cost, bought=u.level>0;
     var d=document.createElement('div');
     d.className='ucard'+(can?' can':'')+(bought&&!can?' bought':'');
+
+    var msRowHtml='<div class="ms-row">';
+    for(var i=0;i<10;i++){
+      var lit=u.milestones[i];
+      var avail=!lit&&u.level>=MS_THRESH[i];
+      var cls='ms-box'+(lit?' lit':avail?' avail':'');
+      var style='';
+      if(lit){
+        style='border-color:'+MS_COLORS[i]+';background:'+MS_LIT_BG[i]+';box-shadow:0 0 6px '+MS_GLOW[i]+',inset 0 0 4px '+MS_LIT_BG[i]+';';
+      } else if(avail){
+        style='border-color:'+MS_COLORS[i]+';--ms-c:'+MS_GLOW[i]+';';
+      }
+      msRowHtml+='<div class="'+cls+'" data-mi="'+i+'"'+(style?' style="'+style+'"':'')+'></div>';
+    }
+    msRowHtml+='</div>';
+
     d.innerHTML='<div class="un">'+u.name+(u.level>0?' <span class="ulvl">('+u.level+')</span>':'')+'</div>'
       +'<div class="ud">'+u.desc()+'</div>'
       +'<div class="uc">'+fmt(cost)+' souls</div>'
-      +'<div class="ms-btn" title="???">'
-        +'<span class="ms-icon">&#9670;</span> Milestone'
-        +'<span class="ms-tip">???</span>'
-      +'</div>';
+      +msRowHtml;
+
+    // Milestone box events (always active regardless of affordability)
+    var boxes=d.querySelectorAll('.ms-box');
+    boxes.forEach(function(box){
+      var mi=parseInt(box.getAttribute('data-mi'),10);
+      box.addEventListener('click',function(e){
+        e.stopPropagation();
+        if(u.milestones[mi]) return;
+        if(u.level>=MS_THRESH[mi]){
+          u.milestones[mi]=true;
+          recalcStats();
+          dirtyU=true;
+          updateEntityStatsPanel();
+        }
+      });
+      box.addEventListener('mouseenter',function(e){ showMsTip(e,u,mi); });
+      box.addEventListener('mousemove',positionMsTip);
+      box.addEventListener('mouseleave',hideMsTip);
+    });
+
     if(can){
       d.addEventListener('click',function(e){
-        if(e.target.closest('.ms-btn')) return;
+        if(e.target.closest('.ms-box')) return;
         var c=repCost(u);
         if(souls>=c){
           souls-=c;
@@ -1464,23 +1531,22 @@ function buildUpgrades(){
           } else {
             u.cost=Math.ceil(u.cost*u.costScale);
           }
-          u.level++; u.apply();
+          u.level++;
+          recalcStats();
           dirtyU=true; updateEntityStatsPanel();
           document.getElementById('soul-count').textContent=fmt(souls);
           setHint();
         }
       });
     }
-    if(u.id==='ss'){
-      el.appendChild(d);
-    } else {
-      el.appendChild(d);
-    }
+    el.appendChild(d);
   });
 }
 
 function updateEntityStatsPanel(){
-  document.getElementById('es-dmg').textContent=(entityDmgMin+entityDmgBonus+clickDmgBonus)+'–'+(entityDmgMax+entityDmgBonus+clickDmgBonus);
+  var dMin=entityDmgMin+entityDmgBonus+Math.floor(clickDmgBonus);
+  var dMax=entityDmgMax+entityDmgBonus+Math.floor(clickDmgBonus);
+  document.getElementById('es-dmg').textContent=fmt(dMin)+'–'+fmt(dMax);
   document.getElementById('es-auto').textContent=autoAttackEnabled?(fmt(Math.floor(totalDps*autoAttackInterval/1000))+' dmg / '+(autoAttackInterval/1000).toFixed(1)+'s'):'—';
   document.getElementById('es-vamp').textContent=enemyHpDrainPct>0?(+(enemyHpDrainPct*100).toFixed(4))+'% HP/s':'—';
 }
@@ -1603,6 +1669,7 @@ function gameLoop(){
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initMist(28);
+recalcStats();
 updateHpBars();
 updateEntityStatsPanel();
 updateTraitsRow();
@@ -1686,5 +1753,6 @@ document.getElementById('mm-next').addEventListener('click',function(){
 
 })();
 </script>
+<div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-status"></div></div>
 </body>
 </html>
