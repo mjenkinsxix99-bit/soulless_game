@@ -37,15 +37,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0; }
 #combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
-  width:830px; height:830px; border-radius:50%;
+  width:930px; height:930px; border-radius:50%;
   background:radial-gradient(circle at center,
-    rgba(0,0,0,0.82) 0%,
-    rgba(0,0,0,0.70) 14%,
-    rgba(0,0,0,0.54) 28%,
-    rgba(0,0,0,0.34) 44%,
-    rgba(0,0,0,0.16) 60%,
-    rgba(0,0,0,0.05) 75%,
-    transparent 90%);
+    rgba(0,0,0,0.55) 0%,
+    rgba(0,0,0,0.42) 18%,
+    rgba(0,0,0,0.25) 38%,
+    rgba(0,0,0,0.09) 58%,
+    rgba(0,0,0,0.02) 74%,
+    transparent 86%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
 #enemy-zone { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:8px; z-index:2; }
 #enemy-zone .canvas-wrap { overflow: visible; }
@@ -564,6 +563,13 @@ function drawMist(canvas, col, dead, sizeBoost) {
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI*2); ctx.fill();
   });
+  // Clip mist to circle
+  ctx.globalCompositeOperation = 'destination-in';
+  ctx.beginPath();
+  ctx.arc(canvas.width/2, canvas.height/2, Math.min(canvas.width, canvas.height)/2, 0, Math.PI*2);
+  ctx.fillStyle = '#000';
+  ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
 }
 
 // ── ENEMY SPRITE RENDERER ─────────────────────────────────────────────────────
@@ -710,6 +716,15 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   }
 
   ctx.restore();
+
+  // Clip everything to a circle — hides the rectangular canvas boundary
+  ctx.globalCompositeOperation = 'destination-in';
+  var cr = Math.min(W, H) / 2;
+  ctx.beginPath();
+  ctx.arc(W / 2, H / 2, cr, 0, Math.PI * 2);
+  ctx.fillStyle = '#000';
+  ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
 }
 
 function drawWispSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,wispImg,wispImgLoaded,0.0018); }
@@ -1103,7 +1118,7 @@ function spawnEnemy(){
   // hp-wrap width follows the canvas width
   document.getElementById('enemy-zone').querySelectorAll('.hp-wrap').forEach(function(w){w.style.width=sz+'px';});
   // resize the circle to fully enshroud the canvas with comfortable margin
-  var circleSize=sz+500;
+  var circleSize=sz+600;
   var oval=document.getElementById('combat-oval');
   oval.style.width=circleSize+'px'; oval.style.height=circleSize+'px';
   // Pick enemy type
