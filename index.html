@@ -7,6 +7,7 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Georgia, serif; overflow: hidden; }
+#game, #game * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M16,1 L31,16 L16,31 L1,16 Z' fill='%230a0a18' stroke='%23d4a843' stroke-width='1.8' stroke-linejoin='round'/%3E%3Cpath d='M16,1 C23,9 23,23 16,31 C9,23 9,9 16,1 Z' fill='none' stroke='%23d4a843' stroke-width='1.2'/%3E%3Cpath d='M1,16 C9,9 23,9 31,16 C23,23 9,23 1,16 Z' fill='none' stroke='%23d4a843' stroke-width='1.2'/%3E%3C/svg%3E") 16 16, crosshair !important; }
 #game { display: flex; flex-direction: column; height: 100vh; }
 #topbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; }
 .title { font-size: 27px; letter-spacing: 4px; color: #d0c4ff; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
@@ -50,7 +51,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .hp-fill.timer-fill { background: #33aa33; }
 .hp-numbers { display: flex; justify-content: space-between; font-size: 14px; color: #8877aa; margin-top: 2px; }
 .canvas-wrap { position: relative; overflow: hidden; }
-#enemy-canvas { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='40' viewBox='0 0 32 40'%3E%3Cpath d='M4,2 L4,26 L9,19 L13,31 L16.5,29.5 L12.5,17.5 L20,17.5 Z' fill='%23d4a843' stroke='%23000000' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M4,2 L4,26 L9,19 L13,31 L16.5,29.5 L12.5,17.5 L20,17.5 Z' fill='none' stroke='%23ffd700' stroke-width='0.5' stroke-linejoin='round'/%3E%3C/svg%3E") 4 2, pointer; display: block; background: transparent; }
+#enemy-canvas { display: block; background: transparent; }
 #entity-canvas { cursor: default; display: block; background: transparent; }
 #crown { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); font-size: 36px; display: none; pointer-events: none; filter: drop-shadow(0 0 8px #d4a843); }
 #vs { font-size: 21px; color: #1e1535; letter-spacing: 2px; font-style: italic; flex-shrink: 0; width: 60px; text-align: center; }
@@ -146,8 +147,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #minimap-panel { position:relative; flex-shrink:0; padding:6px 14px; background:transparent; margin-top:4px; }
 #minimap-inner { display:flex;gap:6px;align-items:center;justify-content:center;padding:4px 0; }
 
-/* Entity canvas spacer to align canvases at same bottom level */
-.canvas-spacer { height: 42px; }
 </style>
 </head>
 <body>
@@ -187,7 +186,10 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <div class="canvas-wrap">
             <canvas id="entity-canvas" width="220" height="220"></canvas>
           </div>
-          <div class="canvas-spacer"></div>
+          <div class="hp-wrap" style="visibility:hidden">
+            <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
+            <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
+          </div>
         </div>
         <div id="vs">vs</div>
         <div class="combatant">
