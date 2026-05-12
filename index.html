@@ -14,9 +14,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #souls-display { text-align: center; }
 #souls-display .num { font-size: 33px; color: #ffffff; font-weight: bold; text-shadow: 0 0 8px rgba(200,180,255,0.9), 0 0 18px rgba(160,120,255,0.5); }
 #souls-display .lbl { font-size: 14px; color: #c0b0f0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 6px rgba(150,120,240,0.4); }
-#stage-info { text-align: right; }
-#stage-name { font-size: 18px; color: #d4a843; letter-spacing: 1px; }
-#stage-desc { font-size: 15px; color: #443366; font-style: italic; }
+#stage-desc { font-size: 13px; color: #7766aa; font-style: italic; text-align: center; }
 #main { display: flex; flex: 1; overflow: hidden; }
 #left, #right { width: 300px; flex-shrink: 0; padding: 16px 14px; background: #08080e; overflow-y: auto; }
 #left { width: 370px; border-right: 1px solid #1e1845; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 0; background: #000; }
@@ -189,16 +187,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div class="num" id="soul-count">0</div>
       <div class="lbl">souls collected</div>
     </div>
-    <div id="stage-info">
-      <div id="stage-name">Ether</div>
-      <div id="stage-desc">Shapeless. Hungry.</div>
-    </div>
   </div>
   <div id="main">
     <div id="left">
       <div id="left-entity">
         <div id="entity-stage-label" class="cname entity-label">You are Ether.</div>
-        <div class="canvas-wrap">
+        <div id="stage-desc">Shapeless. Hungry.</div>
+        <div class="canvas-wrap" style="margin-top:6px;">
           <canvas id="entity-canvas" width="330" height="330"></canvas>
         </div>
         <div class="hp-wrap" style="visibility:hidden">
@@ -1502,7 +1497,6 @@ function updateTraitsRow(){
   if(traits.aff)tr.innerHTML+=pill(traits.aff);
   traits.adds.forEach(function(a){tr.innerHTML+=pill(a);});
   if(traits.outfit)tr.innerHTML+=pill(traits.outfit);
-  document.getElementById('stage-name').textContent=SNAMES[stage];
   document.getElementById('stage-desc').textContent=SDESCS[stage];
   document.getElementById('entity-stage-label').textContent='You are '+SNAMES[stage]+'.';
 }
