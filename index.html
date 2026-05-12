@@ -34,8 +34,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard .ms-btn { margin-top: 7px; padding-top: 6px; border-top: 1px solid #c8b870; font-size: 13px; color: #666666; display: flex; align-items: center; gap: 5px; cursor: default; position: relative; }
 .ucard .ms-btn .ms-icon { color: #8a7030; font-size: 11px; }
 .ucard .ms-btn .ms-tip { margin-left: auto; font-size: 12px; color: #888866; letter-spacing: 1px; }
-#lore-log { font-size: 15px; color: #443366; font-style: italic; }
-.lore-line { margin-bottom: 5px; line-height: 1.5; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; position: relative; background: radial-gradient(ellipse at center, #0d0820 0%, #07070f 70%); overflow: hidden; }
 #combat-zone { display: flex; align-items: flex-end; justify-content: center; gap: 0; width: 100%; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -174,7 +172,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div id="tab-upgrades" class="tab-pane active">
         <div id="ss-arrow">&#8659;</div>
         <div id="upgrade-list"></div>
-        <div id="lore-log" style="display:none"></div>
       </div>
       <div id="tab-stats" class="tab-pane">
         <div class="ph">Entity Stats</div>
@@ -792,17 +789,6 @@ var SNAMES=['Ether','Wraith','Nascent Being','Ascendant'];
 var SDESCS=['Shapeless. Hungry.','A form emerges.','Soul and substance entwine.','Between god and monster.'];
 var dirtyU=true, lastRebuildU=0;
 
-var LORE=["You are nothing. Not even darkness has your shape.",
-  "A warmth drifts past. Someone's last thought.",
-  "You pull. It resists. You pull harder.",
-  "Their memories dissolve into you. Sweetly.",
-  "You begin to feel something like hunger.",
-  "Shades drift toward you. They know what you're becoming.",
-  "You dream of hands.",
-  "Form is a cage. But cages keep things in as much as out.",
-  "You could stop. You won't."];
-var loreAt=[1,10,30,80,200,500,1500,5000,15000];
-var loreIdx=0;
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function fmt(n){
@@ -828,18 +814,6 @@ function fmtHp(n){
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 function repCost(u){return u.cost;}
 
-function addLore(txt){
-  var el=document.getElementById('lore-log');
-  var d=document.createElement('div'); d.className='lore-line';
-  d.textContent='"'+txt+'"';
-  el.insertBefore(d,el.firstChild);
-  while(el.children.length>9) el.removeChild(el.lastChild);
-}
-function checkLore(){
-  while(loreIdx<loreAt.length&&totalSouls>=loreAt[loreIdx]){
-    addLore(LORE[loreIdx]); loreIdx++;
-  }
-}
 function spawnFloat(text,cls,x,y){
   var fl=document.getElementById('float-layer');
   var d=document.createElement('div'); d.className='dmg-float '+cls;
@@ -1168,12 +1142,11 @@ function onEnemyDeath(){
   document.getElementById('elite-timer-wrap').style.display='none';
   souls+=enemySoulReward; totalSouls+=enemySoulReward;
   document.getElementById('soul-count').textContent=fmt(souls);
-  checkLore(); checkEvolution(); dirtyU=true;
+  checkEvolution(); dirtyU=true;
 
   var d=def();
   if(!firstKillDone[d.id]){
     firstKillDone[d.id]=true;
-    addLore('A '+d.name+' falls. The next comes automatically.');
   }
 
   if(isEliteFight()){
@@ -1187,17 +1160,14 @@ function onEnemyDeath(){
         enemyPool.push(nextType);
       }
     }
-    addLore('The elite '+d.name+' falls. A new darkness stirs.');
 
     if(curLevel>=LEVELS_PER_REALM){
-      addLore('All prey consumed. The void stretches wider.');
       document.getElementById('click-hint').textContent='Void Realm complete!';
       return;
     }
     // Unlock next level — wait for player to click
     var nextLevel=curLevel+1;
     if(nextLevel>highestLevel){highestLevel=nextLevel;highestFloor=1;minimapNewFloor=true;}
-    addLore('Click the next room to continue your hunt.');
 
   } else {
     // Normal floor win
@@ -1208,11 +1178,9 @@ function onEnemyDeath(){
       if(floorWins===WINS_PER_FLOOR){
         if(nextFloor<=FLOORS_PER_LEVEL){
           if(curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; minimapNewFloor=true; }
-          addLore('Floor '+curFloor+' cleared. Click the next room to advance.');
         } else {
           // All 10 floors done — unlock elite
           if(curLevel===highestLevel&&highestFloor<11){ highestFloor=11; minimapNewFloor=true; }
-          addLore('All floors cleared. Click the elite chamber to face it...');
         }
       }
       setTimeout(spawnEnemy,100);
@@ -1232,7 +1200,6 @@ function onEliteDpsCheckFail(){
   hitFlashTime=0; attackFlashTime=0;
   document.getElementById('elite-timer-wrap').style.display='none';
   curFloor=10; floorWins=0;
-  addLore('Too slow. The elite endures. Returning to floor 10...');
   buildMinimap();
   setTimeout(spawnEnemy,600);
 }
@@ -1402,7 +1369,6 @@ function buildUpgrades(){
             u.cost=Math.ceil(u.cost*u.costScale);
           }
           u.level++; u.apply();
-          addLore(u.name+' — your essence deepens.');
           dirtyU=true; updateEntityStatsPanel();
           document.getElementById('soul-count').textContent=fmt(souls);
           setHint();
@@ -1472,8 +1438,6 @@ document.getElementById('mok').addEventListener('click',function(){
   if(mstage===1){traits.aff=pending.aff;if(traits.adds.indexOf(pending.add2)<0)traits.adds.push(pending.add2);}
   if(mstage===2){traits.outfit=pending.outfit;}
   stage++;
-  var msgs=['Form crashes over you. You have a shape now.','The second skin tears. Something older emerges.','You stand at the threshold.'];
-  addLore(msgs[mstage]||'You become more.');
   document.getElementById('mo').className='';
   document.getElementById('evb').style.display='none';
   updateTraitsRow(); dirtyU=true;
@@ -1529,7 +1493,6 @@ function gameLoop(){
   else { tickMist(enemyDead); drawMist(ecv,def()?def().color:[200,255,200],enemyDead,1); }
 
   if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;}
-  checkLore();
   // Spirit Slash soul-prompt: show gothic arrow when 5+ souls and not yet purchased
   var ssArrow=document.getElementById('ss-arrow');
   if(ssArrow){
@@ -1544,7 +1507,6 @@ updateEntityStatsPanel();
 updateTraitsRow();
 buildMinimap();
 spawnEnemy();
-addLore('You are nothing. Not even darkness has your shape.');
 requestAnimationFrame(gameLoop);
 
 document.querySelectorAll('.tab-btn').forEach(function(btn){
