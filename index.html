@@ -1297,6 +1297,7 @@ function onEnemyDeath(){
   updateEntityStatsPanel();
   buildMinimap();
   updateProgressLabel();
+  saveGame();
 }
 
 function onEliteDpsCheckFail(){
@@ -1473,6 +1474,64 @@ var REP_UPGRADES=[
     vis:function(){return REP_UPGRADES[28].level>=1;}, milestones:mkMs()},
 ];
 
+// ── SAVE / LOAD ───────────────────────────────────────────────────────────────
+var SAVE_KEY='formless_save_v1';
+var _lastAutoSave=0;
+
+function saveGame(){
+  var data={
+    souls:souls, totalSouls:totalSouls,
+    stage:stage, traits:traits,
+    curLevel:curLevel, curFloor:curFloor, floorWins:floorWins,
+    highestLevel:highestLevel, highestFloor:highestFloor,
+    defeatedElites:defeatedElites,
+    firstKillDone:firstKillDone, killCounts:killCounts,
+    upgrades:REP_UPGRADES.map(function(u){return{id:u.id,level:u.level,cost:u.cost,milestones:u.milestones.slice()};}),
+    savedAt:Date.now()
+  };
+  try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
+}
+
+function loadGame(){
+  var raw;
+  try{ raw=localStorage.getItem(SAVE_KEY); } catch(e){ return; }
+  if(!raw) return;
+  var data;
+  try{ data=JSON.parse(raw); } catch(e){ return; }
+  if(!data) return;
+  souls=data.souls||0;
+  totalSouls=data.totalSouls||0;
+  stage=data.stage||0;
+  if(data.traits) traits=data.traits;
+  curLevel=data.curLevel||1;
+  curFloor=data.curFloor||1;
+  floorWins=data.floorWins||0;
+  highestLevel=data.highestLevel||1;
+  highestFloor=data.highestFloor||1;
+  defeatedElites=data.defeatedElites||[];
+  firstKillDone=data.firstKillDone||{};
+  killCounts=data.killCounts||{};
+  if(data.upgrades){
+    data.upgrades.forEach(function(saved){
+      var u=REP_UPGRADES.filter(function(x){return x.id===saved.id;})[0];
+      if(!u) return;
+      u.level=saved.level||0;
+      u.cost=saved.cost||u.cost;
+      if(saved.milestones) u.milestones=saved.milestones.slice();
+    });
+  }
+  // Rebuild enemy pool from defeatedElites
+  defeatedElites.forEach(function(typeIdx){
+    if(enemyPool.indexOf(typeIdx)<0) enemyPool.push(typeIdx);
+    var nextType=typeIdx+1;
+    if(nextType<ENEMY_TYPES.length&&enemyPool.indexOf(nextType)<0) enemyPool.push(nextType);
+  });
+}
+
+function deleteSave(){
+  try{ localStorage.removeItem(SAVE_KEY); } catch(e){}
+}
+
 function buildUpgrades(){
   var el=document.getElementById('upgrade-list'); el.innerHTML='';
   REP_UPGRADES.forEach(function(u){
@@ -1513,6 +1572,7 @@ function buildUpgrades(){
           recalcStats();
           dirtyU=true;
           updateEntityStatsPanel();
+          saveGame();
         }
       });
       box.addEventListener('mouseenter',function(e){ showMsTip(e,u,mi); });
@@ -1536,6 +1596,7 @@ function buildUpgrades(){
           dirtyU=true; updateEntityStatsPanel();
           document.getElementById('soul-count').textContent=fmt(souls);
           setHint();
+          saveGame();
         }
       });
     }
@@ -1607,6 +1668,7 @@ document.getElementById('mok').addEventListener('click',function(){
   document.getElementById('mo').className='';
   document.getElementById('evb').style.display='none';
   updateTraitsRow(); dirtyU=true;
+  saveGame();
 });
 document.getElementById('mo').addEventListener('click',function(e){if(e.target===this)this.className='';});
 
@@ -1659,6 +1721,7 @@ function gameLoop(){
   else { tickMist(enemyDead); drawMist(ecv,def()?def().color:[200,255,200],enemyDead,1); }
 
   if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;}
+  if(now-_lastAutoSave>30000){saveGame();_lastAutoSave=now;}
   // Spirit Slash soul-prompt: show global arrow when 5+ souls and not yet purchased
   var ssArrow=document.getElementById('ss-global-arrow');
   if(ssArrow){
@@ -1669,6 +1732,7 @@ function gameLoop(){
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initMist(28);
+loadGame();
 recalcStats();
 updateHpBars();
 updateEntityStatsPanel();
