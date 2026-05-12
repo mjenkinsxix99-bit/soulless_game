@@ -146,8 +146,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #minimap-panel { position:relative; flex-shrink:0; padding:6px 14px; background:transparent; margin-top:4px; }
 #minimap-inner { display:flex;gap:6px;align-items:center;justify-content:center;padding:4px 0; }
 
-/* Entity canvas spacer to align canvases at same bottom level */
-.canvas-spacer { height: 42px; }
 </style>
 </head>
 <body>
@@ -187,7 +185,10 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <div class="canvas-wrap">
             <canvas id="entity-canvas" width="220" height="220"></canvas>
           </div>
-          <div class="canvas-spacer"></div>
+          <div class="hp-wrap" style="visibility:hidden">
+            <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
+            <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
+          </div>
         </div>
         <div id="vs">vs</div>
         <div class="combatant">
