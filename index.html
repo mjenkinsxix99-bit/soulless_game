@@ -42,7 +42,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .cname.entity-label { color: #b8aaee; text-shadow: 0 0 8px rgba(180,160,255,0.5); }
 .cname.enemy-label { color: #88cc88; text-shadow: 0 0 8px rgba(100,200,100,0.4); }
 .cname.elite-label { color: #d4a843; text-shadow: 0 0 8px rgba(212,168,67,0.5); }
-.hp-wrap { width: 230px; }
+.hp-wrap { width: 220px; }
 .hp-track { height: 7px; background: #111128; border-radius: 4px; overflow: hidden; border: 1px solid #1e1845; }
 .hp-fill { height: 100%; border-radius: 4px; transition: width 0.15s; }
 .hp-fill.entity-hp { background: #6655aa; }
@@ -575,11 +575,13 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   }
 
   var iw = img.naturalWidth, ih = img.naturalHeight;
-  var drawH = elite ? Math.min(H * 0.96, H - 4) : Math.min(H * 0.78, H - 10);
+  // Elite canvas is 320px; leave ~70px at top for the halo, push sprite down
+  var drawH = elite ? Math.min(H * 0.72, H - 10) : Math.min(H * 0.78, H - 10);
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
   var float = dead ? 0 : Math.sin(t * (floatSpeed || 0.0013)) * 6;
-  var dy = (H - drawH) / 2 + float;
+  // Elite: bias sprite toward bottom of canvas (0.75 of remaining space above)
+  var dy = elite ? (H - drawH) * 0.75 + float : (H - drawH) / 2 + float;
   var cx = W / 2, cy = dy + drawH / 2;
 
   // Hit squish: stretch wide, squish tall
@@ -611,12 +613,13 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
   ctx.scale(scaleX, scaleY);
   ctx.translate(-cx, -cy);
 
-  // Golden halo for elites — drawn before sprite so it sits behind/above
+  // Golden halo for elites — drawn before sprite so it floats above the head
   if (elite && !dead) {
     var haloPulse = Math.sin(t * 0.003) * 0.5 + 0.5;
-    var haloRx = drawW * 0.44;
-    var haloRy = haloRx * 0.26;
-    var haloYpos = dy + drawH * 0.06; // top of character area
+    var haloRx = drawW * 0.38;
+    var haloRy = haloRx * 0.28;
+    // Place halo centre so its top edge is ~10px above sprite top (dy)
+    var haloYpos = dy - haloRy - 10;
     ctx.save();
     ctx.globalAlpha = (0.75 + haloPulse * 0.25) * deathFade;
     ctx.strokeStyle = '#ffd700';
@@ -1083,6 +1086,14 @@ function spawnEnemy(){
   var elite=isEliteFight();
   var lv=curLevel, fl=curFloor;
 
+  // Resize enemy canvas: elites get a larger card
+  var ecv=document.getElementById('enemy-canvas');
+  var sz=elite?320:220;
+  ecv.width=sz; ecv.height=sz;
+  ecv.style.width=sz+'px'; ecv.style.height=sz+'px';
+  // hp-wrap width follows canvas width
+  var hpWraps=document.querySelectorAll('.combatant .hp-wrap');
+  hpWraps.forEach(function(w){ w.style.width=sz+'px'; });
   // Pick enemy type
   if(elite){
     // elite is always the boss of this level (type index = level-1)
