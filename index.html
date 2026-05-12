@@ -123,11 +123,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 /* Upgrade list: shows ~6 cards then scrolls */
 #upgrade-list { max-height: 610px; overflow-y: auto; padding-right: 4px; scroll-behavior: smooth; }
 
-/* Spirit Slash soul-prompt arrow */
-#ss-arrow { display:none; text-align:center; margin-bottom:4px; font-size:28px; color:#d4a843;
-  text-shadow:0 0 10px rgba(212,168,67,0.9),0 0 22px rgba(212,168,67,0.5);
-  animation:ss-bounce 0.7s ease-in-out infinite alternate; pointer-events:none; }
-@keyframes ss-bounce { 0%{transform:translateY(-4px)} 100%{transform:translateY(6px)} }
+/* Spirit Slash soul-prompt arrow — right of the card, pointing left */
+.ss-card-wrap { position:relative; display:flex; align-items:center; }
+.ss-card-wrap .ucard { flex:1; }
+.ss-prompt { display:none; font-size:52px; color:#d4a843; margin-left:10px; line-height:1;
+  text-shadow:0 0 14px rgba(212,168,67,1),0 0 30px rgba(212,168,67,0.6);
+  animation:ss-bounce-h 0.55s ease-in-out infinite alternate; pointer-events:none; flex-shrink:0; }
+.ss-prompt.show { display:block; }
+@keyframes ss-bounce-h { 0%{transform:translateX(8px)} 100%{transform:translateX(-4px)} }
 
 /* Minimap nav arrows */
 .mm-nav { background:transparent; border:none; color:#d4a843; font-size:22px; cursor:pointer;
@@ -169,7 +172,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button class="tab-btn" data-tab="stats">Stats</button>
       </div>
       <div id="tab-upgrades" class="tab-pane active">
-        <div id="ss-arrow">&#8659;</div>
         <div id="upgrade-list"></div>
       </div>
       <div id="tab-stats" class="tab-pane">
@@ -1347,6 +1349,7 @@ var REP_UPGRADES=[
 
 function buildUpgrades(){
   var el=document.getElementById('upgrade-list'); el.innerHTML='';
+  var showSsArrow=(souls>=5&&REP_UPGRADES[0].level===0);
   REP_UPGRADES.forEach(function(u){
     if(!u.vis()) return;
     var cost=repCost(u), can=souls>=cost, bought=u.level>0;
@@ -1377,7 +1380,18 @@ function buildUpgrades(){
         }
       });
     }
-    el.appendChild(d);
+    if(u.id==='ss'){
+      var wrap=document.createElement('div');
+      wrap.className='ss-card-wrap';
+      wrap.appendChild(d);
+      var arrow=document.createElement('div');
+      arrow.className='ss-prompt'+(showSsArrow?' show':'');
+      arrow.textContent='⮜'; // ⮜ bold left arrow
+      wrap.appendChild(arrow);
+      el.appendChild(wrap);
+    } else {
+      el.appendChild(d);
+    }
   });
 }
 
@@ -1495,10 +1509,11 @@ function gameLoop(){
   else { tickMist(enemyDead); drawMist(ecv,def()?def().color:[200,255,200],enemyDead,1); }
 
   if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;}
-  // Spirit Slash soul-prompt: show gothic arrow when 5+ souls and not yet purchased
-  var ssArrow=document.getElementById('ss-arrow');
-  if(ssArrow){
-    ssArrow.style.display=(souls>=5&&REP_UPGRADES[0].level===0)?'block':'none';
+  // Spirit Slash soul-prompt: show arrow when 5+ souls and not yet purchased
+  var ssPrompt=document.querySelector('.ss-prompt');
+  if(ssPrompt){
+    if(souls>=5&&REP_UPGRADES[0].level===0) ssPrompt.classList.add('show');
+    else ssPrompt.classList.remove('show');
   }
 }
 
