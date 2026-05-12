@@ -37,13 +37,17 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard .ms-btn .ms-tip { margin-left: auto; font-size: 12px; color: #888866; letter-spacing: 1px; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; }
 #bg-canvas { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0; }
+#combat-oval { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:920px; height:660px; border-radius:50%;
+  background:radial-gradient(ellipse at center, rgba(0,0,0,0.94) 18%, rgba(0,0,0,0.78) 40%, rgba(0,0,0,0.45) 62%, transparent 78%);
+  pointer-events:none; z-index:0; }
 #combat-zone { display: flex; align-items: flex-end; justify-content: center; gap: 0; width: 100%; position:relative; z-index:1; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cname { font-size: 19px; font-weight: bold; letter-spacing: 2px; color: #9988cc; text-transform: uppercase; }
 .cname.entity-label { color: #b8aaee; text-shadow: 0 0 8px rgba(180,160,255,0.5); }
 .cname.enemy-label { color: #88cc88; text-shadow: 0 0 8px rgba(100,200,100,0.4); }
 .cname.elite-label { color: #d4a843; text-shadow: 0 0 8px rgba(212,168,67,0.5); }
-.hp-wrap { width: 220px; }
+.hp-wrap { width: 330px; }
 .hp-track { height: 7px; background: #111128; border-radius: 4px; overflow: hidden; border: 1px solid #1e1845; }
 .hp-fill { height: 100%; border-radius: 4px; transition: width 0.15s; }
 .hp-fill.entity-hp { background: #6655aa; }
@@ -80,7 +84,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #reform-btn:hover { background: rgba(102,85,170,0.15); }
 #prog-area { text-align: center; }
 #prog-label { font-size: 15px; color: #9988bb; letter-spacing: 2px; margin-bottom: 4px; }
-#prog-track { width: 340px; height: 4px; background: #111128; border-radius: 3px; overflow: hidden; border: 1px solid #1e1845; margin: 0 auto; }
+#prog-track { width: 510px; height: 4px; background: #111128; border-radius: 3px; overflow: hidden; border: 1px solid #1e1845; margin: 0 auto; }
 #prog-bar { height: 100%; background: #6655aa; border-radius: 3px; transition: width 0.3s; width: 0%; }
 #evb { display: none; padding: 8px 20px; background: transparent; border: 1px solid #d4a843; color: #d4a843; font-family: Georgia,serif; font-size: 16px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
 #evb:hover { background: rgba(212,168,67,0.1); }
@@ -201,11 +205,12 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="battlefield">
       <canvas id="bg-canvas"></canvas>
+      <div id="combat-oval"></div>
       <div id="combat-zone">
         <div class="combatant">
           <div class="cname entity-label">The Entity</div>
           <div class="canvas-wrap">
-            <canvas id="entity-canvas" width="220" height="220"></canvas>
+            <canvas id="entity-canvas" width="330" height="330"></canvas>
           </div>
           <div class="hp-wrap" style="visibility:hidden">
             <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
@@ -216,7 +221,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <div class="combatant">
           <div class="cname enemy-label" id="enemy-name-label">Lost Wisp</div>
           <div class="canvas-wrap" style="position:relative;">
-            <canvas id="enemy-canvas" width="220" height="220"></canvas>
+            <canvas id="enemy-canvas" width="330" height="330"></canvas>
             <div id="crown"></div>
           </div>
           <div class="hp-wrap">
@@ -522,8 +527,8 @@ function initMist(count) {
   enemyParticles = [];
   for (var i = 0; i < count; i++) {
     enemyParticles.push({
-      x: 110+(Math.random()-0.5)*40,
-      y: 110+(Math.random()-0.5)*40,
+      x: 165+(Math.random()-0.5)*60,
+      y: 165+(Math.random()-0.5)*60,
       vx:(Math.random()-0.5)*0.3,
       vy:(Math.random()-0.5)*0.3,
       r: 18+Math.random()*38,
@@ -538,8 +543,8 @@ function tickMist(dead) {
     p.phase += p.spd;
     p.x += p.vx + Math.sin(p.phase)*0.4;
     p.y += p.vy + Math.cos(p.phase*1.3)*0.4;
-    p.x += (110-p.x)*0.004;
-    p.y += (110-p.y)*0.004;
+    p.x += (165-p.x)*0.004;
+    p.y += (165-p.y)*0.004;
     if (dead) p.a = Math.max(0, p.a-0.003);
   });
 }
@@ -1090,12 +1095,12 @@ function spawnEnemy(){
 
   // Resize enemy canvas: elites get a larger card
   var ecv=document.getElementById('enemy-canvas');
-  var sz=elite?320:220;
+  var sz=elite?480:330;
   ecv.width=sz; ecv.height=sz;
   ecv.style.width=sz+'px'; ecv.style.height=sz+'px';
-  // hp-wrap width follows canvas width
-  var hpWraps=document.querySelectorAll('.combatant .hp-wrap');
-  hpWraps.forEach(function(w){ w.style.width=sz+'px'; });
+  // hp-wrap width follows its respective canvas width
+  var enemyCombatant=ecv.closest('.combatant');
+  if(enemyCombatant){enemyCombatant.querySelectorAll('.hp-wrap').forEach(function(w){w.style.width=sz+'px';});}
   // Pick enemy type
   if(elite){
     // elite is always the boss of this level (type index = level-1)
