@@ -563,11 +563,15 @@ function drawMist(canvas, col, dead, sizeBoost) {
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI*2); ctx.fill();
   });
-  // Clip mist to circle
+  // Soft vignette mask on mist
   ctx.globalCompositeOperation = 'destination-in';
+  var mr = Math.min(canvas.width, canvas.height) / 2;
+  var mg = ctx.createRadialGradient(canvas.width/2, canvas.height/2, mr * 0.62, canvas.width/2, canvas.height/2, mr);
+  mg.addColorStop(0, 'rgba(0,0,0,1)');
+  mg.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.beginPath();
-  ctx.arc(canvas.width/2, canvas.height/2, Math.min(canvas.width, canvas.height)/2, 0, Math.PI*2);
-  ctx.fillStyle = '#000';
+  ctx.arc(canvas.width/2, canvas.height/2, mr, 0, Math.PI*2);
+  ctx.fillStyle = mg;
   ctx.fill();
   ctx.globalCompositeOperation = 'source-over';
 }
@@ -717,12 +721,15 @@ function drawEnemySprite(canvas, t, dead, elite, img, imgLoaded, floatSpeed) {
 
   ctx.restore();
 
-  // Clip everything to a circle — hides the rectangular canvas boundary
+  // Soft vignette mask — sprite fades to transparent at the canvas edge
   ctx.globalCompositeOperation = 'destination-in';
   var cr = Math.min(W, H) / 2;
+  var vg = ctx.createRadialGradient(W/2, H/2, cr * 0.62, W/2, H/2, cr);
+  vg.addColorStop(0, 'rgba(0,0,0,1)');
+  vg.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.beginPath();
-  ctx.arc(W / 2, H / 2, cr, 0, Math.PI * 2);
-  ctx.fillStyle = '#000';
+  ctx.arc(W/2, H/2, cr, 0, Math.PI * 2);
+  ctx.fillStyle = vg;
   ctx.fill();
   ctx.globalCompositeOperation = 'source-over';
 }
