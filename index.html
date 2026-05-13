@@ -30,15 +30,19 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard .uc { font-size: 15px; color: #7a6010; margin-top: 3px; }
 .ucard .ulvl { font-size: 13px; color: #555555; }
 .ucard .ms-row { display:flex; gap:3px; margin-top:8px; padding-top:7px; border-top:1px solid #c8b870; }
-.ms-box { flex:1; height:20px; border-radius:3px; border:1px solid #2a2010; background:rgba(30,20,10,0.35); cursor:not-allowed; position:relative; transition:background 0.2s,border-color 0.2s,box-shadow 0.2s; }
+.ms-box { flex:1; height:20px; border-radius:3px; border:1px solid #2a2010; background:rgba(30,20,10,0.35); cursor:not-allowed; position:relative; transition:background 0.2s,border-color 0.2s,box-shadow 0.2s; overflow:hidden; }
 .ms-box.avail { cursor:pointer; animation:ms-pulse 1.3s ease-in-out infinite; }
-.ms-box.lit { cursor:default; }
+.ms-box.lit { cursor:default; animation:ms-lit-pulse 2s ease-in-out infinite; }
+.ms-box.lit .ms-star { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; height:90%; object-fit:contain; pointer-events:none; animation:ms-star-glow 2s ease-in-out infinite; }
 @keyframes ms-pulse { 0%,100%{box-shadow:0 0 4px var(--ms-c,rgba(255,255,255,0.5));} 50%{box-shadow:0 0 10px var(--ms-c,rgba(255,255,255,0.85)),0 0 20px var(--ms-c,rgba(255,255,255,0.35));} }
+@keyframes ms-lit-pulse { 0%,100%{filter:brightness(1);} 50%{filter:brightness(1.35);} }
+@keyframes ms-star-glow { 0%,100%{opacity:0.85;} 50%{opacity:1;} }
 #ms-tooltip { display:none; position:fixed; z-index:200; background:#0d0d1e; border:1px solid #4433aa; border-radius:6px; padding:8px 12px; font-family:Georgia,serif; font-size:13px; color:#c0b0ff; pointer-events:none; max-width:220px; box-shadow:0 0 16px rgba(100,60,200,0.5); line-height:1.5; }
 #ms-tooltip .mst-title { font-size:14px; color:#d4a843; letter-spacing:1px; margin-bottom:3px; }
 #ms-tooltip .mst-req { color:#887755; font-size:12px; }
 #ms-tooltip .mst-eff { color:#88aa88; font-size:13px; margin-top:2px; }
 #ms-tooltip .mst-status { color:#554488; font-size:12px; margin-top:3px; font-style:italic; }
+#ms-tooltip .mst-dmg { color:#88ddaa; font-size:13px; margin-top:4px; font-weight:bold; }
 /* Owned (purchased) upgrade card — bright and glowing */
 .ucard.owned { border-color: #7755bb; opacity: 1; background: #0e0920; box-shadow: 0 0 8px rgba(140,100,220,0.4), 0 0 18px rgba(100,70,180,0.2); }
 .ucard.owned:hover { box-shadow: 0 0 14px rgba(160,120,240,0.65), 0 0 28px rgba(120,90,200,0.4); }
@@ -1378,6 +1382,18 @@ var MS_LABELS=['I','II','III','IV','V','VI','VII','VIII','IX','X'];
 var MS_COLORS=['#ffffff','#f8f0e0','#f5e6c0','#f0d888','#e8cc55','#e0bb30','#d8aa18','#cf9a08','#c88a00','#d4a843'];
 var MS_LIT_BG=['rgba(255,255,255,0.35)','rgba(248,240,224,0.35)','rgba(245,230,192,0.35)','rgba(240,216,136,0.35)','rgba(232,204,85,0.35)','rgba(224,187,48,0.35)','rgba(216,170,24,0.35)','rgba(207,154,8,0.35)','rgba(200,138,0,0.35)','rgba(212,168,67,0.38)'];
 var MS_GLOW=['rgba(255,255,255,0.8)','rgba(248,240,224,0.8)','rgba(245,230,192,0.8)','rgba(240,216,136,0.8)','rgba(232,204,85,0.8)','rgba(224,187,48,0.8)','rgba(216,170,24,0.8)','rgba(207,154,8,0.8)','rgba(200,138,0,0.8)','rgba(255,215,0,0.95)'];
+var MS_STAR_FILTER=[
+  'brightness(2.2)',
+  'brightness(2.0) sepia(0.15)',
+  'brightness(1.9) sepia(0.3) saturate(1.5)',
+  'brightness(1.8) sepia(0.5) saturate(2)',
+  'brightness(1.8) sepia(0.7) saturate(2.5)',
+  'brightness(1.8) sepia(0.85) saturate(3)',
+  'brightness(1.9) sepia(1) saturate(3)',
+  'brightness(1.9) sepia(1) saturate(3.5) hue-rotate(-5deg)',
+  'brightness(2.0) sepia(1) saturate(4) hue-rotate(-15deg)',
+  'brightness(2.2) sepia(1) saturate(5) hue-rotate(-25deg)'
+];
 
 function getPurchMult(level){
   if(level<200) return D(1);
@@ -1411,12 +1427,30 @@ function showMsTip(evt,u,i){
   var tip=document.getElementById('ms-tooltip');
   if(!tip) return;
   var lit=u.milestones[i], avail=u.level>=MS_THRESH[i];
-  var multLabel=i===9?'x666':'x7';
+  var multLabel=i===9?'×666':'×7';
   var typeLabel=u.type==='click'?'Click Damage':u.type==='drain'?'HP Drain':'DPS';
   tip.querySelector('.mst-title').textContent='Milestone '+MS_LABELS[i];
   tip.querySelector('.mst-req').textContent='Requires '+MS_THRESH[i]+' purchases';
   tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
   tip.querySelector('.mst-status').textContent=lit?'Active':avail?'Click to activate':'Locked';
+  var dmgEl=tip.querySelector('.mst-dmg');
+  if(dmgEl){
+    if(lit && u.level>0){
+      var mm=getMileMult(u), pm=getPurchMult(u.level);
+      var dmgStr;
+      if(u.type==='drain'){
+        var pct=u.level*u.perLevel*mm*pm.toNumber()*100;
+        dmgStr=(+(pct.toFixed(4)))+'% HP/s drain (total)';
+      } else {
+        var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
+        dmgStr=fmt(eff)+(u.type==='click'?' click dmg':' DPS')+' (total)';
+      }
+      dmgEl.textContent=dmgStr;
+      dmgEl.style.display='block';
+    } else {
+      dmgEl.style.display='none';
+    }
+  }
   tip.style.display='block';
   positionMsTip(evt);
 }
@@ -1746,12 +1780,14 @@ function buildUpgrades(){
       var avail=!lit&&u.level>=MS_THRESH[i];
       var cls='ms-box'+(lit?' lit':avail?' avail':'');
       var style='';
+      var inner='';
       if(lit){
-        style='border-color:'+MS_COLORS[i]+';background:'+MS_LIT_BG[i]+';box-shadow:0 0 6px '+MS_GLOW[i]+',inset 0 0 4px '+MS_LIT_BG[i]+';';
+        style='border-color:'+MS_COLORS[i]+';background:'+MS_LIT_BG[i]+';box-shadow:0 0 8px '+MS_GLOW[i]+',0 0 18px '+MS_GLOW[i].replace(/[\d.]+\)$/,'0.4)')+',inset 0 0 5px '+MS_LIT_BG[i]+';--ms-c:'+MS_GLOW[i]+';';
+        inner='<img class="ms-star" src="artwork/sunburst.png" style="filter:'+MS_STAR_FILTER[i]+'" alt="">';
       } else if(avail){
         style='border-color:'+MS_COLORS[i]+';--ms-c:'+MS_GLOW[i]+';';
       }
-      msRowHtml+='<div class="'+cls+'" data-mi="'+i+'"'+(style?' style="'+style+'"':'')+'></div>';
+      msRowHtml+='<div class="'+cls+'" data-mi="'+i+'"'+(style?' style="'+style+'"':'')+'>'+inner+'</div>';
     }
     msRowHtml+='</div>';
 
@@ -2030,7 +2066,7 @@ document.getElementById('mm-next').addEventListener('click',function(){
 
 })();
 </script>
-<div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-status"></div></div>
+<div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
 <div id="upg-tooltip"><div class="ut-name"></div><div class="ut-val"></div><div class="ut-detail"></div></div>
 </body>
 </html>
