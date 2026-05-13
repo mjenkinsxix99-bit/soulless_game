@@ -99,6 +99,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .dmg-float { position: absolute; font-size: 20px; font-weight: bold; pointer-events: none; animation: floatup 0.9s ease-out forwards; }
 .dmg-float.edamage { color: #9980dd; }
 .dmg-float.ndamage { color: #cc5555; }
+.dmg-float.crit { color: #ffd700; font-size: 26px; text-shadow: 0 0 10px rgba(255,215,0,0.9), 0 0 22px rgba(255,165,0,0.6); }
 @keyframes floatup { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-55px)} }
 @keyframes soul-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
 .soul-pulse { display:inline-block; animation: soul-pulse 0.35s ease-out; }
@@ -113,9 +114,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #prog-label { font-size: 15px; color: #9988bb; letter-spacing: 2px; margin-bottom: 4px; }
 #prog-track { width: 510px; height: 4px; background: #111128; border-radius: 3px; overflow: hidden; border: 1px solid #1e1845; margin: 0 auto; }
 #prog-bar { height: 100%; background: #6655aa; border-radius: 3px; transition: width 0.3s; width: 0%; }
-#evb { display: none; padding: 8px 20px; background: transparent; border: 1px solid #d4a843; color: #d4a843; font-family: Georgia,serif; font-size: 16px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
-#evb:hover { background: rgba(212,168,67,0.1); }
-
 /* Ascend (Rebirth) button */
 #ascend-btn { display: none; margin-top: 6px; padding: 9px 22px; background: transparent; border: 1px solid #aa3333; color: #cc5555; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; }
 #ascend-btn:hover { background: rgba(180,50,50,0.12); box-shadow: 0 0 10px rgba(200,60,60,0.4); }
@@ -126,7 +124,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #tattered-display .lbl { font-size: 11px; color: #9a6030; letter-spacing: 2px; text-transform: uppercase; }
 
 /* Rebirth confirmation modal */
-#rebirth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 100; align-items: center; justify-content: center; }
+#rebirth-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; align-items: center; justify-content: center; }
 #rebirth-modal.open { display: flex; }
 #rebirth-box { background: #0a0a18; border: 1px solid #882222; border-radius: 10px; padding: 30px; max-width: 460px; width: 90%; max-height: 88vh; overflow-y: auto; text-align: center; }
 #rebirth-lore { font-size: 16px; color: #aa8866; font-style: italic; margin-bottom: 18px; line-height: 1.6; letter-spacing: 0.5px; }
@@ -142,7 +140,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #rebirth-cancel:hover { border-color: #554466; color: #665588; }
 
 /* Form selection modal */
-#form-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 101; align-items: center; justify-content: center; }
+#form-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10001; align-items: center; justify-content: center; }
 #form-modal.open { display: flex; }
 #form-box { background: #0a0a18; border: 1px solid #4433aa; border-radius: 10px; padding: 28px; max-width: 700px; width: 95%; max-height: 90vh; overflow-y: auto; }
 #form-title { font-size: 24px; color: #d4a843; text-align: center; margin-bottom: 6px; letter-spacing: 2px; }
@@ -362,7 +360,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <button class="mm-nav" id="mm-next" title="Scroll right">&#9654;</button>
         </div>
       </div>
-      <button id="evb">✦ TRANSCEND ✦</button>
+
       <div id="reform-msg">
         <div class="rm-title">Oh No! Get stronger uwu!</div>
         <div class="rm-sub">Too slow. The elite endures. Return to last floor.</div>
@@ -396,6 +394,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <div class="stat-row"><span>Damage</span><span class="sv" id="es-dmg">8–12</span></div>
         <div class="stat-row"><span>Auto attack</span><span class="sv" id="es-auto">—</span></div>
         <div class="stat-row"><span>Enemy drain</span><span class="sv" id="es-vamp">—</span></div>
+        <div class="stat-row" id="es-crit-row" style="display:none"><span>Crit chance</span><span class="sv good" id="es-crit">—</span></div>
+        <div class="stat-row" id="es-critm-row" style="display:none"><span>Crit multiplier</span><span class="sv good" id="es-critm">—</span></div>
+        <div class="stat-row" id="es-soul-row" style="display:none"><span>Soul absorb</span><span class="sv good" id="es-soul">—</span></div>
         <div class="ph gap">Enemy Defeats</div>
         <div id="enemy-defeats-list"></div>
         <div class="ph gap">Progress</div>
@@ -1490,10 +1491,15 @@ function entityAttack(isAuto){
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
   var hi=entityDmgMax.add(entityDmgBonus).add(bonus);
   var dmg=rndD(lo,hi);
+  var isCrit=false;
+  if(!isAuto && critClickChance>0 && Math.random()<critClickChance){
+    isCrit=true;
+    dmg=dmg.mul(2+critClickMult);
+  }
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
   enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
-  spawnFloat('-'+fmtHp(dmg),'edamage',pp.x,pp.y);
+  spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
   if(enemyHp.lte(0)) onEnemyDeath();
 }
@@ -1503,10 +1509,13 @@ function onEnemyDeath(){
   combatActive=false; enemyDead=true; eliteTimerStart=0;
   spawnSoulCoins();
   document.getElementById('elite-timer-wrap').style.display='none';
-  var reward=rebirthForm==='androgynous'?enemySoulReward.mul(1.1).floor():enemySoulReward;
+  var soulMult=1;
+  if(rebirthForm==='androgynous') soulMult*=1.1;
+  if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
+  var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
-  checkEvolution(); dirtyU=true;
+  dirtyU=true;
 
   var d=def();
   if(!firstKillDone[d.id]){
@@ -1607,6 +1616,21 @@ function updateHpBars(){
 var autoAttackEnabled=false, autoAttackInterval=3000;
 var entityDmgBonus=D(0);
 var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0;
+var critClickChance=0, critClickMult=0, dvDpsToClickRatio=0, soulAbsorbBonus=0;
+
+// Divine Hunger milestone effect labels (replaces generic ×7/×666 text)
+var DV_MS_EFFECTS=[
+  '+0.666% of Total DPS as Click Damage',
+  '+0.666% of Total DPS as Click Damage',
+  '+6.66% Critical Click Chance',
+  '+0.666% of Total DPS as Click Damage',
+  '+0.666% of Total DPS as Click Damage',
+  '+3.33× Critical Click Damage Multiplier',
+  '+0.666% of Total DPS as Click Damage',
+  '+0.666% of Total DPS as Click Damage',
+  '+22.2% Souls Absorbed',
+  '+0.666% of Total DPS as Click Damage',
+];
 
 var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
 function getMsThresh(i){
@@ -1646,9 +1670,12 @@ function getMileMult(u){
 }
 function recalcStats(){
   clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; autoAttackEnabled=false;
+  critClickChance=0; critClickMult=0; dvDpsToClickRatio=0; soulAbsorbBonus=0;
   REP_UPGRADES.forEach(function(u){
     if(u.level===0) return;
-    var mm=getMileMult(u), pm=getPurchMult(u.level);
+    // DV milestones have unique effects — don't apply generic multiplier to drain
+    var mm=(u.id==='dv')?1:getMileMult(u);
+    var pm=getPurchMult(u.level);
     if(u.type==='drain'){
       enemyHpDrainPct+=u.level*u.perLevel*mm*pm.toNumber();
     } else {
@@ -1662,8 +1689,16 @@ function recalcStats(){
     clickDmgBonus=clickDmgBonus.mul(1.1);
     totalDps=totalDps.mul(1.1);
   }
-  // Feline: faster auto-attack (10% shorter interval)
   autoAttackInterval=rebirthForm==='feline'?2700:3000;
+  // Apply Divine Hunger milestone support effects
+  var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
+  if(dv){
+    [0,1,3,4,6,7,9].forEach(function(mi){ if(dv.milestones[mi]) dvDpsToClickRatio+=0.00666; });
+    if(dv.milestones[2]) critClickChance+=0.0666;
+    if(dv.milestones[5]) critClickMult+=3.33;
+    if(dv.milestones[8]) soulAbsorbBonus+=0.222;
+    if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
+  }
 }
 
 var _msTip=null;
@@ -1671,11 +1706,15 @@ function showMsTip(evt,u,i){
   var tip=document.getElementById('ms-tooltip');
   if(!tip) return;
   var lit=u.milestones[i], avail=u.level>=getMsThresh(i);
-  var multLabel=i===9?'×666':'×7';
-  var typeLabel=u.type==='click'?'Click Damage':u.type==='drain'?'HP Drain':'DPS';
   tip.querySelector('.mst-title').textContent='Milestone '+MS_LABELS[i];
   tip.querySelector('.mst-req').textContent='Requires '+getMsThresh(i)+' purchases';
-  tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
+  if(u.id==='dv'){
+    tip.querySelector('.mst-eff').textContent=DV_MS_EFFECTS[i];
+  } else {
+    var multLabel=i===9?'×666':'×7';
+    var typeLabel=u.type==='click'?'Click Damage':u.type==='drain'?'HP Drain':'DPS';
+    tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
+  }
   tip.querySelector('.mst-status').textContent=lit?'Active':avail?'Click to activate':'Locked';
   var dmgEl=tip.querySelector('.mst-dmg');
   if(dmgEl){
@@ -1724,7 +1763,7 @@ var REP_UPGRADES=[
     desc:function(){return '+75 damage per second';},
     vis:function(){return REP_UPGRADES[2].level>=1;}, milestones:mkMs()},
   {id:'dv',name:'Divine Hunger', cost:5000,  costScale:1.07, level:0, type:'drain',  perLevel:0.0003,
-    desc:function(){return '+0.03% enemy HP/s drain';},
+    desc:function(){return '+0.03% enemy HP/s drain. Milestones unlock support bonuses.';},
     vis:function(){return REP_UPGRADES[3].level>=1;}, milestones:mkMs()},
   {id:'vs',name:'Void Sense',    cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
     desc:function(){return '+900 damage per second';},
@@ -2034,9 +2073,9 @@ function calcTatteredSoulsGain(chosenForm){
 function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
-  // Only show for the very first rebirth once the 20th upgrade (index 19) is purchased
-  if(rebirthCount===0 && REP_UPGRADES[19].level>=1){
-    btn.style.display='';
+  var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
+  if(rebirthCount===0 && doom && doom.level>=1){
+    btn.style.display='block';
   } else {
     btn.style.display='none';
   }
@@ -2475,13 +2514,18 @@ function updateEntityStatsPanel(){
   document.getElementById('es-dmg').textContent=fmt(dMin)+'–'+fmt(dMax);
   document.getElementById('es-auto').textContent=autoAttackEnabled?(fmt(totalDps.mul(autoAttackInterval/1000).floor())+' dmg / '+(autoAttackInterval/1000).toFixed(1)+'s'):'—';
   document.getElementById('es-vamp').textContent=enemyHpDrainPct>0?(+(enemyHpDrainPct*100).toFixed(4))+'% HP/s':'—';
+  var critRow=document.getElementById('es-crit-row');
+  var critmRow=document.getElementById('es-critm-row');
+  var soulRow=document.getElementById('es-soul-row');
+  if(critRow) critRow.style.display=critClickChance>0?'':'none';
+  if(critmRow) critmRow.style.display=critClickMult>0?'':'none';
+  if(soulRow) soulRow.style.display=soulAbsorbBonus>0?'':'none';
+  if(critClickChance>0) document.getElementById('es-crit').textContent=(critClickChance*100).toFixed(2)+'%';
+  if(critClickMult>0) document.getElementById('es-critm').textContent=(2+critClickMult).toFixed(2)+'×';
+  if(soulAbsorbBonus>0) document.getElementById('es-soul').textContent='+'+(soulAbsorbBonus*100).toFixed(1)+'%';
 }
 
 // ── EVOLUTION ─────────────────────────────────────────────────────────────────
-function checkEvolution(){
-  if(EV_THRESH[stage]&&totalSouls.gte(EV_THRESH[stage]))
-    document.getElementById('evb').style.display='block';
-}
 function updateTraitsRow(){
   var tr=document.getElementById('traits-row'); tr.innerHTML='';
   function pill(t){return '<span class="trait-pill">'+t+'</span>';}
@@ -2492,25 +2536,7 @@ function updateTraitsRow(){
   document.getElementById('stage-desc').textContent=SDESCS[stage];
   document.getElementById('entity-stage-label').textContent='You are '+SNAMES[stage]+'.';
 }
-document.getElementById('evb').addEventListener('click',function(){
-  mstage=stage;pending={};evReady=false;
-  document.getElementById('mok').className='';
-  var titles=['First Awakening','The Second Becoming','Ascension'];
-  var subs=['Your ether stirs. It craves definition.','The wraith demands more.','Boundaries dissolve.'];
-  document.getElementById('mt').textContent=titles[stage]||'Evolution';
-  document.getElementById('ms').textContent=subs[stage]||'Choose.';
-  var mc=document.getElementById('mc'); mc.innerHTML='';
-  if(stage===0){
-    mc.appendChild(mkS('Essence','sex',[{v:'male',l:'Masculine'},{v:'female',l:'Feminine'},{v:'unbound',l:'Neither'},{v:'cat',l:'A Cat'},{v:'dog',l:'A Dog'},{v:'horse',l:'A Horse'}]));
-    mc.appendChild(mkS('First Addition','add1',[{v:'halo',l:'Halo'},{v:'horns',l:'Horns'},{v:'wings',l:'Wings'},{v:'tail',l:'Tail'},{v:'witchhat',l:"Witch's Hat"},{v:'weapon',l:'Weapon'}]));
-  }
-  if(stage===1){
-    mc.appendChild(mkS('Soul Affinity','aff',[{v:'light',l:'Light'},{v:'shadow',l:'Shadow'},{v:'chaos',l:'Chaos'},{v:'nature',l:'Nature'}]));
-    mc.appendChild(mkS('Second Addition','add2',[{v:'ears',l:'Ears'},{v:'horns',l:'Horns'},{v:'wings',l:'Wings'},{v:'tail',l:'Tail'},{v:'witchhat',l:"Witch's Hat"},{v:'weapon',l:'Weapon'}]));
-  }
-  if(stage===2){mc.appendChild(mkS('Vestments','outfit',[{v:'robes',l:'Void Robes'},{v:'armor',l:'Soul Plate'},{v:'bare',l:'Formless'}]));}
-  document.getElementById('mo').className='open';
-});
+
 function mkS(title,key,opts){
   var sec=document.createElement('div'); sec.className='csec';
   var hd=document.createElement('div'); hd.className='ctitle'; hd.textContent=title; sec.appendChild(hd);
@@ -2552,7 +2578,6 @@ document.getElementById('mok').addEventListener('click',function(){
   ascendCount++;
   currentAscensionKills=0;
   document.getElementById('mo').className='';
-  document.getElementById('evb').style.display='none';
   updateTraitsRow(); dirtyU=true;
   checkAchievements();
   saveGame();
