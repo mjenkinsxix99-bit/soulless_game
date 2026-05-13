@@ -161,15 +161,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 ::-webkit-scrollbar-thumb { background: #1e1845; border-radius: 2px; }
 
 /* Upgrade list scrolls within the right panel */
-#upgrade-list { overflow-y: auto; padding-right: 4px; scroll-behavior: smooth; flex:1; min-width:0; }
+#upgrade-list { overflow-y: auto; padding-right: 4px; scroll-behavior: smooth; }
 
-/* Buy quantity selector */
-#tab-upgrades.active { display:flex !important; flex-direction:row; }
-#buy-selector { display:flex; flex-direction:column; gap:3px; padding:4px 6px 0 0; flex-shrink:0; width:44px; border-right:1px solid #1e1845; margin-right:7px; }
-.buy-label { font-size:9px; color:#332255; letter-spacing:2px; text-align:center; text-transform:uppercase; padding-bottom:4px; }
-.buy-btn { background:#0d0b1a; border:1px solid #1e1845; color:#443366; border-radius:3px; padding:6px 0; font-size:11px; cursor:pointer; text-align:center; font-family:Georgia,serif; width:100%; transition:all 0.12s; }
-.buy-btn:hover { border-color:#5544bb; color:#9980dd; }
-.buy-btn.active { background:#1a1545; border-color:#7755cc; color:#d4a843; box-shadow:0 0 6px rgba(120,90,210,0.3); }
+/* Buy quantity selector — standalone column between battlefield and right panel */
+#buy-selector { display:flex; flex-direction:column; align-items:center; gap:5px; padding:16px 8px; background:#08080e; border-left:1px solid #1e1845; border-right:1px solid #2a1a5a; width:58px; flex-shrink:0; }
+.buy-label { font-size:9px; color:#9980dd; letter-spacing:2px; text-align:center; text-transform:uppercase; padding-bottom:4px; }
+.buy-btn { background:#0d0b1a; border:2px solid #3a2a6a; color:#9980dd; border-radius:5px; padding:10px 0; font-size:13px; font-weight:bold; cursor:pointer; text-align:center; font-family:Georgia,serif; width:100%; transition:all 0.15s; letter-spacing:1px; }
+.buy-btn:hover { border-color:#7755cc; color:#c0a0ff; box-shadow:0 0 8px rgba(150,100,255,0.45); }
+.buy-btn.active { background:#1a1200; border-color:#d4a843; color:#ffd700; box-shadow:0 0 10px rgba(212,168,67,0.9),0 0 22px rgba(212,168,67,0.45); text-shadow:0 0 8px rgba(255,215,0,0.85); }
 .ubuy { font-size:11px; color:#887755; }
 /* Entity display in left panel */
 #left-entity { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
@@ -316,6 +315,15 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       </div>
       <div id="float-layer"></div>
     </div>
+    <div id="buy-selector">
+      <div class="buy-label">BUY</div>
+      <button class="buy-btn active" data-qty="1">1</button>
+      <button class="buy-btn" data-qty="10">10</button>
+      <button class="buy-btn" data-qty="25">25</button>
+      <button class="buy-btn" data-qty="50">50</button>
+      <button class="buy-btn" data-qty="100">100</button>
+      <button class="buy-btn" data-qty="max">MAX</button>
+    </div>
     <div id="right">
       <div class="tab-bar">
         <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
@@ -323,15 +331,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button class="tab-btn" data-tab="stats">Stats</button>
       </div>
       <div id="tab-upgrades" class="tab-pane active">
-        <div id="buy-selector">
-          <div class="buy-label">BUY</div>
-          <button class="buy-btn active" data-qty="1">1</button>
-          <button class="buy-btn" data-qty="10">10</button>
-          <button class="buy-btn" data-qty="25">25</button>
-          <button class="buy-btn" data-qty="50">50</button>
-          <button class="buy-btn" data-qty="100">100</button>
-          <button class="buy-btn" data-qty="max">MAX</button>
-        </div>
         <div id="upgrade-list"></div>
       </div>
       <div id="tab-achievements" class="tab-pane">
