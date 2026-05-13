@@ -921,11 +921,11 @@ function spawnSoulCoins(){
   var ec=d.color; var r=ec[0],g=ec[1],b=ec[2]; var cs=r+','+g+','+b;
   var lr=Math.min(r+90,255), lg=Math.min(g+90,255), lb=Math.min(b+90,255);
   var ecv=document.getElementById('enemy-canvas');
-  var scEl=document.getElementById('soul-count');
-  if(!ecv||!scEl) return;
-  var er=ecv.getBoundingClientRect(); var sr=scEl.getBoundingClientRect();
+  var entCv=document.getElementById('entity-canvas');
+  if(!ecv||!entCv) return;
+  var er=ecv.getBoundingClientRect(); var tr=entCv.getBoundingClientRect();
   var sx=er.left+er.width*0.5, sy=er.top+er.height*0.5;
-  var ex=sr.left+sr.width*0.5, ey=sr.top+sr.height*0.5;
+  var ex=tr.left+tr.width*0.5, ey=tr.top+tr.height*0.5;
   var count=3;
   var POP_DUR=280, PAUSE_DUR=750, FLY_DUR=420;
   for(var i=0;i<count;i++){
@@ -978,11 +978,6 @@ function spawnSoulCoins(){
             requestAnimationFrame(tick);
           } else {
             if(coin.parentNode) coin.parentNode.removeChild(coin);
-            if(idx===count-1){
-              var scount=document.getElementById('soul-count');
-              scount.classList.add('soul-pulse');
-              setTimeout(function(){ scount.classList.remove('soul-pulse'); },380);
-            }
           }
         }
         requestAnimationFrame(tick);
