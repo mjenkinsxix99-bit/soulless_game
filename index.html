@@ -113,9 +113,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #prog-label { font-size: 15px; color: #9988bb; letter-spacing: 2px; margin-bottom: 4px; }
 #prog-track { width: 510px; height: 4px; background: #111128; border-radius: 3px; overflow: hidden; border: 1px solid #1e1845; margin: 0 auto; }
 #prog-bar { height: 100%; background: #6655aa; border-radius: 3px; transition: width 0.3s; width: 0%; }
-#evb { display: none; padding: 8px 20px; background: transparent; border: 1px solid #d4a843; color: #d4a843; font-family: Georgia,serif; font-size: 16px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
-#evb:hover { background: rgba(212,168,67,0.1); }
-
 /* Ascend (Rebirth) button */
 #ascend-btn { display: none; margin-top: 6px; padding: 9px 22px; background: transparent; border: 1px solid #aa3333; color: #cc5555; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; }
 #ascend-btn:hover { background: rgba(180,50,50,0.12); box-shadow: 0 0 10px rgba(200,60,60,0.4); }
@@ -362,7 +359,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <button class="mm-nav" id="mm-next" title="Scroll right">&#9654;</button>
         </div>
       </div>
-      <button id="evb">✦ TRANSCEND ✦</button>
+
       <div id="reform-msg">
         <div class="rm-title">Oh No! Get stronger uwu!</div>
         <div class="rm-sub">Too slow. The elite endures. Return to last floor.</div>
@@ -1506,7 +1503,7 @@ function onEnemyDeath(){
   var reward=rebirthForm==='androgynous'?enemySoulReward.mul(1.1).floor():enemySoulReward;
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
-  checkEvolution(); dirtyU=true;
+  dirtyU=true;
 
   var d=def();
   if(!firstKillDone[d.id]){
@@ -2478,10 +2475,6 @@ function updateEntityStatsPanel(){
 }
 
 // ── EVOLUTION ─────────────────────────────────────────────────────────────────
-function checkEvolution(){
-  if(EV_THRESH[stage]&&totalSouls.gte(EV_THRESH[stage]))
-    document.getElementById('evb').style.display='block';
-}
 function updateTraitsRow(){
   var tr=document.getElementById('traits-row'); tr.innerHTML='';
   function pill(t){return '<span class="trait-pill">'+t+'</span>';}
@@ -2492,25 +2485,7 @@ function updateTraitsRow(){
   document.getElementById('stage-desc').textContent=SDESCS[stage];
   document.getElementById('entity-stage-label').textContent='You are '+SNAMES[stage]+'.';
 }
-document.getElementById('evb').addEventListener('click',function(){
-  mstage=stage;pending={};evReady=false;
-  document.getElementById('mok').className='';
-  var titles=['First Awakening','The Second Becoming','Ascension'];
-  var subs=['Your ether stirs. It craves definition.','The wraith demands more.','Boundaries dissolve.'];
-  document.getElementById('mt').textContent=titles[stage]||'Evolution';
-  document.getElementById('ms').textContent=subs[stage]||'Choose.';
-  var mc=document.getElementById('mc'); mc.innerHTML='';
-  if(stage===0){
-    mc.appendChild(mkS('Essence','sex',[{v:'male',l:'Masculine'},{v:'female',l:'Feminine'},{v:'unbound',l:'Neither'},{v:'cat',l:'A Cat'},{v:'dog',l:'A Dog'},{v:'horse',l:'A Horse'}]));
-    mc.appendChild(mkS('First Addition','add1',[{v:'halo',l:'Halo'},{v:'horns',l:'Horns'},{v:'wings',l:'Wings'},{v:'tail',l:'Tail'},{v:'witchhat',l:"Witch's Hat"},{v:'weapon',l:'Weapon'}]));
-  }
-  if(stage===1){
-    mc.appendChild(mkS('Soul Affinity','aff',[{v:'light',l:'Light'},{v:'shadow',l:'Shadow'},{v:'chaos',l:'Chaos'},{v:'nature',l:'Nature'}]));
-    mc.appendChild(mkS('Second Addition','add2',[{v:'ears',l:'Ears'},{v:'horns',l:'Horns'},{v:'wings',l:'Wings'},{v:'tail',l:'Tail'},{v:'witchhat',l:"Witch's Hat"},{v:'weapon',l:'Weapon'}]));
-  }
-  if(stage===2){mc.appendChild(mkS('Vestments','outfit',[{v:'robes',l:'Void Robes'},{v:'armor',l:'Soul Plate'},{v:'bare',l:'Formless'}]));}
-  document.getElementById('mo').className='open';
-});
+
 function mkS(title,key,opts){
   var sec=document.createElement('div'); sec.className='csec';
   var hd=document.createElement('div'); hd.className='ctitle'; hd.textContent=title; sec.appendChild(hd);
@@ -2552,7 +2527,6 @@ document.getElementById('mok').addEventListener('click',function(){
   ascendCount++;
   currentAscensionKills=0;
   document.getElementById('mo').className='';
-  document.getElementById('evb').style.display='none';
   updateTraitsRow(); dirtyU=true;
   checkAchievements();
   saveGame();
