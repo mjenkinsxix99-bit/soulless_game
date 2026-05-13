@@ -823,12 +823,12 @@ var FLOORS_PER_LEVEL  = 10;
 var LEVELS_PER_REALM  = 10;
 var FLOORS_PER_REALM  = FLOORS_PER_LEVEL * LEVELS_PER_REALM; // 100
 var WINS_PER_FLOOR    = 10;
-var MAX_REALMS        = 15; // ~1500 absolute floors before JS float overflow
+// No realm cap — break_infinity.js handles arbitrarily large HP values
 var MINIMAP_VISIBLE  = 7;
 var minimapNewFloor  = false;
 
 // Location state
-var curRealm  = 1;  // 1-MAX_REALMS
+var curRealm  = 1;
 var curLevel  = 1;  // 1-10
 var curFloor  = 1;  // 1-10  (11 = elite fight)
 var floorWins = 0;  // wins on current floor (0-9)
@@ -1280,25 +1280,21 @@ function onEnemyDeath(){
     }
 
     if(curLevel>=LEVELS_PER_REALM){
-      if(curRealm>=MAX_REALMS){
-        document.getElementById('click-hint').textContent='All realms conquered — you are eternal.';
-      } else {
-        document.getElementById('click-hint').textContent='Realm '+curRealm+' complete! Advancing to Realm '+(curRealm+1)+'…';
-        setTimeout(function(){
-          curRealm++;
-          if(curRealm>highestRealm) highestRealm=curRealm;
-          curLevel=1; curFloor=1; floorWins=0;
-          highestLevel=1; highestFloor=1;
-          defeatedElites=[];
-          enemyPool=[0];
-          minimapNewFloor=false;
-          buildMinimap();
-          updateProgressLabel();
-          saveGame();
-          spawnEnemy();
-        }, 2500);
-        return;
-      }
+      document.getElementById('click-hint').textContent='Realm '+curRealm+' complete! Advancing to Realm '+(curRealm+1)+'…';
+      setTimeout(function(){
+        curRealm++;
+        if(curRealm>highestRealm) highestRealm=curRealm;
+        curLevel=1; curFloor=1; floorWins=0;
+        highestLevel=1; highestFloor=1;
+        defeatedElites=[];
+        enemyPool=[0];
+        minimapNewFloor=false;
+        buildMinimap();
+        updateProgressLabel();
+        saveGame();
+        spawnEnemy();
+      }, 2500);
+      return;
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
     setTimeout(spawnEnemy,1200);
