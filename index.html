@@ -2033,7 +2033,7 @@ function checkRebirthButton(){
   if(!btn) return;
   var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
   if(rebirthCount===0 && doom && doom.level>=1){
-    btn.style.display='';
+    btn.style.display='block';
   } else {
     btn.style.display='none';
   }
