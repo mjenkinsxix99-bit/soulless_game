@@ -161,7 +161,16 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 ::-webkit-scrollbar-thumb { background: #1e1845; border-radius: 2px; }
 
 /* Upgrade list scrolls within the right panel */
-#upgrade-list { overflow-y: auto; padding-right: 4px; scroll-behavior: smooth; }
+#upgrade-list { overflow-y: auto; padding-right: 4px; scroll-behavior: smooth; flex:1; min-width:0; }
+
+/* Buy quantity selector */
+#tab-upgrades.active { display:flex !important; flex-direction:row; }
+#buy-selector { display:flex; flex-direction:column; gap:3px; padding:4px 6px 0 0; flex-shrink:0; width:44px; border-right:1px solid #1e1845; margin-right:7px; }
+.buy-label { font-size:9px; color:#332255; letter-spacing:2px; text-align:center; text-transform:uppercase; padding-bottom:4px; }
+.buy-btn { background:#0d0b1a; border:1px solid #1e1845; color:#443366; border-radius:3px; padding:6px 0; font-size:11px; cursor:pointer; text-align:center; font-family:Georgia,serif; width:100%; transition:all 0.12s; }
+.buy-btn:hover { border-color:#5544bb; color:#9980dd; }
+.buy-btn.active { background:#1a1545; border-color:#7755cc; color:#d4a843; box-shadow:0 0 6px rgba(120,90,210,0.3); }
+.ubuy { font-size:11px; color:#887755; }
 /* Entity display in left panel */
 #left-entity { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
 
@@ -314,6 +323,15 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button class="tab-btn" data-tab="stats">Stats</button>
       </div>
       <div id="tab-upgrades" class="tab-pane active">
+        <div id="buy-selector">
+          <div class="buy-label">BUY</div>
+          <button class="buy-btn active" data-qty="1">1</button>
+          <button class="buy-btn" data-qty="10">10</button>
+          <button class="buy-btn" data-qty="25">25</button>
+          <button class="buy-btn" data-qty="50">50</button>
+          <button class="buy-btn" data-qty="100">100</button>
+          <button class="buy-btn" data-qty="max">MAX</button>
+        </div>
         <div id="upgrade-list"></div>
       </div>
       <div id="tab-achievements" class="tab-pane">
@@ -973,6 +991,7 @@ var EV_THRESH=[D(500000),D(500),D(2000),D(10000)];
 var SNAMES=['Ether','Wraith','Nascent Being','Ascendant'];
 var SDESCS=['Shapeless. Hungry.','A form emerges.','Soul and substance entwine.','Between god and monster.'];
 var dirtyU=true, lastRebuildU=0;
+var buyQty=1;
 
 // ── ACHIEVEMENT STATE ─────────────────────────────────────────────────────────
 var totalClicks=0;
@@ -2075,11 +2094,39 @@ function hideUpgradeTip(){
   var tip=document.getElementById('upg-tooltip'); if(tip) tip.style.display='none';
 }
 
+function calcCostN(u,n){
+  var total=D(0),c=u.cost;
+  for(var i=0;i<n;i++){
+    total=total.add(c);
+    c=(u.id==='ss')?c.add(Decimal.max(D(1),c.mul(0.20).ceil())):c.mul(u.costScale).ceil();
+  }
+  return total;
+}
+function maxAffordableN(u){
+  var total=D(0),c=u.cost,n=0;
+  while(n<10000){
+    if(souls.lt(total.add(c))) break;
+    total=total.add(c);
+    c=(u.id==='ss')?c.add(Decimal.max(D(1),c.mul(0.20).ceil())):c.mul(u.costScale).ceil();
+    n++;
+  }
+  return n;
+}
 function buildUpgrades(){
   var el=document.getElementById('upgrade-list'); el.innerHTML='';
   REP_UPGRADES.forEach(function(u){
     if(!u.vis()) return;
-    var cost=repCost(u), can=souls.gte(cost), bought=u.level>0;
+    var actualN, cost, can;
+    if(buyQty==='max'){
+      actualN=maxAffordableN(u);
+      if(actualN===0){ cost=repCost(u); can=false; actualN=1; }
+      else { cost=calcCostN(u,actualN); can=true; }
+    } else {
+      actualN=buyQty;
+      cost=calcCostN(u,actualN);
+      can=souls.gte(cost);
+    }
+    var bought=u.level>0;
     var d=document.createElement('div');
     d.className='ucard'+(can?' can':'')+(bought?' bought':'');
 
@@ -2107,7 +2154,8 @@ function buildUpgrades(){
     msRowHtml+='</div>';
 
     var idx=REP_UPGRADES.indexOf(u);
-    var nameHtml='<div class="un">'+u.name+(u.level>0?' <span class="ulvl">('+u.level+')</span>':'')+'</div>';
+    var buyLabel=(actualN>1)?' <span class="ubuy">×'+actualN+'</span>':'';
+    var nameHtml='<div class="un">'+u.name+(u.level>0?' <span class="ulvl">('+u.level+')</span>':'')+buyLabel+'</div>';
     var descHtml='<div class="ud">'+(bought?getUpgradeContribStr(u):u.desc())+'</div>';
     var costHtml='<div class="uc">'+fmt(cost)+' souls</div>';
     d.innerHTML=nameHtml+descHtml+costHtml+msRowHtml;
@@ -2144,16 +2192,18 @@ function buildUpgrades(){
     if(can){
       d.addEventListener('click',function(e){
         if(e.target.closest('.ms-box')) return;
-        var c=repCost(u);
-        if(souls.gte(c)){
-          souls=souls.sub(c);
-          if(u.id==='ss'){
-            u.cost=u.cost.add(Decimal.max(D(1),u.cost.mul(0.20).ceil()));
-          } else {
-            u.cost=u.cost.mul(u.costScale).ceil();
+        var n=(buyQty==='max')?maxAffordableN(u):buyQty;
+        if(n<1) return;
+        var total=calcCostN(u,n);
+        if(souls.gte(total)){
+          souls=souls.sub(total);
+          var c=u.cost;
+          for(var i=0;i<n;i++){
+            c=(u.id==='ss')?c.add(Decimal.max(D(1),c.mul(0.20).ceil())):c.mul(u.costScale).ceil();
           }
-          u.level++;
-          totalUpgradePurchases++;
+          u.cost=c;
+          u.level+=n;
+          totalUpgradePurchases+=n;
           recalcStats();
           dirtyU=true; updateEntityStatsPanel();
           document.getElementById('soul-count').textContent=fmt(souls);
@@ -2258,7 +2308,8 @@ document.getElementById('mok').addEventListener('click',function(){
 document.getElementById('mo').addEventListener('click',function(e){if(e.target===this)this.className='';});
 
 // ── INPUT ─────────────────────────────────────────────────────────────────────
-document.getElementById('enemy-canvas').addEventListener('click',function(){
+document.getElementById('enemy-canvas').addEventListener('mousedown',function(e){
+  if(e.button!==0) return;
   entityAttack(false);
 });
 document.getElementById('reform-btn').addEventListener('click',reform);
@@ -2338,6 +2389,16 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
     if(tab==='achievements'){ renderAchievementsTab(); _achievementsTabDirty=false; }
+  });
+});
+
+document.querySelectorAll('.buy-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.buy-btn').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    var qty=btn.getAttribute('data-qty');
+    buyQty=(qty==='max')?'max':parseInt(qty,10);
+    dirtyU=true;
   });
 });
 
