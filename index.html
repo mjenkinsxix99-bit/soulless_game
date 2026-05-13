@@ -108,6 +108,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .rm-sub { font-size: 16px; color: #443366; font-style: italic; }
 #reform-btn { padding: 8px 24px; border: 1px solid #6655aa; color: #b0a0e8; background: transparent; font-family: Georgia,serif; font-size: 18px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
 #reform-btn:hover { background: rgba(102,85,170,0.15); }
+#realm-label { text-align: center; font-size: 18px; font-weight: bold; color: #ccaaff; letter-spacing: 3px; margin-bottom: 6px; text-transform: uppercase; }
 #prog-area { text-align: center; }
 #prog-label { font-size: 15px; color: #9988bb; letter-spacing: 2px; margin-bottom: 4px; }
 #prog-track { width: 510px; height: 4px; background: #111128; border-radius: 3px; overflow: hidden; border: 1px solid #1e1845; margin: 0 auto; }
@@ -244,8 +245,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       </div>
       <div id="ss-global-arrow">⮞</div>
       <div id="click-hint">click the enemy to attack</div>
+      <div id="realm-label">Realm: Void</div>
       <div id="prog-area">
-        <div id="prog-label">Lost Wisp 0 / 10</div>
+        <div id="prog-label">Floor 1 — 0 / 10</div>
         <div id="prog-track"><div id="prog-bar"></div></div>
       </div>
       <!-- MINIMAP moved here, near level/floor info -->
@@ -260,7 +262,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <button id="evb">✦ TRANSCEND ✦</button>
       <div id="reform-msg">
         <div class="rm-title">Oh No! Get stronger uwu!</div>
-        <div class="rm-sub">Too slow. The elite endures. Return to floor 10.</div>
+        <div class="rm-sub">Too slow. The elite endures. Return to last floor.</div>
         <button id="reform-btn">Return</button>
       </div>
       <div id="float-layer"></div>
@@ -834,10 +836,11 @@ var ENEMY_TYPES = [
 //   Elite loss → pushed back to floor 10 of current level
 // ══════════════════════════════════════════════════════════════════════════════
 
-var FLOORS_PER_LEVEL  = 10;
+var FLOORS_PER_LEVEL  = 9;   // normal floors per level; elite is floor FLOORS_PER_LEVEL+1
 var LEVELS_PER_REALM  = 10;
-var FLOORS_PER_REALM  = FLOORS_PER_LEVEL * LEVELS_PER_REALM; // 100
+var FLOORS_PER_REALM  = FLOORS_PER_LEVEL * LEVELS_PER_REALM; // 90 normal + 10 elites
 var WINS_PER_FLOOR    = 10;
+var REALM_NAMES       = ['Void'];  // indexed by curRealm-1; unnamed realms fall back to number
 // No realm cap — break_infinity.js handles arbitrarily large HP values
 var MINIMAP_VISIBLE  = 7;
 var minimapNewFloor  = false;
@@ -845,7 +848,7 @@ var minimapNewFloor  = false;
 // Location state
 var curRealm  = 1;
 var curLevel  = 1;  // 1-10
-var curFloor  = 1;  // 1-10  (11 = elite fight)
+var curFloor  = 1;  // 1-9 normal; FLOORS_PER_LEVEL+1 = elite fight
 var floorWins = 0;  // wins on current floor (0-9)
 
 // Progress tracking
@@ -857,7 +860,7 @@ var defeatedElites = []; // level numbers (1-based) whose elite is beaten
 var enemyPool = [0];
 
 // ── SCALING ───────────────────────────────────────────────────────────────────
-// Absolute floor index: floor 1 of level 1 = 1, floor 1 of level 2 = 11, etc.
+// Absolute floor index for HP scaling (normal floors only; floor 1 of level 2 = FLOORS_PER_LEVEL+1)
 function absFloor(level, floor){ return (curRealm-1)*FLOORS_PER_REALM + (level-1)*FLOORS_PER_LEVEL + floor; }
 
 function floorHp(level, floor){
@@ -1013,7 +1016,10 @@ function spawnSoulCoins(){
   }
 }
 function def(){ return ENEMY_TYPES[currentEnemyTypeIdx]; }
-function isEliteFight(){ return curFloor===11; }
+function isEliteFight(){ return curFloor===FLOORS_PER_LEVEL+1; }
+// Global floor number displayed to the player (never resets across levels)
+function globalFloor(level,floor){ return (level-1)*(FLOORS_PER_LEVEL+1)+floor; }
+function realmName(realm){ return REALM_NAMES[realm-1]||('Realm '+realm); }
 
 // ── MINIMAP ───────────────────────────────────────────────────────────────────
 function floorDone(level, floor){
@@ -1030,8 +1036,8 @@ function floorUnlocked(level, floor){
   if(level < highestLevel) return true;
   // same level as highest
   if(floor <= highestFloor) return true;
-  // floor 11 (elite) unlocked only if floor 10 done
-  if(floor===11 && highestFloor >= 10 && floorDone(level,10)) return true;
+  // elite floor unlocked only if last normal floor is done
+  if(floor===FLOORS_PER_LEVEL+1 && highestFloor >= FLOORS_PER_LEVEL && floorDone(level,FLOORS_PER_LEVEL)) return true;
   return false;
 }
 
@@ -1042,7 +1048,7 @@ function buildMinimap(){
   // Flat room list
   var rooms=[];
   for(var lv=1;lv<=LEVELS_PER_REALM;lv++){
-    for(var fl=1;fl<=11;fl++) rooms.push({level:lv,floor:fl,isElite:fl===11});
+    for(var fl=1;fl<=FLOORS_PER_LEVEL+1;fl++) rooms.push({level:lv,floor:fl,isElite:fl===FLOORS_PER_LEVEL+1});
   }
 
   // Current room index
@@ -1091,8 +1097,8 @@ function buildMinimap(){
     else if(done)   cls+=' done';
     else if(locked) cls+=' locked';
     cell.className=cls;
-    cell.textContent=r.isElite?'★':r.floor;
-    cell.title='Level '+r.level+', '+(r.isElite?'Elite':'Floor '+r.floor);
+    cell.textContent=r.isElite?'★':globalFloor(r.level,r.floor);
+    cell.title='Level '+r.level+', '+(r.isElite?'Elite (Floor '+globalFloor(r.level,r.floor)+')':'Floor '+globalFloor(r.level,r.floor));
 
     if(!locked){
       (function(l,f){
@@ -1121,7 +1127,7 @@ function navigateTo(level, floor){
   if(!floorUnlocked(level,floor)) return;
   // Can't go forward past highest reached
   if(level > highestLevel) return;
-  if(level === highestLevel && floor > highestFloor && !(floor===11&&highestFloor>=10)) return;
+  if(level === highestLevel && floor > highestFloor && !(floor===FLOORS_PER_LEVEL+1&&highestFloor>=FLOORS_PER_LEVEL)) return;
 
   combatActive=false; enemyDead=true;
   curLevel=level; curFloor=floor;
@@ -1171,7 +1177,7 @@ function spawnEnemy(){
   enemyDmgMin  = floorDmgMin(hp);
   enemyDmgMax  = floorDmgMax(hp);
   enemySoulReward = elite ? eliteSouls(lv) : floorSouls(lv,fl);
-  enemySpeed   = elite ? Math.max(800, Math.round(2000-(absFloor(lv,10))*11)) : floorSpeed(lv,fl);
+  enemySpeed   = elite ? Math.max(800, Math.round(2000-(absFloor(lv,FLOORS_PER_LEVEL))*11)) : floorSpeed(lv,fl);
 
   enemyDead=false; enemyDeathTime=0; combatActive=true;
 
@@ -1207,12 +1213,15 @@ function setHint(){
 function updateProgressLabel(){
   var elite=isEliteFight();
   var d=def()||ENEMY_TYPES[curLevel-1];
+  var rn=document.getElementById('realm-label');
+  if(rn) rn.textContent='Realm: '+realmName(curRealm);
   if(elite){
     document.getElementById('prog-label').textContent=d.name+' — defeat to advance';
     document.getElementById('prog-bar').style.width='100%';
   } else {
+    var gf=globalFloor(curLevel,curFloor);
     document.getElementById('prog-label').textContent=
-      'Realm '+curRealm+' · Level '+curLevel+' · Floor '+curFloor+' — '+Math.min(floorWins,WINS_PER_FLOOR)+' / '+WINS_PER_FLOOR;
+      'Floor '+gf+' — '+Math.min(floorWins,WINS_PER_FLOOR)+' / '+WINS_PER_FLOOR;
     document.getElementById('prog-bar').style.width=(floorWins/WINS_PER_FLOOR*100)+'%';
   }
 }
@@ -1226,7 +1235,7 @@ function updateEnemyPanel(){
   document.getElementById('kp-left').textContent=elite?'—':Math.max(0,WINS_PER_FLOOR-floorWins);
   document.getElementById('kp-elite').textContent=
     defeatedElites.indexOf(curLevel-1)>=0?'beaten':
-    (floorDone(curLevel,10)?'ready':'locked');
+    (floorDone(curLevel,FLOORS_PER_LEVEL)?'ready':'locked');
 }
 
 function updateEnemyDefeatsPanel(){
@@ -1323,8 +1332,8 @@ function onEnemyDeath(){
         if(nextFloor<=FLOORS_PER_LEVEL){
           if(curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; minimapNewFloor=true; }
         } else {
-          // All 10 floors done — unlock elite
-          if(curLevel===highestLevel&&highestFloor<11){ highestFloor=11; minimapNewFloor=true; }
+          // All normal floors done — unlock elite
+          if(curLevel===highestLevel&&highestFloor<FLOORS_PER_LEVEL+1){ highestFloor=FLOORS_PER_LEVEL+1; minimapNewFloor=true; }
         }
       }
     }
@@ -1342,7 +1351,7 @@ function onEliteDpsCheckFail(){
   combatActive=false; eliteTimerStart=0;
   hitFlashTime=0; attackFlashTime=0;
   document.getElementById('elite-timer-wrap').style.display='none';
-  curFloor=10; floorWins=0;
+  curFloor=FLOORS_PER_LEVEL; floorWins=0;
   buildMinimap();
   setTimeout(spawnEnemy,600);
 }
