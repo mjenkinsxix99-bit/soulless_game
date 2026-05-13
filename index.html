@@ -811,18 +811,22 @@ var ENEMY_TYPES = [
 //   Elite loss → pushed back to floor 10 of current level
 // ══════════════════════════════════════════════════════════════════════════════
 
-var FLOORS_PER_LEVEL = 10;
-var LEVELS_PER_REALM = 10;
-var WINS_PER_FLOOR   = 10;
+var FLOORS_PER_LEVEL  = 10;
+var LEVELS_PER_REALM  = 10;
+var FLOORS_PER_REALM  = FLOORS_PER_LEVEL * LEVELS_PER_REALM; // 100
+var WINS_PER_FLOOR    = 10;
+var MAX_REALMS        = 15; // ~1500 absolute floors before JS float overflow
 var MINIMAP_VISIBLE  = 7;
 var minimapNewFloor  = false;
 
 // Location state
-var curLevel = 1;   // 1-10
-var curFloor = 1;   // 1-10  (11 = elite fight)
+var curRealm  = 1;  // 1-MAX_REALMS
+var curLevel  = 1;  // 1-10
+var curFloor  = 1;  // 1-10  (11 = elite fight)
 var floorWins = 0;  // wins on current floor (0-9)
 
 // Progress tracking
+var highestRealm  = 1;
 var highestLevel  = 1;
 var highestFloor  = 1;   // highest floor reached within highestLevel
 var defeatedElites = []; // level numbers (1-based) whose elite is beaten
@@ -831,7 +835,7 @@ var enemyPool = [0];
 
 // ── SCALING ───────────────────────────────────────────────────────────────────
 // Absolute floor index: floor 1 of level 1 = 1, floor 1 of level 2 = 11, etc.
-function absFloor(level, floor){ return (level-1)*FLOORS_PER_LEVEL + floor; }
+function absFloor(level, floor){ return (curRealm-1)*FLOORS_PER_REALM + (level-1)*FLOORS_PER_LEVEL + floor; }
 
 function floorHp(level, floor){
   var af = absFloor(level, floor);
@@ -1185,7 +1189,7 @@ function updateProgressLabel(){
     document.getElementById('prog-bar').style.width='100%';
   } else {
     document.getElementById('prog-label').textContent=
-      'Level '+curLevel+' · Floor '+curFloor+' — '+Math.min(floorWins,WINS_PER_FLOOR)+' / '+WINS_PER_FLOOR;
+      'Realm '+curRealm+' · Level '+curLevel+' · Floor '+curFloor+' — '+Math.min(floorWins,WINS_PER_FLOOR)+' / '+WINS_PER_FLOOR;
     document.getElementById('prog-bar').style.width=(floorWins/WINS_PER_FLOOR*100)+'%';
   }
 }
@@ -1266,7 +1270,25 @@ function onEnemyDeath(){
     }
 
     if(curLevel>=LEVELS_PER_REALM){
-      document.getElementById('click-hint').textContent='Void Realm complete!';
+      if(curRealm>=MAX_REALMS){
+        document.getElementById('click-hint').textContent='All realms conquered — you are eternal.';
+      } else {
+        document.getElementById('click-hint').textContent='Realm '+curRealm+' complete! Advancing to Realm '+(curRealm+1)+'…';
+        setTimeout(function(){
+          curRealm++;
+          if(curRealm>highestRealm) highestRealm=curRealm;
+          curLevel=1; curFloor=1; floorWins=0;
+          highestLevel=1; highestFloor=1;
+          defeatedElites=[];
+          enemyPool=[0];
+          minimapNewFloor=false;
+          buildMinimap();
+          updateProgressLabel();
+          saveGame();
+          spawnEnemy();
+        }, 2500);
+        return;
+      }
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
     setTimeout(spawnEnemy,1200);
@@ -1477,8 +1499,8 @@ function saveGame(){
   var data={
     souls:souls, totalSouls:totalSouls,
     stage:stage, traits:traits,
-    curLevel:curLevel, curFloor:curFloor, floorWins:floorWins,
-    highestLevel:highestLevel, highestFloor:highestFloor,
+    curRealm:curRealm, curLevel:curLevel, curFloor:curFloor, floorWins:floorWins,
+    highestRealm:highestRealm, highestLevel:highestLevel, highestFloor:highestFloor,
     defeatedElites:defeatedElites,
     firstKillDone:firstKillDone, killCounts:killCounts,
     upgrades:REP_UPGRADES.map(function(u){return{id:u.id,level:u.level,cost:u.cost,milestones:u.milestones.slice()};}),
@@ -1498,9 +1520,11 @@ function loadGame(){
   totalSouls=data.totalSouls||0;
   stage=data.stage||0;
   if(data.traits) traits=data.traits;
+  curRealm=data.curRealm||1;
   curLevel=data.curLevel||1;
   curFloor=data.curFloor||1;
   floorWins=data.floorWins||0;
+  highestRealm=data.highestRealm||1;
   highestLevel=data.highestLevel||1;
   highestFloor=data.highestFloor||1;
   defeatedElites=data.defeatedElites||[];
