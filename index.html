@@ -1148,9 +1148,9 @@ function fmt(v){
 function fmtHp(v){
   var d=D(v);
   if(d.gte(D('1e36'))) return d.mantissa.toFixed(2)+'e'+d.exponent;
-  if(d.gte(D('1e9')))  return d.div(D('1e9')).toFixed(2)+'B';
-  if(d.gte(D('1e6')))  return d.div(D('1e6')).toFixed(2)+'M';
-  if(d.gte(D('1e3')))  return d.div(D('1e3')).toFixed(1)+'K';
+  for(var i=0;i<FMT_TIERS.length;i++){
+    if(d.gte(FMT_TIERS[i][0])) return d.div(FMT_TIERS[i][0]).toFixed(2)+FMT_TIERS[i][1];
+  }
   return d.floor().toNumber().toLocaleString();
 }
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
