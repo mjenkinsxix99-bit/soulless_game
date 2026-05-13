@@ -2034,8 +2034,8 @@ function calcTatteredSoulsGain(chosenForm){
 function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
-  // Only show for the very first rebirth once the 20th upgrade (index 19) is purchased
-  if(rebirthCount===0 && REP_UPGRADES[19].level>=1){
+  var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
+  if(rebirthCount===0 && doom && doom.level>=1){
     btn.style.display='';
   } else {
     btn.style.display='none';
