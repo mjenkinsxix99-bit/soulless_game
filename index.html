@@ -907,15 +907,42 @@ var enemyPool = [0];
 // Absolute floor index for HP scaling (normal floors only; floor 1 of level 2 = FLOORS_PER_LEVEL+1)
 function absFloor(level, floor){ return (curRealm-1)*FLOORS_PER_REALM + (level-1)*FLOORS_PER_LEVEL + floor; }
 
+function computeFloorHp(af){
+  var base = D(10);
+  // Zone 1: floors 1-150, 1.5x per floor
+  if(af <= 150) return base.mul(D(1.5).pow(af - 1));
+  var hp150 = base.mul(D(1.5).pow(149));
+  // Zone 2: floors 151-666, 1.15x per floor
+  if(af <= 666) return hp150.mul(D(1.15).pow(af - 150));
+  var hp666 = hp150.mul(D(1.15).pow(516));
+  // Zone 3: floors 667-200000; every 444 floors the per-floor multiplier gains +0.0013
+  // (starting at 1.1513 for the first 444-floor segment), capped at 1.545
+  var cap3 = Math.min(af, 200000);
+  var hp = hp666;
+  var remaining = cap3 - 666;
+  var seg = 0;
+  while(remaining > 0){
+    var m = Math.min(1.15 + (seg + 1) * 0.0013, 1.545);
+    var steps = Math.min(remaining, 444);
+    hp = hp.mul(D(m).pow(steps));
+    remaining -= steps;
+    seg++;
+  }
+  // Zone 4: floors 200001+, permanently 1.545x per floor
+  if(af > 200000) hp = hp.mul(D(1.545).pow(af - 200000));
+  return hp;
+}
 function floorHp(level, floor){
-  var af = absFloor(level, floor);
-  return D(10).mul(D(1.6).pow(af-1)).ceil();
+  return computeFloorHp(absFloor(level, floor)).ceil();
 }
 function floorSouls(level, floor){
   return floorHp(level, floor).div(5).ceil();
 }
 function eliteHp(level){
-  return floorHp(level, FLOORS_PER_LEVEL).mul(2.5).ceil();
+  // Base = 10 regular enemies of that floor; every 666 absolute floors add 0.6 enemies
+  var af = absFloor(level, FLOORS_PER_LEVEL);
+  var mult = 10 + 0.6 * Math.floor(af / 666);
+  return computeFloorHp(af).mul(mult).ceil();
 }
 function eliteSouls(level){
   return eliteHp(level).div(5).ceil();
