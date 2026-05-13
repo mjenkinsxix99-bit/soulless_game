@@ -1674,10 +1674,11 @@ function recalcStats(){
   REP_UPGRADES.forEach(function(u){
     if(u.level===0) return;
     // DV milestones have unique effects — don't apply generic multiplier to drain
+    // getPurchMult also excluded from drain: % drain scales naturally with HP, no boost needed
     var mm=(u.id==='dv')?1:getMileMult(u);
     var pm=getPurchMult(u.level);
     if(u.type==='drain'){
-      enemyHpDrainPct+=u.level*u.perLevel*mm*pm.toNumber();
+      enemyHpDrainPct+=u.level*u.perLevel*mm;
     } else {
       var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
       if(u.type==='click') clickDmgBonus=clickDmgBonus.add(eff);
