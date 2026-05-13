@@ -236,6 +236,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   text-shadow:0 0 8px rgba(212,168,67,0.6); flex-shrink:0; }
 .mm-nav:hover { color:#ffd700; background:rgba(212,168,67,0.18); text-shadow:0 0 14px rgba(255,215,0,0.9); }
 .mm-nav:disabled { color:#2a2030; text-shadow:none; background:transparent; border-color:rgba(60,40,80,0.3); cursor:default; }
+#mm-auto { font-size:13px; padding:4px 10px; display:none; }
+#mm-auto.ap-on { color:#ffd700; background:rgba(212,168,67,0.25); border-color:rgba(212,168,67,0.7); text-shadow:0 0 10px rgba(255,215,0,0.8); }
+#mm-auto.ap-off { color:#7a5a20; background:rgba(212,168,67,0.04); border-color:rgba(212,168,67,0.2); text-shadow:none; }
 
 /* Next-available floor cell highlight */
 .mm-cell.next-available { border-color:#ff4444; color:#ff6666;
@@ -358,6 +361,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <button class="mm-nav" id="mm-prev" title="Scroll left">&#9664;</button>
           <div id="mm-cells"></div>
           <button class="mm-nav" id="mm-next" title="Scroll right">&#9654;</button>
+          <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
         </div>
       </div>
 
@@ -1028,6 +1032,7 @@ var REALM_NAMES       = ['Void'];  // indexed by curRealm-1; unnamed realms fall
 // No realm cap — break_infinity.js handles arbitrarily large HP values
 var MINIMAP_VISIBLE  = 7;
 var minimapNewFloor  = false;
+var autoProgressEnabled = false;
 
 // Location state
 var curRealm  = 1;
@@ -1348,6 +1353,16 @@ function buildMinimap(){
   // Red arrow: show above minimap pointing to next available floor
   var arrowEl=document.getElementById('mm-new-arrow');
   if(arrowEl) arrowEl.style.display=(minimapNewFloor&&nextRoom)?'block':'none';
+  updateAutoProgressBtn();
+}
+
+function updateAutoProgressBtn(){
+  var btn=document.getElementById('mm-auto');
+  if(!btn) return;
+  if(ascendCount<1){ btn.style.display='none'; return; }
+  btn.style.display='';
+  btn.classList.toggle('ap-on', autoProgressEnabled);
+  btn.classList.toggle('ap-off', !autoProgressEnabled);
 }
 
 function navigateTo(level, floor){
@@ -1564,7 +1579,11 @@ function onEnemyDeath(){
       return;
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
-    setTimeout(spawnEnemy,1200);
+    if(autoProgressEnabled){
+      (function(nl){ setTimeout(function(){ navigateTo(nl,1); },1200); })(curLevel+1);
+    } else {
+      setTimeout(spawnEnemy,1200);
+    }
 
   } else {
     // Normal floor win
@@ -1580,8 +1599,13 @@ function onEnemyDeath(){
         }
       }
     }
-    // Always respawn on current floor until player clicks next room
-    setTimeout(spawnEnemy,100);
+    if(autoProgressEnabled&&floorWins>=WINS_PER_FLOOR){
+      // Auto-advance to the next floor
+      (function(nl,nf){ setTimeout(function(){ navigateTo(nl,nf); },400); })(curLevel,curFloor+1);
+    } else {
+      // Stay on current floor until player clicks next room
+      setTimeout(spawnEnemy,100);
+    }
   }
 
   updateEntityStatsPanel();
@@ -1596,6 +1620,7 @@ function onEliteDpsCheckFail(){
   hitFlashTime=0; attackFlashTime=0;
   document.getElementById('elite-timer-wrap').style.display='none';
   curFloor=FLOORS_PER_LEVEL; floorWins=0;
+  if(autoProgressEnabled){ autoProgressEnabled=false; saveGame(); }
   buildMinimap();
   setTimeout(spawnEnemy,600);
 }
@@ -2179,6 +2204,7 @@ function saveGame(){
     tatteredSouls:tatteredSouls,
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
+    autoProgressEnabled:autoProgressEnabled,
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -2234,6 +2260,7 @@ function loadGame(){
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
+  autoProgressEnabled=data.autoProgressEnabled||false;
 }
 
 function deleteSave(){
@@ -2580,6 +2607,7 @@ document.getElementById('mok').addEventListener('click',function(){
   document.getElementById('mo').className='';
   updateTraitsRow(); dirtyU=true;
   checkAchievements();
+  updateAutoProgressBtn();
   saveGame();
 });
 document.getElementById('mo').addEventListener('click',function(e){if(e.target===this)this.className='';});
@@ -2741,6 +2769,12 @@ document.getElementById('mm-next').addEventListener('click',function(){
   var r=this._room; if(!r) return;
   minimapNewFloor=false;
   navigateTo(r.level,r.floor);
+});
+document.getElementById('mm-auto').addEventListener('click',function(){
+  if(ascendCount<1) return;
+  autoProgressEnabled=!autoProgressEnabled;
+  updateAutoProgressBtn();
+  saveGame();
 });
 
 (function initVoidBackground(){
