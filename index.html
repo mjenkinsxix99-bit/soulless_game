@@ -9,7 +9,7 @@
 html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Georgia, serif; overflow: hidden; }
 #game, #game * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M4,2 L18,5 L13,8 L26,13 L16,14 L15,24 L10,11 L7,16 Z' fill='%23d4a843' stroke='%23000' stroke-width='0.8' stroke-linejoin='round'/%3E%3C/svg%3E") 4 2, crosshair !important; }
 #game { display: flex; flex-direction: column; height: 100vh; }
-#topbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; }
+#topbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; position: relative; }
 .title { font-size: 27px; letter-spacing: 4px; color: #d0c4ff; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
 #souls-display { text-align: center; }
 #souls-display .num { font-size: 33px; color: #ffffff; font-weight: bold; text-shadow: 0 0 8px rgba(200,180,255,0.9), 0 0 18px rgba(160,120,255,0.5); }
@@ -200,6 +200,41 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #minimap-panel { position:relative; flex-shrink:0; padding:6px 14px; background:transparent; margin-top:4px; }
 #minimap-inner { display:flex;gap:8px;align-items:center;justify-content:center;padding:6px 0; }
 
+/* ── ACHIEVEMENT BANNER ──────────────────────────────────────────────────── */
+#ach-banner {
+  position:absolute; inset:0; z-index:50;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  pointer-events:none; opacity:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(212,168,67,0.10) 20%,rgba(212,168,67,0.26) 50%,rgba(212,168,67,0.10) 80%,transparent 100%);
+  box-shadow:0 0 60px rgba(212,168,67,0.25) inset;
+}
+#ach-banner.show { animation:ach-fadeinout 3s ease-out forwards; }
+@keyframes ach-fadeinout {
+  0%   { opacity:0; transform:scaleY(0.88); }
+  9%   { opacity:1; transform:scaleY(1); }
+  68%  { opacity:1; }
+  100% { opacity:0; }
+}
+.ach-label { font-size:10px; letter-spacing:5px; color:#c8a040; text-transform:uppercase; text-shadow:0 0 8px rgba(212,168,67,0.7); }
+.ach-name  { font-size:19px; color:#ffd700; letter-spacing:3px; font-weight:bold; margin-top:2px;
+  text-shadow:0 0 16px rgba(255,215,0,1),0 0 34px rgba(255,215,0,0.65),0 0 60px rgba(255,215,0,0.3); }
+.ach-desc  { font-size:12px; color:#b89030; font-style:italic; margin-top:3px; letter-spacing:1px; text-shadow:0 0 8px rgba(212,168,67,0.4); }
+
+/* ── ACHIEVEMENT TAB ─────────────────────────────────────────────────────── */
+.ach-count { font-size:11px; color:#443366; text-align:right; padding:0 0 8px; letter-spacing:1px; }
+.ach-cat { margin-bottom:14px; }
+.ach-cat-title { font-size:10px; letter-spacing:3px; color:#332255; text-transform:uppercase;
+  border-bottom:1px solid #1a1535; padding-bottom:3px; margin-bottom:7px; }
+.ach-grid { display:flex; flex-wrap:wrap; gap:4px; }
+.ach-card { width:calc(50% - 2px); box-sizing:border-box; padding:6px 7px; border-radius:4px;
+  border:1px solid #150f2a; background:#0a091a; }
+.ach-card.earned { border-color:#a07828; background:#0e0c00;
+  box-shadow:0 0 6px rgba(180,140,40,0.20); }
+.ach-card .acn { font-size:11px; color:#2a1d44; line-height:1.3; }
+.ach-card.earned .acn { color:#d4a843; text-shadow:0 0 5px rgba(212,168,67,0.35); }
+.ach-card .acd { font-size:10px; color:#1a1030; font-style:italic; margin-top:2px; line-height:1.3; }
+.ach-card.earned .acd { color:#6a5020; }
+
 </style>
 </head>
 <body>
@@ -209,6 +244,11 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div id="souls-display">
       <div class="num" id="soul-count">0</div>
       <div class="lbl">souls collected</div>
+    </div>
+    <div id="ach-banner">
+      <div class="ach-label">Achievement Unlocked</div>
+      <div class="ach-name"></div>
+      <div class="ach-desc"></div>
     </div>
   </div>
   <div id="main">
@@ -270,10 +310,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div id="right">
       <div class="tab-bar">
         <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
+        <button class="tab-btn" data-tab="achievements">Achievements</button>
         <button class="tab-btn" data-tab="stats">Stats</button>
       </div>
       <div id="tab-upgrades" class="tab-pane active">
         <div id="upgrade-list"></div>
+      </div>
+      <div id="tab-achievements" class="tab-pane">
+        <div id="ach-list"></div>
       </div>
       <div id="tab-stats" class="tab-pane">
         <div class="ph">Entity Stats</div>
@@ -903,6 +947,19 @@ var SNAMES=['Ether','Wraith','Nascent Being','Ascendant'];
 var SDESCS=['Shapeless. Hungry.','A form emerges.','Soul and substance entwine.','Between god and monster.'];
 var dirtyU=true, lastRebuildU=0;
 
+// ── ACHIEVEMENT STATE ─────────────────────────────────────────────────────────
+var totalClicks=0;
+var totalUpgradePurchases=0;
+var totalMilestonePurchases=0;
+var ascendCount=0;
+var currentAscensionKills=0;
+var eliteKillsTotal=0;
+var highestGlobalFloorEver=0;
+var achievementsEarned=[];
+var traitChoicesEver=[];
+var namedEliteFirstKills=[];
+var _achQueue=[], _achActive=false, _achievementsTabDirty=false;
+
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 var FMT_TIERS=[
@@ -1257,6 +1314,7 @@ function updateEnemyDefeatsPanel(){
 // ── COMBAT ────────────────────────────────────────────────────────────────────
 function entityAttack(isAuto){
   if(!combatActive||enemyDead) return;
+  if(!isAuto){ totalClicks++; checkAchievements(); }
   attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
@@ -1284,11 +1342,14 @@ function onEnemyDeath(){
     firstKillDone[d.id]=true;
   }
   killCounts[d.id]=(killCounts[d.id]||0)+1;
+  currentAscensionKills++;
   updateEnemyDefeatsPanel();
 
   if(isEliteFight()){
+    eliteKillsTotal++;
     // Elite beaten — add this level's enemy type to the pool
     var typeIdx2=curLevel-1;
+    if(namedEliteFirstKills.indexOf(typeIdx2)<0) namedEliteFirstKills.push(typeIdx2);
     if(defeatedElites.indexOf(typeIdx2)<0){
       defeatedElites.push(typeIdx2);
       // add next type to pool if not already there
@@ -1304,6 +1365,7 @@ function onEnemyDeath(){
     }
 
     if(curLevel>=LEVELS_PER_REALM){
+      updateHighestFloor(); checkAchievements();
       document.getElementById('click-hint').textContent='Realm '+curRealm+' complete! Advancing to Realm '+(curRealm+1)+'…';
       setTimeout(function(){
         curRealm++;
@@ -1313,6 +1375,7 @@ function onEnemyDeath(){
         defeatedElites=[];
         enemyPool=[0];
         minimapNewFloor=false;
+        updateHighestFloor();
         buildMinimap();
         updateProgressLabel();
         saveGame();
@@ -1344,6 +1407,7 @@ function onEnemyDeath(){
   updateEntityStatsPanel();
   buildMinimap();
   updateProgressLabel();
+  updateHighestFloor(); checkAchievements();
   saveGame();
 }
 
@@ -1559,6 +1623,210 @@ var REP_UPGRADES=[
 // Convert all upgrade costs to Decimal after definition
 REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); });
 
+// ── ACHIEVEMENT SYSTEM ────────────────────────────────────────────────────────
+function absGlobalFloor(realm,level,floor){ return (realm-1)*100+globalFloor(level,floor); }
+function updateHighestFloor(){
+  var af=absGlobalFloor(curRealm,highestLevel,highestFloor);
+  if(af>highestGlobalFloorEver) highestGlobalFloorEver=af;
+}
+
+var ACHIEVEMENTS=[
+  // Clicks
+  {id:'click-1k',      cat:'Striker',         name:'First Blood',             desc:'Strike 1,000 times',                          check:function(){return totalClicks>=1000;}},
+  {id:'click-10k',     cat:'Striker',         name:'Unrelenting',             desc:'Strike 10,000 times',                         check:function(){return totalClicks>=10000;}},
+  {id:'click-50k',     cat:'Striker',         name:'The Hungry Dark',         desc:'Strike 50,000 times',                         check:function(){return totalClicks>=50000;}},
+  {id:'click-100k',    cat:'Striker',         name:'Ten Thousand Fists',      desc:'Strike 100,000 times',                        check:function(){return totalClicks>=100000;}},
+  {id:'click-250k',    cat:'Striker',         name:'Endless Violence',        desc:'Strike 250,000 times',                        check:function(){return totalClicks>=250000;}},
+  {id:'click-500k',    cat:'Striker',         name:'Half a Million Strikes',  desc:'Strike 500,000 times',                        check:function(){return totalClicks>=500000;}},
+  {id:'click-1m',      cat:'Striker',         name:'A Million Graves',        desc:'Strike 1,000,000 times',                      check:function(){return totalClicks>=1000000;}},
+  // Upgrade purchases
+  {id:'upg-100',       cat:'Scholar of Power',name:'Hungry for Power',        desc:'Purchase 100 upgrades',                       check:function(){return totalUpgradePurchases>=100;}},
+  {id:'upg-250',       cat:'Scholar of Power',name:'The Habit of Growth',     desc:'Purchase 250 upgrades',                       check:function(){return totalUpgradePurchases>=250;}},
+  {id:'upg-500',       cat:'Scholar of Power',name:'Insatiable Seeker',       desc:'Purchase 500 upgrades',                       check:function(){return totalUpgradePurchases>=500;}},
+  {id:'upg-1k',        cat:'Scholar of Power',name:'Scholar of the Void',     desc:'Purchase 1,000 upgrades',                     check:function(){return totalUpgradePurchases>=1000;}},
+  {id:'upg-2500',      cat:'Scholar of Power',name:'Obsessive Collector',     desc:'Purchase 2,500 upgrades',                     check:function(){return totalUpgradePurchases>=2500;}},
+  {id:'upg-10k',       cat:'Scholar of Power',name:'Ten Thousand Upgrades',   desc:'Purchase 10,000 upgrades',                    check:function(){return totalUpgradePurchases>=10000;}},
+  {id:'upg-25k',       cat:'Scholar of Power',name:'Twenty-Five Thousand',    desc:'Purchase 25,000 upgrades',                    check:function(){return totalUpgradePurchases>=25000;}},
+  {id:'upg-50k',       cat:'Scholar of Power',name:'Halfway to the Abyss',    desc:'Purchase 50,000 upgrades',                    check:function(){return totalUpgradePurchases>=50000;}},
+  {id:'upg-100k',      cat:'Scholar of Power',name:'The Infinite Pursuit',    desc:'Purchase 100,000 upgrades',                   check:function(){return totalUpgradePurchases>=100000;}},
+  // Souls
+  {id:'souls-1k',      cat:'Soul Drinker',    name:'First Taste',             desc:'Collect 1,000 souls',                         check:function(){return totalSouls.gte(D(1000));}},
+  {id:'souls-5k',      cat:'Soul Drinker',    name:'Growing Hunger',          desc:'Collect 5,000 souls',                         check:function(){return totalSouls.gte(D(5000));}},
+  {id:'souls-10k',     cat:'Soul Drinker',    name:'The Collector Awakens',   desc:'Collect 10,000 souls',                        check:function(){return totalSouls.gte(D(10000));}},
+  {id:'souls-50k',     cat:'Soul Drinker',    name:'Soul Glutton',            desc:'Collect 50,000 souls',                        check:function(){return totalSouls.gte(D(50000));}},
+  {id:'souls-100k',    cat:'Soul Drinker',    name:'Harvester',               desc:'Collect 100,000 souls',                       check:function(){return totalSouls.gte(D(100000));}},
+  {id:'souls-500k',    cat:'Soul Drinker',    name:'Half a Million Souls',    desc:'Collect 500,000 souls',                       check:function(){return totalSouls.gte(D(500000));}},
+  {id:'souls-1m',      cat:'Soul Drinker',    name:'Soulhoarder',             desc:'Collect 1,000,000 souls',                     check:function(){return totalSouls.gte(D('1e6'));}},
+  {id:'souls-10m',     cat:'Soul Drinker',    name:'The Devourer',            desc:'Collect 10,000,000 souls',                    check:function(){return totalSouls.gte(D('1e7'));}},
+  {id:'souls-1b',      cat:'Soul Drinker',    name:'Billion Soul March',      desc:'Collect 1,000,000,000 souls',                 check:function(){return totalSouls.gte(D('1e9'));}},
+  {id:'souls-1t',      cat:'Soul Drinker',    name:'Unfathomable Greed',      desc:'Collect 1,000,000,000,000 souls',             check:function(){return totalSouls.gte(D('1e12'));}},
+  // Milestones
+  {id:'mile-25',       cat:'Milestone Seeker',name:'Milestone Seeker',        desc:'Activate 25 milestones',                      check:function(){return totalMilestonePurchases>=25;}},
+  {id:'mile-50',       cat:'Milestone Seeker',name:'Power Hungry',            desc:'Activate 50 milestones',                      check:function(){return totalMilestonePurchases>=50;}},
+  {id:'mile-100',      cat:'Milestone Seeker',name:'Centenary of Might',      desc:'Activate 100 milestones',                     check:function(){return totalMilestonePurchases>=100;}},
+  {id:'mile-250',      cat:'Milestone Seeker',name:'Quarter Thousand Stars',  desc:'Activate 250 milestones',                     check:function(){return totalMilestonePurchases>=250;}},
+  {id:'mile-500',      cat:'Milestone Seeker',name:'Five Hundred Lights',     desc:'Activate 500 milestones',                     check:function(){return totalMilestonePurchases>=500;}},
+  {id:'mile-1k',       cat:'Milestone Seeker',name:'Thousand Milestones',     desc:'Activate 1,000 milestones',                   check:function(){return totalMilestonePurchases>=1000;}},
+  {id:'mile-2k',       cat:'Milestone Seeker',name:'Beyond Reckoning',        desc:'Activate 2,000 milestones',                   check:function(){return totalMilestonePurchases>=2000;}},
+  {id:'mile-3k',       cat:'Milestone Seeker',name:'The Unyielding Path',     desc:'Activate 3,000 milestones',                   check:function(){return totalMilestonePurchases>=3000;}},
+  // Floors
+  {id:'floor-10',      cat:'Realm Walker',    name:'First Door Opened',       desc:'Reach floor 10',                              check:function(){return highestGlobalFloorEver>=10;}},
+  {id:'floor-25',      cat:'Realm Walker',    name:'Deep Wanderer',           desc:'Reach floor 25',                              check:function(){return highestGlobalFloorEver>=25;}},
+  {id:'floor-50',      cat:'Realm Walker',    name:'The Fifty Chambers',      desc:'Reach floor 50',                              check:function(){return highestGlobalFloorEver>=50;}},
+  {id:'floor-100',     cat:'Realm Walker',    name:'Centuriate',              desc:'Reach floor 100',                             check:function(){return highestGlobalFloorEver>=100;}},
+  {id:'floor-150',     cat:'Realm Walker',    name:'Depths Uncharted',        desc:'Reach floor 150',                             check:function(){return highestGlobalFloorEver>=150;}},
+  {id:'floor-250',     cat:'Realm Walker',    name:'The Long Descent',        desc:'Reach floor 250',                             check:function(){return highestGlobalFloorEver>=250;}},
+  {id:'floor-500',     cat:'Realm Walker',    name:'Five Hundred Voids',      desc:'Reach floor 500',                             check:function(){return highestGlobalFloorEver>=500;}},
+  {id:'floor-1k',      cat:'Realm Walker',    name:'Thousand Rooms',          desc:'Reach floor 1,000',                           check:function(){return highestGlobalFloorEver>=1000;}},
+  {id:'floor-1250',    cat:'Realm Walker',    name:'The Unending Hall',       desc:'Reach floor 1,250',                           check:function(){return highestGlobalFloorEver>=1250;}},
+  {id:'floor-1500',    cat:'Realm Walker',    name:'Where Light Fears',       desc:'Reach floor 1,500',                           check:function(){return highestGlobalFloorEver>=1500;}},
+  {id:'floor-1750',    cat:'Realm Walker',    name:'The Bottomless Dark',     desc:'Reach floor 1,750',                           check:function(){return highestGlobalFloorEver>=1750;}},
+  {id:'floor-2k',      cat:'Realm Walker',    name:'Two Thousand Floors',     desc:'Reach floor 2,000',                           check:function(){return highestGlobalFloorEver>=2000;}},
+  {id:'floor-2150',    cat:'Realm Walker',    name:'Past the Point of Return',desc:'Reach floor 2,150',                           check:function(){return highestGlobalFloorEver>=2150;}},
+  {id:'floor-2300',    cat:'Realm Walker',    name:'The Final Depths',        desc:'Reach floor 2,300',                           check:function(){return highestGlobalFloorEver>=2300;}},
+  {id:'floor-2500',    cat:'Realm Walker',    name:'The Last Floor',          desc:'Reach floor 2,500',                           check:function(){return highestGlobalFloorEver>=2500;}},
+  // Ascension
+  {id:'asc-1',         cat:'Transcendence',   name:'First Transformation',    desc:'Ascend once',                                 check:function(){return ascendCount>=1;}},
+  {id:'asc-5',         cat:'Transcendence',   name:'Five Evolutions',         desc:'Ascend 5 times',                              check:function(){return ascendCount>=5;}},
+  {id:'asc-10',        cat:'Transcendence',   name:'Veteran of Change',       desc:'Ascend 10 times',                             check:function(){return ascendCount>=10;}},
+  {id:'asc-25',        cat:'Transcendence',   name:'The Endless Cycle',       desc:'Ascend 25 times',                             check:function(){return ascendCount>=25;}},
+  {id:'asc-50',        cat:'Transcendence',   name:'Perpetual Becoming',      desc:'Ascend 50 times',                             check:function(){return ascendCount>=50;}},
+  {id:'asc-100',       cat:'Transcendence',   name:'One Hundred Lives',       desc:'Ascend 100 times',                            check:function(){return ascendCount>=100;}},
+  {id:'asc-250',       cat:'Transcendence',   name:'Eternal Rebirth',         desc:'Ascend 250 times',                            check:function(){return ascendCount>=250;}},
+  // Kill count in 1 ascension
+  {id:'asc-kill-100',  cat:'Void Hunter',     name:'Bloody Hands',            desc:'Kill 100 enemies in one ascension',           check:function(){return currentAscensionKills>=100;}},
+  {id:'asc-kill-1k',   cat:'Void Hunter',     name:'Mass Slaughter',          desc:'Kill 1,000 enemies in one ascension',         check:function(){return currentAscensionKills>=1000;}},
+  {id:'asc-kill-10k',  cat:'Void Hunter',     name:'The Merciless',           desc:'Kill 10,000 enemies in one ascension',        check:function(){return currentAscensionKills>=10000;}},
+  {id:'asc-kill-100k', cat:'Void Hunter',     name:'Legion Killer',           desc:'Kill 100,000 enemies in one ascension',       check:function(){return currentAscensionKills>=100000;}},
+  {id:'asc-kill-1m',   cat:'Void Hunter',     name:'Million Body March',      desc:'Kill 1,000,000 enemies in one ascension',     check:function(){return currentAscensionKills>=1000000;}},
+  {id:'asc-kill-10m',  cat:'Void Hunter',     name:'Undying Hunger',          desc:'Kill 10,000,000 enemies in one ascension',    check:function(){return currentAscensionKills>=10000000;}},
+  {id:'asc-kill-100m', cat:'Void Hunter',     name:'The Extinction',          desc:'Kill 100,000,000 enemies in one ascension',   check:function(){return currentAscensionKills>=100000000;}},
+  // Elite kills
+  {id:'elite-10',      cat:'Elite Slayer',    name:'Elite Hunter',            desc:'Slay 10 elite enemies',                       check:function(){return eliteKillsTotal>=10;}},
+  {id:'elite-100',     cat:'Elite Slayer',    name:'Champion Slayer',         desc:'Slay 100 elite enemies',                      check:function(){return eliteKillsTotal>=100;}},
+  {id:'elite-1k',      cat:'Elite Slayer',    name:'Thousand Champions',      desc:'Slay 1,000 elite enemies',                    check:function(){return eliteKillsTotal>=1000;}},
+  {id:'elite-10k',     cat:'Elite Slayer',    name:'Elite Annihilator',       desc:'Slay 10,000 elite enemies',                   check:function(){return eliteKillsTotal>=10000;}},
+  {id:'elite-100k',    cat:'Elite Slayer',    name:'The Apex Slayer',         desc:'Slay 100,000 elite enemies',                  check:function(){return eliteKillsTotal>=100000;}},
+  {id:'elite-1m',      cat:'Elite Slayer',    name:'Million Elites',          desc:'Slay 1,000,000 elite enemies',                check:function(){return eliteKillsTotal>=1000000;}},
+  // Named elite first kills
+  {id:'elite-first-wisp',   cat:'Named Prey', name:'Wisp Bane',              desc:'Defeat the Lost Wisp elite for the first time',          check:function(){return namedEliteFirstKills.indexOf(0)>=0;}},
+  {id:'elite-first-shade',  cat:'Named Prey', name:'Shade Crusher',          desc:'Defeat the Hollow Shade elite for the first time',       check:function(){return namedEliteFirstKills.indexOf(1)>=0;}},
+  {id:'elite-first-specter',cat:'Named Prey', name:'Specter Felled',         desc:'Defeat the Weeping Specter elite for the first time',    check:function(){return namedEliteFirstKills.indexOf(2)>=0;}},
+  {id:'elite-first-haunt',  cat:'Named Prey', name:'Haunt Silenced',         desc:'Defeat the Hateful Haunt elite for the first time',      check:function(){return namedEliteFirstKills.indexOf(3)>=0;}},
+  {id:'elite-first-wraith', cat:'Named Prey', name:'Wraith Unraveled',       desc:'Defeat the Wailing Wraith elite for the first time',     check:function(){return namedEliteFirstKills.indexOf(4)>=0;}},
+  {id:'elite-first-shiver', cat:'Named Prey', name:'Shiver Broken',          desc:'Defeat the Shivering Shade elite for the first time',    check:function(){return namedEliteFirstKills.indexOf(5)>=0;}},
+  {id:'elite-first-ghoul',  cat:'Named Prey', name:'Ghoul Laid Low',         desc:'Defeat the Glaring Ghoul elite for the first time',      check:function(){return namedEliteFirstKills.indexOf(6)>=0;}},
+  {id:'elite-first-phlegm', cat:'Named Prey', name:'Phantom Purged',         desc:'Defeat the Phlegm Phantom elite for the first time',     check:function(){return namedEliteFirstKills.indexOf(7)>=0;}},
+  {id:'elite-first-banshee',cat:'Named Prey', name:'Banshee Quieted',        desc:'Defeat the Bereft Banshee elite for the first time',     check:function(){return namedEliteFirstKills.indexOf(8)>=0;}},
+  {id:'elite-first-demon',  cat:'Named Prey', name:'Demon Unmade',           desc:'Defeat the Dispatched Demon elite for the first time',   check:function(){return namedEliteFirstKills.indexOf(9)>=0;}},
+  // Identity / Form
+  {id:'form-male',     cat:'Identity',        name:'The Masculine Form',      desc:'Choose a masculine essence',                  check:function(){return traitChoicesEver.indexOf('male')>=0;}},
+  {id:'form-female',   cat:'Identity',        name:'The Feminine Form',       desc:'Choose a feminine essence',                   check:function(){return traitChoicesEver.indexOf('female')>=0;}},
+  {id:'form-neither',  cat:'Identity',        name:'The Unbound Self',        desc:'Refuse all labels',                           check:function(){return traitChoicesEver.indexOf('unbound')>=0;}},
+  {id:'form-cat',      cat:'Identity',        name:'Feline Essence',          desc:'Part cat, part void',                         check:function(){return traitChoicesEver.indexOf('cat')>=0;}},
+  {id:'form-dog',      cat:'Identity',        name:'Canine Essence',          desc:'Loyal only to hunger',                        check:function(){return traitChoicesEver.indexOf('dog')>=0;}},
+  {id:'form-horse',    cat:'Identity',        name:'Equine Essence',          desc:'Unbridled and free',                          check:function(){return traitChoicesEver.indexOf('horse')>=0;}},
+  {id:'form-wings',    cat:'Identity',        name:'Given Wings',             desc:'Something to carry you',                      check:function(){return traitChoicesEver.indexOf('wings')>=0;}},
+  {id:'form-horns',    cat:'Identity',        name:'Adorned with Horns',      desc:'Power made visible',                          check:function(){return traitChoicesEver.indexOf('horns')>=0;}},
+  {id:'form-witchhat', cat:'Identity',        name:"The Witch's Mark",        desc:'Old magic claims you',                        check:function(){return traitChoicesEver.indexOf('witchhat')>=0;}},
+  {id:'form-halo',     cat:'Identity',        name:'The Fallen Halo',         desc:'Light that no longer protects',               check:function(){return traitChoicesEver.indexOf('halo')>=0;}},
+  {id:'form-tail',     cat:'Identity',        name:'A New Appendage',         desc:'Something follows you now',                   check:function(){return traitChoicesEver.indexOf('tail')>=0;}},
+  {id:'form-weapon',   cat:'Identity',        name:'Armed',                   desc:'A tool of ending',                            check:function(){return traitChoicesEver.indexOf('weapon')>=0;}},
+  {id:'form-ultimate', cat:'Identity',        name:'Ascendant',               desc:'Reach the ultimate form',                     check:function(){return stage>=3;}},
+];
+
+function checkAchievements(silent){
+  ACHIEVEMENTS.forEach(function(a){
+    if(achievementsEarned.indexOf(a.id)<0&&a.check()){
+      achievementsEarned.push(a.id);
+      if(!silent) queueAchievement(a);
+      _achievementsTabDirty=true;
+    }
+  });
+  if(_achievementsTabDirty){
+    var tabEl=document.getElementById('tab-achievements');
+    if(tabEl&&tabEl.classList.contains('active')){
+      renderAchievementsTab();
+      _achievementsTabDirty=false;
+    }
+  }
+}
+
+function queueAchievement(a){
+  _achQueue.push(a);
+  if(!_achActive) drainAchQueue();
+}
+function drainAchQueue(){
+  if(_achQueue.length===0){_achActive=false;return;}
+  _achActive=true;
+  var a=_achQueue.shift();
+  showAchievementBanner(a);
+  playChurchBell();
+  setTimeout(drainAchQueue,3400);
+}
+function showAchievementBanner(a){
+  var banner=document.getElementById('ach-banner');
+  if(!banner) return;
+  banner.querySelector('.ach-name').textContent=a.name;
+  banner.querySelector('.ach-desc').textContent=a.desc;
+  banner.classList.remove('show');
+  void banner.offsetWidth;
+  banner.classList.add('show');
+}
+function playChurchBell(){
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC) return;
+    var ctx=new AC();
+    var master=ctx.createGain();
+    master.gain.value=0.55;
+    master.connect(ctx.destination);
+    [{freq:174,gain:0.70,decay:5.0},{freq:261,gain:0.40,decay:4.0},
+     {freq:349,gain:0.28,decay:3.0},{freq:523,gain:0.18,decay:2.0},
+     {freq:698,gain:0.09,decay:1.5}].forEach(function(p){
+      var osc=ctx.createOscillator(),g=ctx.createGain();
+      osc.type='sine'; osc.frequency.value=p.freq;
+      g.gain.setValueAtTime(p.gain,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+p.decay);
+      osc.connect(g); g.connect(master);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime+p.decay+0.1);
+    });
+    setTimeout(function(){try{ctx.close();}catch(e){}},6000);
+  }catch(e){}
+}
+function renderAchievementsTab(){
+  var el=document.getElementById('ach-list'); if(!el) return;
+  el.innerHTML='';
+  var header=document.createElement('div');
+  header.className='ach-count';
+  header.textContent=achievementsEarned.length+' / '+ACHIEVEMENTS.length+' achievements';
+  el.appendChild(header);
+  var catOrder=[],catMap={};
+  ACHIEVEMENTS.forEach(function(a){
+    if(!catMap[a.cat]){catMap[a.cat]=[];catOrder.push(a.cat);}
+    catMap[a.cat].push(a);
+  });
+  catOrder.forEach(function(cat){
+    var achs=catMap[cat];
+    var earned=achs.filter(function(a){return achievementsEarned.indexOf(a.id)>=0;}).length;
+    var sec=document.createElement('div'); sec.className='ach-cat';
+    var title=document.createElement('div'); title.className='ach-cat-title';
+    title.textContent=cat+' ('+earned+'/'+achs.length+')'; sec.appendChild(title);
+    var grid=document.createElement('div'); grid.className='ach-grid';
+    achs.forEach(function(a){
+      var isEarned=achievementsEarned.indexOf(a.id)>=0;
+      var card=document.createElement('div');
+      card.className='ach-card'+(isEarned?' earned':'');
+      var nm=document.createElement('div'); nm.className='acn';
+      nm.textContent=isEarned?a.name:'???';
+      var dc=document.createElement('div'); dc.className='acd';
+      dc.textContent=isEarned?a.desc:'—';
+      card.appendChild(nm); card.appendChild(dc); grid.appendChild(card);
+    });
+    sec.appendChild(grid); el.appendChild(sec);
+  });
+}
+
 // ── SAVE / LOAD ───────────────────────────────────────────────────────────────
 var SAVE_KEY='formless_save_v1';
 var _lastAutoSave=0;
@@ -1572,6 +1840,13 @@ function saveGame(){
     defeatedElites:defeatedElites,
     firstKillDone:firstKillDone, killCounts:killCounts,
     upgrades:REP_UPGRADES.map(function(u){return{id:u.id,level:u.level,cost:u.cost.toString(),milestones:u.milestones.slice()};}),
+    totalClicks:totalClicks, totalUpgradePurchases:totalUpgradePurchases,
+    totalMilestonePurchases:totalMilestonePurchases, ascendCount:ascendCount,
+    currentAscensionKills:currentAscensionKills, eliteKillsTotal:eliteKillsTotal,
+    highestGlobalFloorEver:highestGlobalFloorEver,
+    achievementsEarned:achievementsEarned.slice(),
+    traitChoicesEver:traitChoicesEver.slice(),
+    namedEliteFirstKills:namedEliteFirstKills.slice(),
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -1613,6 +1888,16 @@ function loadGame(){
     var nextType=typeIdx+1;
     if(nextType<ENEMY_TYPES.length&&enemyPool.indexOf(nextType)<0) enemyPool.push(nextType);
   });
+  totalClicks=data.totalClicks||0;
+  totalUpgradePurchases=data.totalUpgradePurchases||0;
+  totalMilestonePurchases=data.totalMilestonePurchases||0;
+  ascendCount=data.ascendCount||0;
+  currentAscensionKills=data.currentAscensionKills||0;
+  eliteKillsTotal=data.eliteKillsTotal||0;
+  highestGlobalFloorEver=data.highestGlobalFloorEver||0;
+  achievementsEarned=data.achievementsEarned||[];
+  traitChoicesEver=data.traitChoicesEver||[];
+  namedEliteFirstKills=data.namedEliteFirstKills||[];
 }
 
 function deleteSave(){
@@ -1809,9 +2094,11 @@ function buildUpgrades(){
         if(u.milestones[mi]) return;
         if(u.level>=MS_THRESH[mi]){
           u.milestones[mi]=true;
+          totalMilestonePurchases++;
           recalcStats();
           dirtyU=true;
           updateEntityStatsPanel();
+          checkAchievements();
           saveGame();
         }
       });
@@ -1839,10 +2126,12 @@ function buildUpgrades(){
             u.cost=u.cost.mul(u.costScale).ceil();
           }
           u.level++;
+          totalUpgradePurchases++;
           recalcStats();
           dirtyU=true; updateEntityStatsPanel();
           document.getElementById('soul-count').textContent=fmt(souls);
           setHint();
+          checkAchievements();
           saveGame();
         }
       });
@@ -1882,8 +2171,14 @@ document.getElementById('evb').addEventListener('click',function(){
   document.getElementById('mt').textContent=titles[stage]||'Evolution';
   document.getElementById('ms').textContent=subs[stage]||'Choose.';
   var mc=document.getElementById('mc'); mc.innerHTML='';
-  if(stage===0){mc.appendChild(mkS('Essence','sex',[{v:'male',l:'Masculine'},{v:'female',l:'Feminine'},{v:'unbound',l:'Unbound'}]));mc.appendChild(mkS('First Addition','add1',[{v:'halo',l:'Halo'},{v:'horns',l:'Horns'},{v:'wings',l:'Wings'},{v:'tail',l:'Tail'}]));}
-  if(stage===1){mc.appendChild(mkS('Soul Affinity','aff',[{v:'light',l:'Light'},{v:'shadow',l:'Shadow'},{v:'chaos',l:'Chaos'},{v:'nature',l:'Nature'}]));mc.appendChild(mkS('Second Addition','add2',[{v:'ears',l:'Ears'},{v:'horns',l:'Horns'},{v:'wings',l:'Wings'},{v:'tail',l:'Tail'}]));}
+  if(stage===0){
+    mc.appendChild(mkS('Essence','sex',[{v:'male',l:'Masculine'},{v:'female',l:'Feminine'},{v:'unbound',l:'Neither'},{v:'cat',l:'A Cat'},{v:'dog',l:'A Dog'},{v:'horse',l:'A Horse'}]));
+    mc.appendChild(mkS('First Addition','add1',[{v:'halo',l:'Halo'},{v:'horns',l:'Horns'},{v:'wings',l:'Wings'},{v:'tail',l:'Tail'},{v:'witchhat',l:"Witch's Hat"},{v:'weapon',l:'Weapon'}]));
+  }
+  if(stage===1){
+    mc.appendChild(mkS('Soul Affinity','aff',[{v:'light',l:'Light'},{v:'shadow',l:'Shadow'},{v:'chaos',l:'Chaos'},{v:'nature',l:'Nature'}]));
+    mc.appendChild(mkS('Second Addition','add2',[{v:'ears',l:'Ears'},{v:'horns',l:'Horns'},{v:'wings',l:'Wings'},{v:'tail',l:'Tail'},{v:'witchhat',l:"Witch's Hat"},{v:'weapon',l:'Weapon'}]));
+  }
   if(stage===2){mc.appendChild(mkS('Vestments','outfit',[{v:'robes',l:'Void Robes'},{v:'armor',l:'Soul Plate'},{v:'bare',l:'Formless'}]));}
   document.getElementById('mo').className='open';
 });
@@ -1908,13 +2203,29 @@ function checkR(){
 }
 document.getElementById('mok').addEventListener('click',function(){
   if(!evReady) return;
-  if(mstage===0){traits.sex=pending.sex;if(traits.adds.indexOf(pending.add1)<0)traits.adds.push(pending.add1);}
-  if(mstage===1){traits.aff=pending.aff;if(traits.adds.indexOf(pending.add2)<0)traits.adds.push(pending.add2);}
-  if(mstage===2){traits.outfit=pending.outfit;}
+  if(mstage===0){
+    traits.sex=pending.sex;
+    if(traits.adds.indexOf(pending.add1)<0) traits.adds.push(pending.add1);
+    if(traitChoicesEver.indexOf(pending.sex)<0) traitChoicesEver.push(pending.sex);
+    if(traitChoicesEver.indexOf(pending.add1)<0) traitChoicesEver.push(pending.add1);
+  }
+  if(mstage===1){
+    traits.aff=pending.aff;
+    if(traits.adds.indexOf(pending.add2)<0) traits.adds.push(pending.add2);
+    if(traitChoicesEver.indexOf(pending.aff)<0) traitChoicesEver.push(pending.aff);
+    if(traitChoicesEver.indexOf(pending.add2)<0) traitChoicesEver.push(pending.add2);
+  }
+  if(mstage===2){
+    traits.outfit=pending.outfit;
+    if(traitChoicesEver.indexOf(pending.outfit)<0) traitChoicesEver.push(pending.outfit);
+  }
   stage++;
+  ascendCount++;
+  currentAscensionKills=0;
   document.getElementById('mo').className='';
   document.getElementById('evb').style.display='none';
   updateTraitsRow(); dirtyU=true;
+  checkAchievements();
   saveGame();
 });
 document.getElementById('mo').addEventListener('click',function(e){if(e.target===this)this.className='';});
@@ -1981,12 +2292,15 @@ function gameLoop(){
 initUpgradeIcons();
 initMist(28);
 loadGame();
+updateHighestFloor();
 recalcStats();
 updateHpBars();
 updateEntityStatsPanel();
 updateTraitsRow();
 buildMinimap();
 spawnEnemy();
+checkAchievements(true);
+renderAchievementsTab();
 requestAnimationFrame(gameLoop);
 
 document.querySelectorAll('.tab-btn').forEach(function(btn){
@@ -1996,6 +2310,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
+    if(tab==='achievements'){ renderAchievementsTab(); _achievementsTabDirty=false; }
   });
 });
 
