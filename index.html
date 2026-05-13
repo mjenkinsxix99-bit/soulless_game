@@ -115,6 +115,56 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #prog-bar { height: 100%; background: #6655aa; border-radius: 3px; transition: width 0.3s; width: 0%; }
 #evb { display: none; padding: 8px 20px; background: transparent; border: 1px solid #d4a843; color: #d4a843; font-family: Georgia,serif; font-size: 16px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
 #evb:hover { background: rgba(212,168,67,0.1); }
+
+/* Ascend (Rebirth) button */
+#ascend-btn { display: none; margin-top: 6px; padding: 9px 22px; background: transparent; border: 1px solid #aa3333; color: #cc5555; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; }
+#ascend-btn:hover { background: rgba(180,50,50,0.12); box-shadow: 0 0 10px rgba(200,60,60,0.4); }
+
+/* Tattered Souls display in topbar */
+#tattered-display { display: none; text-align: center; }
+#tattered-display .num { font-size: 22px; color: #c47c2a; font-weight: bold; text-shadow: 0 0 8px rgba(200,120,40,0.8), 0 0 18px rgba(160,80,20,0.4); }
+#tattered-display .lbl { font-size: 11px; color: #9a6030; letter-spacing: 2px; text-transform: uppercase; }
+
+/* Rebirth confirmation modal */
+#rebirth-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 100; align-items: center; justify-content: center; }
+#rebirth-modal.open { display: flex; }
+#rebirth-box { background: #0a0a18; border: 1px solid #882222; border-radius: 10px; padding: 30px; max-width: 460px; width: 90%; max-height: 88vh; overflow-y: auto; text-align: center; }
+#rebirth-lore { font-size: 16px; color: #aa8866; font-style: italic; margin-bottom: 18px; line-height: 1.6; letter-spacing: 0.5px; }
+.rebirth-info { margin: 8px 0; font-size: 15px; color: #776699; letter-spacing: 0.5px; }
+.rebirth-info .rval { color: #c47c2a; font-weight: bold; }
+.rebirth-info .rloss { color: #994444; }
+.rebirth-info .rkeep { color: #667744; }
+.rebirth-info .rspecial { color: #aa99cc; font-style: italic; }
+#rebirth-ascend-now { margin-top: 22px; padding: 12px 30px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 17px; letter-spacing: 3px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 16px rgba(212,168,67,0.7), 0 0 32px rgba(212,168,67,0.3); text-shadow: 0 0 10px rgba(255,215,0,0.9); transition: box-shadow 0.2s, background 0.2s; animation: gold-pulse 2s ease-in-out infinite; }
+#rebirth-ascend-now:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 24px rgba(212,168,67,0.9), 0 0 48px rgba(212,168,67,0.5); }
+@keyframes gold-pulse { 0%,100%{box-shadow:0 0 16px rgba(212,168,67,0.7),0 0 32px rgba(212,168,67,0.3);} 50%{box-shadow:0 0 26px rgba(212,168,67,1),0 0 52px rgba(212,168,67,0.55);} }
+#rebirth-cancel { margin-top: 10px; padding: 6px 18px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; }
+#rebirth-cancel:hover { border-color: #554466; color: #665588; }
+
+/* Form selection modal */
+#form-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 101; align-items: center; justify-content: center; }
+#form-modal.open { display: flex; }
+#form-box { background: #0a0a18; border: 1px solid #4433aa; border-radius: 10px; padding: 28px; max-width: 700px; width: 95%; max-height: 90vh; overflow-y: auto; }
+#form-title { font-size: 24px; color: #d4a843; text-align: center; margin-bottom: 6px; letter-spacing: 2px; }
+#form-sub { font-size: 15px; color: #776699; text-align: center; font-style: italic; margin-bottom: 20px; letter-spacing: 0.5px; }
+#form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+.form-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 12px 8px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
+.form-card:hover { border-color: #4433aa; background: #111128; }
+.form-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
+.form-card img { width: 80px; height: 80px; object-fit: contain; display: block; margin: 0 auto 8px; border-radius: 4px; }
+.form-card .fc-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
+.form-card .fc-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; line-height: 1.4; }
+#form-confirm-area { text-align: center; }
+#form-confirm-btn { display: none; padding: 10px 26px; background: transparent; border: 1px solid #d4a843; color: #d4a843; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
+#form-confirm-btn.show { display: inline-block; }
+#form-confirm-btn:hover { background: rgba(212,168,67,0.1); }
+#form-certain { display: none; margin-top: 14px; }
+#form-certain.show { display: block; }
+#form-certain p { font-size: 16px; color: #aa9966; margin-bottom: 12px; font-style: italic; }
+#form-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#form-yes:hover { background: rgba(212,168,67,0.15); }
+#form-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#form-no:hover { border-color: #554466; color: #776699; }
 .stat-row { display: flex; justify-content: space-between; font-size: 15px; color: #776699; padding: 3px 0; border-bottom: 1px solid #0f0f1e; }
 .stat-row .sv { color: #7766aa; }
 .stat-row .sv.good { color: #88aa88; }
@@ -253,6 +303,10 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div class="num" id="soul-count">0</div>
       <div class="lbl">souls collected</div>
     </div>
+    <div id="tattered-display">
+      <div class="num" id="tattered-count">0</div>
+      <div class="lbl">tattered souls</div>
+    </div>
     <div id="ach-banner">
       <div class="ach-label">Achievement Unlocked</div>
       <div class="ach-name"></div>
@@ -271,6 +325,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
           <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
         </div>
+        <button id="ascend-btn">✦ ASCEND ✦</button>
       </div>
     </div>
     <div id="battlefield">
@@ -360,6 +415,66 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div id="ms"></div>
     <div id="mc"></div>
     <div id="mok">EMBRACE FORM</div>
+  </div>
+</div>
+
+<div id="rebirth-modal">
+  <div id="rebirth-box">
+    <div id="rebirth-lore">You have grown strong enough to Ascend this world.<br>You will restart your journey, but stronger.<br>Are you ready to begin again?</div>
+    <div class="rebirth-info">You will gain <span class="rval" id="rebirth-ts-gain">0</span> Tattered Souls</div>
+    <div class="rebirth-info"><span class="rloss">You will lose all progress, souls, and Upgrades.</span></div>
+    <div class="rebirth-info" id="rebirth-keep-line" style="display:none"><span class="rkeep">You will keep any Evolutions or Tattered Soul upgrades.</span></div>
+    <div class="rebirth-info"><span class="rspecial" id="rebirth-special-text"></span></div>
+    <button id="rebirth-ascend-now">✦ Ascend Now ✦</button>
+    <br>
+    <button id="rebirth-cancel">Not yet</button>
+  </div>
+</div>
+
+<div id="form-modal">
+  <div id="form-box">
+    <div id="form-title">Choose Your Form</div>
+    <div id="form-sub">You must Choose your form. Choose wisely. Changing forms is difficult.</div>
+    <div id="form-grid">
+      <div class="form-card" data-form="masculine">
+        <img src="artwork/masculine.png" alt="Masculine">
+        <div class="fc-name">Masculine</div>
+        <div class="fc-bonus">+10% DPS &amp; Click Damage</div>
+      </div>
+      <div class="form-card" data-form="feminine">
+        <img src="artwork/feminine.png" alt="Feminine">
+        <div class="fc-name">Feminine</div>
+        <div class="fc-bonus">+10% Tattered Souls gained</div>
+      </div>
+      <div class="form-card" data-form="androgynous">
+        <img src="artwork/androgynous.png" alt="Androgynous">
+        <div class="fc-name">Androgynous</div>
+        <div class="fc-bonus">+10% Souls gained</div>
+      </div>
+      <div class="form-card" data-form="canine">
+        <img src="artwork/canine.png" alt="Canine">
+        <div class="fc-name">Canine</div>
+        <div class="fc-bonus">-10% Milestone requirement</div>
+      </div>
+      <div class="form-card" data-form="feline">
+        <img src="artwork/feline.png" alt="Feline">
+        <div class="fc-name">Feline</div>
+        <div class="fc-bonus">-10% Auto-attack interval</div>
+      </div>
+      <div class="form-card" data-form="equine">
+        <img src="artwork/equine.png" alt="Equine">
+        <div class="fc-name">Equine</div>
+        <div class="fc-bonus">+5s to Elite timer</div>
+      </div>
+    </div>
+    <div id="form-confirm-area">
+      <button id="form-confirm-btn">Confirm Choice</button>
+      <div id="form-certain">
+        <p>Are you Certain?</p>
+        <button id="form-yes">Yes. Begin.</button>
+        <button id="form-no">Choose Again</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -471,11 +586,18 @@ function drawEntityCanvas(t) {
   var W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  if (!entityImgLoaded) return;
+  // Use form artwork image if a rebirth form is active
+  var activeImg = entityImg, activeLoaded = entityImgLoaded;
+  if(_rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
+    activeImg = FORM_IMAGES[_rebirthEntityOverride];
+    activeLoaded = true;
+  }
+
+  if (!activeLoaded) return;
 
   var deathFade = 1;
 
-  var iw = entityImg.naturalWidth, ih = entityImg.naturalHeight;
+  var iw = activeImg.naturalWidth, ih = activeImg.naturalHeight;
   var drawH = Math.min(H * 0.9, H - 10);
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
@@ -516,7 +638,7 @@ function drawEntityCanvas(t) {
     ctx.filter = 'brightness('+(1+hf*3)+') saturate('+(1-hf*0.5)+')';
   }
 
-  ctx.drawImage(entityImg, dx, dy, drawW, drawH);
+  ctx.drawImage(activeImg, dx, dy, drawW, drawH);
   ctx.filter = 'none';
   ctx.restore();
 
@@ -998,6 +1120,9 @@ var totalUpgradePurchases=0;
 var totalMilestonePurchases=0;
 var ascendCount=0;
 var currentAscensionKills=0;
+var tatteredSouls=0;
+var rebirthCount=0;
+var rebirthForm=null;
 var eliteKillsTotal=0;
 var highestGlobalFloorEver=0;
 var achievementsEarned=[];
@@ -1378,7 +1503,8 @@ function onEnemyDeath(){
   combatActive=false; enemyDead=true; eliteTimerStart=0;
   spawnSoulCoins();
   document.getElementById('elite-timer-wrap').style.display='none';
-  souls=souls.add(enemySoulReward); totalSouls=totalSouls.add(enemySoulReward);
+  var reward=rebirthForm==='androgynous'?enemySoulReward.mul(1.1).floor():enemySoulReward;
+  souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
   checkEvolution(); dirtyU=true;
 
@@ -1483,6 +1609,11 @@ var entityDmgBonus=D(0);
 var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0;
 
 var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
+function getMsThresh(i){
+  var t=MS_THRESH[i];
+  if(rebirthForm==='canine') t=Math.max(1,Math.floor(t*0.9));
+  return t;
+}
 var MS_MULT=[7,7,7,7,7,7,7,7,7,666];
 var MS_LABELS=['I','II','III','IV','V','VI','VII','VIII','IX','X'];
 var MS_COLORS=['#ffffff','#f8f0e0','#f5e6c0','#f0d888','#e8cc55','#e0bb30','#d8aa18','#cf9a08','#c88a00','#d4a843'];
@@ -1526,17 +1657,24 @@ function recalcStats(){
       else { totalDps=totalDps.add(eff); if(u.id==='dh') autoAttackEnabled=true; }
     }
   });
+  // Apply form bonuses
+  if(rebirthForm==='masculine'){
+    clickDmgBonus=clickDmgBonus.mul(1.1);
+    totalDps=totalDps.mul(1.1);
+  }
+  // Feline: faster auto-attack (10% shorter interval)
+  autoAttackInterval=rebirthForm==='feline'?2700:3000;
 }
 
 var _msTip=null;
 function showMsTip(evt,u,i){
   var tip=document.getElementById('ms-tooltip');
   if(!tip) return;
-  var lit=u.milestones[i], avail=u.level>=MS_THRESH[i];
+  var lit=u.milestones[i], avail=u.level>=getMsThresh(i);
   var multLabel=i===9?'×666':'×7';
   var typeLabel=u.type==='click'?'Click Damage':u.type==='drain'?'HP Drain':'DPS';
   tip.querySelector('.mst-title').textContent='Milestone '+MS_LABELS[i];
-  tip.querySelector('.mst-req').textContent='Requires '+MS_THRESH[i]+' purchases';
+  tip.querySelector('.mst-req').textContent='Requires '+getMsThresh(i)+' purchases';
   tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
   tip.querySelector('.mst-status').textContent=lit?'Active':avail?'Click to activate':'Locked';
   var dmgEl=tip.querySelector('.mst-dmg');
@@ -1666,7 +1804,7 @@ var REP_UPGRADES=[
 ];
 
 // Convert all upgrade costs to Decimal after definition
-REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); });
+REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
 
 // ── ACHIEVEMENT SYSTEM ────────────────────────────────────────────────────────
 function absGlobalFloor(realm,level,floor){ return (realm-1)*100+globalFloor(level,floor); }
@@ -1872,6 +2010,113 @@ function renderAchievementsTab(){
   });
 }
 
+// ── REBIRTH ───────────────────────────────────────────────────────────────────
+var FORM_IMAGES={};
+var _formImagesLoaded=false;
+var FORM_NAMES=['masculine','feminine','androgynous','canine','feline','equine'];
+function preloadFormImages(){
+  FORM_NAMES.forEach(function(f){
+    var img=new Image();
+    img.src='artwork/'+f+'.png';
+    FORM_IMAGES[f]=img;
+  });
+  _formImagesLoaded=true;
+}
+
+function calcTatteredSoulsGain(chosenForm){
+  var base=Math.floor(totalUpgradePurchases/666);
+  // Feminine bonus applies to the NEWLY CHOSEN form (not the current one, since this is the gain for this rebirth)
+  var form=chosenForm!==undefined?chosenForm:rebirthForm;
+  if(form==='feminine') base=Math.floor(base*1.1);
+  return Math.max(0,base);
+}
+
+function checkRebirthButton(){
+  var btn=document.getElementById('ascend-btn');
+  if(!btn) return;
+  // Only show for the very first rebirth once the 20th upgrade (index 19) is purchased
+  if(rebirthCount===0 && REP_UPGRADES[19].level>=1){
+    btn.style.display='';
+  } else {
+    btn.style.display='none';
+  }
+}
+
+function updateTatteredDisplay(){
+  var el=document.getElementById('tattered-count');
+  if(el) el.textContent=tatteredSouls.toLocaleString();
+  var disp=document.getElementById('tattered-display');
+  if(disp) disp.style.display=rebirthCount>0?'block':'none';
+}
+
+var ASCENSION_SPECIAL=[
+  'You will Choose your form.',        // ascension 1 (rebirthCount===0)
+  'You will become flesh.',            // ascension 2
+  'You will Evolve.',                  // ascension 3
+  'You will further Evolve.',          // ascension 4
+  'You will Finish your Evolution.',   // ascension 5
+  'You will Choose your weapon.',      // ascension 6
+  'You will choose your Power.',       // ascension 7
+];
+
+function openRebirthModal(){
+  var gain=calcTatteredSoulsGain(null);
+  document.getElementById('rebirth-ts-gain').textContent=gain.toLocaleString();
+  var keepLine=document.getElementById('rebirth-keep-line');
+  keepLine.style.display=rebirthCount>=1?'':'none';
+  var specIdx=rebirthCount; // 0-based: 0 = first ascension
+  var specText=specIdx<ASCENSION_SPECIAL.length?ASCENSION_SPECIAL[specIdx]:'You have become Powerful, indeed.';
+  document.getElementById('rebirth-special-text').textContent=specText;
+  document.getElementById('rebirth-modal').classList.add('open');
+}
+
+function doRebirthReset(chosenForm){
+  // Gain tattered souls using the chosen form's bonus
+  var gain=calcTatteredSoulsGain(chosenForm);
+  tatteredSouls+=gain;
+
+  // Reset all progress
+  souls=D(0); totalSouls=D(0);
+  curRealm=1; curLevel=1; curFloor=1; floorWins=0;
+  highestRealm=1; highestLevel=1; highestFloor=1;
+  highestGlobalFloorEver=0;
+  defeatedElites=[]; firstKillDone={}; killCounts={};
+  enemyPool=[0]; currentEnemyTypeIdx=0;
+  stage=0; traits={sex:null,adds:[],aff:null,outfit:null};
+  totalUpgradePurchases=0; totalMilestonePurchases=0;
+  totalClicks=0; currentAscensionKills=0;
+
+  // Reset upgrades
+  REP_UPGRADES.forEach(function(u){
+    u.level=0;
+    u.cost=D(u._baseCost||u.cost); // reset cost — stored during init
+    u.milestones=mkMs();
+  });
+
+  // Apply rebirth
+  rebirthCount++;
+  rebirthForm=chosenForm;
+
+  // Reload entity image as chosen form image
+  _rebirthEntityOverride=chosenForm;
+
+  recalcStats();
+  updateTatteredDisplay();
+  updateTraitsRow();
+  checkRebirthButton();
+  dirtyU=true;
+  document.getElementById('soul-count').textContent=fmt(souls);
+  document.getElementById('entity-stage-label').textContent='You are Ether.';
+  document.getElementById('stage-desc').textContent='Shapeless. Hungry.';
+  buildMinimap();
+  updateProgressLabel();
+  updateHighestFloor();
+  saveGame();
+  spawnEnemy();
+}
+
+var _rebirthEntityOverride=null;
+
 // ── SAVE / LOAD ───────────────────────────────────────────────────────────────
 var SAVE_KEY='formless_save_v1';
 var _lastAutoSave=0;
@@ -1892,6 +2137,9 @@ function saveGame(){
     achievementsEarned:achievementsEarned.slice(),
     traitChoicesEver:traitChoicesEver.slice(),
     namedEliteFirstKills:namedEliteFirstKills.slice(),
+    tatteredSouls:tatteredSouls,
+    rebirthCount:rebirthCount,
+    rebirthForm:rebirthForm,
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -1943,6 +2191,10 @@ function loadGame(){
   achievementsEarned=data.achievementsEarned||[];
   traitChoicesEver=data.traitChoicesEver||[];
   namedEliteFirstKills=data.namedEliteFirstKills||[];
+  tatteredSouls=data.tatteredSouls||0;
+  rebirthCount=data.rebirthCount||0;
+  rebirthForm=data.rebirthForm||null;
+  if(rebirthForm) _rebirthEntityOverride=rebirthForm;
 }
 
 function deleteSave(){
@@ -2133,7 +2385,7 @@ function buildUpgrades(){
     for(var i=0;i<10;i++){
       var lit=u.milestones[i];
       var prevLit=i===0||u.milestones[i-1];
-      var threshMet=u.level>=MS_THRESH[i];
+      var threshMet=u.level>=getMsThresh(i);
       // A box is visible if: it's lit, OR it's the first milestone and threshold is met,
       // OR the previous milestone is purchased (shows as locked until threshold met)
       var visible=lit||(i===0&&threshMet)||prevLit;
@@ -2166,7 +2418,7 @@ function buildUpgrades(){
       box.addEventListener('click',function(e){
         e.stopPropagation();
         if(u.milestones[mi]) return;
-        if(u.level>=MS_THRESH[mi]){
+        if(u.level>=getMsThresh(mi)){
           u.milestones[mi]=true;
           totalMilestonePurchases++;
           recalcStats();
@@ -2208,6 +2460,7 @@ function buildUpgrades(){
           document.getElementById('soul-count').textContent=fmt(souls);
           setHint();
           checkAchievements();
+          checkRebirthButton();
           saveGame();
         }
       });
@@ -2306,6 +2559,54 @@ document.getElementById('mok').addEventListener('click',function(){
 });
 document.getElementById('mo').addEventListener('click',function(e){if(e.target===this)this.className='';});
 
+// ── REBIRTH BUTTON & MODALS ───────────────────────────────────────────────────
+document.getElementById('ascend-btn').addEventListener('click',function(){
+  openRebirthModal();
+});
+
+document.getElementById('rebirth-cancel').addEventListener('click',function(){
+  document.getElementById('rebirth-modal').classList.remove('open');
+});
+
+document.getElementById('rebirth-ascend-now').addEventListener('click',function(){
+  document.getElementById('rebirth-modal').classList.remove('open');
+  // Reset selected form state
+  document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
+  document.getElementById('form-confirm-btn').classList.remove('show');
+  document.getElementById('form-certain').classList.remove('show');
+  document.getElementById('form-modal').classList.add('open');
+});
+
+var _selectedForm=null;
+document.querySelectorAll('.form-card').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _selectedForm=card.getAttribute('data-form');
+    document.getElementById('form-confirm-btn').classList.add('show');
+    document.getElementById('form-certain').classList.remove('show');
+  });
+});
+
+document.getElementById('form-confirm-btn').addEventListener('click',function(){
+  if(!_selectedForm) return;
+  document.getElementById('form-certain').classList.add('show');
+});
+
+document.getElementById('form-yes').addEventListener('click',function(){
+  if(!_selectedForm) return;
+  document.getElementById('form-modal').classList.remove('open');
+  doRebirthReset(_selectedForm);
+  _selectedForm=null;
+});
+
+document.getElementById('form-no').addEventListener('click',function(){
+  document.getElementById('form-certain').classList.remove('show');
+  document.getElementById('form-confirm-btn').classList.remove('show');
+  document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
+  _selectedForm=null;
+});
+
 // ── INPUT ─────────────────────────────────────────────────────────────────────
 document.getElementById('enemy-canvas').addEventListener('mousedown',function(e){
   if(e.button!==0) return;
@@ -2330,10 +2631,11 @@ function gameLoop(){
       if(enemyHp.lte(0)) onEnemyDeath();
     } else { lastDrainTick=now; }
     if(isEliteFight()&&eliteTimerStart>0){
+      var eliteMs=rebirthForm==='equine'?25000:20000;
       var elapsed=now-eliteTimerStart;
-      var pct=Math.max(0,1-elapsed/20000);
+      var pct=Math.max(0,1-elapsed/eliteMs);
       document.getElementById('elite-timer-bar').style.width=(pct*100)+'%';
-      var secs=Math.ceil((20000-elapsed)/1000);
+      var secs=Math.ceil((eliteMs-elapsed)/1000);
       document.getElementById('elite-timer-label').textContent=Math.max(0,secs)+'s';
       if(pct<=0) onEliteDpsCheckFail();
     }
@@ -2368,6 +2670,7 @@ function gameLoop(){
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
 initMist(28);
+preloadFormImages();
 loadGame();
 updateHighestFloor();
 recalcStats();
@@ -2375,6 +2678,8 @@ updateHpBars();
 updateEntityStatsPanel();
 updateTraitsRow();
 buildMinimap();
+checkRebirthButton();
+updateTatteredDisplay();
 spawnEnemy();
 checkAchievements(true);
 renderAchievementsTab();
