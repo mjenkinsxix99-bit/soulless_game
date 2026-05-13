@@ -1723,7 +1723,8 @@ function showMsTip(evt,u,i){
       var mm=getMileMult(u), pm=getPurchMult(u.level);
       var dmgStr;
       if(u.type==='drain'){
-        var pct=u.level*u.perLevel*mm*pm.toNumber()*100;
+        var drainMm=(u.id==='dv')?1:getMileMult(u);
+        var pct=u.level*u.perLevel*drainMm*100;
         dmgStr=(+(pct.toFixed(4)))+'% HP/s drain (total)';
       } else {
         var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
@@ -2344,7 +2345,8 @@ function getUpgradeContribStr(u){
   if(u.level===0) return u.desc();
   var mm=getMileMult(u), pm=getPurchMult(u.level);
   if(u.type==='drain'){
-    var pct=u.level*u.perLevel*mm*pm.toNumber()*100;
+    var drainMm=(u.id==='dv')?1:getMileMult(u);
+    var pct=u.level*u.perLevel*drainMm*100;
     return (+(pct.toFixed(4)))+'% HP/s drain';
   }
   var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
@@ -2358,10 +2360,11 @@ function showUpgradeTip(evt,u){
   tip.querySelector('.ut-name').textContent=u.name;
   var valStr,detailStr;
   if(u.type==='drain'){
-    var pct=u.level*u.perLevel*mm*pm.toNumber()*100;
+    var drainMm=(u.id==='dv')?1:getMileMult(u);
+    var pct=u.level*u.perLevel*drainMm*100;
     valStr=(+(pct.toFixed(4)))+'% HP drained per second';
     detailStr='Lv.'+u.level+' × '+u.perLevel+' base/lv';
-    if(mm>1) detailStr+=' × ×'+mm+' milestones';
+    if(drainMm>1) detailStr+=' × ×'+drainMm+' milestones';
   } else {
     var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
     valStr=fmt(eff)+(u.type==='click'?' click damage':' damage per second');
