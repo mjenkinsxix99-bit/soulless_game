@@ -1714,6 +1714,8 @@ function recalcStats(){
     totalDps=totalDps.mul(1.1);
   }
   autoAttackInterval=rebirthForm==='feline'?2700:3000;
+  // Tattered Souls: each unspent soul grants ×1.0666 DPS
+  if(tatteredSouls>0) totalDps=totalDps.mul(D(1.0666).pow(tatteredSouls));
   // Apply Divine Hunger milestone support effects
   var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
   if(dv){
