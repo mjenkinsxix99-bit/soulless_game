@@ -44,6 +44,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #ms-tooltip .mst-title { font-size:14px; color:#d4a843; letter-spacing:1px; margin-bottom:3px; }
 #ms-tooltip .mst-req { color:#887755; font-size:12px; }
 #ms-tooltip .mst-eff { color:#88aa88; font-size:13px; margin-top:2px; }
+#ms-tooltip .mst-cost { font-size:12px; margin-top:3px; font-weight:bold; }
 #ms-tooltip .mst-status { color:#554488; font-size:12px; margin-top:3px; font-style:italic; }
 #ms-tooltip .mst-dmg { color:#88ddaa; font-size:13px; margin-top:4px; font-weight:bold; }
 /* Flex layout: icon left, content right */
@@ -1748,6 +1749,18 @@ function showMsTip(evt,u,i){
     var typeLabel=u.type==='click'?'Click Damage':u.type==='drain'?'HP Drain':'DPS';
     tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
   }
+  var costEl=tip.querySelector('.mst-cost');
+  if(costEl){
+    if(!lit && avail){
+      var msCost=u.milestoneCosts[i];
+      var canAfford=souls.gte(msCost);
+      costEl.textContent='Cost: '+fmt(msCost)+' souls';
+      costEl.style.color=canAfford?'#88ddaa':'#dd6666';
+      costEl.style.display='block';
+    } else {
+      costEl.style.display='none';
+    }
+  }
   tip.querySelector('.mst-status').textContent=lit?'Active':avail?'Click to activate':'Locked';
   var dmgEl=tip.querySelector('.mst-dmg');
   if(dmgEl){
@@ -1878,6 +1891,17 @@ var REP_UPGRADES=[
 
 // Convert all upgrade costs to Decimal after definition
 REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
+
+// Each milestone cost = previous milestone cost × chain factor (compounding)
+var MS_CHAIN_FACTORS=[3.33, 3.33, 6.66, 6.66, 9.99, 9.99, 9.99, 6.66, 3.33];
+function calcMilestoneCosts(u){
+  var c=u._baseCost, base=D(0);
+  for(var i=0;i<10;i++){ base=base.add(c); c=c.mul(u.costScale).ceil(); }
+  var costs=[base.floor()];
+  for(var i=0;i<9;i++){ costs.push(costs[i].mul(MS_CHAIN_FACTORS[i]).floor()); }
+  u.milestoneCosts=costs;
+}
+REP_UPGRADES.forEach(calcMilestoneCosts);
 
 // ── ACHIEVEMENT SYSTEM ────────────────────────────────────────────────────────
 function absGlobalFloor(realm,level,floor){ return (realm-1)*100+globalFloor(level,floor); }
@@ -2473,6 +2497,10 @@ function buildUpgrades(){
         e.stopPropagation();
         if(u.milestones[mi]) return;
         if(u.level>=getMsThresh(mi)){
+          var msCost=u.milestoneCosts[mi];
+          if(!souls.gte(msCost)) return;
+          souls=souls.sub(msCost);
+          document.getElementById('soul-count').textContent=fmt(souls);
           u.milestones[mi]=true;
           totalMilestonePurchases++;
           recalcStats();
@@ -2921,6 +2949,6 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
 })();
 </script>
-<div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
+<div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-cost" style="display:none"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
 </body>
 </html>
