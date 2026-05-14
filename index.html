@@ -2496,7 +2496,7 @@ function buildUpgrades(){
           souls=souls.sub(total);
           var c=u.cost;
           for(var i=0;i<n;i++){
-            c=(u.id==='ss')?c.add(Decimal.max(D(1),c.mul(0.20).ceil())):c.mul(u.costScale).ceil();
+            c=c.mul(u.costScale).ceil();
           }
           u.cost=c;
           u.level+=n;
