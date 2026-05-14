@@ -32,7 +32,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard .uc { font-size: 15px; color: #7a6010; margin-top: 3px; }
 .ucard .ulvl { font-size: 13px; color: #555555; }
 .ucard .ms-row { display:flex; gap:3px; margin-top:8px; padding-top:7px; border-top:1px solid #c8b870; }
-.ms-box { flex:1; height:20px; border-radius:3px; border:1px solid #2a2010; background:rgba(30,20,10,0.35); cursor:not-allowed; position:relative; transition:background 0.2s,border-color 0.2s,box-shadow 0.2s; overflow:hidden; }
+.ms-box { flex:1; height:23px; border-radius:3px; border:1px solid #2a2010; background:rgba(30,20,10,0.35); cursor:not-allowed; position:relative; transition:background 0.2s,border-color 0.2s,box-shadow 0.2s; overflow:hidden; }
 .ms-box.avail { cursor:pointer; animation:ms-pulse 1.3s ease-in-out infinite; }
 .ms-box.lit { cursor:default; animation:ms-lit-pulse 2s ease-in-out infinite; }
 .ms-box.lit .ms-star { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; height:90%; object-fit:contain; pointer-events:none; animation:ms-star-glow 2s ease-in-out infinite; }
@@ -49,11 +49,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard-flex { display: flex; gap: 10px; align-items: flex-start; }
 .ucard-icon { width: 52px; height: 52px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; }
 .ucard-body { flex: 1; min-width: 0; }
-/* Upgrade contribution tooltip */
-#upg-tooltip { display:none; position:fixed; z-index:200; background:#0d0d1e; border:1px solid #5544bb; border-radius:6px; padding:9px 13px; font-family:Georgia,serif; font-size:13px; color:#c0b0ff; pointer-events:none; max-width:240px; box-shadow:0 0 16px rgba(100,60,200,0.5); line-height:1.5; }
-#upg-tooltip .ut-name { font-size:14px; color:#d4a843; letter-spacing:1px; margin-bottom:4px; }
-#upg-tooltip .ut-val { color:#88ddaa; font-size:14px; font-weight:bold; margin-top:2px; }
-#upg-tooltip .ut-detail { color:#776699; font-size:12px; margin-top:4px; line-height:1.4; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0; }
 #combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
@@ -2380,40 +2375,6 @@ function getUpgradeContribStr(u){
   return fmt(eff)+(u.type==='click'?' click damage':' DPS');
 }
 
-function showUpgradeTip(evt,u){
-  var tip=document.getElementById('upg-tooltip');
-  if(!tip||u.level===0) return;
-  var mm=getMileMult(u), pm=getPurchMult(u.level);
-  tip.querySelector('.ut-name').textContent=u.name;
-  var valStr,detailStr;
-  if(u.type==='drain'){
-    var drainMm=(u.id==='dv')?1:getMileMult(u);
-    var pct=u.level*u.perLevel*drainMm*100;
-    valStr=(+(pct.toFixed(4)))+'% HP drained per second';
-    detailStr='Lv.'+u.level+' × '+u.perLevel+' base/lv';
-    if(drainMm>1) detailStr+=' × ×'+drainMm+' milestones';
-  } else {
-    var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
-    valStr=fmt(eff)+(u.type==='click'?' click damage':' damage per second');
-    detailStr='Lv.'+u.level+' × '+u.perLevel+' base/lv';
-    if(mm>1) detailStr+=' × ×'+mm+' milestones';
-    if(pm.gt(1)) detailStr+=' × ×'+fmt(pm)+' scaling';
-  }
-  tip.querySelector('.ut-val').textContent=valStr;
-  tip.querySelector('.ut-detail').textContent=detailStr;
-  tip.style.display='block';
-  positionUpgradeTip(evt);
-}
-function positionUpgradeTip(evt){
-  var tip=document.getElementById('upg-tooltip'); if(!tip) return;
-  var x=evt.clientX+14, y=evt.clientY-72;
-  if(x+250>window.innerWidth) x=evt.clientX-254;
-  if(y<4) y=4;
-  tip.style.left=x+'px'; tip.style.top=y+'px';
-}
-function hideUpgradeTip(){
-  var tip=document.getElementById('upg-tooltip'); if(tip) tip.style.display='none';
-}
 
 function calcCostN(u,n){
   var total=D(0),c=u.cost;
@@ -2498,17 +2459,12 @@ function buildUpgrades(){
           saveGame();
         }
       });
-      box.addEventListener('mouseenter',function(e){ hideUpgradeTip(); showMsTip(e,u,mi); });
+      box.addEventListener('mouseenter',function(e){ showMsTip(e,u,mi); });
       box.addEventListener('mousemove',positionMsTip);
       box.addEventListener('mouseleave',hideMsTip);
     });
 
-    // Upgrade contribution tooltip for owned cards
-    if(bought){
-      d.addEventListener('mouseenter',function(e){ if(!e.target.closest('.ms-box')) showUpgradeTip(e,u); });
-      d.addEventListener('mousemove',function(e){ if(!e.target.closest('.ms-box')) positionUpgradeTip(e); else hideUpgradeTip(); });
-      d.addEventListener('mouseleave',function(){ hideUpgradeTip(); });
-    }
+
 
     if(can){
       d.addEventListener('click',function(e){
@@ -2836,6 +2792,5 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 })();
 </script>
 <div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
-<div id="upg-tooltip"><div class="ut-name"></div><div class="ut-val"></div><div class="ut-detail"></div></div>
 </body>
 </html>
