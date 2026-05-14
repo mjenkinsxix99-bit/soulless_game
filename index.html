@@ -384,6 +384,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <button class="buy-btn" data-qty="50">50</button>
       <button class="buy-btn" data-qty="100">100</button>
       <button class="buy-btn" data-qty="max">MAX</button>
+      <button class="buy-btn" data-qty="all">ALL</button>
     </div>
     <div id="right">
       <div id="damage-summary">
@@ -2782,11 +2783,67 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
   });
 });
 
+function buyAllAffordable(){
+  var changed=false;
+
+  function buyFreeMilestones(){
+    REP_UPGRADES.forEach(function(u){
+      for(var mi=0;mi<10;mi++){
+        if(!u.milestones[mi]&&u.level>=getMsThresh(mi)){
+          u.milestones[mi]=true;
+          totalMilestonePurchases++;
+          changed=true;
+        }
+      }
+    });
+  }
+
+  buyFreeMilestones();
+
+  var keepGoing=true;
+  while(keepGoing){
+    keepGoing=false;
+    var candidates=REP_UPGRADES.filter(function(u){return u.vis();});
+    candidates.sort(function(a,b){return a.cost.lt(b.cost)?-1:a.cost.gt(b.cost)?1:0;});
+    for(var i=0;i<candidates.length;i++){
+      var u=candidates[i];
+      var n=maxAffordableN(u);
+      if(n>=1){
+        var total=calcCostN(u,n);
+        souls=souls.sub(total);
+        var c=u.cost;
+        for(var j=0;j<n;j++){c=c.mul(u.costScale).ceil();}
+        u.cost=c;
+        u.level+=n;
+        totalUpgradePurchases+=n;
+        changed=true;
+        keepGoing=true;
+        buyFreeMilestones();
+      }
+    }
+  }
+
+  if(changed){
+    recalcStats();
+    dirtyU=true;
+    updateEntityStatsPanel();
+    document.getElementById('soul-count').textContent=fmt(souls);
+    setHint();
+    checkAchievements();
+    checkRebirthButton();
+    saveGame();
+  }
+}
+
 document.querySelectorAll('.buy-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
+    var qty=btn.getAttribute('data-qty');
+    if(qty==='all'){
+      buyAllAffordable();
+      return;
+    }
     document.querySelectorAll('.buy-btn').forEach(function(b){b.classList.remove('active');});
     btn.classList.add('active');
-    var qty=btn.getAttribute('data-qty');
     buyQty=(qty==='max')?'max':parseInt(qty,10);
     dirtyU=true;
   });
