@@ -397,6 +397,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <div class="stat-row" id="es-crit-row" style="display:none"><span>Crit chance</span><span class="sv good" id="es-crit">—</span></div>
         <div class="stat-row" id="es-critm-row" style="display:none"><span>Crit multiplier</span><span class="sv good" id="es-critm">—</span></div>
         <div class="stat-row" id="es-soul-row" style="display:none"><span>Soul absorb</span><span class="sv good" id="es-soul">—</span></div>
+        <div class="stat-row"><span>Total strikes</span><span class="sv" id="es-clicks">0</span></div>
         <div class="ph gap">Enemy Defeats</div>
         <div id="enemy-defeats-list"></div>
         <div class="ph gap">Progress</div>
@@ -1496,7 +1497,7 @@ function updateEnemyDefeatsPanel(){
 // ── COMBAT ────────────────────────────────────────────────────────────────────
 function entityAttack(isAuto){
   if(!combatActive||enemyDead) return;
-  if(!isAuto){ totalClicks++; checkAchievements(); }
+  if(!isAuto){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
   attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
@@ -1878,13 +1879,13 @@ function updateHighestFloor(){
 
 var ACHIEVEMENTS=[
   // Clicks
-  {id:'click-1k',      cat:'Striker',         name:'First Blood',             desc:'Strike 1,000 times',                          check:function(){return totalClicks>=1000;}},
-  {id:'click-10k',     cat:'Striker',         name:'Unrelenting',             desc:'Strike 10,000 times',                         check:function(){return totalClicks>=10000;}},
-  {id:'click-50k',     cat:'Striker',         name:'The Hungry Dark',         desc:'Strike 50,000 times',                         check:function(){return totalClicks>=50000;}},
-  {id:'click-100k',    cat:'Striker',         name:'Ten Thousand Fists',      desc:'Strike 100,000 times',                        check:function(){return totalClicks>=100000;}},
-  {id:'click-250k',    cat:'Striker',         name:'Endless Violence',        desc:'Strike 250,000 times',                        check:function(){return totalClicks>=250000;}},
-  {id:'click-500k',    cat:'Striker',         name:'Half a Million Strikes',  desc:'Strike 500,000 times',                        check:function(){return totalClicks>=500000;}},
-  {id:'click-1m',      cat:'Striker',         name:'A Million Graves',        desc:'Strike 1,000,000 times',                      check:function(){return totalClicks>=1000000;}},
+  {id:'click-1k',      cat:'Striker',         name:'First Blood',             desc:'Strike 1,000 times',                          check:function(){return totalClicks>=1000;},      threshold:1000},
+  {id:'click-10k',     cat:'Striker',         name:'Unrelenting',             desc:'Strike 10,000 times',                         check:function(){return totalClicks>=10000;},     threshold:10000},
+  {id:'click-50k',     cat:'Striker',         name:'The Hungry Dark',         desc:'Strike 50,000 times',                         check:function(){return totalClicks>=50000;},     threshold:50000},
+  {id:'click-100k',    cat:'Striker',         name:'Ten Thousand Fists',      desc:'Strike 100,000 times',                        check:function(){return totalClicks>=100000;},    threshold:100000},
+  {id:'click-250k',    cat:'Striker',         name:'Endless Violence',        desc:'Strike 250,000 times',                        check:function(){return totalClicks>=250000;},    threshold:250000},
+  {id:'click-500k',    cat:'Striker',         name:'Half a Million Strikes',  desc:'Strike 500,000 times',                        check:function(){return totalClicks>=500000;},    threshold:500000},
+  {id:'click-1m',      cat:'Striker',         name:'A Million Graves',        desc:'Strike 1,000,000 times',                      check:function(){return totalClicks>=1000000;},   threshold:1000000},
   // Upgrade purchases
   {id:'upg-100',       cat:'Scholar of Power',name:'Hungry for Power',        desc:'Purchase 100 upgrades',                       check:function(){return totalUpgradePurchases>=100;}},
   {id:'upg-250',       cat:'Scholar of Power',name:'The Habit of Growth',     desc:'Purchase 250 upgrades',                       check:function(){return totalUpgradePurchases>=250;}},
@@ -2067,7 +2068,14 @@ function renderAchievementsTab(){
       nm.textContent=isEarned?a.name:'???';
       var dc=document.createElement('div'); dc.className='acd';
       dc.textContent=isEarned?a.desc:'—';
-      card.appendChild(nm); card.appendChild(dc); grid.appendChild(card);
+      card.appendChild(nm); card.appendChild(dc);
+      if(!isEarned&&a.threshold){
+        var pr=document.createElement('div'); pr.className='acd';
+        pr.style.cssText='color:#554477;margin-top:3px;font-size:11px;';
+        pr.textContent=totalClicks.toLocaleString()+' / '+a.threshold.toLocaleString();
+        card.appendChild(pr);
+      }
+      grid.appendChild(card);
     });
     sec.appendChild(grid); el.appendChild(sec);
   });
@@ -2513,6 +2521,7 @@ function updateEntityStatsPanel(){
   if(critClickChance>0) document.getElementById('es-crit').textContent=(critClickChance*100).toFixed(2)+'%';
   if(critClickMult>0) document.getElementById('es-critm').textContent=(2+critClickMult).toFixed(2)+'×';
   if(soulAbsorbBonus>0) document.getElementById('es-soul').textContent='+'+(soulAbsorbBonus*100).toFixed(1)+'%';
+  var _escl=document.getElementById('es-clicks'); if(_escl) _escl.textContent=totalClicks.toLocaleString();
 }
 
 // ── EVOLUTION ─────────────────────────────────────────────────────────────────
