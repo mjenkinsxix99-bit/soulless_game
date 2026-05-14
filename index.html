@@ -2252,7 +2252,9 @@ function loadGame(){
       var u=REP_UPGRADES.filter(function(x){return x.id===saved.id;})[0];
       if(!u) return;
       u.level=saved.level||0;
-      u.cost=D(saved.cost||u.cost.toString());
+      var c=u._baseCost;
+      for(var i=0;i<u.level;i++) c=c.mul(u.costScale).ceil();
+      u.cost=c;
       if(saved.milestones) u.milestones=saved.milestones.slice();
     });
   }
