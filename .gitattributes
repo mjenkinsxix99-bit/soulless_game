@@ -1,4 +1,11 @@
 artwork/sunburst.png !filter !diff !merge -text
+artwork/masculine.png !filter !diff !merge -text
+artwork/feminine.png !filter !diff !merge -text
+artwork/androgynous.png !filter !diff !merge -text
+artwork/canine.png !filter !diff !merge -text
+artwork/feline.png !filter !diff !merge -text
+artwork/equine.png !filter !diff !merge -text
+artwork/wisp_clean.png !filter !diff !merge -text
 artwork/*.png filter=lfs diff=lfs merge=lfs -text
 artwork/*.jpg filter=lfs diff=lfs merge=lfs -text
 artwork/*.jpeg filter=lfs diff=lfs merge=lfs -text
