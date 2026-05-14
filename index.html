@@ -1723,6 +1723,12 @@ function recalcStats(){
     if(dv.milestones[8]) soulAbsorbBonus+=0.222;
     if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
   }
+  // Tattered Souls: additive +6.66% to final DPS and click damage per unspent soul
+  if(tatteredSouls>0){
+    var tsBonus=1+tatteredSouls*0.0666;
+    totalDps=totalDps.mul(tsBonus);
+    clickDmgBonus=clickDmgBonus.mul(tsBonus);
+  }
 }
 
 var _msTip=null;
