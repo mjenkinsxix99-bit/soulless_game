@@ -1783,7 +1783,7 @@ function hideMsTip(){
 
 function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
 var REP_UPGRADES=[
-  {id:'ss',name:'Spirit Slash',  cost:5,     costScale:1.20, level:0, type:'click',  perLevel:1,
+  {id:'ss',name:'Spirit Slash',  cost:5,     costScale:1.0666, level:0, type:'click',  perLevel:1,
     desc:function(){return '+1 damage per click';},
     vis:function(){return true;}, milestones:mkMs()},
   {id:'dh',name:'Deeper Hunger', cost:50,    costScale:1.06, level:0, type:'dps',    perLevel:5,
@@ -2399,7 +2399,7 @@ function calcCostN(u,n){
   var total=D(0),c=u.cost;
   for(var i=0;i<n;i++){
     total=total.add(c);
-    c=(u.id==='ss')?c.add(Decimal.max(D(1),c.mul(0.20).ceil())):c.mul(u.costScale).ceil();
+    c=c.mul(u.costScale).ceil();
   }
   return total;
 }
@@ -2408,7 +2408,7 @@ function maxAffordableN(u){
   while(n<10000){
     if(souls.lt(total.add(c))) break;
     total=total.add(c);
-    c=(u.id==='ss')?c.add(Decimal.max(D(1),c.mul(0.20).ceil())):c.mul(u.costScale).ceil();
+    c=c.mul(u.costScale).ceil();
     n++;
   }
   return n;
