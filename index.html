@@ -1356,7 +1356,7 @@ function buildMinimap(){
 function updateAutoProgressBtn(){
   var btn=document.getElementById('mm-auto');
   if(!btn) return;
-  if(ascendCount<1){ btn.style.display='none'; return; }
+  if(rebirthCount<1){ btn.style.display='none'; return; }
   btn.style.display='';
   btn.classList.toggle('ap-on', autoProgressEnabled);
   btn.classList.toggle('ap-off', !autoProgressEnabled);
@@ -2182,6 +2182,7 @@ function doRebirthReset(chosenForm){
   buildMinimap();
   updateProgressLabel();
   updateHighestFloor();
+  updateAutoProgressBtn();
   saveGame();
   spawnEnemy();
 }
@@ -2743,7 +2744,7 @@ document.getElementById('mm-next').addEventListener('click',function(){
   navigateTo(r.level,r.floor);
 });
 document.getElementById('mm-auto').addEventListener('click',function(){
-  if(ascendCount<1) return;
+  if(rebirthCount<1) return;
   autoProgressEnabled=!autoProgressEnabled;
   updateAutoProgressBtn();
   saveGame();
