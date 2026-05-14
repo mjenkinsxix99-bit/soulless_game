@@ -1327,8 +1327,8 @@ function buildMinimap(){
     else if(done)   cls+=' done';
     else if(locked) cls+=' locked';
     cell.className=cls;
-    cell.textContent=r.isElite?'★':globalFloor(r.level,r.floor);
-    cell.title='Level '+r.level+', '+(r.isElite?'Elite (Floor '+globalFloor(r.level,r.floor)+')':'Floor '+globalFloor(r.level,r.floor));
+    cell.textContent=r.isElite?'★':absGlobalFloor(curRealm,r.level,r.floor);
+    cell.title='Level '+r.level+', '+(r.isElite?'Elite (Floor '+absGlobalFloor(curRealm,r.level,r.floor)+')':'Floor '+absGlobalFloor(curRealm,r.level,r.floor));
 
     if(!locked){
       (function(l,f){
@@ -1459,7 +1459,7 @@ function updateProgressLabel(){
     document.getElementById('prog-label').textContent=d.name+' — defeat to advance';
     document.getElementById('prog-bar').style.width='100%';
   } else {
-    var gf=globalFloor(curLevel,curFloor);
+    var gf=absGlobalFloor(curRealm,curLevel,curFloor);
     document.getElementById('prog-label').textContent=
       'Floor '+gf+' — '+Math.min(floorWins,WINS_PER_FLOOR)+' / '+WINS_PER_FLOOR;
     document.getElementById('prog-bar').style.width=(floorWins/WINS_PER_FLOOR*100)+'%';
