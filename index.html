@@ -1764,8 +1764,8 @@ function showMsTip(evt,u,i){
 }
 function positionMsTip(evt){
   var tip=document.getElementById('ms-tooltip'); if(!tip) return;
-  var x=evt.clientX+14, y=evt.clientY-60;
-  if(x+230>window.innerWidth) x=evt.clientX-234;
+  var x=evt.clientX-234, y=evt.clientY-60;
+  if(x<4) x=4;
   if(y<4) y=4;
   tip.style.left=x+'px'; tip.style.top=y+'px';
 }
