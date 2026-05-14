@@ -1714,8 +1714,6 @@ function recalcStats(){
     totalDps=totalDps.mul(1.1);
   }
   autoAttackInterval=rebirthForm==='feline'?2700:3000;
-  // Tattered Souls: each unspent soul grants ×1.0666 DPS
-  if(tatteredSouls>0) totalDps=totalDps.mul(D(1.0666).pow(tatteredSouls));
   // Apply Divine Hunger milestone support effects
   var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
   if(dv){
@@ -1724,6 +1722,12 @@ function recalcStats(){
     if(dv.milestones[5]) critClickMult+=3.33;
     if(dv.milestones[8]) soulAbsorbBonus+=0.222;
     if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
+  }
+  // Tattered Souls: additive +6.66% to final DPS and click damage per unspent soul
+  if(tatteredSouls>0){
+    var tsBonus=1+tatteredSouls*0.0666;
+    totalDps=totalDps.mul(tsBonus);
+    clickDmgBonus=clickDmgBonus.mul(tsBonus);
   }
 }
 
