@@ -27,10 +27,11 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard.bought { border-color: #b5a040; opacity: 0.7; background: #f0e8b8; }
 	.ucard.can.bought { border-color: #c8a830; opacity: 1; cursor: pointer; background: #fff8c0; box-shadow: 0 0 18px rgba(212,168,67,0.55), 0 0 36px rgba(212,168,67,0.25); }
 	.ucard.can.bought:hover { border-color: #e0b820; background: #fffde0; box-shadow: 0 0 26px rgba(212,168,67,0.8), 0 0 52px rgba(212,168,67,0.4); }
-.ucard .un { font-size: 16px; color: #1a1a1a; margin-bottom: 2px; }
-.ucard .ud { font-size: 15px; color: #333333; font-style: italic; line-height: 1.4; }
-.ucard .uc { font-size: 15px; color: #7a6010; margin-top: 3px; }
-.ucard .ulvl { font-size: 13px; color: #555555; }
+.ucard .un-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+.ucard .un { font-size: 17px; font-weight: bold; color: #1a1a1a; }
+.ucard .uowned { font-size: 15px; font-weight: bold; color: #7a6010; margin-left: auto; padding-left: 10px; white-space: nowrap; }
+.ucard .ud { font-size: 15px; font-weight: 600; color: #333333; font-style: italic; line-height: 1.4; }
+.ucard .uc { font-size: 15px; font-weight: bold; color: #7a6010; margin-top: 4px; }
 .ucard .ms-row { display:flex; gap:3px; margin-top:8px; padding-top:7px; border-top:1px solid #c8b870; }
 .ms-box { flex:1; height:23px; border-radius:3px; border:1px solid #2a2010; background:rgba(30,20,10,0.35); cursor:not-allowed; position:relative; transition:background 0.2s,border-color 0.2s,box-shadow 0.2s; overflow:hidden; }
 .ms-box.avail { cursor:pointer; animation:ms-pulse 1.3s ease-in-out infinite; }
@@ -212,7 +213,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .buy-btn { background:#0d0b1a; border:2px solid #3a2a6a; color:#9980dd; border-radius:5px; padding:10px 0; font-size:13px; font-weight:bold; cursor:pointer; text-align:center; font-family:Georgia,serif; width:100%; transition:all 0.15s; letter-spacing:1px; }
 .buy-btn:hover { border-color:#7755cc; color:#c0a0ff; box-shadow:0 0 8px rgba(150,100,255,0.45); }
 .buy-btn.active { background:#1a1200; border-color:#d4a843; color:#ffd700; box-shadow:0 0 10px rgba(212,168,67,0.9),0 0 22px rgba(212,168,67,0.45); text-shadow:0 0 8px rgba(255,215,0,0.85); }
-.ubuy { font-size:11px; color:#887755; }
+.ubuy { font-size:14px; font-weight:bold; color:#887755; margin-right:5px; }
 /* Entity display in left panel */
 #left-entity { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
 
@@ -1516,6 +1517,7 @@ function entityAttack(isAuto){
 
 
 function onEnemyDeath(){
+  if(enemyDead) return;
   combatActive=false; enemyDead=true; eliteTimerStart=0;
   spawnSoulCoins();
   document.getElementById('elite-timer-wrap').style.display='none';
@@ -2436,10 +2438,11 @@ function buildUpgrades(){
     msRowHtml+='</div>';
 
     var idx=REP_UPGRADES.indexOf(u);
-    var buyLabel=(actualN>1)?' <span class="ubuy">×'+actualN+'</span>':'';
-    var nameHtml='<div class="un">'+u.name+(u.level>0?' <span class="ulvl">('+u.level+')</span>':'')+buyLabel+'</div>';
+    var ownedHtml=u.level>0?'<span class="uowned">'+u.level+' owned</span>':'';
+    var nameHtml='<div class="un-row"><span class="un">'+u.name+'</span>'+ownedHtml+'</div>';
     var descHtml='<div class="ud">'+(bought?getUpgradeContribStr(u):u.desc())+'</div>';
-    var costHtml='<div class="uc">'+fmt(cost)+' souls</div>';
+    var buyPrefix=(actualN>1)?'<span class="ubuy">×'+actualN+'</span>':'';
+    var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
     d.innerHTML=nameHtml+descHtml+costHtml+msRowHtml;
 
     // Milestone box events (always active regardless of affordability)
