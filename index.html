@@ -398,6 +398,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <div class="stat-row" id="es-critm-row" style="display:none"><span>Crit multiplier</span><span class="sv good" id="es-critm">—</span></div>
         <div class="stat-row" id="es-soul-row" style="display:none"><span>Soul absorb</span><span class="sv good" id="es-soul">—</span></div>
         <div class="stat-row"><span>Total strikes</span><span class="sv" id="es-clicks">0</span></div>
+        <div class="stat-row"><span>Ascensions</span><span class="sv good" id="es-ascend">0</span></div>
         <div class="ph gap">Enemy Defeats</div>
         <div id="enemy-defeats-list"></div>
         <div class="ph gap">Progress</div>
@@ -1356,8 +1357,8 @@ function buildMinimap(){
 function updateAutoProgressBtn(){
   var btn=document.getElementById('mm-auto');
   if(!btn) return;
-  if(rebirthCount<1){ btn.style.display='none'; return; }
-  btn.style.display='';
+  if(ascendCount<1 && rebirthCount<1){ btn.style.display='none'; return; }
+  btn.style.display='inline-block';
   btn.classList.toggle('ap-on', autoProgressEnabled);
   btn.classList.toggle('ap-off', !autoProgressEnabled);
 }
@@ -2166,6 +2167,7 @@ function doRebirthReset(chosenForm){
 
   // Apply rebirth
   rebirthCount++;
+  ascendCount++;
   rebirthForm=chosenForm;
 
   // Reload entity image as chosen form image
@@ -2523,6 +2525,7 @@ function updateEntityStatsPanel(){
   if(critClickMult>0) document.getElementById('es-critm').textContent=(2+critClickMult).toFixed(2)+'×';
   if(soulAbsorbBonus>0) document.getElementById('es-soul').textContent='+'+(soulAbsorbBonus*100).toFixed(1)+'%';
   var _escl=document.getElementById('es-clicks'); if(_escl) _escl.textContent=totalClicks.toLocaleString();
+  var _esca=document.getElementById('es-ascend'); if(_esca) _esca.textContent=ascendCount.toLocaleString();
 }
 
 // ── EVOLUTION ─────────────────────────────────────────────────────────────────
@@ -2744,7 +2747,7 @@ document.getElementById('mm-next').addEventListener('click',function(){
   navigateTo(r.level,r.floor);
 });
 document.getElementById('mm-auto').addEventListener('click',function(){
-  if(rebirthCount<1) return;
+  if(ascendCount<1 && rebirthCount<1) return;
   autoProgressEnabled=!autoProgressEnabled;
   updateAutoProgressBtn();
   saveGame();
