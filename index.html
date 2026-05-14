@@ -40,6 +40,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 @keyframes ms-pulse { 0%,100%{box-shadow:none;} 50%{box-shadow:none;} }
 @keyframes ms-lit-pulse { 0%,100%{filter:brightness(1);} 50%{filter:brightness(1.35);} }
 @keyframes ms-star-glow { 0%,100%{opacity:0.85;} 50%{opacity:1;} }
+@keyframes tatteredPulse { 0%,100%{text-shadow:0 0 5px rgba(255,180,0,1),0 0 12px rgba(255,120,0,1),0 0 24px rgba(255,80,0,0.8),0 0 48px rgba(255,60,0,0.4);} 50%{text-shadow:0 0 8px rgba(255,200,0,1),0 0 20px rgba(255,140,0,1),0 0 40px rgba(255,100,0,0.9),0 0 70px rgba(255,80,0,0.5);} }
+@keyframes bgSlowRotate { from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);} }
 #ms-tooltip { display:none; position:fixed; z-index:200; background:#0d0d1e; border:1px solid #4433aa; border-radius:6px; padding:8px 12px; font-family:Georgia,serif; font-size:13px; color:#c0b0ff; pointer-events:none; max-width:220px; box-shadow:0 0 16px rgba(100,60,200,0.5); line-height:1.5; }
 #ms-tooltip .mst-title { font-size:14px; color:#d4a843; letter-spacing:1px; margin-bottom:3px; }
 #ms-tooltip .mst-req { color:#887755; font-size:12px; }
@@ -52,7 +54,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard-icon { width: 52px; height: 52px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; }
 .ucard-body { flex: 1; min-width: 0; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
-#bg-canvas { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0; }
+#bg-canvas { position:absolute;top:50%;left:50%;pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
 #combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
   width:930px; height:930px; border-radius:50%;
   background:radial-gradient(circle at center,
@@ -117,8 +119,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 
 /* Tattered Souls display in topbar */
 #tattered-display { display: none; text-align: center; }
-#tattered-display .num { font-size: 22px; color: #c47c2a; font-weight: bold; text-shadow: 0 0 8px rgba(200,120,40,0.8), 0 0 18px rgba(160,80,20,0.4); }
-#tattered-display .lbl { font-size: 11px; color: #9a6030; letter-spacing: 2px; text-transform: uppercase; }
+#tattered-display .num { font-size: 22px; color: #ff8800; font-weight: bold; text-shadow: 0 0 5px rgba(255,180,0,1), 0 0 12px rgba(255,120,0,1), 0 0 24px rgba(255,80,0,0.8), 0 0 48px rgba(255,60,0,0.4); animation: tatteredPulse 2s ease-in-out infinite; }
+#tattered-display .lbl { font-size: 11px; color: #ff9900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,140,0,0.9), 0 0 18px rgba(255,80,0,0.5); }
 
 /* Rebirth confirmation modal */
 #rebirth-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; align-items: center; justify-content: center; }
@@ -2908,8 +2910,9 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     };
   }
   function draw(){
-    c.width=bf.offsetWidth;
-    c.height=bf.offsetHeight;
+    var diag=Math.ceil(Math.hypot(bf.offsetWidth,bf.offsetHeight));
+    c.width=diag;
+    c.height=diag;
     var W=c.width, H=c.height;
     var ctx=c.getContext('2d');
     ctx.clearRect(0,0,W,H);
