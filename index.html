@@ -162,6 +162,32 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #form-yes:hover { background: rgba(212,168,67,0.15); }
 #form-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
 #form-no:hover { border-color: #554466; color: #776699; }
+
+/* Settings button */
+#settings-btn { position: fixed; bottom: 18px; right: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
+#settings-btn:hover { background: linear-gradient(135deg, #3a2c00, #1e1800); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+
+/* Settings modal */
+#settings-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10002; align-items: center; justify-content: center; }
+#settings-modal.open { display: flex; }
+#settings-box { background: #0a0a18; border: 1px solid #d4a843; border-radius: 10px; padding: 30px 36px; max-width: 380px; width: 90%; text-align: center; }
+#settings-title { font-size: 22px; color: #d4a843; letter-spacing: 3px; margin-bottom: 24px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1540; }
+.settings-row:last-of-type { border-bottom: none; }
+.settings-label { font-size: 15px; color: #9988bb; letter-spacing: 1px; }
+#mute-toggle { padding: 6px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
+#mute-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
+#mute-toggle.muted { border-color: #d4a843; color: #d4a843; }
+#hard-reset-btn { margin-top: 22px; padding: 10px 24px; background: transparent; border: 1px solid #882222; color: #994444; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; width: 100%; transition: background 0.2s, color 0.2s; }
+#hard-reset-btn:hover { background: rgba(140,30,30,0.15); color: #cc5555; }
+#hard-reset-confirm { display: none; margin-top: 14px; }
+#hard-reset-confirm p { font-size: 14px; color: #994444; margin-bottom: 10px; font-style: italic; }
+#hard-reset-yes { padding: 8px 20px; background: transparent; border: 1px solid #882222; color: #cc4444; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; margin-right: 8px; }
+#hard-reset-yes:hover { background: rgba(140,30,30,0.2); }
+#hard-reset-no { padding: 8px 20px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#hard-reset-no:hover { border-color: #554466; color: #776699; }
+#settings-close { margin-top: 18px; padding: 6px 18px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; }
+#settings-close:hover { border-color: #554466; color: #665588; }
 .stat-row { display: flex; justify-content: space-between; font-size: 15px; color: #776699; padding: 3px 0; border-bottom: 1px solid #0f0f1e; }
 .stat-row .sv { color: #7766aa; }
 .stat-row .sv.good { color: #88aa88; }
@@ -495,6 +521,26 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button id="form-no">Choose Again</button>
       </div>
     </div>
+  </div>
+</div>
+
+<button id="settings-btn">⚙</button>
+
+<div id="settings-modal">
+  <div id="settings-box">
+    <div id="settings-title">⚙ Settings</div>
+    <div class="settings-row">
+      <span class="settings-label">Sound</span>
+      <button id="mute-toggle">On</button>
+    </div>
+    <div id="hard-reset-confirm">
+      <p>This will wipe ALL progress. Are you certain?</p>
+      <button id="hard-reset-yes">Wipe Everything</button>
+      <button id="hard-reset-no">Cancel</button>
+    </div>
+    <button id="hard-reset-btn">Hard Reset</button>
+    <br>
+    <button id="settings-close">Close</button>
   </div>
 </div>
 
@@ -1144,6 +1190,7 @@ var currentAscensionKills=0;
 var tatteredSouls=0;
 var rebirthCount=0;
 var rebirthForm=null;
+var soundMuted=false;
 var eliteKillsTotal=0;
 var highestGlobalFloorEver=0;
 var achievementsEarned=[];
@@ -2249,6 +2296,7 @@ function saveGame(){
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
     autoProgressEnabled:autoProgressEnabled,
+    soundMuted:soundMuted,
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -2307,6 +2355,7 @@ function loadGame(){
   rebirthForm=data.rebirthForm||null;
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
+  soundMuted=data.soundMuted||false;
 }
 
 function deleteSave(){
@@ -2851,6 +2900,49 @@ function gameLoop(){
     else ssArrow.classList.remove('show');
   }
 }
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function updateMuteToggle(){
+  var btn=document.getElementById('mute-toggle');
+  if(soundMuted){ btn.textContent='Off'; btn.classList.add('muted'); }
+  else { btn.textContent='On'; btn.classList.remove('muted'); }
+}
+
+document.getElementById('settings-btn').addEventListener('click',function(){
+  document.getElementById('hard-reset-confirm').style.display='none';
+  document.getElementById('hard-reset-btn').style.display='';
+  updateMuteToggle();
+  document.getElementById('settings-modal').classList.add('open');
+});
+
+document.getElementById('settings-close').addEventListener('click',function(){
+  document.getElementById('settings-modal').classList.remove('open');
+});
+
+document.getElementById('settings-modal').addEventListener('click',function(e){
+  if(e.target===this) this.classList.remove('open');
+});
+
+document.getElementById('mute-toggle').addEventListener('click',function(){
+  soundMuted=!soundMuted;
+  updateMuteToggle();
+  saveGame();
+});
+
+document.getElementById('hard-reset-btn').addEventListener('click',function(){
+  document.getElementById('hard-reset-confirm').style.display='block';
+  this.style.display='none';
+});
+
+document.getElementById('hard-reset-no').addEventListener('click',function(){
+  document.getElementById('hard-reset-confirm').style.display='none';
+  document.getElementById('hard-reset-btn').style.display='';
+});
+
+document.getElementById('hard-reset-yes').addEventListener('click',function(){
+  deleteSave();
+  location.reload();
+});
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
