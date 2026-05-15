@@ -2442,8 +2442,127 @@ function maxAffordableN(u){
   }
   return n;
 }
+function createUpgradeCard(u, can, bought, actualN, cost){
+  var d=document.createElement('div');
+  d.className='ucard'+(can?' can':'')+(bought?' bought':'');
+  d.setAttribute('data-uid', u.id);
+
+  var msRowHtml='<div class="ms-row">';
+  for(var i=0;i<10;i++){
+    var lit=u.milestones[i];
+    var prevLit=i===0||u.milestones[i-1];
+    var threshMet=u.level>=getMsThresh(i);
+    var visible=lit||(i===0&&threshMet)||prevLit;
+    if(!visible){ msRowHtml+='<div class="ms-box" data-mi="'+i+'" style="visibility:hidden"></div>'; continue; }
+    var avail=!lit&&threshMet&&prevLit;
+    var cls='ms-box'+(lit?' lit':avail?' avail':'');
+    var style='';
+    var inner='';
+    if(lit){
+      style='border-color:'+MS_COLORS[i]+';background:'+MS_LIT_BG[i]+';box-shadow:inset 0 0 5px '+MS_LIT_BG[i]+';--ms-c:'+MS_GLOW[i]+';';
+      inner='<img class="ms-star" src="artwork/sunburst.png" style="filter:'+MS_STAR_FILTER[i]+'" alt="">';
+    } else if(avail){
+      style='border-color:'+MS_COLORS[i]+';--ms-c:'+MS_GLOW[i]+';';
+    }
+    msRowHtml+='<div class="'+cls+'" data-mi="'+i+'"'+(style?' style="'+style+'"':'')+'>'+inner+'</div>';
+  }
+  msRowHtml+='</div>';
+
+  var ownedHtml=bought?'<span class="uowned">'+u.level+' owned</span>':'';
+  var nameHtml='<div class="un-row"><span class="un">'+u.name+'</span>'+ownedHtml+'</div>';
+  var descHtml='<div class="ud">'+(bought?getUpgradeContribStr(u):u.desc())+'</div>';
+  var buyPrefix=(actualN>1)?'<span class="ubuy">×'+actualN+'</span>':'';
+  var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
+  d.innerHTML=nameHtml+descHtml+costHtml+msRowHtml;
+
+  // Milestone box events — listeners live for the lifetime of the card element
+  d.querySelectorAll('.ms-box').forEach(function(box){
+    var mi=parseInt(box.getAttribute('data-mi'),10);
+    box.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(u.milestones[mi]) return;
+      if(u.level>=getMsThresh(mi)){
+        var msCost=u.milestoneCosts[mi];
+        if(!souls.gte(msCost)) return;
+        souls=souls.sub(msCost);
+        document.getElementById('soul-count').textContent=fmt(souls);
+        u.milestones[mi]=true;
+        totalMilestonePurchases++;
+        recalcStats();
+        dirtyU=true;
+        updateEntityStatsPanel();
+        checkAchievements();
+        saveGame();
+      }
+    });
+    box.addEventListener('mouseenter',function(e){ showMsTip(e,u,mi); });
+    box.addEventListener('mousemove',positionMsTip);
+    box.addEventListener('mouseleave',hideMsTip);
+  });
+
+  // Card buy click — always attached; affordability checked at call time
+  d.addEventListener('click',function(e){
+    if(e.target.closest('.ms-box')) return;
+    var n=(buyQty==='max')?maxAffordableN(u):buyQty;
+    if(n<1) return;
+    var total=calcCostN(u,n);
+    if(souls.gte(total)){
+      souls=souls.sub(total);
+      var c=u.cost;
+      for(var i=0;i<n;i++){ c=c.mul(u.costScale).ceil(); }
+      u.cost=c;
+      u.level+=n;
+      totalUpgradePurchases+=n;
+      recalcStats();
+      dirtyU=true; updateEntityStatsPanel();
+      document.getElementById('soul-count').textContent=fmt(souls);
+      setHint();
+      checkAchievements();
+      checkRebirthButton();
+      saveGame();
+    }
+  });
+
+  return d;
+}
+
+function patchMilestoneRow(card, u){
+  var boxes=card.querySelectorAll('.ms-box');
+  boxes.forEach(function(box){
+    // Lit milestone animations are immortal — never touch them again
+    if(box.classList.contains('lit')) return;
+    var i=parseInt(box.getAttribute('data-mi'),10);
+    var lit=u.milestones[i];
+    var prevLit=i===0||u.milestones[i-1];
+    var threshMet=u.level>=getMsThresh(i);
+    var visible=lit||(i===0&&threshMet)||prevLit;
+    if(!visible){
+      box.style.cssText='visibility:hidden';
+      box.className='ms-box';
+      return;
+    }
+    if(lit){
+      // First and only time this box becomes lit — start its animation
+      box.className='ms-box lit';
+      box.style.cssText='border-color:'+MS_COLORS[i]+';background:'+MS_LIT_BG[i]+';box-shadow:inset 0 0 5px '+MS_LIT_BG[i]+';--ms-c:'+MS_GLOW[i]+';';
+      box.innerHTML='<img class="ms-star" src="artwork/sunburst.png" style="filter:'+MS_STAR_FILTER[i]+'" alt="">';
+    } else {
+      var avail=threshMet&&prevLit;
+      box.className='ms-box'+(avail?' avail':'');
+      box.style.cssText=avail?'border-color:'+MS_COLORS[i]+';--ms-c:'+MS_GLOW[i]+';':'';
+    }
+  });
+}
+
 function buildUpgrades(){
-  var el=document.getElementById('upgrade-list'); el.innerHTML='';
+  var el=document.getElementById('upgrade-list');
+
+  // Remove cards for upgrades that are no longer visible
+  el.querySelectorAll('.ucard[data-uid]').forEach(function(card){
+    var u=REP_UPGRADES.find(function(x){ return x.id===card.getAttribute('data-uid'); });
+    if(!u||!u.vis()) el.removeChild(card);
+  });
+
   REP_UPGRADES.forEach(function(u){
     if(!u.vis()) return;
     var actualN, cost, can;
@@ -2457,94 +2576,31 @@ function buildUpgrades(){
       can=souls.gte(cost);
     }
     var bought=u.level>0;
-    var d=document.createElement('div');
-    d.className='ucard'+(can?' can':'')+(bought?' bought':'');
 
-    var msRowHtml='<div class="ms-row">';
-    for(var i=0;i<10;i++){
-      var lit=u.milestones[i];
-      var prevLit=i===0||u.milestones[i-1];
-      var threshMet=u.level>=getMsThresh(i);
-      // A box is visible if: it's lit, OR it's the first milestone and threshold is met,
-      // OR the previous milestone is purchased (shows as locked until threshold met)
-      var visible=lit||(i===0&&threshMet)||prevLit;
-      if(!visible){ msRowHtml+='<div class="ms-box" data-mi="'+i+'" style="visibility:hidden"></div>'; continue; }
-      var avail=!lit&&threshMet&&prevLit;
-      var cls='ms-box'+(lit?' lit':avail?' avail':'');
-      var style='';
-      var inner='';
-      if(lit){
-        style='border-color:'+MS_COLORS[i]+';background:'+MS_LIT_BG[i]+';box-shadow:inset 0 0 5px '+MS_LIT_BG[i]+';--ms-c:'+MS_GLOW[i]+';';
-        inner='<img class="ms-star" src="artwork/sunburst.png" style="filter:'+MS_STAR_FILTER[i]+'" alt="">';
-      } else if(avail){
-        style='border-color:'+MS_COLORS[i]+';--ms-c:'+MS_GLOW[i]+';';
+    var card=el.querySelector('.ucard[data-uid="'+u.id+'"]');
+    if(card){
+      // Patch the existing card — no DOM destruction
+      card.className='ucard'+(can?' can':'')+(bought?' bought':'');
+      var ownedEl=card.querySelector('.uowned');
+      if(bought){
+        if(!ownedEl){
+          ownedEl=document.createElement('span');
+          ownedEl.className='uowned';
+          var unRow=card.querySelector('.un-row');
+          if(unRow) unRow.appendChild(ownedEl);
+        }
+        ownedEl.textContent=u.level+' owned';
+      } else if(ownedEl){
+        ownedEl.parentNode.removeChild(ownedEl);
       }
-      msRowHtml+='<div class="'+cls+'" data-mi="'+i+'"'+(style?' style="'+style+'"':'')+'>'+inner+'</div>';
+      var udEl=card.querySelector('.ud');
+      if(udEl) udEl.textContent=bought?getUpgradeContribStr(u):u.desc();
+      var ucEl=card.querySelector('.uc');
+      if(ucEl) ucEl.innerHTML=(actualN>1?'<span class="ubuy">×'+actualN+'</span>':'')+fmt(cost)+' souls';
+      patchMilestoneRow(card, u);
+    } else {
+      el.appendChild(createUpgradeCard(u, can, bought, actualN, cost));
     }
-    msRowHtml+='</div>';
-
-    var idx=REP_UPGRADES.indexOf(u);
-    var ownedHtml=u.level>0?'<span class="uowned">'+u.level+' owned</span>':'';
-    var nameHtml='<div class="un-row"><span class="un">'+u.name+'</span>'+ownedHtml+'</div>';
-    var descHtml='<div class="ud">'+(bought?getUpgradeContribStr(u):u.desc())+'</div>';
-    var buyPrefix=(actualN>1)?'<span class="ubuy">×'+actualN+'</span>':'';
-    var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
-    d.innerHTML=nameHtml+descHtml+costHtml+msRowHtml;
-
-    // Milestone box events (always active regardless of affordability)
-    var boxes=d.querySelectorAll('.ms-box');
-    boxes.forEach(function(box){
-      var mi=parseInt(box.getAttribute('data-mi'),10);
-      box.addEventListener('click',function(e){
-        e.stopPropagation();
-        if(u.milestones[mi]) return;
-        if(u.level>=getMsThresh(mi)){
-          var msCost=u.milestoneCosts[mi];
-          if(!souls.gte(msCost)) return;
-          souls=souls.sub(msCost);
-          document.getElementById('soul-count').textContent=fmt(souls);
-          u.milestones[mi]=true;
-          totalMilestonePurchases++;
-          recalcStats();
-          dirtyU=true;
-          updateEntityStatsPanel();
-          checkAchievements();
-          saveGame();
-        }
-      });
-      box.addEventListener('mouseenter',function(e){ showMsTip(e,u,mi); });
-      box.addEventListener('mousemove',positionMsTip);
-      box.addEventListener('mouseleave',hideMsTip);
-    });
-
-
-
-    if(can){
-      d.addEventListener('click',function(e){
-        if(e.target.closest('.ms-box')) return;
-        var n=(buyQty==='max')?maxAffordableN(u):buyQty;
-        if(n<1) return;
-        var total=calcCostN(u,n);
-        if(souls.gte(total)){
-          souls=souls.sub(total);
-          var c=u.cost;
-          for(var i=0;i<n;i++){
-            c=c.mul(u.costScale).ceil();
-          }
-          u.cost=c;
-          u.level+=n;
-          totalUpgradePurchases+=n;
-          recalcStats();
-          dirtyU=true; updateEntityStatsPanel();
-          document.getElementById('soul-count').textContent=fmt(souls);
-          setHint();
-          checkAchievements();
-          checkRebirthButton();
-          saveGame();
-        }
-      });
-    }
-    el.appendChild(d);
   });
 }
 
