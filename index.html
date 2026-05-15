@@ -2212,8 +2212,9 @@ function doRebirthReset(chosenForm){
   checkRebirthButton();
   dirtyU=true;
   document.getElementById('soul-count').textContent=fmt(souls);
-  document.getElementById('entity-stage-label').textContent='You are Ether.';
-  document.getElementById('stage-desc').textContent='Shapeless. Hungry.';
+  var _np=FORM_NAMEPLATES[chosenForm];
+  document.getElementById('entity-stage-label').textContent=_np?_np.label:'You are Ether.';
+  document.getElementById('stage-desc').textContent=_np?_np.desc:'Shapeless. Hungry.';
   buildMinimap();
   updateProgressLabel();
   updateHighestFloor();
@@ -2614,6 +2615,15 @@ var FORM_BONUSES={
   equine:      '+5s to Elite timer'
 };
 
+var FORM_NAMEPLATES={
+  masculine:   {label:'Masculine.',   desc:'Strong.... Aggressive.'},
+  feminine:    {label:'Graceful....', desc:'Alluring.'},
+  androgynous: {label:'Neutral....',  desc:'Fluid.'},
+  canine:      {label:'Vigilant....', desc:'Loyal.'},
+  feline:      {label:'Agile....',    desc:'Playful.'},
+  equine:      {label:'Powerful....', desc:'Energetic.'}
+};
+
 function updateEntityStatsPanel(){
   var dMin=entityDmgMin.add(entityDmgBonus).add(clickDmgBonus.floor());
   var dMax=entityDmgMax.add(entityDmgBonus).add(clickDmgBonus.floor());
@@ -2681,8 +2691,9 @@ function updateTraitsRow(){
   if(traits.aff)tr.innerHTML+=pill(traits.aff);
   traits.adds.forEach(function(a){tr.innerHTML+=pill(a);});
   if(traits.outfit)tr.innerHTML+=pill(traits.outfit);
-  document.getElementById('stage-desc').textContent=SDESCS[stage];
-  document.getElementById('entity-stage-label').textContent='You are '+SNAMES[stage]+'.';
+  var np=(stage===0&&rebirthForm&&FORM_NAMEPLATES[rebirthForm])?FORM_NAMEPLATES[rebirthForm]:null;
+  document.getElementById('stage-desc').textContent=np?np.desc:SDESCS[stage];
+  document.getElementById('entity-stage-label').textContent=np?np.label:('You are '+SNAMES[stage]+'.');
 }
 
 function mkS(title,key,opts){
