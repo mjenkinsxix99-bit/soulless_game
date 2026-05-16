@@ -250,6 +250,28 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .buy-btn { background:#0d0b1a; border:2px solid #3a2a6a; color:#9980dd; border-radius:5px; padding:10px 0; font-size:13px; font-weight:bold; cursor:pointer; text-align:center; font-family:Georgia,serif; width:100%; transition:all 0.15s; letter-spacing:1px; }
 .buy-btn:hover { border-color:#7755cc; color:#c0a0ff; box-shadow:0 0 8px rgba(150,100,255,0.45); }
 .buy-btn.active { background:#1a1200; border-color:#d4a843; color:#ffd700; box-shadow:0 0 10px rgba(212,168,67,0.9),0 0 22px rgba(212,168,67,0.45); text-shadow:0 0 8px rgba(255,215,0,0.85); }
+
+/* ── SPELL PANEL ─────────────────────────────────────────────────────────── */
+#spell-panel { display:none; flex-direction:column; align-items:center; gap:4px; width:100%; padding-top:6px; }
+#spell-panel.visible { display:flex; }
+.spell-divider { width:80%; height:1px; background:#2a1a5a; margin:3px 0; }
+#mana-label { font-size:8px; color:#2d3a7a; letter-spacing:2px; text-transform:uppercase; text-align:center; margin-top:2px; }
+#mana-bar-outer { width:12px; height:80px; background:#04030f; border:1px solid #1a1a3a; border-radius:4px; overflow:hidden; position:relative; margin:1px auto; }
+#mana-bar-fill { position:absolute; bottom:0; left:0; right:0; height:0%; background:linear-gradient(to top,#1a3399,#66aaff); transition:height 0.3s ease; border-radius:3px 3px 0 0; }
+#mana-bar-fill.mana-full { background:linear-gradient(to top,#2255cc,#aaccff); box-shadow:0 0 6px rgba(100,170,255,0.6); }
+#mana-num { font-size:8px; color:#334477; text-align:center; letter-spacing:0; line-height:1.2; }
+.spell-btn { width:44px; height:44px; border-radius:7px; border:1px solid #1a1535; background:#05040e; cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center; font-size:19px; line-height:1; flex-shrink:0; transition:border-color 0.2s,box-shadow 0.2s,opacity 0.2s; overflow:visible; }
+.spell-btn.spell-lit { border-color:#3355aa; box-shadow:0 0 7px rgba(50,90,200,0.3); opacity:1; }
+.spell-btn.spell-dim { border-color:#141230; opacity:0.35; cursor:default; }
+.spell-btn.spell-active-glow { border-color:#7799ee; box-shadow:0 0 12px rgba(90,140,255,0.7),0 0 26px rgba(70,120,255,0.35); animation:spellGlow 1s ease-in-out infinite; }
+@keyframes spellGlow { 0%,100%{box-shadow:0 0 10px rgba(90,140,255,0.6),0 0 22px rgba(70,120,255,0.3);} 50%{box-shadow:0 0 18px rgba(120,170,255,0.9),0 0 38px rgba(100,160,255,0.5);} }
+.spell-tt { position:absolute; right:calc(100% + 10px); top:50%; transform:translateY(-50%); width:210px; background:#06041a; border:1px solid #2a3688; border-radius:7px; padding:11px 13px; pointer-events:none; z-index:500; display:none; box-shadow:0 4px 22px rgba(0,0,40,0.85); white-space:normal; }
+.spell-btn:hover .spell-tt { display:block; }
+.spell-tt-name { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; margin-bottom:5px; }
+.spell-tt-cost { font-size:11px; color:#6688cc; margin-bottom:5px; }
+.spell-tt-desc { font-size:12px; color:#c8c0e8; line-height:1.5; }
+.spell-tt-status { font-size:11px; color:#55dd88; margin-top:6px; font-style:italic; }
+.spell-tt-stacks { font-size:11px; color:#ffbb44; margin-top:4px; }
 .ubuy { font-size:14px; font-weight:bold; color:#887755; margin-right:5px; }
 /* Entity display in left panel */
 #left-entity { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
@@ -460,6 +482,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <button class="buy-btn" data-qty="100">100</button>
       <button class="buy-btn" data-qty="max">MAX</button>
       <button class="buy-btn" data-qty="all">ALL</button>
+      <div id="spell-panel">
+        <div class="spell-divider"></div>
+        <div id="mana-label">mana</div>
+        <div id="mana-bar-outer"><div id="mana-bar-fill"></div></div>
+        <div id="mana-num">0<br>—<br>100</div>
+        <div class="spell-divider"></div>
+      </div>
     </div>
     <div id="right">
       <div id="damage-summary">
@@ -1288,6 +1317,14 @@ function fmtCoin(n){
   return ''+n;
 }
 function spawnSoulCoins(){
+  // Mana gain: each of the 3 bubbles contributes 0.00001 × completed floors this ascension
+  var _floorsComp=completedFloorsThisAscension.length;
+  if(_floorsComp>0){
+    var _mg=3*0.00001*_floorsComp;
+    if(isSpellActive('manaHungry')) _mg*=1.333;
+    mana=Math.min(manaMax,mana+_mg);
+    updateManaBar();
+  }
   var d=def(); if(!d) return;
   var ec=d.color; var r=ec[0],g=ec[1],b=ec[2]; var cs=r+','+g+','+b;
   var lr=Math.min(r+90,255), lg=Math.min(g+90,255), lb=Math.min(b+90,255);
@@ -1594,24 +1631,38 @@ function updateEnemyDefeatsPanel(){
 }
 
 // ── COMBAT ────────────────────────────────────────────────────────────────────
-function entityAttack(isAuto){
+// isSpell: true when called by Flurry (skips click counter)
+function entityAttack(isAuto, isSpell){
   if(!combatActive||enemyDead) return;
-  if(!isAuto){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
+  if(!isAuto && !isSpell){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
   attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
   var hi=entityDmgMax.add(entityDmgBonus).add(bonus);
   var dmg=rndD(lo,hi);
+  // Spell: Twin Blades — DPS ×2 for auto attacks
+  if(isAuto && isSpellActive('twinBlades')) dmg=dmg.mul(2);
   var isCrit=false;
-  if(!isAuto && critClickChance>0 && Math.random()<critClickChance){
+  var effectiveCrit=critClickChance+((!isAuto && isSpellActive('critStrike'))?0.666:0);
+  if(!isAuto && effectiveCrit>0 && Math.random()<effectiveCrit){
     isCrit=true;
     dmg=dmg.mul(2+critClickMult);
   }
+  // Spell: Twin Strikes — strike damage ×2 for non-auto attacks
+  if(!isAuto && isSpellActive('twinStrikes')) dmg=dmg.mul(2);
+  // Spell: Invoke Power — multiply all damage by (1 + stacks × 0.0666)
+  if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
   enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
   spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
+  // Spell: Rule of 3 — immediately gain enemy death soul value ×3 per strike
+  if(isSpellActive('ruleOf3')){
+    var r3=enemySoulReward.mul(3);
+    souls=souls.add(r3); totalSouls=totalSouls.add(r3);
+    document.getElementById('soul-count').textContent=fmt(souls);
+  }
   if(enemyHp.lte(0)) onEnemyDeath();
 }
 
@@ -1624,6 +1675,8 @@ function onEnemyDeath(){
   var soulMult=1;
   if(rebirthForm==='androgynous') soulMult*=1.1;
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
+  // Spell: Twin Souls — ×2 souls gained
+  if(isSpellActive('twinSouls')) soulMult*=2;
   var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
@@ -1686,6 +1739,9 @@ function onEnemyDeath(){
     if(floorWins<WINS_PER_FLOOR){
       floorWins++;
       if(floorWins===WINS_PER_FLOOR){
+        // Track unique floor completions for mana generation
+        var _fk=curRealm+'-'+curLevel+'-'+curFloor;
+        if(completedFloorsThisAscension.indexOf(_fk)<0) completedFloorsThisAscension.push(_fk);
         var nextFloor=curFloor+1;
         if(nextFloor<=FLOORS_PER_LEVEL){
           if(curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; minimapNewFloor=true; }
@@ -1738,6 +1794,14 @@ var autoAttackEnabled=false, autoAttackInterval=3000;
 var entityDmgBonus=D(0);
 var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0;
 var critClickChance=0, critClickMult=0, dvDpsToClickRatio=0, soulAbsorbBonus=0;
+
+// ── MANA & SPELLS ─────────────────────────────────────────────────────────────
+var mana=0, manaMax=100;
+var completedFloorsThisAscension=[];
+var spellEndTimes={};
+var flurryInterval=null;
+var invokePowerStacks=0;
+var _lastSpellUiTick=0;
 
 // Divine Hunger milestone effect labels (replaces generic ×7/×666 text)
 var DV_MS_EFFECTS=[
@@ -2210,9 +2274,163 @@ function renderAchievementsTab(){
 }
 
 // ── SOUL SHOP ─────────────────────────────────────────────────────────────────
+// ── SPELLS ────────────────────────────────────────────────────────────────────
+var SPELLS = [
+  { id:'flurry',      tsId:'spell-flurry',      icon:'⚡', manaCost:20,  duration:33300,
+    name:'Flurry of Strikes',
+    desc:'Unleashes 7 strikes per second for 33.3s, each dealing click damage.' },
+  { id:'critStrike',  tsId:'spell-critStrike',   icon:'✦', manaCost:33,  duration:33300,
+    name:'Critical Strike',
+    desc:'Critical strike chance is improved by 66.6% for 33.3s.' },
+  { id:'twinBlades',  tsId:'spell-twinBlades',   icon:'⚔', manaCost:33,  duration:33300,
+    name:'Twin Blades',
+    desc:'DPS output is doubled for 33.3s.' },
+  { id:'twinSouls',   tsId:'spell-twinSouls',    icon:'∞', manaCost:33,  duration:33300,
+    name:'Twin Souls',
+    desc:'Doubles all souls gained from enemy deaths for 33.3s.' },
+  { id:'ruleOf3',     tsId:'spell-ruleOf3',      icon:'Ⅲ', manaCost:66,  duration:33300,
+    name:'Rule of 3',
+    desc:'Every strike immediately grants the current enemy\'s death soul reward ×3 for 33.3s.' },
+  { id:'twinStrikes', tsId:'spell-twinStrikes',  icon:'⊕', manaCost:99,  duration:33300,
+    name:'Twin Strikes',
+    desc:'Each strike deals ×2 damage for 33.3s.' },
+  { id:'powerOf3',    tsId:'spell-powerOf3',     icon:'❖', manaCost:199, duration:33300,
+    name:'Power of 3',
+    desc:'The next spell activated gives 3× its effect, then this buff is consumed.' },
+  { id:'manaHungry',  tsId:'spell-manaHungry',   icon:'◉', manaCost:333, duration:33300,
+    name:'Mana Hungry',
+    desc:'Mana regeneration is increased by 33.3% for 33.3s.' },
+  { id:'invokePower', tsId:'spell-invokePower',  icon:'★', manaCost:666, duration:0,
+    name:'Invoke Power',
+    desc:'Multiplies DPS and Strike damage by (1 + 0.0666 × stacks). Stackable up to 10×. Endures this Ascension.' },
+];
+
+function isSpellActive(id){
+  if(id==='invokePower') return false; // stacks-based, no duration
+  return (spellEndTimes[id]||0) > Date.now();
+}
+
+function castSpell(id){
+  var spell=SPELLS.filter(function(s){return s.id===id;})[0];
+  if(!spell) return;
+  if(id==='invokePower'){
+    if(invokePowerStacks>=10||mana<spell.manaCost) return;
+  } else {
+    if(mana<spell.manaCost) return;
+    if(id!=='powerOf3'&&isSpellActive(id)) return; // no re-cast while active
+  }
+  // Check Power of 3 modifier (3× effect)
+  var p3=isSpellActive('powerOf3')&&id!=='powerOf3';
+  var durMult=p3?3:1;
+
+  mana-=spell.manaCost;
+
+  if(id==='flurry'){
+    if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
+    var fDur=spell.duration*durMult;
+    var fEnd=Date.now()+fDur;
+    spellEndTimes['flurry']=fEnd;
+    flurryInterval=setInterval(function(){
+      if(Date.now()>=fEnd){clearInterval(flurryInterval);flurryInterval=null;spellEndTimes['flurry']=0;renderSpellPanel();return;}
+      entityAttack(false,true);
+    }, Math.floor(1000/7));
+  } else if(id==='invokePower'){
+    var add=p3?3:1;
+    invokePowerStacks=Math.min(10,invokePowerStacks+add);
+  } else {
+    spellEndTimes[id]=Date.now()+spell.duration*durMult;
+    if(id==='powerOf3') {/* just set timer, don't consume itself */}
+  }
+
+  if(p3) spellEndTimes['powerOf3']=0; // consume Power of 3 after modifying another spell
+
+  updateManaBar();
+  renderSpellPanel();
+  saveGame();
+}
+
+function updateManaBar(){
+  var pct=Math.min(1,mana/manaMax)*100;
+  var fill=document.getElementById('mana-bar-fill');
+  if(fill){
+    fill.style.height=pct+'%';
+    if(pct>=100) fill.classList.add('mana-full');
+    else fill.classList.remove('mana-full');
+  }
+  var num=document.getElementById('mana-num');
+  if(num) num.innerHTML=Math.floor(mana)+'<br>—<br>'+manaMax;
+}
+
+function renderSpellPanel(){
+  var panel=document.getElementById('spell-panel');
+  if(!panel) return;
+  var anyOwned=SPELLS.some(function(s){return soulShopOwned[s.tsId]>=1;});
+  if(!anyOwned){panel.classList.remove('visible');return;}
+  panel.classList.add('visible');
+  // Remove old spell buttons (keep the static header nodes)
+  panel.querySelectorAll('.spell-btn').forEach(function(b){b.remove();});
+  SPELLS.forEach(function(spell){
+    if(!soulShopOwned[spell.tsId]) return;
+    var isActive=isSpellActive(spell.id);
+    var isInvoke=spell.id==='invokePower';
+    var canCast=mana>=spell.manaCost&&(isInvoke?invokePowerStacks<10:!isActive);
+    var btn=document.createElement('button');
+    var cls='spell-btn';
+    if(isActive||( isInvoke&&invokePowerStacks>0)) cls+=' spell-active-glow';
+    else if(canCast) cls+=' spell-lit';
+    else cls+=' spell-dim';
+    btn.className=cls;
+    btn.textContent=spell.icon;
+    btn.setAttribute('data-spell',spell.id);
+    // Tooltip
+    var remaining='';
+    if(isActive&&!isInvoke){
+      var secs=Math.max(0,((spellEndTimes[spell.id]||0)-Date.now())/1000);
+      remaining='<div class="spell-tt-status">Active — '+secs.toFixed(1)+'s remaining</div>';
+    }
+    var stacksLine=isInvoke&&invokePowerStacks>0?'<div class="spell-tt-stacks">Stacks: '+invokePowerStacks+' / 10</div>':'';
+    btn.innerHTML+=
+      '<div class="spell-tt">'+
+        '<div class="spell-tt-name">'+spell.name+'</div>'+
+        '<div class="spell-tt-cost">'+spell.manaCost+' Mana</div>'+
+        '<div class="spell-tt-desc">'+spell.desc+'</div>'+
+        remaining+stacksLine+
+      '</div>';
+    if(canCast){
+      btn.addEventListener('click',function(){castSpell(spell.id);});
+    }
+    panel.appendChild(btn);
+  });
+}
+
 var SOUL_SHOP_ITEMS = [
-  // Items will be added here. Each item:
-  // { id, name, desc, cost, maxOwned (or 0 for unlimited), effect: function() }
+  { id:'spell-flurry',     name:'Flurry of Strikes',
+    desc:'Unlocks the spell Flurry of Strikes. Cast for 20 Mana: unleash 7 strikes per second for 33.3 seconds, each dealing strike damage.',
+    cost:10,    maxOwned:1, effect:function(){renderSpellPanel();} },
+  { id:'spell-critStrike', name:'Critical Strike',
+    desc:'Unlocks the spell Critical Strike. Cast for 33 Mana: critical strike chance +66.6% for 33.3 seconds.',
+    cost:50,    maxOwned:1, effect:function(){renderSpellPanel();} },
+  { id:'spell-twinBlades', name:'Twin Blades',
+    desc:'Unlocks the spell Twin Blades. Cast for 33 Mana: DPS ×2 for 33.3 seconds.',
+    cost:100,   maxOwned:1, effect:function(){renderSpellPanel();} },
+  { id:'spell-twinSouls',  name:'Twin Souls',
+    desc:'Unlocks the spell Twin Souls. Cast for 33 Mana: all souls gained from deaths ×2 for 33.3 seconds.',
+    cost:250,   maxOwned:1, effect:function(){renderSpellPanel();} },
+  { id:'spell-ruleOf3',    name:'Rule of 3',
+    desc:'Unlocks the spell Rule of 3. Cast for 66 Mana: each strike instantly grants the enemy\'s death soul reward ×3 for 33.3 seconds.',
+    cost:1000,  maxOwned:1, effect:function(){renderSpellPanel();} },
+  { id:'spell-twinStrikes',name:'Twin Strikes',
+    desc:'Unlocks the spell Twin Strikes. Cast for 99 Mana: each strike deals ×2 damage for 33.3 seconds.',
+    cost:2500,  maxOwned:1, effect:function(){renderSpellPanel();} },
+  { id:'spell-powerOf3',   name:'Power of 3',
+    desc:'Unlocks the spell Power of 3. Cast for 199 Mana: the next spell activated gives 3× its effect, then this buff is consumed.',
+    cost:5000,  maxOwned:1, effect:function(){renderSpellPanel();} },
+  { id:'spell-manaHungry', name:'Mana Hungry',
+    desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3 seconds.',
+    cost:10000, maxOwned:1, effect:function(){renderSpellPanel();} },
+  { id:'spell-invokePower',name:'Invoke Power',
+    desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Endures the rest of this Ascension.',
+    cost:20000, maxOwned:1, effect:function(){renderSpellPanel();} },
 ];
 
 var soulShopOwned = {}; // persisted per id
@@ -2378,6 +2596,11 @@ function doRebirthReset(chosenForm){
   totalUpgradePurchases=0; totalMilestonePurchases=0;
   currentAscensionKills=0;
 
+  // Reset mana & spell state
+  mana=0; completedFloorsThisAscension=[]; invokePowerStacks=0;
+  for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
+  if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
+
   // Reset upgrades
   REP_UPGRADES.forEach(function(u){
     u.level=0;
@@ -2435,6 +2658,9 @@ function saveGame(){
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
     soulShopOwned:soulShopOwned,
+    mana:mana, manaMax:manaMax,
+    invokePowerStacks:invokePowerStacks,
+    completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
     savedAt:Date.now()
@@ -2494,6 +2720,9 @@ function loadGame(){
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
+  mana=data.mana||0; manaMax=data.manaMax||100;
+  invokePowerStacks=data.invokePowerStacks||0;
+  if(data.completedFloorsThisAscension) completedFloorsThisAscension=data.completedFloorsThisAscension;
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
@@ -3034,6 +3263,12 @@ function gameLoop(){
 
   if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;}
   if(now-_lastAutoSave>30000){saveGame();_lastAutoSave=now;}
+  // Spell panel UI refresh (every 500ms — updates countdown timers and lit/dim states)
+  if(now-_lastSpellUiTick>500){
+    var _sp=document.getElementById('spell-panel');
+    if(_sp&&_sp.classList.contains('visible')) renderSpellPanel();
+    _lastSpellUiTick=now;
+  }
   // Spirit Slash soul-prompt: show global arrow when 5+ souls and not yet purchased
   var ssArrow=document.getElementById('ss-global-arrow');
   if(ssArrow){
@@ -3098,6 +3333,8 @@ updateTraitsRow();
 buildMinimap();
 checkRebirthButton();
 updateTatteredDisplay();
+updateManaBar();
+renderSpellPanel();
 spawnEnemy();
 checkAchievements(true);
 renderAchievementsTab();
