@@ -327,6 +327,39 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ach-card .acd { font-size:10px; color:#554477; font-style:italic; margin-top:2px; line-height:1.3; }
 .ach-card.earned .acd { color:#6a5020; }
 
+/* ── LEFT PANEL TABS ─────────────────────────────────────────────────────── */
+#left-header { width:100%; text-align:center; padding-bottom:6px; }
+.left-tab-bar { display:flex; width:100%; border-bottom:1px solid #1e1845; margin-bottom:10px; }
+.left-tab-btn { flex:1; background:transparent; border:none; border-bottom:2px solid transparent;
+  color:#554477; font-family:Georgia,serif; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  padding:7px 6px; cursor:pointer; transition:color 0.15s,border-color 0.15s; margin-bottom:-1px; }
+.left-tab-btn:hover:not(.locked) { color:#9980dd; }
+.left-tab-btn.active { color:#d4a843; border-bottom-color:#d4a843; }
+.left-tab-btn.locked { color:#2a2040; cursor:default; }
+#left-tab-content { width:100%; }
+.left-tab-pane { display:none; width:100%; }
+.left-tab-pane.active { display:block; }
+
+/* ── SOUL SHOP ───────────────────────────────────────────────────────────── */
+#soul-shop-list { width:100%; padding:2px 0 8px; }
+.ss-locked { text-align:center; color:#443366; font-style:italic; font-size:13px;
+  padding:28px 14px; line-height:1.6; }
+.ss-section-title { font-size:10px; letter-spacing:3px; color:#7766aa; text-transform:uppercase;
+  border-bottom:1px solid #1a1535; padding-bottom:3px; margin:12px 0 7px; }
+.ss-item { width:100%; box-sizing:border-box; padding:10px 12px; margin-bottom:6px;
+  border-radius:5px; border:1px solid #2a1e50; background:#0a0818; cursor:pointer;
+  transition:border-color 0.2s, background 0.2s; }
+.ss-item:hover:not(.ss-maxed):not(.ss-cant-afford) { border-color:#9970cc; background:#0f0c22; }
+.ss-item.ss-maxed { border-color:#3a2a10; background:#0c0a00; cursor:default; }
+.ss-item.ss-cant-afford { opacity:0.5; cursor:default; }
+.ss-item-name { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; line-height:1.3; }
+.ss-item-desc { font-size:12px; color:#bbaade; margin-top:4px; line-height:1.45; }
+.ss-item-cost { font-size:11px; color:#d4a843; margin-top:6px; letter-spacing:1px; }
+.ss-item-owned { font-size:10px; color:#7a6010; margin-top:3px; letter-spacing:1px; }
+.ss-item.ss-maxed .ss-item-name { color:#7a6010; }
+.ss-item.ss-maxed .ss-item-desc { color:#4a3820; }
+.ss-item.ss-maxed .ss-item-cost { color:#4a3010; }
+
 </style>
 </head>
 <body>
@@ -349,17 +382,30 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
   <div id="main">
     <div id="left">
-      <div id="left-entity">
+      <div id="left-header">
         <div id="entity-stage-label" class="cname entity-label">You are Ether.</div>
         <div id="stage-desc">Shapeless. Hungry.</div>
-        <div class="canvas-wrap" style="margin-top:6px;">
-          <canvas id="entity-canvas" width="330" height="330"></canvas>
+      </div>
+      <div class="left-tab-bar">
+        <button class="left-tab-btn active" data-ltab="entity">Entity</button>
+        <button class="left-tab-btn" data-ltab="soul-shop" id="soul-shop-tab-btn">Soul Shop</button>
+      </div>
+      <div id="left-tab-content">
+        <div id="ltab-entity" class="left-tab-pane active">
+          <div id="left-entity">
+            <div class="canvas-wrap" style="margin-top:6px;">
+              <canvas id="entity-canvas" width="330" height="330"></canvas>
+            </div>
+            <div class="hp-wrap" style="visibility:hidden">
+              <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
+              <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
+            </div>
+            <button id="ascend-btn">✦ ASCEND ✦</button>
+          </div>
         </div>
-        <div class="hp-wrap" style="visibility:hidden">
-          <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
-          <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
+        <div id="ltab-soul-shop" class="left-tab-pane">
+          <div id="soul-shop-list"></div>
         </div>
-        <button id="ascend-btn">✦ ASCEND ✦</button>
       </div>
     </div>
     <div id="battlefield">
@@ -2163,6 +2209,98 @@ function renderAchievementsTab(){
   });
 }
 
+// ── SOUL SHOP ─────────────────────────────────────────────────────────────────
+var SOUL_SHOP_ITEMS = [
+  // Items will be added here. Each item:
+  // { id, name, desc, cost, maxOwned (or 0 for unlimited), effect: function() }
+];
+
+var soulShopOwned = {}; // persisted per id
+
+function renderSoulShop() {
+  var el = document.getElementById('soul-shop-list');
+  if (!el) return;
+  el.innerHTML = '';
+
+  if (rebirthCount < 1) {
+    var lock = document.createElement('div');
+    lock.className = 'ss-locked';
+    lock.textContent = 'The Soul Shop awakens after your first Ascension. Grow stronger.';
+    el.appendChild(lock);
+    return;
+  }
+
+  if (SOUL_SHOP_ITEMS.length === 0) {
+    var empty = document.createElement('div');
+    empty.className = 'ss-locked';
+    empty.textContent = 'The shop stirs. More offerings will come.';
+    el.appendChild(empty);
+    return;
+  }
+
+  SOUL_SHOP_ITEMS.forEach(function(item) {
+    var owned = soulShopOwned[item.id] || 0;
+    var isMaxed = item.maxOwned > 0 && owned >= item.maxOwned;
+    var canAfford = tatteredSouls >= item.cost;
+
+    var card = document.createElement('div');
+    card.className = 'ss-item' + (isMaxed ? ' ss-maxed' : (!canAfford ? ' ss-cant-afford' : ''));
+
+    var nm = document.createElement('div');
+    nm.className = 'ss-item-name';
+    nm.textContent = item.name;
+
+    var dc = document.createElement('div');
+    dc.className = 'ss-item-desc';
+    dc.textContent = item.desc;
+
+    var cost = document.createElement('div');
+    cost.className = 'ss-item-cost';
+    if (isMaxed) {
+      cost.textContent = 'Acquired';
+    } else {
+      cost.textContent = item.cost.toLocaleString() + ' Tattered Soul' + (item.cost !== 1 ? 's' : '');
+    }
+
+    card.appendChild(nm);
+    card.appendChild(dc);
+    card.appendChild(cost);
+
+    if (owned > 0 && !isMaxed) {
+      var ownedEl = document.createElement('div');
+      ownedEl.className = 'ss-item-owned';
+      ownedEl.textContent = 'Owned: ' + owned + (item.maxOwned > 0 ? ' / ' + item.maxOwned : '');
+      card.appendChild(ownedEl);
+    }
+
+    if (!isMaxed) {
+      card.addEventListener('click', function() {
+        if (tatteredSouls < item.cost) return;
+        tatteredSouls -= item.cost;
+        soulShopOwned[item.id] = (soulShopOwned[item.id] || 0) + 1;
+        if (item.effect) item.effect(soulShopOwned[item.id]);
+        updateTatteredDisplay();
+        renderSoulShop();
+        saveGame();
+      });
+    }
+
+    el.appendChild(card);
+  });
+}
+
+function updateSoulShopTabBtn() {
+  var btn = document.getElementById('soul-shop-tab-btn');
+  if (!btn) return;
+  if (rebirthCount < 1) {
+    btn.classList.add('locked');
+    btn.title = 'Unlocks after your first Ascension';
+  } else {
+    btn.classList.remove('locked');
+    btn.title = '';
+  }
+}
+
 // ── REBIRTH ───────────────────────────────────────────────────────────────────
 var FORM_IMAGES={};
 var _formImagesLoaded=false;
@@ -2200,6 +2338,7 @@ function updateTatteredDisplay(){
   if(el) el.textContent=tatteredSouls.toLocaleString();
   var disp=document.getElementById('tattered-display');
   if(disp) disp.style.display=rebirthCount>0?'block':'none';
+  updateSoulShopTabBtn();
 }
 
 var ASCENSION_SPECIAL=[
@@ -2295,6 +2434,7 @@ function saveGame(){
     tatteredSouls:tatteredSouls,
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
+    soulShopOwned:soulShopOwned,
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
     savedAt:Date.now()
@@ -2353,6 +2493,7 @@ function loadGame(){
   tatteredSouls=data.tatteredSouls||0;
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
+  if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
@@ -2970,6 +3111,18 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
     if(tab==='honors'){ renderAchievementsTab(); _achievementsTabDirty=false; }
+  });
+});
+
+document.querySelectorAll('.left-tab-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var ltab=btn.getAttribute('data-ltab');
+    if(ltab==='soul-shop' && rebirthCount < 1) return;
+    document.querySelectorAll('.left-tab-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.left-tab-pane').forEach(function(p){p.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('ltab-'+ltab).classList.add('active');
+    if(ltab==='soul-shop') renderSoulShop();
   });
 });
 
