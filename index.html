@@ -1273,14 +1273,7 @@ var LEVELS_PER_REALM  = 10;
 var FLOORS_PER_REALM  = FLOORS_PER_LEVEL * LEVELS_PER_REALM; // 90 normal + 10 elites
 var WINS_PER_FLOOR    = 10;
 var REALM_NAMES       = ['Void', 'Underworld'];  // indexed by curRealm-1; unnamed realms fall back to number
-var REALM_BACKGROUNDS = [
-  'radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%)',
-  'radial-gradient(ellipse at center, #0d0101 0%, #1f0405 55%, #2a0709 100%)'
-];
-function setRealmBackground(){
-  var bg=REALM_BACKGROUNDS[curRealm-1]||REALM_BACKGROUNDS[REALM_BACKGROUNDS.length-1];
-  document.getElementById('battlefield').style.background=bg;
-}
+
 // No realm cap — break_infinity.js handles arbitrarily large HP values
 var MINIMAP_VISIBLE  = 7;
 var minimapNewFloor  = false;
@@ -1825,7 +1818,6 @@ function onEnemyDeath(){
         highestLevel=1; highestFloor=1;
         defeatedElites=[];
         enemyPool=[(curRealm-1)*LEVELS_PER_REALM];
-        setRealmBackground();
         minimapNewFloor=false;
         updateHighestFloor();
         buildMinimap();
@@ -3207,7 +3199,6 @@ function loadGame(){
   achievementsEarned=data.achievementsEarned||[];
   traitChoicesEver=data.traitChoicesEver||[];
   namedEliteFirstKills=data.namedEliteFirstKills||[];
-  setRealmBackground();
   tatteredSouls=data.tatteredSouls||0;
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
