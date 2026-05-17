@@ -2594,6 +2594,22 @@ var TATTERED_NODES = [
   { id:'crit-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:100,
     desc:'Decreases auto damage interval by 0.111 seconds.',
     x:285,  y:-18,  requires:[] },
+  // Stat nodes clustered around Twin Blades (176, 243) — pentacle, point toward center
+  { id:'blade-dps',      type:'dps',    name:'DPS +33.3%',     icon:'', cost:100,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:132,  y:182,  requires:[] },
+  { id:'blade-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:133,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:220,  y:182,  requires:[] },
+  { id:'blade-strike-1', type:'strike', name:'Strike Bonus',   icon:'', cost:177,
+    desc:'Increases your Strike Damage by +0.666% of your total DPS.',
+    x:247,  y:266,  requires:[] },
+  { id:'blade-hp',       type:'hp',     name:'HP Drain +1.11%',icon:'', cost:200,
+    desc:'Increases max HP drain of Divine Hunger by +1.11%.',
+    x:176,  y:318,  requires:[] },
+  { id:'blade-strike-2', type:'strike', name:'Strike Bonus',   icon:'', cost:250,
+    desc:'Increases your Strike Damage by +0.666% of your total DPS.',
+    x:105,  y:266,  requires:[] },
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
