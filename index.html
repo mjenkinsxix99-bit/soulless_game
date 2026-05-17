@@ -2562,22 +2562,22 @@ var TATTERED_NODES = [
   { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:20000,
     desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Persists this Ascension.',
     x:-318, y:-318, requires:[] },
-  // Stat nodes clustered around Flurry of Strikes (0, -300)
+  // Stat nodes clustered around Flurry of Strikes (0, -300) — pentacle, point toward center
   { id:'flurry-dps-1',    type:'dps',    name:'DPS +9%',        icon:'', cost:5,
     desc:'Increases DPS of all upgrades by +9%.',
-    x:-75,  y:-370, requires:[] },
+    x:0,    y:-225, requires:[] },
   { id:'flurry-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:5,
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
-    x:75,   y:-370, requires:[] },
+    x:71,   y:-277, requires:[] },
   { id:'flurry-dps-2',    type:'dps',    name:'DPS +9%',        icon:'', cost:5,
     desc:'Increases DPS of all upgrades by +9%.',
-    x:0,    y:-390, requires:[] },
+    x:44,   y:-361, requires:[] },
   { id:'flurry-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:5,
     desc:'Increases all souls gained by 33.3%.',
-    x:-90,  y:-300, requires:[] },
+    x:-44,  y:-361, requires:[] },
   { id:'flurry-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:5,
     desc:'Decreases auto damage interval by 0.111 seconds.',
-    x:90,   y:-300, requires:[] },
+    x:-71,  y:-277, requires:[] },
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
