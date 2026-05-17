@@ -2717,6 +2717,15 @@ var TATTERED_EDGES = [
   {from:'flurry-strike', to:'flurry-dps-2'},
   {from:'flurry-speed',  to:'flurry-souls'},
   {from:'flurry-dps-2',  to:'flurry-souls'},
+  // Critical Strike cluster (2 connections from Flurry)
+  {from:'flurry-dps-2',   to:'crit-dps-1'},
+  {from:'flurry-strike',  to:'crit-strike'},
+  {from:'spell-critStrike', to:'crit-dps-1'},
+  {from:'crit-dps-1',  to:'crit-strike'},
+  {from:'crit-dps-1',  to:'crit-speed'},
+  {from:'crit-strike', to:'crit-dps-2'},
+  {from:'crit-speed',  to:'crit-souls'},
+  {from:'crit-dps-2',  to:'crit-souls'},
 ];
 
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
