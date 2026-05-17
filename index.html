@@ -1443,6 +1443,11 @@ function spawnSoulCoins(){
   if(_floorsComp>0){
     var _mg=3*0.00001*_floorsComp;
     if(isSpellActive('manaHungry')) _mg*=1.333;
+    var _tregens={'flurry-speed':0.10,'crit-speed':0.15,'blade-speed':0.20,'souls-speed':0.30,
+      'rule-speed':0.40,'strikes-speed':0.50,'power3-speed':0.65,'mana-speed':0.85,'invoke-speed':1.35};
+    var _tregenSum=0;
+    for(var _rk in _tregens){if(soulShopOwned[_rk]>=1)_tregenSum+=_tregens[_rk];}
+    if(_tregenSum>0) _mg*=(1+_tregenSum);
     mana=Math.min(manaMax,mana+_mg);
     updateManaBar();
   }
@@ -1798,6 +1803,12 @@ function onEnemyDeath(){
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
   // Spell: Twin Souls — ×2 souls gained
   if(isSpellActive('twinSouls')) soulMult*=2;
+  // Tattered Shop: souls gain bonus nodes
+  var _tsouls={'flurry-souls':0.333,'crit-souls':0.333,'souls-souls':0.333,'rule-souls':0.333,
+    'strikes-souls':0.333,'power3-souls':0.333,'mana-souls':0.666,'invoke-souls':0.999};
+  var _tsoulsSum=0;
+  for(var _sk in _tsouls){if(soulShopOwned[_sk]>=1)_tsoulsSum+=_tsouls[_sk];}
+  if(_tsoulsSum>0) soulMult*=(1+_tsoulsSum);
   var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
@@ -2007,6 +2018,32 @@ function recalcStats(){
     if(dv.milestones[8]) soulAbsorbBonus+=0.222;
     if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
   }
+  // Tattered Shop stat node bonuses
+  var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
+    'blade-dps':0.333,'souls-dps-1':0.333,'souls-dps-2':0.333,'rule-dps-1':0.333,'rule-dps-2':0.333,
+    'strikes-dps-1':0.333,'strikes-dps-2':0.333,'power3-dps-1':0.333,'power3-dps-2':0.333,
+    'mana-dps-1':0.333,'mana-dps-2':0.666,'invoke-dps-1':0.666,'invoke-dps-2':0.333};
+  var _tdpsSum=0;
+  for(var _dk in _tdps){if(soulShopOwned[_dk]>=1)_tdpsSum+=_tdps[_dk];}
+  if(_tdpsSum>0){totalDps=totalDps.mul(1+_tdpsSum);clickDmgBonus=clickDmgBonus.mul(1+_tdpsSum);}
+  // Strike: +0.666% of total DPS added as strike damage per node
+  var _tstrSum=0;
+  ['flurry-strike','crit-strike','blade-strike-1','souls-strike','invoke-strike'].forEach(function(s){if(soulShopOwned[s]>=1)_tstrSum+=0.00666;});
+  if(_tstrSum>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(_tstrSum));
+  // Crit chance nodes (+3.33% each)
+  ['blade-strike-2','strikes-crit','power3-crit'].forEach(function(s){if(soulShopOwned[s]>=1)critClickChance+=0.0333;});
+  // Crit multiplier
+  if(soulShopOwned['mana-crit']>=1) critClickMult+=3.33;
+  // HP drain
+  if(soulShopOwned['blade-hp']>=1) enemyHpDrainPct+=0.0111;
+  if(soulShopOwned['rule-hp']>=1) enemyHpDrainPct+=0.0111;
+  // Mana cap: recompute from purchased mana nodes
+  var _tmana={'flurry-speed':50,'crit-speed':75,'blade-speed':100,'souls-speed':125,'rule-speed':150,
+    'strikes-speed':175,'power3-speed':225,'mana-speed':250,'invoke-speed':250};
+  var _tmanaBonus=0;
+  for(var _mk in _tmana){if(soulShopOwned[_mk]>=1)_tmanaBonus+=_tmana[_mk];}
+  manaMax=100+_tmanaBonus;
+  if(mana>manaMax) mana=manaMax;
   // Tattered Souls: additive +6.66% to final DPS and click damage per unspent soul
   if(tatteredSouls>0){
     var tsBonus=1+tatteredSouls*0.0666;
@@ -2675,10 +2712,10 @@ var TATTERED_NODES = [
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:136,  y:-271, requires:[] },
   // Stat nodes clustered around Mana Hungry (428, 139) — pentagon, point straight up, clockwise
-  { id:'mana-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:10333,
+  { id:'mana-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:12777,
     desc:'Increases Mana cap by 250 and Mana regen rate by 85%.',
     x:300,  y:45,   requires:[] },
-  { id:'mana-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:12777,
+  { id:'mana-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:10333,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:349,  y:81,  requires:[] },
   { id:'mana-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:15666,
@@ -2691,7 +2728,7 @@ var TATTERED_NODES = [
     desc:'Increases DPS of all upgrades by +66.6%.',
     x:250,  y:81,  requires:[] },
   // Stat nodes clustered around Invoke Power (-428, 139) — pentagon, point straight up, clockwise
-  { id:'invoke-speed',   type:'mana',   name:'Mana Conduit',   icon:'', cost:20333,
+  { id:'invoke-speed',   type:'mana',   name:'Mana Conduit',   icon:'', cost:24999,
     desc:'Increases Mana cap by 250 and Mana regen rate by 135%.',
     x:-300, y:45,   requires:[] },
   { id:'invoke-dps-1',   type:'dps',    name:'DPS +66.6%',     icon:'', cost:21777,
@@ -2703,13 +2740,96 @@ var TATTERED_NODES = [
   { id:'invoke-strike',  type:'strike', name:'Strike Bonus',   icon:'', cost:23777,
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
     x:-330, y:140,  requires:[] },
-  { id:'invoke-dps-2',   type:'dps',    name:'DPS +33.3%',     icon:'', cost:24999,
+  { id:'invoke-dps-2',   type:'dps',    name:'DPS +33.3%',     icon:'', cost:20333,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-349, y:81,  requires:[] },
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
-var TATTERED_EDGES = [];
+var TATTERED_EDGES = [
+  // Flurry of Strikes cluster
+  {from:'spell-flurry',  to:'flurry-dps-1'},
+  {from:'flurry-dps-1',  to:'auto-progress'},
+  {from:'flurry-dps-1',  to:'flurry-strike'},
+  {from:'flurry-dps-1',  to:'flurry-speed'},
+  {from:'flurry-strike', to:'flurry-dps-2'},
+  {from:'flurry-speed',  to:'flurry-souls'},
+  {from:'flurry-dps-2',  to:'flurry-souls'},
+  // Inner ring connections (gateway chain)
+  {from:'crit-dps-1',   to:'blade-dps'},
+  {from:'blade-dps',    to:'souls-souls'},
+  {from:'souls-souls',  to:'rule-hp'},
+  {from:'rule-hp',      to:'flurry-dps-1'},
+  // Outer cluster links
+  {from:'rule-souls', to:'strikes-souls'},
+  // Rule of 3 cluster — pentagon ring, rule-hp connects to spell
+  {from:'spell-ruleOf3', to:'rule-hp'},
+  {from:'rule-hp',    to:'rule-dps-1'},
+  {from:'rule-dps-1', to:'rule-speed'},
+  {from:'rule-speed', to:'rule-souls'},
+  {from:'rule-souls', to:'rule-dps-2'},
+  {from:'rule-dps-2', to:'rule-hp'},
+  // Twin Souls cluster — pentagon ring, souls-souls connects to spell
+  {from:'spell-twinSouls', to:'souls-souls'},
+  {from:'souls-souls',  to:'souls-strike'},
+  {from:'souls-strike', to:'souls-speed'},
+  {from:'souls-speed',  to:'souls-dps-2'},
+  {from:'souls-dps-2',  to:'souls-dps-1'},
+  {from:'souls-dps-1',  to:'souls-souls'},
+  // Twin Blades cluster — pentagon ring, blade-dps connects to spell
+  {from:'spell-twinBlades', to:'blade-dps'},
+  {from:'blade-dps',      to:'blade-speed'},
+  {from:'blade-speed',    to:'blade-strike-1'},
+  {from:'blade-strike-1', to:'blade-hp'},
+  {from:'blade-hp',       to:'blade-strike-2'},
+  {from:'blade-strike-2', to:'blade-dps'},
+  // Inner ring second chain
+  {from:'crit-speed',      to:'blade-speed'},
+  {from:'blade-strike-2',  to:'souls-strike'},
+  {from:'souls-dps-1',     to:'rule-dps-1'},
+  {from:'rule-dps-2',      to:'flurry-speed'},
+  // Critical Strike cluster (2 connections from Flurry)
+  {from:'flurry-dps-1',   to:'crit-dps-1'},
+  {from:'flurry-strike',  to:'crit-strike'},
+  {from:'spell-critStrike', to:'crit-dps-1'},
+  {from:'crit-dps-1',  to:'crit-strike'},
+  {from:'crit-dps-1',  to:'crit-speed'},
+  {from:'crit-strike', to:'crit-dps-2'},
+  {from:'crit-speed',  to:'crit-souls'},
+  {from:'crit-dps-2',  to:'crit-souls'},
+  // Twin Strikes cluster — pentagon ring, strikes-speed connects to spell
+  {from:'spell-twinStrikes', to:'strikes-souls'},
+  {from:'strikes-speed',  to:'strikes-crit'},
+  {from:'strikes-crit',   to:'strikes-dps-1'},
+  {from:'strikes-dps-1',  to:'strikes-souls'},
+  {from:'strikes-souls',  to:'strikes-dps-2'},
+  {from:'strikes-dps-2',  to:'strikes-speed'},
+  // Power of 3 cluster — pentagon ring, power3-speed connects to spell
+  {from:'spell-powerOf3', to:'power3-speed'},
+  {from:'power3-speed',  to:'power3-dps-1'},
+  {from:'power3-dps-1',  to:'power3-souls'},
+  {from:'power3-souls',  to:'power3-crit'},
+  {from:'power3-crit',   to:'power3-dps-2'},
+  {from:'power3-dps-2',  to:'power3-speed'},
+  // Mana Hungry cluster — pentagon ring, mana-speed connects to spell
+  {from:'spell-manaHungry', to:'mana-dps-1'},
+  {from:'mana-speed',  to:'mana-dps-1'},
+  {from:'mana-dps-1',  to:'mana-souls'},
+  {from:'mana-souls',  to:'mana-crit'},
+  {from:'mana-crit',   to:'mana-dps-2'},
+  {from:'mana-dps-2',  to:'mana-speed'},
+  // Invoke Power cluster — pentagon ring, invoke-speed connects to spell
+  {from:'spell-invokePower', to:'invoke-dps-2'},
+  {from:'invoke-speed',  to:'invoke-dps-1'},
+  {from:'invoke-dps-1',  to:'invoke-souls'},
+  {from:'invoke-souls',  to:'invoke-strike'},
+  {from:'invoke-strike', to:'invoke-dps-2'},
+  {from:'invoke-dps-2',  to:'invoke-speed'},
+  // Outer arched connections (curved to follow outer ring, r≈358)
+  {from:'invoke-dps-2',  to:'strikes-dps-2', cp:{x:-388, y:-127}},
+  {from:'strikes-speed', to:'power3-speed',  cp:{x:0,    y:-409}},
+  {from:'power3-dps-1',  to:'mana-dps-1',    cp:{x:388,  y:-127}},
+];
 
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
 
@@ -2731,6 +2851,7 @@ function buyTatteredNode(id){
   tatteredSouls-=node.cost;
   tatteredUpgradesSpent+=node.cost;
   soulShopOwned[id]=1;
+  recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
   updateAutoProgressBtn();
@@ -2750,6 +2871,7 @@ function doRespec(){
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
   invokePowerStacks=0;
   autoProgressEnabled=false;
+  recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
   updateAutoProgressBtn();
@@ -2774,17 +2896,37 @@ function renderTatteredGrid(){
     if(c.id!=='tm-svg'&&!c.classList.contains('tm-center-glyph')) c.remove();
   });
   svg.innerHTML='';
+  function nodeRadius(n){
+    if(n.type==='center') return 27;
+    if(n.type==='spell')  return 24;
+    if(n.type==='upg')    return 21;
+    return 15;
+  }
   // Draw edges first (SVG)
   TATTERED_EDGES.forEach(function(edge){
     var fn=TATTERED_NODES.filter(function(n){return n.id===edge.from;})[0];
     var tn=TATTERED_NODES.filter(function(n){return n.id===edge.to;})[0];
     if(!fn||!tn) return;
-    var line=document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1',fn.x); line.setAttribute('y1',fn.y);
-    line.setAttribute('x2',tn.x); line.setAttribute('y2',tn.y);
-    var purchased=soulShopOwned[fn.id]>=1&&soulShopOwned[tn.id]>=1;
-    line.setAttribute('class','tm-edge'+(purchased?' active':''));
-    svg.appendChild(line);
+    var dx=tn.x-fn.x, dy=tn.y-fn.y;
+    var dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<1) return;
+    var ux=dx/dist, uy=dy/dist;
+    var x1=fn.x+ux*nodeRadius(fn), y1=fn.y+uy*nodeRadius(fn);
+    var x2=tn.x-ux*nodeRadius(tn), y2=tn.y-uy*nodeRadius(tn);
+    var purchased=soulShopOwned[fn.id]>=1||soulShopOwned[tn.id]>=1;
+    var cls='tm-edge'+(purchased?' active':'');
+    if(edge.cp){
+      var path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d','M '+x1+' '+y1+' Q '+edge.cp.x+' '+edge.cp.y+' '+x2+' '+y2);
+      path.setAttribute('class',cls);
+      svg.appendChild(path);
+    } else {
+      var line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+      line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+      line.setAttribute('class',cls);
+      svg.appendChild(line);
+    }
   });
   // Draw nodes
   TATTERED_NODES.forEach(function(node){
@@ -3699,8 +3841,6 @@ initUpgradeIcons();
 initMist(28);
 preloadFormImages();
 loadGame();
-// TEST — remove before release
-tatteredSouls=Math.max(tatteredSouls,1000); rebirthCount=Math.max(rebirthCount,1);
 updateHighestFloor();
 recalcStats();
 updateHpBars();
