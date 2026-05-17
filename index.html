@@ -2718,6 +2718,11 @@ var TATTERED_EDGES = [
   {from:'flurry-strike', to:'flurry-dps-2'},
   {from:'flurry-speed',  to:'flurry-souls'},
   {from:'flurry-dps-2',  to:'flurry-souls'},
+  // Inner ring connections (gateway chain)
+  {from:'crit-dps-1',   to:'blade-dps'},
+  {from:'blade-dps',    to:'souls-souls'},
+  {from:'souls-souls',  to:'rule-hp'},
+  {from:'rule-hp',      to:'flurry-dps-1'},
   // Critical Strike cluster (2 connections from Flurry)
   {from:'flurry-dps-1',   to:'crit-dps-1'},
   {from:'flurry-strike',  to:'crit-strike'},
