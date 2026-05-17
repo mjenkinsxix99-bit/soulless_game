@@ -2578,6 +2578,22 @@ var TATTERED_NODES = [
   { id:'flurry-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:25,
     desc:'Decreases auto damage interval by 0.111 seconds.',
     x:-71,  y:-277, requires:[] },
+  // Stat nodes clustered around Critical Strike (285, -93) — pentacle, point toward center
+  { id:'crit-dps-1',    type:'dps',    name:'DPS +11%',       icon:'', cost:25,
+    desc:'Increases DPS of all upgrades by +11%.',
+    x:214,  y:-70,  requires:[] },
+  { id:'crit-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:33,
+    desc:'Increases your Strike Damage by +0.666% of your total DPS.',
+    x:241,  y:-154, requires:[] },
+  { id:'crit-dps-2',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:50,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:329,  y:-154, requires:[] },
+  { id:'crit-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:77,
+    desc:'Increases all souls gained by 33.3%.',
+    x:356,  y:-70,  requires:[] },
+  { id:'crit-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:100,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:285,  y:-18,  requires:[] },
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
