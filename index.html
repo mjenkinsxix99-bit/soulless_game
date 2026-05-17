@@ -296,23 +296,53 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .tm-node.type-center .tm-node-ring { width:54px; height:54px; border-color:#4a2e88; background:#0c0620; }
 .tm-node.type-center.state-purchased .tm-node-ring { border-color:#cc88ff; background:#120830; box-shadow:0 0 20px rgba(180,100,255,0.65),0 0 44px rgba(140,60,240,0.25); }
 .tm-node.type-center.state-affordable .tm-node-ring { border-color:#8855cc; background:#0f0628; box-shadow:0 0 12px rgba(120,70,220,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
-/* spell hub nodes — 40% smaller than before (78→47px) */
-.tm-node.type-spell .tm-node-ring { width:47px; height:47px; border-color:#6644bb; background:#0c0825; }
-.tm-node.type-spell.state-purchased .tm-node-ring { border-color:#cc88ff; background:#100922; box-shadow:0 0 12px rgba(180,100,255,0.5),0 0 28px rgba(140,60,220,0.2); }
-.tm-node.type-spell.state-affordable .tm-node-ring { border-color:#8855dd; background:#0d0720; box-shadow:0 0 8px rgba(120,70,220,0.35); animation:nodeAffordPulse 2s ease-in-out infinite; }
-.tm-node.type-spell.state-locked .tm-node-ring { border-color:#2a1e55; opacity:0.5; cursor:default; }
+/* spell nodes — red theme */
+.tm-node.type-spell .tm-node-ring { width:47px; height:47px; border-color:#771818; background:#120608; }
+.tm-node.type-spell.state-purchased .tm-node-ring { border-color:#ff3333; background:#200a08; box-shadow:0 0 12px rgba(255,60,60,0.55),0 0 28px rgba(200,40,40,0.25); }
+.tm-node.type-spell.state-affordable .tm-node-ring { border-color:#cc2222; background:#180808; box-shadow:0 0 8px rgba(200,40,40,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-spell.state-locked .tm-node-ring { border-color:#3a1010; opacity:0.5; cursor:default; }
 /* upgrade nodes */
 .tm-node.type-upg .tm-node-ring { width:42px; height:42px; }
 .tm-node.type-upg.state-purchased .tm-node-ring { border-color:#d4a843; background:#0d0a00; box-shadow:0 0 10px rgba(212,168,67,0.4); }
 .tm-node.type-upg.state-affordable .tm-node-ring { border-color:#886620; animation:nodeAffordPulse 2s ease-in-out infinite; }
 .tm-node.type-upg.state-locked .tm-node-ring { opacity:0.35; cursor:default; }
+/* stat nodes — 30px (35% smaller than 47px spell nodes), solid color fill, no label */
+.tm-node.type-dps .tm-node-ring    { width:30px; height:30px; border-color:#226633; background:#0e2e18; }
+.tm-node.type-strike .tm-node-ring { width:30px; height:30px; border-color:#1a3eaa; background:#080f2e; }
+.tm-node.type-souls .tm-node-ring  { width:30px; height:30px; border-color:#997700; background:#221a00; }
+.tm-node.type-hp .tm-node-ring     { width:30px; height:30px; border-color:#993300; background:#1e0e00; }
+.tm-node.type-mana .tm-node-ring   { width:30px; height:30px; border-color:#662299; background:#160028; }
+.tm-node.type-speed .tm-node-ring  { width:30px; height:30px; border-color:#778899; background:#141820; }
+.tm-node.type-dps.state-purchased .tm-node-ring    { border-color:#44ff77; background:#1a5c30; box-shadow:0 0 10px rgba(60,220,90,0.65); }
+.tm-node.type-strike.state-purchased .tm-node-ring { border-color:#4488ff; background:#0e2266; box-shadow:0 0 10px rgba(60,110,255,0.65); }
+.tm-node.type-souls.state-purchased .tm-node-ring  { border-color:#ffcc33; background:#4a3300; box-shadow:0 0 10px rgba(220,170,40,0.65); }
+.tm-node.type-hp.state-purchased .tm-node-ring     { border-color:#ff7722; background:#5a2200; box-shadow:0 0 10px rgba(240,100,30,0.65); }
+.tm-node.type-mana.state-purchased .tm-node-ring   { border-color:#bb55ff; background:#3a0066; box-shadow:0 0 10px rgba(180,80,240,0.65); }
+.tm-node.type-speed.state-purchased .tm-node-ring  { border-color:#dde8ff; background:#303848; box-shadow:0 0 10px rgba(200,210,240,0.65); }
+.tm-node.type-dps.state-affordable .tm-node-ring    { border-color:#33bb55; background:#112e1c; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-strike.state-affordable .tm-node-ring { border-color:#2255cc; background:#0a0f22; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-souls.state-affordable .tm-node-ring  { border-color:#ccaa00; background:#1e1600; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-hp.state-affordable .tm-node-ring     { border-color:#cc5500; background:#1e0e00; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-mana.state-affordable .tm-node-ring   { border-color:#8833cc; background:#120022; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-speed.state-affordable .tm-node-ring  { border-color:#9aaabb; background:#111520; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-dps.state-locked .tm-node-ring,.tm-node.type-strike.state-locked .tm-node-ring,
+.tm-node.type-souls.state-locked .tm-node-ring,.tm-node.type-hp.state-locked .tm-node-ring,
+.tm-node.type-mana.state-locked .tm-node-ring,.tm-node.type-speed.state-locked .tm-node-ring { opacity:0.35; cursor:default; }
 @keyframes nodeAffordPulse { 0%,100%{opacity:0.7;} 50%{opacity:1;} }
 .tm-node-icon { font-size:16px; line-height:1; pointer-events:none; }
 .tm-node.type-center .tm-node-icon { font-size:18px; }
-.tm-node-name { font-size:8px; color:#9977cc; letter-spacing:1px; text-align:center; margin-top:2px; pointer-events:none; max-width:54px; line-height:1.2; }
+.tm-node-name { font-size:8px; color:#cc5555; letter-spacing:1px; text-align:center; margin-top:2px; pointer-events:none; max-width:54px; line-height:1.2; }
 .tm-node.type-center .tm-node-name { color:#aa88ee; max-width:60px; }
-.tm-node.state-purchased .tm-node-name { color:#aa8833; }
-.tm-node.state-affordable .tm-node-name { color:#bb99ff; }
+.tm-node.type-spell.state-purchased .tm-node-name { color:#ff4444; }
+.tm-node.type-spell.state-affordable .tm-node-name { color:#ee3333; }
+.tm-node.type-spell.state-locked .tm-node-name { color:#772222; }
+/* stat nodes show no label */
+.tm-node.type-dps .tm-node-name,.tm-node.type-strike .tm-node-name,
+.tm-node.type-souls .tm-node-name,.tm-node.type-hp .tm-node-name,
+.tm-node.type-mana .tm-node-name,.tm-node.type-speed .tm-node-name { display:none; }
+.tm-node.type-dps .tm-node-icon,.tm-node.type-strike .tm-node-icon,
+.tm-node.type-souls .tm-node-icon,.tm-node.type-hp .tm-node-icon,
+.tm-node.type-mana .tm-node-icon,.tm-node.type-speed .tm-node-icon { display:none; }
 /* SVG edges */
 .tm-edge { stroke:#1e1440; stroke-width:1.5; fill:none; }
 .tm-edge.active { stroke:#aa44ff; stroke-width:2.5; filter:drop-shadow(0 0 5px rgba(170,60,255,0.75)); }
@@ -649,7 +679,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div class="form-card" data-form="masculine">
         <img src="artwork/masculine.png" alt="Masculine">
         <div class="fc-name">Masculine</div>
-        <div class="fc-bonus">+10% DPS &amp; Click Damage</div>
+        <div class="fc-bonus">+10% DPS &amp; Strike Damage</div>
       </div>
       <div class="form-card" data-form="feminine">
         <img src="artwork/feminine.png" alt="Feminine">
@@ -1896,16 +1926,16 @@ var _lastSpellUiTick=0;
 
 // Divine Hunger milestone effect labels (replaces generic ×7/×666 text)
 var DV_MS_EFFECTS=[
-  '+0.666% of Total DPS as Click Damage',
-  '+0.666% of Total DPS as Click Damage',
-  '+6.66% Critical Click Chance',
-  '+0.666% of Total DPS as Click Damage',
-  '+0.666% of Total DPS as Click Damage',
-  '+3.33× Critical Click Damage Multiplier',
-  '+0.666% of Total DPS as Click Damage',
-  '+0.666% of Total DPS as Click Damage',
+  '+0.666% of Total DPS as Strike Damage',
+  '+0.666% of Total DPS as Strike Damage',
+  '+6.66% Critical Strike Chance',
+  '+0.666% of Total DPS as Strike Damage',
+  '+0.666% of Total DPS as Strike Damage',
+  '+3.33× Critical Strike Damage Multiplier',
+  '+0.666% of Total DPS as Strike Damage',
+  '+0.666% of Total DPS as Strike Damage',
   '+22.2% Souls Absorbed',
-  '+0.666% of Total DPS as Click Damage',
+  '+0.666% of Total DPS as Strike Damage',
 ];
 
 var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
@@ -1996,7 +2026,7 @@ function showMsTip(evt,u,i){
     tip.querySelector('.mst-eff').textContent=DV_MS_EFFECTS[i];
   } else {
     var multLabel=MS_MULT_LABELS[i];
-    var typeLabel=u.type==='click'?'Click Damage':u.type==='drain'?'HP Drain':'DPS';
+    var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
     tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
   }
   var costEl=tip.querySelector('.mst-cost');
@@ -2369,7 +2399,7 @@ function renderAchievementsTab(){
 var SPELLS = [
   { id:'flurry',      tsId:'spell-flurry',      icon:'⚡', manaCost:20,  duration:33300,
     name:'Flurry of Strikes',
-    desc:'Unleashes 7 strikes per second for 33.3s, each dealing click damage.' },
+    desc:'Unleashes 7 strikes per second for 33.3s, each dealing strike damage.' },
   { id:'critStrike',  tsId:'spell-critStrike',   icon:'✦', manaCost:33,  duration:33300,
     name:'Critical Strike',
     desc:'Critical strike chance is improved by 66.6% for 33.3s.' },
@@ -2506,7 +2536,7 @@ var TATTERED_NODES = [
     desc:'Unlocks the Auto Progress button. Floors advance automatically when cleared.',
     x:0, y:0, requires:[] },
   { id:'spell-flurry',      type:'spell', name:'Flurry of Strikes', icon:'⚡', cost:10,
-    desc:'Unlocks the spell Flurry of Strikes. Cast for 20 Mana: 7 strikes per second for 33.3s, each dealing click damage.',
+    desc:'Unlocks the spell Flurry of Strikes. Cast for 20 Mana: 7 strikes per second for 33.3s, each dealing strike damage.',
     x:0,    y:-300, requires:[] },
   { id:'spell-critStrike',  type:'spell', name:'Critical Strike',   icon:'✦', cost:50,
     desc:'Unlocks the spell Critical Strike. Cast for 33 Mana: critical strike chance +66.6% for 33.3s.',
@@ -2532,6 +2562,22 @@ var TATTERED_NODES = [
   { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:20000,
     desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Persists this Ascension.',
     x:-318, y:-318, requires:[] },
+  // Stat nodes clustered around Flurry of Strikes (0, -300)
+  { id:'flurry-dps-1',    type:'dps',    name:'DPS +9%',        icon:'', cost:5,
+    desc:'Increases DPS of all upgrades by +9%.',
+    x:-75,  y:-370, requires:[] },
+  { id:'flurry-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:5,
+    desc:'Increases your Strike Damage by +0.666% of your total DPS.',
+    x:75,   y:-370, requires:[] },
+  { id:'flurry-dps-2',    type:'dps',    name:'DPS +9%',        icon:'', cost:5,
+    desc:'Increases DPS of all upgrades by +9%.',
+    x:0,    y:-390, requires:[] },
+  { id:'flurry-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:5,
+    desc:'Increases all souls gained by 33.3%.',
+    x:-90,  y:-300, requires:[] },
+  { id:'flurry-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:5,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:90,   y:-300, requires:[] },
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
@@ -3040,7 +3086,7 @@ function getUpgradeContribStr(u){
     return (+(pct.toFixed(4)))+'% HP/s drain';
   }
   var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
-  return fmt(eff)+(u.type==='click'?' click damage':' DPS');
+  return fmt(eff)+(u.type==='click'?' strike damage':' DPS');
 }
 
 
