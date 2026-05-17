@@ -2709,7 +2709,15 @@ var TATTERED_NODES = [
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
-var TATTERED_EDGES = [];
+var TATTERED_EDGES = [
+  // Flurry of Strikes cluster
+  {from:'spell-flurry',  to:'flurry-dps-1'},
+  {from:'flurry-dps-1',  to:'flurry-strike'},
+  {from:'flurry-dps-1',  to:'flurry-speed'},
+  {from:'flurry-strike', to:'flurry-dps-2'},
+  {from:'flurry-speed',  to:'flurry-souls'},
+  {from:'flurry-dps-2',  to:'flurry-souls'},
+];
 
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
 
