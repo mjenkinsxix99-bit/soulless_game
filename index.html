@@ -1033,7 +1033,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
 
   var iw = sd.w, ih = sd.h;
   // Elite canvas is 320px; leave ~70px at top for the halo, push sprite down
-  var drawH = elite ? Math.min(H * 0.72, H - 10) * 0.75 : Math.min(H * 0.78, H - 10) * 0.5;
+  var drawH = elite ? Math.min(H * 0.72, H - 10) * 0.8 : Math.min(H * 0.78, H - 10) * 0.6;
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
   var float = dead ? 0 : Math.sin(t * (floatSpeed || 0.0013)) * 6;
