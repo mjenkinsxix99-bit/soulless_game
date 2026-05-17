@@ -1226,6 +1226,26 @@ var ENEMY_TYPES = [
     hp:650000, dmgMin:14000, dmgMax:20000, speed:1000, souls:200000,
     eliteHp:2600000, eliteDmgMin:45000, eliteDmgMax:65000, eliteSouls:1200000,
     color:[220,40,40] },
+  { id:'uw_ember',   name:'Ember',       simpleName:'Ember',     subtitle:'a smoldering remnant',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[220,80,40] },
+  { id:'uw_ash',     name:'Ash',         simpleName:'Ash',       subtitle:'what remains after burning',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[180,60,30] },
+  { id:'uw_cinder',  name:'Cinder',      simpleName:'Cinder',    subtitle:'alive just long enough to sting',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[200,70,20] },
+  { id:'uw_smolder', name:'Smolder',     simpleName:'Smolder',   subtitle:'patient heat without flame',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[190,50,20] },
+  { id:'uw_char',    name:'Char',        simpleName:'Char',      subtitle:'the memory of something living',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[160,40,20] },
+  { id:'uw_blaze',   name:'Blaze',       simpleName:'Blaze',     subtitle:'hunger with no direction',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[230,90,30] },
+  { id:'uw_scorch',  name:'Scorch',      simpleName:'Scorch',    subtitle:'the pain that lingers',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[210,60,25] },
+  { id:'uw_brand',   name:'Brand',       simpleName:'Brand',     subtitle:'marked and never forgiven',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[200,45,30] },
+  { id:'uw_inferno', name:'Inferno',     simpleName:'Inferno',   subtitle:'too angry to die fully',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[240,100,20] },
+  { id:'uw_hellion', name:'Hellion',     simpleName:'Hellion',   subtitle:'cast down, clawing back',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[180,20,20] },
 ];
 
 
@@ -1252,7 +1272,15 @@ var FLOORS_PER_LEVEL  = 9;   // normal floors per level; elite is floor FLOORS_P
 var LEVELS_PER_REALM  = 10;
 var FLOORS_PER_REALM  = FLOORS_PER_LEVEL * LEVELS_PER_REALM; // 90 normal + 10 elites
 var WINS_PER_FLOOR    = 10;
-var REALM_NAMES       = ['Void'];  // indexed by curRealm-1; unnamed realms fall back to number
+var REALM_NAMES       = ['Void', 'Underworld'];  // indexed by curRealm-1; unnamed realms fall back to number
+var REALM_BACKGROUNDS = [
+  'radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%)',
+  'radial-gradient(ellipse at center, #0d0101 0%, #1f0405 55%, #2a0709 100%)'
+];
+function setRealmBackground(){
+  var bg=REALM_BACKGROUNDS[curRealm-1]||REALM_BACKGROUNDS[REALM_BACKGROUNDS.length-1];
+  document.getElementById('battlefield').style.background=bg;
+}
 // No realm cap — break_infinity.js handles arbitrarily large HP values
 var MINIMAP_VISIBLE  = 7;
 var minimapNewFloor  = false;
@@ -1277,29 +1305,7 @@ var enemyPool = [0];
 function absFloor(level, floor){ return (curRealm-1)*FLOORS_PER_REALM + (level-1)*FLOORS_PER_LEVEL + floor; }
 
 function computeFloorHp(af){
-  var base = D(10);
-  // Zone 1: floors 1-150, 1.5x per floor
-  if(af <= 150) return base.mul(D(1.5).pow(af - 1));
-  var hp150 = base.mul(D(1.5).pow(149));
-  // Zone 2: floors 151-666, 1.15x per floor
-  if(af <= 666) return hp150.mul(D(1.15).pow(af - 150));
-  var hp666 = hp150.mul(D(1.15).pow(516));
-  // Zone 3: floors 667-200000; every 444 floors the per-floor multiplier gains +0.0013
-  // (starting at 1.1513 for the first 444-floor segment), capped at 1.545
-  var cap3 = Math.min(af, 200000);
-  var hp = hp666;
-  var remaining = cap3 - 666;
-  var seg = 0;
-  while(remaining > 0){
-    var m = Math.min(1.15 + (seg + 1) * 0.0013, 1.545);
-    var steps = Math.min(remaining, 444);
-    hp = hp.mul(D(m).pow(steps));
-    remaining -= steps;
-    seg++;
-  }
-  // Zone 4: floors 200001+, permanently 1.545x per floor
-  if(af > 200000) hp = hp.mul(D(1.545).pow(af - 200000));
-  return hp;
+  return D(10).mul(D(1.0777).pow(af - 1));
 }
 function floorHp(level, floor){
   return computeFloorHp(absFloor(level, floor)).ceil();
@@ -1643,14 +1649,13 @@ function spawnEnemy(){
   var oval=document.getElementById('combat-oval');
   oval.style.width=circleSize+'px'; oval.style.height=circleSize+'px';
   // Pick enemy type
+  var realmOffset = (curRealm-1) * LEVELS_PER_REALM;
   if(elite){
-    // elite is always the boss of this level (type index = level-1)
-    currentEnemyTypeIdx = lv-1;
+    currentEnemyTypeIdx = realmOffset + lv - 1;
   } else {
-    // All regular types (0-8) spawn on any floor; Demon (9) only on level 10
     var regularPool = [];
-    for (var rpi = 0; rpi < ENEMY_TYPES.length - 1; rpi++) regularPool.push(rpi);
-    if (lv >= 10) regularPool.push(9);
+    for (var rpi = 0; rpi < LEVELS_PER_REALM - 1; rpi++) regularPool.push(realmOffset + rpi);
+    if (lv >= LEVELS_PER_REALM) regularPool.push(realmOffset + LEVELS_PER_REALM - 1);
     currentEnemyTypeIdx = regularPool[Math.floor(Math.random() * regularPool.length)];
   }
 
@@ -1793,13 +1798,14 @@ function onEnemyDeath(){
   if(isEliteFight()){
     eliteKillsTotal++;
     // Elite beaten — add this level's enemy type to the pool
-    var typeIdx2=curLevel-1;
+    var typeIdx2=(curRealm-1)*LEVELS_PER_REALM+curLevel-1;
     if(namedEliteFirstKills.indexOf(typeIdx2)<0) namedEliteFirstKills.push(typeIdx2);
     if(defeatedElites.indexOf(typeIdx2)<0){
       defeatedElites.push(typeIdx2);
       // add next type to pool if not already there
       var nextType=typeIdx2+1;
-      if(nextType<ENEMY_TYPES.length && enemyPool.indexOf(nextType)<0){
+      var realmEnd=curRealm*LEVELS_PER_REALM;
+      if(nextType<realmEnd && nextType<ENEMY_TYPES.length && enemyPool.indexOf(nextType)<0){
         enemyPool.push(nextType);
       }
       // Unlock next level on minimap for click-to-advance (first kill only)
@@ -1818,7 +1824,8 @@ function onEnemyDeath(){
         curLevel=1; curFloor=1; floorWins=0;
         highestLevel=1; highestFloor=1;
         defeatedElites=[];
-        enemyPool=[0];
+        enemyPool=[(curRealm-1)*LEVELS_PER_REALM];
+        setRealmBackground();
         minimapNewFloor=false;
         updateHighestFloor();
         buildMinimap();
@@ -3200,6 +3207,7 @@ function loadGame(){
   achievementsEarned=data.achievementsEarned||[];
   traitChoicesEver=data.traitChoicesEver||[];
   namedEliteFirstKills=data.namedEliteFirstKills||[];
+  setRealmBackground();
   tatteredSouls=data.tatteredSouls||0;
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
