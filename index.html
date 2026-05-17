@@ -287,7 +287,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #tm-canvas-wrap { flex:1; overflow:hidden; position:relative; cursor:grab; }
 #tm-canvas-wrap.dragging { cursor:grabbing; }
 #tm-grid { position:absolute; left:0; top:0; will-change:transform; }
-#tm-svg { position:absolute; overflow:visible; pointer-events:none; top:-200px; left:-200px; width:400px; height:400px; }
+#tm-svg { position:absolute; overflow:visible; pointer-events:none; top:-400px; left:-400px; width:800px; height:800px; }
 .tm-center-glyph { position:absolute; transform:translate(-50%,-50%); width:36px; height:36px; border-radius:50%; background:#06040f; border:1px solid #2a1a5a; display:flex; align-items:center; justify-content:center; font-size:16px; color:#2a1a5a; pointer-events:none; box-shadow:0 0 20px rgba(80,40,160,0.15); }
 /* node base */
 .tm-node { position:absolute; transform:translate(-50%,-50%); z-index:2; }
@@ -601,7 +601,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
   <div id="tm-canvas-wrap">
     <div id="tm-grid">
-      <svg id="tm-svg" viewBox="-200 -200 400 400"></svg>
+      <svg id="tm-svg" viewBox="-400 -400 800 800"></svg>
       <div class="tm-center-glyph">&#10022;</div>
     </div>
   </div>
@@ -1406,6 +1406,8 @@ function fmtCoin(n){
   return ''+n;
 }
 function spawnSoulCoins(){
+  var _tm=document.getElementById('tattered-modal');
+  if(_tm&&_tm.classList.contains('open')) return;
   // Mana gain: each of the 3 bubbles contributes 0.00001 × completed floors this ascension
   var _floorsComp=completedFloorsThisAscension.length;
   if(_floorsComp>0){
@@ -2494,7 +2496,7 @@ function renderSpellPanel(){
 
 // ── TATTERED UPGRADES ─────────────────────────────────────────────────────────
 var tatteredUpgradesSpent = 0;
-var _tattPanX = 0, _tattPanY = 0;
+var _tattPanX = 0, _tattPanY = 0, _tattScale = 1;
 var _tattDragging = false, _tattDragSX = 0, _tattDragSY = 0, _tattDragPX = 0, _tattDragPY = 0;
 
 // Center node + 9 spell nodes arranged in a circle (radius 150 — 50% of original 300).
@@ -2505,31 +2507,31 @@ var TATTERED_NODES = [
     x:0, y:0, requires:[] },
   { id:'spell-flurry',      type:'spell', name:'Flurry of Strikes', icon:'⚡', cost:10,
     desc:'Unlocks the spell Flurry of Strikes. Cast for 20 Mana: 7 strikes per second for 33.3s, each dealing click damage.',
-    x:0,    y:-150, requires:[] },
+    x:0,    y:-300, requires:[] },
   { id:'spell-critStrike',  type:'spell', name:'Critical Strike',   icon:'✦', cost:50,
     desc:'Unlocks the spell Critical Strike. Cast for 33 Mana: critical strike chance +66.6% for 33.3s.',
-    x:96,   y:-115, requires:[] },
+    x:193,  y:-230, requires:[] },
   { id:'spell-twinBlades',  type:'spell', name:'Twin Blades',       icon:'⚔', cost:100,
     desc:'Unlocks the spell Twin Blades. Cast for 33 Mana: DPS output ×2 for 33.3s.',
-    x:148,  y:-26,  requires:[] },
+    x:295,  y:-52,  requires:[] },
   { id:'spell-twinSouls',   type:'spell', name:'Twin Souls',        icon:'∞', cost:250,
     desc:'Unlocks the spell Twin Souls. Cast for 33 Mana: all souls gained ×2 for 33.3s.',
-    x:130,  y:75,   requires:[] },
+    x:260,  y:150,  requires:[] },
   { id:'spell-ruleOf3',     type:'spell', name:'Rule of 3',         icon:'Ⅲ', cost:1000,
     desc:'Unlocks the spell Rule of 3. Cast for 66 Mana: each strike instantly grants current enemy\'s death soul reward ×3 for 33.3s.',
-    x:51,   y:141,  requires:[] },
+    x:103,  y:282,  requires:[] },
   { id:'spell-twinStrikes', type:'spell', name:'Twin Strikes',      icon:'⊕', cost:2500,
     desc:'Unlocks the spell Twin Strikes. Cast for 99 Mana: each strike deals ×2 damage for 33.3s.',
-    x:-51,  y:141,  requires:[] },
+    x:-103, y:282,  requires:[] },
   { id:'spell-powerOf3',    type:'spell', name:'Power of 3',        icon:'❖', cost:5000,
     desc:'Unlocks the spell Power of 3. Cast for 199 Mana: the next spell activated gives 3× its effect, then this buff is consumed.',
-    x:-130, y:75,   requires:[] },
+    x:-260, y:150,  requires:[] },
   { id:'spell-manaHungry',  type:'spell', name:'Mana Hungry',       icon:'◉', cost:10000,
     desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3s.',
-    x:-148, y:-26,  requires:[] },
+    x:-295, y:-52,  requires:[] },
   { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:20000,
     desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Persists this Ascension.',
-    x:-96,  y:-115, requires:[] },
+    x:-193, y:-230, requires:[] },
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
@@ -2696,7 +2698,8 @@ function openTatteredModal(){
   var wrap=document.getElementById('tm-canvas-wrap');
   _tattPanX=wrap.clientWidth/2;
   _tattPanY=wrap.clientHeight/2;
-  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px)';
+  _tattScale=1;
+  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
   updateTatteredModalTs();
   renderTatteredGrid();
 }
@@ -3601,11 +3604,22 @@ document.addEventListener('mousemove',function(e){
   if(!_tattDragging) return;
   _tattPanX=_tattDragPX+(e.clientX-_tattDragSX);
   _tattPanY=_tattDragPY+(e.clientY-_tattDragSY);
-  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px)';
+  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
 });
 document.addEventListener('mouseup',function(){
   if(_tattDragging){_tattDragging=false; _tmWrap.classList.remove('dragging');}
 });
+_tmWrap.addEventListener('wheel',function(e){
+  e.preventDefault();
+  var rect=_tmWrap.getBoundingClientRect();
+  var mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  var factor=e.deltaY<0?1.1:0.909;
+  var newScale=Math.min(3,Math.max(0.3,_tattScale*factor));
+  var gx=(mx-_tattPanX)/_tattScale, gy=(my-_tattPanY)/_tattScale;
+  _tattPanX=mx-gx*newScale; _tattPanY=my-gy*newScale;
+  _tattScale=newScale;
+  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
+},{passive:false});
 // Close modal on backdrop click (not on grid itself)
 document.getElementById('tattered-modal').addEventListener('click',function(e){
   if(e.target===this) closeTatteredModal();
