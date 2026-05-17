@@ -250,6 +250,120 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .buy-btn { background:#0d0b1a; border:2px solid #3a2a6a; color:#9980dd; border-radius:5px; padding:10px 0; font-size:13px; font-weight:bold; cursor:pointer; text-align:center; font-family:Georgia,serif; width:100%; transition:all 0.15s; letter-spacing:1px; }
 .buy-btn:hover { border-color:#7755cc; color:#c0a0ff; box-shadow:0 0 8px rgba(150,100,255,0.45); }
 .buy-btn.active { background:#1a1200; border-color:#d4a843; color:#ffd700; box-shadow:0 0 10px rgba(212,168,67,0.9),0 0 22px rgba(212,168,67,0.45); text-shadow:0 0 8px rgba(255,215,0,0.85); }
+
+/* ── SPELL PANEL ─────────────────────────────────────────────────────────── */
+#spell-panel { display:none; flex-direction:column; align-items:center; gap:4px; width:100%; padding-top:6px; }
+#spell-panel.visible { display:flex; }
+.spell-divider { width:80%; height:1px; background:#2a1a5a; margin:3px 0; }
+#mana-label { font-size:8px; color:#2d3a7a; letter-spacing:2px; text-transform:uppercase; text-align:center; margin-top:2px; }
+#mana-bar-outer { width:12px; height:80px; background:#04030f; border:1px solid #1a1a3a; border-radius:4px; overflow:hidden; position:relative; margin:1px auto; }
+#mana-bar-fill { position:absolute; bottom:0; left:0; right:0; height:0%; background:linear-gradient(to top,#1a3399,#66aaff); transition:height 0.3s ease; border-radius:3px 3px 0 0; }
+#mana-bar-fill.mana-full { background:linear-gradient(to top,#2255cc,#aaccff); box-shadow:0 0 6px rgba(100,170,255,0.6); }
+#mana-num { font-size:8px; color:#334477; text-align:center; letter-spacing:0; line-height:1.2; }
+.spell-btn { width:44px; height:44px; border-radius:7px; border:1px solid #1a1535; background:#05040e; cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center; font-size:19px; line-height:1; flex-shrink:0; transition:border-color 0.2s,box-shadow 0.2s,opacity 0.2s; overflow:visible; }
+.spell-btn.spell-lit { border-color:#3355aa; box-shadow:0 0 7px rgba(50,90,200,0.3); opacity:1; }
+.spell-btn.spell-dim { border-color:#141230; opacity:0.35; cursor:default; }
+.spell-btn.spell-active-glow { border-color:#7799ee; box-shadow:0 0 12px rgba(90,140,255,0.7),0 0 26px rgba(70,120,255,0.35); animation:spellGlow 1s ease-in-out infinite; }
+@keyframes spellGlow { 0%,100%{box-shadow:0 0 10px rgba(90,140,255,0.6),0 0 22px rgba(70,120,255,0.3);} 50%{box-shadow:0 0 18px rgba(120,170,255,0.9),0 0 38px rgba(100,160,255,0.5);} }
+.spell-tt { position:absolute; right:calc(100% + 10px); top:50%; transform:translateY(-50%); width:210px; background:#06041a; border:1px solid #2a3688; border-radius:7px; padding:11px 13px; pointer-events:none; z-index:500; display:none; box-shadow:0 4px 22px rgba(0,0,40,0.85); white-space:normal; }
+.spell-btn:hover .spell-tt { display:block; }
+.spell-tt-name { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; margin-bottom:5px; }
+.spell-tt-cost { font-size:11px; color:#6688cc; margin-bottom:5px; }
+.spell-tt-desc { font-size:12px; color:#c8c0e8; line-height:1.5; }
+.spell-tt-status { font-size:11px; color:#55dd88; margin-top:6px; font-style:italic; }
+.spell-tt-stacks { font-size:11px; color:#ffbb44; margin-top:4px; }
+/* ── TATTERED UPGRADES MODAL ─────────────────────────────────────────────── */
+#tattered-modal { display:none; position:fixed; top:0;left:370px;right:0;bottom:0; background:#02010e; z-index:900; flex-direction:column; }
+#tattered-modal.open { display:flex; }
+#tm-header { display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:14px; padding:12px 18px; background:#05030e; border-bottom:1px solid #1e1548; flex-shrink:0; position:relative; z-index:2; }
+#tm-ts-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
+#tm-ts-label { font-size:9px; color:#7a5a20; letter-spacing:3px; text-transform:uppercase; }
+#tm-ts-val { font-size:20px; color:#d4a843; font-family:Georgia,serif; letter-spacing:2px; text-shadow:0 0 14px rgba(212,168,67,0.8); }
+#tm-respec-btn { justify-self:center; background:#1a0404; border:2px solid #cc2222; color:#ff4444; font-family:Georgia,serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; padding:8px 20px; border-radius:5px; cursor:pointer; transition:all 0.2s; text-shadow:0 0 8px rgba(255,60,60,0.6); box-shadow:0 0 10px rgba(220,30,30,0.25); }
+#tm-respec-btn:hover { border-color:#ff3333; color:#ff6666; background:#220606; box-shadow:0 0 16px rgba(255,50,50,0.4); text-shadow:0 0 12px rgba(255,80,80,0.8); }
+#tm-respec-btn:disabled { opacity:0.25; cursor:default; box-shadow:none; text-shadow:none; }
+#tm-close-btn { width:36px; height:36px; background:transparent; border:1px solid #2a1a5a; color:#554477; font-size:20px; border-radius:5px; cursor:pointer; line-height:1; transition:all 0.2s; }
+#tm-close-btn:hover { border-color:#7755aa; color:#9980dd; }
+#tm-canvas-wrap { flex:1; overflow:hidden; position:relative; cursor:grab; }
+#tm-canvas-wrap.dragging { cursor:grabbing; }
+#tm-grid { position:absolute; left:0; top:0; will-change:transform; }
+#tm-svg { position:absolute; overflow:visible; pointer-events:none; top:-500px; left:-500px; width:1000px; height:1000px; }
+.tm-center-glyph { position:absolute; transform:translate(-50%,-50%); width:36px; height:36px; border-radius:50%; background:#06040f; border:1px solid #2a1a5a; display:flex; align-items:center; justify-content:center; font-size:16px; color:#2a1a5a; pointer-events:none; box-shadow:0 0 20px rgba(80,40,160,0.15); }
+/* node base */
+.tm-node { position:absolute; transform:translate(-50%,-50%); z-index:2; }
+.tm-node-ring { border-radius:50%; border:2px solid #1e1845; background:#06040f; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:border-color 0.2s, box-shadow 0.2s, background 0.2s; position:relative; }
+/* center node */
+.tm-node.type-center .tm-node-ring { width:54px; height:54px; border-color:#4a2e88; background:#0c0620; }
+.tm-node.type-center.state-purchased .tm-node-ring { border-color:#cc88ff; background:#120830; box-shadow:0 0 20px rgba(180,100,255,0.65),0 0 44px rgba(140,60,240,0.25); }
+.tm-node.type-center.state-affordable .tm-node-ring { border-color:#8855cc; background:#0f0628; box-shadow:0 0 12px rgba(120,70,220,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
+/* spell nodes — red theme */
+.tm-node.type-spell .tm-node-ring { width:47px; height:47px; border-color:#771818; background:#120608; }
+.tm-node.type-spell.state-purchased .tm-node-ring { border-color:#ff3333; background:#200a08; box-shadow:0 0 12px rgba(255,60,60,0.55),0 0 28px rgba(200,40,40,0.25); }
+.tm-node.type-spell.state-affordable .tm-node-ring { border-color:#cc2222; background:#180808; box-shadow:0 0 8px rgba(200,40,40,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-spell.state-locked .tm-node-ring { border-color:#3a1010; opacity:0.5; cursor:default; }
+/* upgrade nodes */
+.tm-node.type-upg .tm-node-ring { width:42px; height:42px; }
+.tm-node.type-upg.state-purchased .tm-node-ring { border-color:#d4a843; background:#0d0a00; box-shadow:0 0 10px rgba(212,168,67,0.4); }
+.tm-node.type-upg.state-affordable .tm-node-ring { border-color:#886620; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-upg.state-locked .tm-node-ring { opacity:0.35; cursor:default; }
+/* stat nodes — 30px (35% smaller than 47px spell nodes), solid color fill, no label */
+.tm-node.type-dps .tm-node-ring    { width:30px; height:30px; border-color:#226633; background:#0e2e18; }
+.tm-node.type-strike .tm-node-ring { width:30px; height:30px; border-color:#1a3eaa; background:#080f2e; }
+.tm-node.type-souls .tm-node-ring  { width:30px; height:30px; border-color:#997700; background:#221a00; }
+.tm-node.type-hp .tm-node-ring     { width:30px; height:30px; border-color:#993300; background:#1e0e00; }
+.tm-node.type-mana .tm-node-ring   { width:30px; height:30px; border-color:#662299; background:#160028; }
+.tm-node.type-speed .tm-node-ring  { width:30px; height:30px; border-color:#778899; background:#141820; }
+.tm-node.type-dps.state-purchased .tm-node-ring    { border-color:#44ff77; background:#1a5c30; box-shadow:0 0 10px rgba(60,220,90,0.65); }
+.tm-node.type-strike.state-purchased .tm-node-ring { border-color:#4488ff; background:#0e2266; box-shadow:0 0 10px rgba(60,110,255,0.65); }
+.tm-node.type-souls.state-purchased .tm-node-ring  { border-color:#ffcc33; background:#4a3300; box-shadow:0 0 10px rgba(220,170,40,0.65); }
+.tm-node.type-hp.state-purchased .tm-node-ring     { border-color:#ff7722; background:#5a2200; box-shadow:0 0 10px rgba(240,100,30,0.65); }
+.tm-node.type-mana.state-purchased .tm-node-ring   { border-color:#bb55ff; background:#3a0066; box-shadow:0 0 10px rgba(180,80,240,0.65); }
+.tm-node.type-speed.state-purchased .tm-node-ring  { border-color:#dde8ff; background:#303848; box-shadow:0 0 10px rgba(200,210,240,0.65); }
+.tm-node.type-dps.state-affordable .tm-node-ring    { border-color:#33bb55; background:#112e1c; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-strike.state-affordable .tm-node-ring { border-color:#2255cc; background:#0a0f22; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-souls.state-affordable .tm-node-ring  { border-color:#ccaa00; background:#1e1600; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-hp.state-affordable .tm-node-ring     { border-color:#cc5500; background:#1e0e00; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-mana.state-affordable .tm-node-ring   { border-color:#8833cc; background:#120022; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-speed.state-affordable .tm-node-ring  { border-color:#9aaabb; background:#111520; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-dps.state-locked .tm-node-ring,.tm-node.type-strike.state-locked .tm-node-ring,
+.tm-node.type-souls.state-locked .tm-node-ring,.tm-node.type-hp.state-locked .tm-node-ring,
+.tm-node.type-mana.state-locked .tm-node-ring,.tm-node.type-speed.state-locked .tm-node-ring { opacity:0.35; cursor:default; }
+@keyframes nodeAffordPulse { 0%,100%{opacity:0.7;} 50%{opacity:1;} }
+.tm-node-icon { font-size:16px; line-height:1; pointer-events:none; }
+.tm-node.type-center .tm-node-icon { font-size:18px; }
+.tm-node-name { font-size:8px; color:#cc5555; letter-spacing:1px; text-align:center; margin-top:2px; pointer-events:none; max-width:54px; line-height:1.2; }
+.tm-node.type-center .tm-node-name { color:#aa88ee; max-width:60px; }
+.tm-node.type-spell.state-purchased .tm-node-name { color:#ff4444; }
+.tm-node.type-spell.state-affordable .tm-node-name { color:#ee3333; }
+.tm-node.type-spell.state-locked .tm-node-name { color:#772222; }
+/* stat nodes show no label */
+.tm-node.type-dps .tm-node-name,.tm-node.type-strike .tm-node-name,
+.tm-node.type-souls .tm-node-name,.tm-node.type-hp .tm-node-name,
+.tm-node.type-mana .tm-node-name,.tm-node.type-speed .tm-node-name { display:none; }
+.tm-node.type-dps .tm-node-icon,.tm-node.type-strike .tm-node-icon,
+.tm-node.type-souls .tm-node-icon,.tm-node.type-hp .tm-node-icon,
+.tm-node.type-mana .tm-node-icon,.tm-node.type-speed .tm-node-icon { display:none; }
+/* SVG edges */
+.tm-edge { stroke:#1e1440; stroke-width:1.5; fill:none; }
+.tm-edge.active { stroke:#aa44ff; stroke-width:2.5; filter:drop-shadow(0 0 5px rgba(170,60,255,0.75)); }
+/* global floating tooltip (position:fixed, avoids overflow clip) */
+#tatt-tooltip { display:none; position:fixed; width:220px; background:#06041a; border:1px solid #3344aa; border-radius:8px; padding:12px 14px; z-index:1100; pointer-events:none; box-shadow:0 6px 28px rgba(0,0,40,0.9); }
+#tatt-tooltip.show { display:block; }
+#tatt-tt-name { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; margin-bottom:5px; }
+#tatt-tt-cost { font-size:11px; color:#d4a843; margin-bottom:5px; }
+#tatt-tt-desc { font-size:12px; color:#c8c0e8; line-height:1.5; }
+#tatt-tt-req  { font-size:10px; color:#554466; margin-top:5px; font-style:italic; }
+#tatt-tt-status { font-size:11px; color:#55dd88; margin-top:5px; font-style:italic; }
+/* respec confirm popup */
+#respec-confirm { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#0a0410; border:2px solid #cc1111; border-radius:10px; padding:26px 30px; z-index:1200; text-align:center; width:340px; box-shadow:0 8px 44px rgba(200,10,10,0.35),0 0 80px rgba(0,0,0,0.9); }
+#respec-confirm.open { display:block; }
+#respec-confirm-title { font-size:15px; color:#ff3333; font-family:Georgia,serif; letter-spacing:3px; margin-bottom:12px; text-transform:uppercase; text-shadow:0 0 12px rgba(255,50,50,0.7); }
+#respec-confirm-msg { font-size:13px; color:#ddcccc; line-height:1.8; margin-bottom:22px; }
+#respec-confirm-refund { font-size:16px; color:#ff5555; font-weight:bold; display:block; margin-top:6px; text-shadow:0 0 10px rgba(255,60,60,0.6); }
+#respec-confirm-yes { background:#330606; border:2px solid #dd2222; color:#ff5555; font-family:Georgia,serif; font-size:12px; letter-spacing:1px; padding:9px 22px; border-radius:5px; cursor:pointer; margin-right:10px; transition:all 0.2s; text-shadow:0 0 6px rgba(255,60,60,0.5); }
+#respec-confirm-yes:hover { background:#440808; border-color:#ff3333; color:#ff7777; box-shadow:0 0 12px rgba(255,40,40,0.4); }
+#respec-confirm-no { background:#09071a; border:1px solid #2a1a5a; color:#776699; font-family:Georgia,serif; font-size:12px; letter-spacing:1px; padding:9px 22px; border-radius:5px; cursor:pointer; transition:all 0.2s; }
+#respec-confirm-no:hover { border-color:#7755aa; color:#9980dd; }
 .ubuy { font-size:14px; font-weight:bold; color:#887755; margin-right:5px; }
 /* Entity display in left panel */
 #left-entity { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
@@ -327,6 +441,39 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ach-card .acd { font-size:10px; color:#554477; font-style:italic; margin-top:2px; line-height:1.3; }
 .ach-card.earned .acd { color:#6a5020; }
 
+/* ── LEFT PANEL TABS ─────────────────────────────────────────────────────── */
+#left-header { width:100%; text-align:center; padding-bottom:6px; }
+.left-tab-bar { display:flex; width:100%; border-bottom:1px solid #1e1845; margin-bottom:10px; }
+.left-tab-btn { flex:1; background:transparent; border:none; border-bottom:2px solid transparent;
+  color:#554477; font-family:Georgia,serif; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  padding:7px 6px; cursor:pointer; transition:color 0.15s,border-color 0.15s; margin-bottom:-1px; }
+.left-tab-btn:hover:not(.locked) { color:#9980dd; }
+.left-tab-btn.active { color:#d4a843; border-bottom-color:#d4a843; }
+.left-tab-btn.locked { color:#2a2040; cursor:default; }
+#left-tab-content { width:100%; }
+.left-tab-pane { display:none; width:100%; }
+.left-tab-pane.active { display:block; }
+
+/* ── SOUL SHOP ───────────────────────────────────────────────────────────── */
+#soul-shop-list { width:100%; padding:2px 0 8px; }
+.ss-locked { text-align:center; color:#443366; font-style:italic; font-size:13px;
+  padding:28px 14px; line-height:1.6; }
+.ss-section-title { font-size:10px; letter-spacing:3px; color:#7766aa; text-transform:uppercase;
+  border-bottom:1px solid #1a1535; padding-bottom:3px; margin:12px 0 7px; }
+.ss-item { width:100%; box-sizing:border-box; padding:10px 12px; margin-bottom:6px;
+  border-radius:5px; border:1px solid #2a1e50; background:#0a0818; cursor:pointer;
+  transition:border-color 0.2s, background 0.2s; }
+.ss-item:hover:not(.ss-maxed):not(.ss-cant-afford) { border-color:#9970cc; background:#0f0c22; }
+.ss-item.ss-maxed { border-color:#3a2a10; background:#0c0a00; cursor:default; }
+.ss-item.ss-cant-afford { opacity:0.5; cursor:default; }
+.ss-item-name { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; line-height:1.3; }
+.ss-item-desc { font-size:12px; color:#bbaade; margin-top:4px; line-height:1.45; }
+.ss-item-cost { font-size:11px; color:#d4a843; margin-top:6px; letter-spacing:1px; }
+.ss-item-owned { font-size:10px; color:#7a6010; margin-top:3px; letter-spacing:1px; }
+.ss-item.ss-maxed .ss-item-name { color:#7a6010; }
+.ss-item.ss-maxed .ss-item-desc { color:#4a3820; }
+.ss-item.ss-maxed .ss-item-cost { color:#4a3010; }
+
 </style>
 </head>
 <body>
@@ -349,17 +496,28 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
   <div id="main">
     <div id="left">
-      <div id="left-entity">
+      <div id="left-header">
         <div id="entity-stage-label" class="cname entity-label">You are Ether.</div>
         <div id="stage-desc">Shapeless. Hungry.</div>
-        <div class="canvas-wrap" style="margin-top:6px;">
-          <canvas id="entity-canvas" width="330" height="330"></canvas>
+      </div>
+      <div class="left-tab-bar">
+        <button class="left-tab-btn active" data-ltab="entity">Entity</button>
+        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop">Tattered Upgrades</button>
+      </div>
+      <div id="left-tab-content">
+        <div id="ltab-entity" class="left-tab-pane active">
+          <div id="left-entity">
+            <div class="canvas-wrap" style="margin-top:6px;">
+              <canvas id="entity-canvas" width="330" height="330"></canvas>
+            </div>
+            <div class="hp-wrap" style="visibility:hidden">
+              <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
+              <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
+            </div>
+            <button id="ascend-btn">✦ ASCEND ✦</button>
+          </div>
         </div>
-        <div class="hp-wrap" style="visibility:hidden">
-          <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
-          <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
-        </div>
-        <button id="ascend-btn">✦ ASCEND ✦</button>
+        <div id="ltab-soul-shop" class="left-tab-pane"></div>
       </div>
     </div>
     <div id="battlefield">
@@ -414,6 +572,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <button class="buy-btn" data-qty="100">100</button>
       <button class="buy-btn" data-qty="max">MAX</button>
       <button class="buy-btn" data-qty="all">ALL</button>
+      <div id="spell-panel">
+        <div class="spell-divider"></div>
+        <div id="mana-label">mana</div>
+        <div id="mana-bar-outer"><div id="mana-bar-fill"></div></div>
+        <div id="mana-num">0<br>—<br>100</div>
+        <div class="spell-divider"></div>
+      </div>
     </div>
     <div id="right">
       <div id="damage-summary">
@@ -455,6 +620,35 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
 
 </div>
+<div id="tattered-modal">
+  <div id="tm-header">
+    <button id="tm-close-btn">&#215;</button>
+    <button id="tm-respec-btn">&#8635; Respec</button>
+    <div id="tm-ts-wrap">
+      <span id="tm-ts-label">Tattered Souls</span>
+      <span id="tm-ts-val">0</span>
+    </div>
+  </div>
+  <div id="tm-canvas-wrap">
+    <div id="tm-grid">
+      <svg id="tm-svg" viewBox="-500 -500 1000 1000"></svg>
+      <div class="tm-center-glyph">&#10022;</div>
+    </div>
+  </div>
+</div>
+<div id="tatt-tooltip">
+  <div id="tatt-tt-name"></div>
+  <div id="tatt-tt-cost"></div>
+  <div id="tatt-tt-desc"></div>
+  <div id="tatt-tt-req"></div>
+  <div id="tatt-tt-status"></div>
+</div>
+<div id="respec-confirm">
+  <div id="respec-confirm-title">Respec?</div>
+  <div id="respec-confirm-msg">Respec returns 90% of your spent Tattered Souls.<span id="respec-confirm-refund"></span></div>
+  <button id="respec-confirm-yes">Respec</button>
+  <button id="respec-confirm-no">Cancel</button>
+</div>
 <div id="mo">
   <div id="modal">
     <div id="mt"></div>
@@ -485,7 +679,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div class="form-card" data-form="masculine">
         <img src="artwork/masculine.png" alt="Masculine">
         <div class="fc-name">Masculine</div>
-        <div class="fc-bonus">+10% DPS &amp; Click Damage</div>
+        <div class="fc-bonus">+10% DPS &amp; Strike Damage</div>
       </div>
       <div class="form-card" data-form="feminine">
         <img src="artwork/feminine.png" alt="Feminine">
@@ -1242,6 +1436,16 @@ function fmtCoin(n){
   return ''+n;
 }
 function spawnSoulCoins(){
+  var _tm=document.getElementById('tattered-modal');
+  if(_tm&&_tm.classList.contains('open')) return;
+  // Mana gain: each of the 3 bubbles contributes 0.00001 × completed floors this ascension
+  var _floorsComp=completedFloorsThisAscension.length;
+  if(_floorsComp>0){
+    var _mg=3*0.00001*_floorsComp;
+    if(isSpellActive('manaHungry')) _mg*=1.333;
+    mana=Math.min(manaMax,mana+_mg);
+    updateManaBar();
+  }
   var d=def(); if(!d) return;
   var ec=d.color; var r=ec[0],g=ec[1],b=ec[2]; var cs=r+','+g+','+b;
   var lr=Math.min(r+90,255), lg=Math.min(g+90,255), lb=Math.min(b+90,255);
@@ -1421,7 +1625,7 @@ function buildMinimap(){
 function updateAutoProgressBtn(){
   var btn=document.getElementById('mm-auto');
   if(!btn) return;
-  if(rebirthCount<1){ btn.style.display='none'; return; }
+  if(!soulShopOwned['auto-progress']){ btn.style.display='none'; return; }
   btn.style.display='';
   btn.classList.toggle('ap-on', autoProgressEnabled);
   btn.classList.toggle('ap-off', !autoProgressEnabled);
@@ -1548,24 +1752,38 @@ function updateEnemyDefeatsPanel(){
 }
 
 // ── COMBAT ────────────────────────────────────────────────────────────────────
-function entityAttack(isAuto){
+// isSpell: true when called by Flurry (skips click counter)
+function entityAttack(isAuto, isSpell){
   if(!combatActive||enemyDead) return;
-  if(!isAuto){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
+  if(!isAuto && !isSpell){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
   attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
   var hi=entityDmgMax.add(entityDmgBonus).add(bonus);
   var dmg=rndD(lo,hi);
+  // Spell: Twin Blades — DPS ×2 for auto attacks
+  if(isAuto && isSpellActive('twinBlades')) dmg=dmg.mul(2);
   var isCrit=false;
-  if(!isAuto && critClickChance>0 && Math.random()<critClickChance){
+  var effectiveCrit=critClickChance+((!isAuto && isSpellActive('critStrike'))?0.666:0);
+  if(!isAuto && effectiveCrit>0 && Math.random()<effectiveCrit){
     isCrit=true;
     dmg=dmg.mul(2+critClickMult);
   }
+  // Spell: Twin Strikes — strike damage ×2 for non-auto attacks
+  if(!isAuto && isSpellActive('twinStrikes')) dmg=dmg.mul(2);
+  // Spell: Invoke Power — multiply all damage by (1 + stacks × 0.0666)
+  if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
   enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
   spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
+  // Spell: Rule of 3 — immediately gain enemy death soul value ×3 per strike
+  if(isSpellActive('ruleOf3')){
+    var r3=enemySoulReward.mul(3);
+    souls=souls.add(r3); totalSouls=totalSouls.add(r3);
+    document.getElementById('soul-count').textContent=fmt(souls);
+  }
   if(enemyHp.lte(0)) onEnemyDeath();
 }
 
@@ -1578,6 +1796,8 @@ function onEnemyDeath(){
   var soulMult=1;
   if(rebirthForm==='androgynous') soulMult*=1.1;
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
+  // Spell: Twin Souls — ×2 souls gained
+  if(isSpellActive('twinSouls')) soulMult*=2;
   var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
@@ -1640,6 +1860,9 @@ function onEnemyDeath(){
     if(floorWins<WINS_PER_FLOOR){
       floorWins++;
       if(floorWins===WINS_PER_FLOOR){
+        // Track unique floor completions for mana generation
+        var _fk=curRealm+'-'+curLevel+'-'+curFloor;
+        if(completedFloorsThisAscension.indexOf(_fk)<0) completedFloorsThisAscension.push(_fk);
         var nextFloor=curFloor+1;
         if(nextFloor<=FLOORS_PER_LEVEL){
           if(curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; minimapNewFloor=true; }
@@ -1693,18 +1916,26 @@ var entityDmgBonus=D(0);
 var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0;
 var critClickChance=0, critClickMult=0, dvDpsToClickRatio=0, soulAbsorbBonus=0;
 
+// ── MANA & SPELLS ─────────────────────────────────────────────────────────────
+var mana=0, manaMax=100;
+var completedFloorsThisAscension=[];
+var spellEndTimes={};
+var flurryInterval=null;
+var invokePowerStacks=0;
+var _lastSpellUiTick=0;
+
 // Divine Hunger milestone effect labels (replaces generic ×7/×666 text)
 var DV_MS_EFFECTS=[
-  '+0.666% of Total DPS as Click Damage',
-  '+0.666% of Total DPS as Click Damage',
-  '+6.66% Critical Click Chance',
-  '+0.666% of Total DPS as Click Damage',
-  '+0.666% of Total DPS as Click Damage',
-  '+3.33× Critical Click Damage Multiplier',
-  '+0.666% of Total DPS as Click Damage',
-  '+0.666% of Total DPS as Click Damage',
+  '+0.666% of Total DPS as Strike Damage',
+  '+0.666% of Total DPS as Strike Damage',
+  '+6.66% Critical Strike Chance',
+  '+0.666% of Total DPS as Strike Damage',
+  '+0.666% of Total DPS as Strike Damage',
+  '+3.33× Critical Strike Damage Multiplier',
+  '+0.666% of Total DPS as Strike Damage',
+  '+0.666% of Total DPS as Strike Damage',
   '+22.2% Souls Absorbed',
-  '+0.666% of Total DPS as Click Damage',
+  '+0.666% of Total DPS as Strike Damage',
 ];
 
 var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
@@ -1795,7 +2026,7 @@ function showMsTip(evt,u,i){
     tip.querySelector('.mst-eff').textContent=DV_MS_EFFECTS[i];
   } else {
     var multLabel=MS_MULT_LABELS[i];
-    var typeLabel=u.type==='click'?'Click Damage':u.type==='drain'?'HP Drain':'DPS';
+    var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
     tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
   }
   var costEl=tip.querySelector('.mst-cost');
@@ -2163,6 +2394,455 @@ function renderAchievementsTab(){
   });
 }
 
+// ── SOUL SHOP ─────────────────────────────────────────────────────────────────
+// ── SPELLS ────────────────────────────────────────────────────────────────────
+var SPELLS = [
+  { id:'flurry',      tsId:'spell-flurry',      icon:'⚡', manaCost:20,  duration:33300,
+    name:'Flurry of Strikes',
+    desc:'Unleashes 7 strikes per second for 33.3s, each dealing strike damage.' },
+  { id:'critStrike',  tsId:'spell-critStrike',   icon:'✦', manaCost:33,  duration:33300,
+    name:'Critical Strike',
+    desc:'Critical strike chance is improved by 66.6% for 33.3s.' },
+  { id:'twinBlades',  tsId:'spell-twinBlades',   icon:'⚔', manaCost:33,  duration:33300,
+    name:'Twin Blades',
+    desc:'DPS output is doubled for 33.3s.' },
+  { id:'twinSouls',   tsId:'spell-twinSouls',    icon:'∞', manaCost:33,  duration:33300,
+    name:'Twin Souls',
+    desc:'Doubles all souls gained from enemy deaths for 33.3s.' },
+  { id:'ruleOf3',     tsId:'spell-ruleOf3',      icon:'Ⅲ', manaCost:66,  duration:33300,
+    name:'Rule of 3',
+    desc:'Every strike immediately grants the current enemy\'s death soul reward ×3 for 33.3s.' },
+  { id:'twinStrikes', tsId:'spell-twinStrikes',  icon:'⊕', manaCost:99,  duration:33300,
+    name:'Twin Strikes',
+    desc:'Each strike deals ×2 damage for 33.3s.' },
+  { id:'powerOf3',    tsId:'spell-powerOf3',     icon:'❖', manaCost:199, duration:33300,
+    name:'Power of 3',
+    desc:'The next spell activated gives 3× its effect, then this buff is consumed.' },
+  { id:'manaHungry',  tsId:'spell-manaHungry',   icon:'◉', manaCost:333, duration:33300,
+    name:'Mana Hungry',
+    desc:'Mana regeneration is increased by 33.3% for 33.3s.' },
+  { id:'invokePower', tsId:'spell-invokePower',  icon:'★', manaCost:666, duration:0,
+    name:'Invoke Power',
+    desc:'Multiplies DPS and Strike damage by (1 + 0.0666 × stacks). Stackable up to 10×. Endures this Ascension.' },
+];
+
+function isSpellActive(id){
+  if(id==='invokePower') return false; // stacks-based, no duration
+  return (spellEndTimes[id]||0) > Date.now();
+}
+
+function castSpell(id){
+  var spell=SPELLS.filter(function(s){return s.id===id;})[0];
+  if(!spell) return;
+  if(id==='invokePower'){
+    if(invokePowerStacks>=10||mana<spell.manaCost) return;
+  } else {
+    if(mana<spell.manaCost) return;
+    if(id!=='powerOf3'&&isSpellActive(id)) return; // no re-cast while active
+  }
+  // Check Power of 3 modifier (3× effect)
+  var p3=isSpellActive('powerOf3')&&id!=='powerOf3';
+  var durMult=p3?3:1;
+
+  mana-=spell.manaCost;
+
+  if(id==='flurry'){
+    if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
+    var fDur=spell.duration*durMult;
+    var fEnd=Date.now()+fDur;
+    spellEndTimes['flurry']=fEnd;
+    flurryInterval=setInterval(function(){
+      if(Date.now()>=fEnd){clearInterval(flurryInterval);flurryInterval=null;spellEndTimes['flurry']=0;renderSpellPanel();return;}
+      entityAttack(false,true);
+    }, Math.floor(1000/7));
+  } else if(id==='invokePower'){
+    var add=p3?3:1;
+    invokePowerStacks=Math.min(10,invokePowerStacks+add);
+  } else {
+    spellEndTimes[id]=Date.now()+spell.duration*durMult;
+    if(id==='powerOf3') {/* just set timer, don't consume itself */}
+  }
+
+  if(p3) spellEndTimes['powerOf3']=0; // consume Power of 3 after modifying another spell
+
+  updateManaBar();
+  renderSpellPanel();
+  saveGame();
+}
+
+function updateManaBar(){
+  var pct=Math.min(1,mana/manaMax)*100;
+  var fill=document.getElementById('mana-bar-fill');
+  if(fill){
+    fill.style.height=pct+'%';
+    if(pct>=100) fill.classList.add('mana-full');
+    else fill.classList.remove('mana-full');
+  }
+  var num=document.getElementById('mana-num');
+  if(num) num.innerHTML=Math.floor(mana)+'<br>—<br>'+manaMax;
+}
+
+function renderSpellPanel(){
+  var panel=document.getElementById('spell-panel');
+  if(!panel) return;
+  var anyOwned=SPELLS.some(function(s){return soulShopOwned[s.tsId]>=1;});
+  if(!anyOwned){panel.classList.remove('visible');return;}
+  panel.classList.add('visible');
+  // Remove old spell buttons (keep the static header nodes)
+  panel.querySelectorAll('.spell-btn').forEach(function(b){b.remove();});
+  SPELLS.forEach(function(spell){
+    if(!soulShopOwned[spell.tsId]) return;
+    var isActive=isSpellActive(spell.id);
+    var isInvoke=spell.id==='invokePower';
+    var canCast=mana>=spell.manaCost&&(isInvoke?invokePowerStacks<10:!isActive);
+    var btn=document.createElement('button');
+    var cls='spell-btn';
+    if(isActive||( isInvoke&&invokePowerStacks>0)) cls+=' spell-active-glow';
+    else if(canCast) cls+=' spell-lit';
+    else cls+=' spell-dim';
+    btn.className=cls;
+    btn.textContent=spell.icon;
+    btn.setAttribute('data-spell',spell.id);
+    // Tooltip
+    var remaining='';
+    if(isActive&&!isInvoke){
+      var secs=Math.max(0,((spellEndTimes[spell.id]||0)-Date.now())/1000);
+      remaining='<div class="spell-tt-status">Active — '+secs.toFixed(1)+'s remaining</div>';
+    }
+    var stacksLine=isInvoke&&invokePowerStacks>0?'<div class="spell-tt-stacks">Stacks: '+invokePowerStacks+' / 10</div>':'';
+    btn.innerHTML+=
+      '<div class="spell-tt">'+
+        '<div class="spell-tt-name">'+spell.name+'</div>'+
+        '<div class="spell-tt-cost">'+spell.manaCost+' Mana</div>'+
+        '<div class="spell-tt-desc">'+spell.desc+'</div>'+
+        remaining+stacksLine+
+      '</div>';
+    if(canCast){
+      btn.addEventListener('click',function(){castSpell(spell.id);});
+    }
+    panel.appendChild(btn);
+  });
+}
+
+// ── TATTERED UPGRADES ─────────────────────────────────────────────────────────
+var tatteredUpgradesSpent = 0;
+var _tattPanX = 0, _tattPanY = 0, _tattScale = 1;
+var _tattDragging = false, _tattDragSX = 0, _tattDragSY = 0, _tattDragPX = 0, _tattDragPY = 0;
+
+// Center node + 9 spell nodes arranged in a circle (radius 150 — 50% of original 300).
+// Upgrade nodes will be appended here as { id, type:'upg', name, icon, cost, desc, x, y, requires:['nodeId',...], requiresAny:['nodeId',...] }
+var TATTERED_NODES = [
+  { id:'auto-progress', type:'center', name:'Auto Progress', icon:'⟳', cost:0,
+    desc:'Unlocks the Auto Progress button. Floors advance automatically when cleared.',
+    x:0, y:0, requires:[] },
+  { id:'spell-flurry',      type:'spell', name:'Flurry of Strikes', icon:'⚡', cost:10,
+    desc:'Unlocks the spell Flurry of Strikes. Cast for 20 Mana: 7 strikes per second for 33.3s, each dealing strike damage.',
+    x:0,    y:-300, requires:[] },
+  { id:'spell-critStrike',  type:'spell', name:'Critical Strike',   icon:'✦', cost:50,
+    desc:'Unlocks the spell Critical Strike. Cast for 33 Mana: critical strike chance +66.6% for 33.3s.',
+    x:285,  y:-93,  requires:[] },
+  { id:'spell-twinBlades',  type:'spell', name:'Twin Blades',       icon:'⚔', cost:100,
+    desc:'Unlocks the spell Twin Blades. Cast for 33 Mana: DPS output ×2 for 33.3s.',
+    x:176,  y:243,  requires:[] },
+  { id:'spell-twinSouls',   type:'spell', name:'Twin Souls',        icon:'∞', cost:250,
+    desc:'Unlocks the spell Twin Souls. Cast for 33 Mana: all souls gained ×2 for 33.3s.',
+    x:-176, y:243,  requires:[] },
+  { id:'spell-ruleOf3',     type:'spell', name:'Rule of 3',         icon:'Ⅲ', cost:1000,
+    desc:'Unlocks the spell Rule of 3. Cast for 66 Mana: each strike instantly grants current enemy\'s death soul reward ×3 for 33.3s.',
+    x:-285, y:-93,  requires:[] },
+  { id:'spell-twinStrikes', type:'spell', name:'Twin Strikes',      icon:'⊕', cost:2500,
+    desc:'Unlocks the spell Twin Strikes. Cast for 99 Mana: each strike deals ×2 damage for 33.3s.',
+    x:-265, y:-364, requires:[] },
+  { id:'spell-powerOf3',    type:'spell', name:'Power of 3',        icon:'❖', cost:5000,
+    desc:'Unlocks the spell Power of 3. Cast for 199 Mana: the next spell activated gives 3× its effect, then this buff is consumed.',
+    x:265,  y:-364, requires:[] },
+  { id:'spell-manaHungry',  type:'spell', name:'Mana Hungry',       icon:'◉', cost:10000,
+    desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3s.',
+    x:285,  y:243,  requires:[] },
+  { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:20000,
+    desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Persists this Ascension.',
+    x:-285, y:243,  requires:[] },
+  // Stat nodes clustered around Flurry of Strikes (0, -300) — pentacle, point toward center
+  { id:'flurry-dps-1',    type:'dps',    name:'DPS +9%',        icon:'', cost:5,
+    desc:'Increases DPS of all upgrades by +9%.',
+    x:0,    y:-225, requires:[] },
+  { id:'flurry-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:10,
+    desc:'Increases all souls gained by 33.3%.',
+    x:-44,  y:-361, requires:[] },
+  { id:'flurry-dps-2',    type:'dps',    name:'DPS +9%',        icon:'', cost:10,
+    desc:'Increases DPS of all upgrades by +9%.',
+    x:44,   y:-361, requires:[] },
+  { id:'flurry-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:5,
+    desc:'Increases your Strike Damage by +0.666% of your total DPS.',
+    x:71,   y:-277, requires:[] },
+  { id:'flurry-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:25,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:-71,  y:-277, requires:[] },
+  // Stat nodes clustered around Critical Strike (285, -93) — pentacle, point toward center
+  { id:'crit-dps-1',    type:'dps',    name:'DPS +11%',       icon:'', cost:25,
+    desc:'Increases DPS of all upgrades by +11%.',
+    x:214,  y:-70,  requires:[] },
+  { id:'crit-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:33,
+    desc:'Increases your Strike Damage by +0.666% of your total DPS.',
+    x:241,  y:-154, requires:[] },
+  { id:'crit-dps-2',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:50,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:329,  y:-154, requires:[] },
+  { id:'crit-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:77,
+    desc:'Increases all souls gained by 33.3%.',
+    x:356,  y:-70,  requires:[] },
+  { id:'crit-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:100,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:285,  y:-18,  requires:[] },
+  // Stat nodes clustered around Twin Blades (176, 243) — pentacle, point toward center
+  { id:'blade-dps',      type:'dps',    name:'DPS +33.3%',     icon:'', cost:100,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:132,  y:182,  requires:[] },
+  { id:'blade-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:133,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:220,  y:182,  requires:[] },
+  { id:'blade-strike-1', type:'strike', name:'Strike Bonus',   icon:'', cost:177,
+    desc:'Increases your Strike Damage by +0.666% of your total DPS.',
+    x:247,  y:266,  requires:[] },
+  { id:'blade-hp',       type:'hp',     name:'HP Drain +1.11%',icon:'', cost:200,
+    desc:'Increases max HP drain of Divine Hunger by +1.11%.',
+    x:176,  y:318,  requires:[] },
+  { id:'blade-strike-2', type:'strike', name:'Crit Chance',    icon:'', cost:250,
+    desc:'Increases your Critical Strike chance by +3.33%.',
+    x:105,  y:266,  requires:[] },
+  // Stat nodes clustered around Twin Souls (-176, 243) — pentacle, point toward center
+  { id:'souls-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:277,
+    desc:'Increases all souls gained by 33.3%.',
+    x:-132, y:182,  requires:[] },
+  { id:'souls-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:369,
+    desc:'Increases your Strike Damage by +0.666% of your total DPS.',
+    x:-105, y:266,  requires:[] },
+  { id:'souls-speed',    type:'speed',  name:'Auto Speed',     icon:'', cost:555,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:-176, y:318,  requires:[] },
+  { id:'souls-dps-2',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:777,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:-247, y:266,  requires:[] },
+  { id:'souls-dps-1',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:999,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:-220, y:182,  requires:[] },
+  // Stat nodes clustered around Rule of 3 (-285, -93) — pentacle, point toward center
+  { id:'rule-hp',        type:'hp',     name:'HP Drain +1.11%',icon:'', cost:999,
+    desc:'Increases max HP drain of Divine Hunger by +1.11%.',
+    x:-214, y:-70,  requires:[] },
+  { id:'rule-dps-1',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:1111,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:-285, y:-18,  requires:[] },
+  { id:'rule-speed',     type:'speed',  name:'Auto Speed',     icon:'', cost:1555,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:-356, y:-70,  requires:[] },
+  { id:'rule-souls',     type:'souls',  name:'Soul Gain',      icon:'', cost:1999,
+    desc:'Increases all souls gained by 33.3%.',
+    x:-329, y:-154, requires:[] },
+  { id:'rule-dps-2',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:2333,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:-241, y:-154, requires:[] },
+  // Stat nodes clustered around Twin Strikes (-265, -364) — pentacle, point straight up
+  { id:'strikes-speed',  type:'speed',  name:'Auto Speed',     icon:'', cost:2555,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:-265, y:-439, requires:[] },
+  { id:'strikes-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:2999,
+    desc:'Increases your Critical Strike chance by +3.33%.',
+    x:-194, y:-387, requires:[] },
+  { id:'strikes-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:3333,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:-221, y:-303, requires:[] },
+  { id:'strikes-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:3999,
+    desc:'Increases all souls gained by 33.3%.',
+    x:-309, y:-303, requires:[] },
+  { id:'strikes-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:4666,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:-336, y:-387, requires:[] },
+];
+// Spokes: center → each spell node. Ring: adjacent spell nodes connected.
+var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
+var TATTERED_EDGES = [];
+
+var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
+
+function isTattNodeUnlocked(node){
+  if(!node.requires || node.requires.length===0){
+    if(!node.requiresAny || node.requiresAny.length===0) return true;
+  }
+  var reqOk=!node.requires||node.requires.length===0||node.requires.every(function(rid){return soulShopOwned[rid]>=1;});
+  var anyOk=!node.requiresAny||node.requiresAny.length===0||node.requiresAny.some(function(rid){return soulShopOwned[rid]>=1;});
+  return reqOk&&anyOk;
+}
+
+function buyTatteredNode(id){
+  var node=TATTERED_NODES.filter(function(n){return n.id===id;})[0];
+  if(!node) return;
+  if(soulShopOwned[id]>=1) return;
+  if(!isTattNodeUnlocked(node)) return;
+  if(tatteredSouls<node.cost) return;
+  tatteredSouls-=node.cost;
+  tatteredUpgradesSpent+=node.cost;
+  soulShopOwned[id]=1;
+  updateTatteredDisplay();
+  updateTatteredModalTs();
+  updateAutoProgressBtn();
+  renderTatteredGrid();
+  renderSpellPanel();
+  saveGame();
+}
+
+function doRespec(){
+  if(tatteredUpgradesSpent<=0) return;
+  var refund=Math.floor(tatteredUpgradesSpent*0.9);
+  tatteredSouls+=refund;
+  tatteredUpgradesSpent=0;
+  TATTERED_NODES.forEach(function(n){ soulShopOwned[n.id]=0; });
+  // Clear spell active states since spells are no longer owned
+  if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
+  for(var _k in spellEndTimes) spellEndTimes[_k]=0;
+  invokePowerStacks=0;
+  autoProgressEnabled=false;
+  updateTatteredDisplay();
+  updateTatteredModalTs();
+  updateAutoProgressBtn();
+  renderTatteredGrid();
+  renderSpellPanel();
+  saveGame();
+}
+
+function updateTatteredModalTs(){
+  var el=document.getElementById('tm-ts-val');
+  if(el) el.textContent=tatteredSouls.toLocaleString();
+  var btn=document.getElementById('tm-respec-btn');
+  if(btn) btn.disabled=(tatteredUpgradesSpent<=0);
+}
+
+function renderTatteredGrid(){
+  var grid=document.getElementById('tm-grid');
+  var svg=document.getElementById('tm-svg');
+  if(!grid||!svg) return;
+  // Remove old nodes (keep svg and center glyph)
+  Array.from(grid.children).forEach(function(c){
+    if(c.id!=='tm-svg'&&!c.classList.contains('tm-center-glyph')) c.remove();
+  });
+  svg.innerHTML='';
+  // Draw edges first (SVG)
+  TATTERED_EDGES.forEach(function(edge){
+    var fn=TATTERED_NODES.filter(function(n){return n.id===edge.from;})[0];
+    var tn=TATTERED_NODES.filter(function(n){return n.id===edge.to;})[0];
+    if(!fn||!tn) return;
+    var line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',fn.x); line.setAttribute('y1',fn.y);
+    line.setAttribute('x2',tn.x); line.setAttribute('y2',tn.y);
+    var purchased=soulShopOwned[fn.id]>=1&&soulShopOwned[tn.id]>=1;
+    line.setAttribute('class','tm-edge'+(purchased?' active':''));
+    svg.appendChild(line);
+  });
+  // Draw nodes
+  TATTERED_NODES.forEach(function(node){
+    var isPurchased=soulShopOwned[node.id]>=1;
+    var isUnlocked=isPurchased||isTattNodeUnlocked(node);
+    var canAfford=tatteredSouls>=node.cost;
+    var state=isPurchased?'purchased':(isUnlocked&&canAfford?'affordable':'locked');
+    var el=document.createElement('div');
+    el.className='tm-node type-'+node.type+' state-'+state;
+    el.style.left=node.x+'px';
+    el.style.top=node.y+'px';
+    var ring=document.createElement('div');
+    ring.className='tm-node-ring';
+    var icon=document.createElement('div');
+    icon.className='tm-node-icon'; icon.textContent=node.icon;
+    var nm=document.createElement('div');
+    nm.className='tm-node-name'; nm.textContent=node.name;
+    ring.appendChild(icon); ring.appendChild(nm);
+    el.appendChild(ring);
+    if(!isPurchased&&isUnlocked&&canAfford){
+      ring.addEventListener('click',function(e){e.stopPropagation();buyTatteredNode(node.id);});
+    }
+    // Tooltip events
+    ring.addEventListener('mouseenter',function(e){showTattTooltip(node,state,e.clientX,e.clientY);});
+    ring.addEventListener('mousemove',function(e){posTattTooltip(e.clientX,e.clientY);});
+    ring.addEventListener('mouseleave',hideTattTooltip);
+    grid.appendChild(el);
+  });
+}
+
+function showTattTooltip(node,state,cx,cy){
+  var tt=document.getElementById('tatt-tooltip');
+  if(!tt) return;
+  document.getElementById('tatt-tt-name').textContent=node.name;
+  var costEl=document.getElementById('tatt-tt-cost');
+  if(soulShopOwned[node.id]>=1){
+    costEl.textContent='Acquired';
+    costEl.style.color='#7a6010';
+  } else if(node.cost===0){
+    costEl.textContent='Free';
+    costEl.style.color='#66dd88';
+  } else {
+    costEl.textContent=node.cost.toLocaleString()+' Tattered Souls';
+    costEl.style.color='#d4a843';
+  }
+  document.getElementById('tatt-tt-desc').textContent=node.desc||'';
+  var reqEl=document.getElementById('tatt-tt-req');
+  if(state==='locked'&&node.requires&&node.requires.length>0){
+    reqEl.textContent='Requires: '+node.requires.join(', ');
+    reqEl.style.display='block';
+  } else if(state==='locked'&&node.requiresAny&&node.requiresAny.length>0){
+    reqEl.textContent='Requires any of: '+node.requiresAny.join(', ');
+    reqEl.style.display='block';
+  } else {
+    reqEl.style.display='none';
+  }
+  var stEl=document.getElementById('tatt-tt-status');
+  stEl.style.display='none';
+  tt.classList.add('show');
+  posTattTooltip(cx,cy);
+}
+function posTattTooltip(cx,cy){
+  var tt=document.getElementById('tatt-tooltip');
+  if(!tt||!tt.classList.contains('show')) return;
+  var w=220, h=tt.offsetHeight||120;
+  var x=cx-w-14; if(x<8){x=cx+14;}
+  var y=cy-h/2; if(y<8) y=8; if(y+h>window.innerHeight-8) y=window.innerHeight-h-8;
+  tt.style.left=x+'px'; tt.style.top=y+'px';
+}
+function hideTattTooltip(){
+  var tt=document.getElementById('tatt-tooltip');
+  if(tt) tt.classList.remove('show');
+}
+
+function openTatteredModal(){
+  if(rebirthCount<1) return;
+  var modal=document.getElementById('tattered-modal');
+  if(!modal) return;
+  modal.classList.add('open');
+  var wrap=document.getElementById('tm-canvas-wrap');
+  _tattPanX=wrap.clientWidth/2;
+  _tattPanY=wrap.clientHeight/2;
+  _tattScale=1;
+  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
+  updateTatteredModalTs();
+  renderTatteredGrid();
+}
+function closeTatteredModal(){
+  var modal=document.getElementById('tattered-modal');
+  if(modal) modal.classList.remove('open');
+  hideTattTooltip();
+}
+
+function updateTatteredBtn(){
+  var btn=document.getElementById('tattered-upgrades-btn');
+  if(!btn) return;
+  if(rebirthCount<1){
+    btn.classList.add('locked');
+    btn.title='Unlocks after your first Ascension';
+  } else {
+    btn.classList.remove('locked');
+    btn.title='';
+  }
+}
+
+
 // ── REBIRTH ───────────────────────────────────────────────────────────────────
 var FORM_IMAGES={};
 var _formImagesLoaded=false;
@@ -2200,6 +2880,7 @@ function updateTatteredDisplay(){
   if(el) el.textContent=tatteredSouls.toLocaleString();
   var disp=document.getElementById('tattered-display');
   if(disp) disp.style.display=rebirthCount>0?'block':'none';
+  updateTatteredBtn();
 }
 
 var ASCENSION_SPECIAL=[
@@ -2238,6 +2919,11 @@ function doRebirthReset(chosenForm){
   stage=0; traits={sex:null,adds:[],aff:null,outfit:null};
   totalUpgradePurchases=0; totalMilestonePurchases=0;
   currentAscensionKills=0;
+
+  // Reset mana & spell state
+  mana=0; completedFloorsThisAscension=[]; invokePowerStacks=0;
+  for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
+  if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
 
   // Reset upgrades
   REP_UPGRADES.forEach(function(u){
@@ -2295,6 +2981,11 @@ function saveGame(){
     tatteredSouls:tatteredSouls,
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
+    soulShopOwned:soulShopOwned,
+    tatteredUpgradesSpent:tatteredUpgradesSpent,
+    mana:mana, manaMax:manaMax,
+    invokePowerStacks:invokePowerStacks,
+    completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
     savedAt:Date.now()
@@ -2353,6 +3044,11 @@ function loadGame(){
   tatteredSouls=data.tatteredSouls||0;
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
+  if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
+  tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
+  mana=data.mana||0; manaMax=data.manaMax||100;
+  invokePowerStacks=data.invokePowerStacks||0;
+  if(data.completedFloorsThisAscension) completedFloorsThisAscension=data.completedFloorsThisAscension;
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
@@ -2470,7 +3166,7 @@ function getUpgradeContribStr(u){
     return (+(pct.toFixed(4)))+'% HP/s drain';
   }
   var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
-  return fmt(eff)+(u.type==='click'?' click damage':' DPS');
+  return fmt(eff)+(u.type==='click'?' strike damage':' DPS');
 }
 
 
@@ -2893,6 +3589,12 @@ function gameLoop(){
 
   if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;}
   if(now-_lastAutoSave>30000){saveGame();_lastAutoSave=now;}
+  // Spell panel UI refresh (every 500ms — updates countdown timers and lit/dim states)
+  if(now-_lastSpellUiTick>500){
+    var _sp=document.getElementById('spell-panel');
+    if(_sp&&_sp.classList.contains('visible')) renderSpellPanel();
+    _lastSpellUiTick=now;
+  }
   // Spirit Slash soul-prompt: show global arrow when 5+ souls and not yet purchased
   var ssArrow=document.getElementById('ss-global-arrow');
   if(ssArrow){
@@ -2949,6 +3651,8 @@ initUpgradeIcons();
 initMist(28);
 preloadFormImages();
 loadGame();
+// TEST — remove before release
+tatteredSouls=Math.max(tatteredSouls,1000); rebirthCount=Math.max(rebirthCount,1);
 updateHighestFloor();
 recalcStats();
 updateHpBars();
@@ -2957,6 +3661,9 @@ updateTraitsRow();
 buildMinimap();
 checkRebirthButton();
 updateTatteredDisplay();
+updateTatteredBtn();
+updateManaBar();
+renderSpellPanel();
 spawnEnemy();
 checkAchievements(true);
 renderAchievementsTab();
@@ -2971,6 +3678,72 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     document.getElementById('tab-'+tab).classList.add('active');
     if(tab==='honors'){ renderAchievementsTab(); _achievementsTabDirty=false; }
   });
+});
+
+document.querySelectorAll('.left-tab-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var ltab=btn.getAttribute('data-ltab');
+    if(ltab==='soul-shop'){
+      var _tm=document.getElementById('tattered-modal');
+      if(_tm&&_tm.classList.contains('open')) closeTatteredModal();
+      else openTatteredModal();
+      return;
+    }
+    document.querySelectorAll('.left-tab-btn').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.left-tab-pane').forEach(function(p){p.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('ltab-'+ltab).classList.add('active');
+  });
+});
+
+// ── TATTERED MODAL EVENTS ─────────────────────────────────────────────────────
+document.getElementById('tm-close-btn').addEventListener('click', closeTatteredModal);
+
+document.getElementById('tm-respec-btn').addEventListener('click', function(){
+  if(tatteredUpgradesSpent<=0) return;
+  var refund=Math.floor(tatteredUpgradesSpent*0.9);
+  document.getElementById('respec-confirm-refund').textContent='(+'+refund.toLocaleString()+' Tattered Souls)';
+  document.getElementById('respec-confirm').classList.add('open');
+});
+document.getElementById('respec-confirm-yes').addEventListener('click', function(){
+  document.getElementById('respec-confirm').classList.remove('open');
+  doRespec();
+});
+document.getElementById('respec-confirm-no').addEventListener('click', function(){
+  document.getElementById('respec-confirm').classList.remove('open');
+});
+
+// Pan drag
+var _tmWrap=document.getElementById('tm-canvas-wrap');
+_tmWrap.addEventListener('mousedown',function(e){
+  if(e.target.closest('.tm-node-ring')) return;
+  _tattDragging=true; _tattDragSX=e.clientX; _tattDragSY=e.clientY;
+  _tattDragPX=_tattPanX; _tattDragPY=_tattPanY;
+  _tmWrap.classList.add('dragging');
+});
+document.addEventListener('mousemove',function(e){
+  if(!_tattDragging) return;
+  _tattPanX=_tattDragPX+(e.clientX-_tattDragSX);
+  _tattPanY=_tattDragPY+(e.clientY-_tattDragSY);
+  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
+});
+document.addEventListener('mouseup',function(){
+  if(_tattDragging){_tattDragging=false; _tmWrap.classList.remove('dragging');}
+});
+_tmWrap.addEventListener('wheel',function(e){
+  e.preventDefault();
+  var rect=_tmWrap.getBoundingClientRect();
+  var mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  var factor=e.deltaY<0?1.1:0.909;
+  var newScale=Math.min(3,Math.max(0.3,_tattScale*factor));
+  var gx=(mx-_tattPanX)/_tattScale, gy=(my-_tattPanY)/_tattScale;
+  _tattPanX=mx-gx*newScale; _tattPanY=my-gy*newScale;
+  _tattScale=newScale;
+  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
+},{passive:false});
+// Close modal on backdrop click (not on grid itself)
+document.getElementById('tattered-modal').addEventListener('click',function(e){
+  if(e.target===this) closeTatteredModal();
 });
 
 function buyAllAffordable(){
