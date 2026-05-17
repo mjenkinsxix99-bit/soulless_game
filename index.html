@@ -1443,6 +1443,11 @@ function spawnSoulCoins(){
   if(_floorsComp>0){
     var _mg=3*0.00001*_floorsComp;
     if(isSpellActive('manaHungry')) _mg*=1.333;
+    var _tregens={'flurry-speed':0.10,'crit-speed':0.15,'blade-speed':0.20,'souls-speed':0.30,
+      'rule-speed':0.40,'strikes-speed':0.50,'power3-speed':0.65,'mana-speed':0.85,'invoke-speed':1.35};
+    var _tregenSum=0;
+    for(var _rk in _tregens){if(soulShopOwned[_rk]>=1)_tregenSum+=_tregens[_rk];}
+    if(_tregenSum>0) _mg*=(1+_tregenSum);
     mana=Math.min(manaMax,mana+_mg);
     updateManaBar();
   }
@@ -1798,6 +1803,12 @@ function onEnemyDeath(){
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
   // Spell: Twin Souls — ×2 souls gained
   if(isSpellActive('twinSouls')) soulMult*=2;
+  // Tattered Shop: souls gain bonus nodes
+  var _tsouls={'flurry-souls':0.333,'crit-souls':0.333,'souls-souls':0.333,'rule-souls':0.333,
+    'strikes-souls':0.333,'power3-souls':0.333,'mana-souls':0.666,'invoke-souls':0.999};
+  var _tsoulsSum=0;
+  for(var _sk in _tsouls){if(soulShopOwned[_sk]>=1)_tsoulsSum+=_tsouls[_sk];}
+  if(_tsoulsSum>0) soulMult*=(1+_tsoulsSum);
   var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
@@ -2007,6 +2018,32 @@ function recalcStats(){
     if(dv.milestones[8]) soulAbsorbBonus+=0.222;
     if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
   }
+  // Tattered Shop stat node bonuses
+  var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
+    'blade-dps':0.333,'souls-dps-1':0.333,'souls-dps-2':0.333,'rule-dps-1':0.333,'rule-dps-2':0.333,
+    'strikes-dps-1':0.333,'strikes-dps-2':0.333,'power3-dps-1':0.333,'power3-dps-2':0.333,
+    'mana-dps-1':0.333,'mana-dps-2':0.666,'invoke-dps-1':0.666,'invoke-dps-2':0.333};
+  var _tdpsSum=0;
+  for(var _dk in _tdps){if(soulShopOwned[_dk]>=1)_tdpsSum+=_tdps[_dk];}
+  if(_tdpsSum>0){totalDps=totalDps.mul(1+_tdpsSum);clickDmgBonus=clickDmgBonus.mul(1+_tdpsSum);}
+  // Strike: +0.666% of total DPS added as strike damage per node
+  var _tstrSum=0;
+  ['flurry-strike','crit-strike','blade-strike-1','souls-strike','invoke-strike'].forEach(function(s){if(soulShopOwned[s]>=1)_tstrSum+=0.00666;});
+  if(_tstrSum>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(_tstrSum));
+  // Crit chance nodes (+3.33% each)
+  ['blade-strike-2','strikes-crit','power3-crit'].forEach(function(s){if(soulShopOwned[s]>=1)critClickChance+=0.0333;});
+  // Crit multiplier
+  if(soulShopOwned['mana-crit']>=1) critClickMult+=3.33;
+  // HP drain
+  if(soulShopOwned['blade-hp']>=1) enemyHpDrainPct+=0.0111;
+  if(soulShopOwned['rule-hp']>=1) enemyHpDrainPct+=0.0111;
+  // Mana cap: recompute from purchased mana nodes
+  var _tmana={'flurry-speed':50,'crit-speed':75,'blade-speed':100,'souls-speed':125,'rule-speed':150,
+    'strikes-speed':175,'power3-speed':225,'mana-speed':250,'invoke-speed':250};
+  var _tmanaBonus=0;
+  for(var _mk in _tmana){if(soulShopOwned[_mk]>=1)_tmanaBonus+=_tmana[_mk];}
+  manaMax=100+_tmanaBonus;
+  if(mana>manaMax) mana=manaMax;
   // Tattered Souls: additive +6.66% to final DPS and click damage per unspent soul
   if(tatteredSouls>0){
     var tsBonus=1+tatteredSouls*0.0666;
@@ -2814,6 +2851,7 @@ function buyTatteredNode(id){
   tatteredSouls-=node.cost;
   tatteredUpgradesSpent+=node.cost;
   soulShopOwned[id]=1;
+  recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
   updateAutoProgressBtn();
@@ -2833,6 +2871,7 @@ function doRespec(){
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
   invokePowerStacks=0;
   autoProgressEnabled=false;
+  recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
   updateAutoProgressBtn();
