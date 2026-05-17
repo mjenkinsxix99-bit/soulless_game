@@ -2489,121 +2489,218 @@ function renderSpellPanel(){
   });
 }
 
-var SOUL_SHOP_ITEMS = [
-  { id:'spell-flurry',     name:'Flurry of Strikes',
-    desc:'Unlocks the spell Flurry of Strikes. Cast for 20 Mana: unleash 7 strikes per second for 33.3 seconds, each dealing strike damage.',
-    cost:10,    maxOwned:1, effect:function(){renderSpellPanel();} },
-  { id:'spell-critStrike', name:'Critical Strike',
-    desc:'Unlocks the spell Critical Strike. Cast for 33 Mana: critical strike chance +66.6% for 33.3 seconds.',
-    cost:50,    maxOwned:1, effect:function(){renderSpellPanel();} },
-  { id:'spell-twinBlades', name:'Twin Blades',
-    desc:'Unlocks the spell Twin Blades. Cast for 33 Mana: DPS ×2 for 33.3 seconds.',
-    cost:100,   maxOwned:1, effect:function(){renderSpellPanel();} },
-  { id:'spell-twinSouls',  name:'Twin Souls',
-    desc:'Unlocks the spell Twin Souls. Cast for 33 Mana: all souls gained from deaths ×2 for 33.3 seconds.',
-    cost:250,   maxOwned:1, effect:function(){renderSpellPanel();} },
-  { id:'spell-ruleOf3',    name:'Rule of 3',
-    desc:'Unlocks the spell Rule of 3. Cast for 66 Mana: each strike instantly grants the enemy\'s death soul reward ×3 for 33.3 seconds.',
-    cost:1000,  maxOwned:1, effect:function(){renderSpellPanel();} },
-  { id:'spell-twinStrikes',name:'Twin Strikes',
-    desc:'Unlocks the spell Twin Strikes. Cast for 99 Mana: each strike deals ×2 damage for 33.3 seconds.',
-    cost:2500,  maxOwned:1, effect:function(){renderSpellPanel();} },
-  { id:'spell-powerOf3',   name:'Power of 3',
+// ── TATTERED UPGRADES ─────────────────────────────────────────────────────────
+var tatteredUpgradesSpent = 0;
+var _tattPanX = 0, _tattPanY = 0;
+var _tattDragging = false, _tattDragSX = 0, _tattDragSY = 0, _tattDragPX = 0, _tattDragPY = 0;
+
+// 9 spell nodes arranged in a circle (radius 300), one per spell.
+// Upgrade nodes will be appended here as { id, type:'upg', name, icon, cost, desc, x, y, requires:['nodeId',...], requiresAny:['nodeId',...] }
+var TATTERED_NODES = [
+  { id:'spell-flurry',      type:'spell', name:'Flurry of Strikes', icon:'⚡', cost:10,
+    desc:'Unlocks the spell Flurry of Strikes. Cast for 20 Mana: 7 strikes per second for 33.3s, each dealing click damage.',
+    x:0,    y:-300, requires:[] },
+  { id:'spell-critStrike',  type:'spell', name:'Critical Strike',   icon:'✦', cost:50,
+    desc:'Unlocks the spell Critical Strike. Cast for 33 Mana: critical strike chance +66.6% for 33.3s.',
+    x:193,  y:-230, requires:[] },
+  { id:'spell-twinBlades',  type:'spell', name:'Twin Blades',       icon:'⚔', cost:100,
+    desc:'Unlocks the spell Twin Blades. Cast for 33 Mana: DPS output ×2 for 33.3s.',
+    x:295,  y:-52,  requires:[] },
+  { id:'spell-twinSouls',   type:'spell', name:'Twin Souls',        icon:'∞', cost:250,
+    desc:'Unlocks the spell Twin Souls. Cast for 33 Mana: all souls gained ×2 for 33.3s.',
+    x:260,  y:150,  requires:[] },
+  { id:'spell-ruleOf3',     type:'spell', name:'Rule of 3',         icon:'Ⅲ', cost:1000,
+    desc:'Unlocks the spell Rule of 3. Cast for 66 Mana: each strike instantly grants current enemy\'s death soul reward ×3 for 33.3s.',
+    x:103,  y:282,  requires:[] },
+  { id:'spell-twinStrikes', type:'spell', name:'Twin Strikes',      icon:'⊕', cost:2500,
+    desc:'Unlocks the spell Twin Strikes. Cast for 99 Mana: each strike deals ×2 damage for 33.3s.',
+    x:-103, y:282,  requires:[] },
+  { id:'spell-powerOf3',    type:'spell', name:'Power of 3',        icon:'❖', cost:5000,
     desc:'Unlocks the spell Power of 3. Cast for 199 Mana: the next spell activated gives 3× its effect, then this buff is consumed.',
-    cost:5000,  maxOwned:1, effect:function(){renderSpellPanel();} },
-  { id:'spell-manaHungry', name:'Mana Hungry',
-    desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3 seconds.',
-    cost:10000, maxOwned:1, effect:function(){renderSpellPanel();} },
-  { id:'spell-invokePower',name:'Invoke Power',
-    desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Endures the rest of this Ascension.',
-    cost:20000, maxOwned:1, effect:function(){renderSpellPanel();} },
+    x:-260, y:150,  requires:[] },
+  { id:'spell-manaHungry',  type:'spell', name:'Mana Hungry',       icon:'◉', cost:10000,
+    desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3s.',
+    x:-295, y:-52,  requires:[] },
+  { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:20000,
+    desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Persists this Ascension.',
+    x:-193, y:-230, requires:[] },
 ];
+// Edges between nodes. Format: { from:'nodeId', to:'nodeId' }
+// Upgrade nodes and their edges will be added here by future expansions.
+var TATTERED_EDGES = [];
 
-var soulShopOwned = {}; // persisted per id
+var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
 
-function renderSoulShop() {
-  var el = document.getElementById('soul-shop-list');
-  if (!el) return;
-  el.innerHTML = '';
-
-  if (rebirthCount < 1) {
-    var lock = document.createElement('div');
-    lock.className = 'ss-locked';
-    lock.textContent = 'The Soul Shop awakens after your first Ascension. Grow stronger.';
-    el.appendChild(lock);
-    return;
+function isTattNodeUnlocked(node){
+  if(!node.requires || node.requires.length===0){
+    if(!node.requiresAny || node.requiresAny.length===0) return true;
   }
+  var reqOk=!node.requires||node.requires.length===0||node.requires.every(function(rid){return soulShopOwned[rid]>=1;});
+  var anyOk=!node.requiresAny||node.requiresAny.length===0||node.requiresAny.some(function(rid){return soulShopOwned[rid]>=1;});
+  return reqOk&&anyOk;
+}
 
-  if (SOUL_SHOP_ITEMS.length === 0) {
-    var empty = document.createElement('div');
-    empty.className = 'ss-locked';
-    empty.textContent = 'The shop stirs. More offerings will come.';
-    el.appendChild(empty);
-    return;
-  }
+function buyTatteredNode(id){
+  var node=TATTERED_NODES.filter(function(n){return n.id===id;})[0];
+  if(!node) return;
+  if(soulShopOwned[id]>=1) return;
+  if(!isTattNodeUnlocked(node)) return;
+  if(tatteredSouls<node.cost) return;
+  tatteredSouls-=node.cost;
+  tatteredUpgradesSpent+=node.cost;
+  soulShopOwned[id]=1;
+  updateTatteredDisplay();
+  updateTatteredModalTs();
+  renderTatteredGrid();
+  renderSpellPanel(); // spells become available in buy-selector immediately
+  saveGame();
+}
 
-  SOUL_SHOP_ITEMS.forEach(function(item) {
-    var owned = soulShopOwned[item.id] || 0;
-    var isMaxed = item.maxOwned > 0 && owned >= item.maxOwned;
-    var canAfford = tatteredSouls >= item.cost;
+function doRespec(){
+  if(tatteredUpgradesSpent<=0) return;
+  var refund=Math.floor(tatteredUpgradesSpent*0.9);
+  tatteredSouls+=refund;
+  tatteredUpgradesSpent=0;
+  TATTERED_NODES.forEach(function(n){ soulShopOwned[n.id]=0; });
+  // Clear spell active states since spells are no longer owned
+  if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
+  for(var _k in spellEndTimes) spellEndTimes[_k]=0;
+  invokePowerStacks=0;
+  updateTatteredDisplay();
+  updateTatteredModalTs();
+  renderTatteredGrid();
+  renderSpellPanel();
+  saveGame();
+}
 
-    var card = document.createElement('div');
-    card.className = 'ss-item' + (isMaxed ? ' ss-maxed' : (!canAfford ? ' ss-cant-afford' : ''));
+function updateTatteredModalTs(){
+  var el=document.getElementById('tm-ts-val');
+  if(el) el.textContent=tatteredSouls.toLocaleString();
+  var btn=document.getElementById('tm-respec-btn');
+  if(btn) btn.disabled=(tatteredUpgradesSpent<=0);
+}
 
-    var nm = document.createElement('div');
-    nm.className = 'ss-item-name';
-    nm.textContent = item.name;
-
-    var dc = document.createElement('div');
-    dc.className = 'ss-item-desc';
-    dc.textContent = item.desc;
-
-    var cost = document.createElement('div');
-    cost.className = 'ss-item-cost';
-    if (isMaxed) {
-      cost.textContent = 'Acquired';
-    } else {
-      cost.textContent = item.cost.toLocaleString() + ' Tattered Soul' + (item.cost !== 1 ? 's' : '');
+function renderTatteredGrid(){
+  var grid=document.getElementById('tm-grid');
+  var svg=document.getElementById('tm-svg');
+  if(!grid||!svg) return;
+  // Remove old nodes (keep svg and center glyph)
+  Array.from(grid.children).forEach(function(c){
+    if(c.id!=='tm-svg'&&!c.classList.contains('tm-center-glyph')) c.remove();
+  });
+  svg.innerHTML='';
+  // Draw edges first (SVG)
+  TATTERED_EDGES.forEach(function(edge){
+    var fn=TATTERED_NODES.filter(function(n){return n.id===edge.from;})[0];
+    var tn=TATTERED_NODES.filter(function(n){return n.id===edge.to;})[0];
+    if(!fn||!tn) return;
+    var line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',fn.x); line.setAttribute('y1',fn.y);
+    line.setAttribute('x2',tn.x); line.setAttribute('y2',tn.y);
+    var purchased=soulShopOwned[fn.id]>=1&&soulShopOwned[tn.id]>=1;
+    line.setAttribute('class','tm-edge'+(purchased?' active':''));
+    svg.appendChild(line);
+  });
+  // Draw nodes
+  TATTERED_NODES.forEach(function(node){
+    var isPurchased=soulShopOwned[node.id]>=1;
+    var isUnlocked=isPurchased||isTattNodeUnlocked(node);
+    var canAfford=tatteredSouls>=node.cost;
+    var state=isPurchased?'purchased':(isUnlocked&&canAfford?'affordable':'locked');
+    var el=document.createElement('div');
+    el.className='tm-node type-'+node.type+' state-'+state;
+    el.style.left=node.x+'px';
+    el.style.top=node.y+'px';
+    var ring=document.createElement('div');
+    ring.className='tm-node-ring';
+    var icon=document.createElement('div');
+    icon.className='tm-node-icon'; icon.textContent=node.icon;
+    var nm=document.createElement('div');
+    nm.className='tm-node-name'; nm.textContent=node.name;
+    ring.appendChild(icon); ring.appendChild(nm);
+    el.appendChild(ring);
+    if(!isPurchased&&isUnlocked&&canAfford){
+      ring.addEventListener('click',function(e){e.stopPropagation();buyTatteredNode(node.id);});
     }
-
-    card.appendChild(nm);
-    card.appendChild(dc);
-    card.appendChild(cost);
-
-    if (owned > 0 && !isMaxed) {
-      var ownedEl = document.createElement('div');
-      ownedEl.className = 'ss-item-owned';
-      ownedEl.textContent = 'Owned: ' + owned + (item.maxOwned > 0 ? ' / ' + item.maxOwned : '');
-      card.appendChild(ownedEl);
-    }
-
-    if (!isMaxed) {
-      card.addEventListener('click', function() {
-        if (tatteredSouls < item.cost) return;
-        tatteredSouls -= item.cost;
-        soulShopOwned[item.id] = (soulShopOwned[item.id] || 0) + 1;
-        if (item.effect) item.effect(soulShopOwned[item.id]);
-        updateTatteredDisplay();
-        renderSoulShop();
-        saveGame();
-      });
-    }
-
-    el.appendChild(card);
+    // Tooltip events
+    ring.addEventListener('mouseenter',function(e){showTattTooltip(node,state,e.clientX,e.clientY);});
+    ring.addEventListener('mousemove',function(e){posTattTooltip(e.clientX,e.clientY);});
+    ring.addEventListener('mouseleave',hideTattTooltip);
+    grid.appendChild(el);
   });
 }
 
-function updateSoulShopTabBtn() {
-  var btn = document.getElementById('soul-shop-tab-btn');
-  if (!btn) return;
-  if (rebirthCount < 1) {
+function showTattTooltip(node,state,cx,cy){
+  var tt=document.getElementById('tatt-tooltip');
+  if(!tt) return;
+  document.getElementById('tatt-tt-name').textContent=node.name;
+  var costEl=document.getElementById('tatt-tt-cost');
+  if(soulShopOwned[node.id]>=1){
+    costEl.textContent='Acquired';
+    costEl.style.color='#7a6010';
+  } else {
+    costEl.textContent=node.cost.toLocaleString()+' Tattered Souls';
+    costEl.style.color='#d4a843';
+  }
+  document.getElementById('tatt-tt-desc').textContent=node.desc||'';
+  var reqEl=document.getElementById('tatt-tt-req');
+  if(state==='locked'&&node.requires&&node.requires.length>0){
+    reqEl.textContent='Requires: '+node.requires.join(', ');
+    reqEl.style.display='block';
+  } else if(state==='locked'&&node.requiresAny&&node.requiresAny.length>0){
+    reqEl.textContent='Requires any of: '+node.requiresAny.join(', ');
+    reqEl.style.display='block';
+  } else {
+    reqEl.style.display='none';
+  }
+  var stEl=document.getElementById('tatt-tt-status');
+  stEl.style.display='none';
+  tt.classList.add('show');
+  posTattTooltip(cx,cy);
+}
+function posTattTooltip(cx,cy){
+  var tt=document.getElementById('tatt-tooltip');
+  if(!tt||!tt.classList.contains('show')) return;
+  var w=220, h=tt.offsetHeight||120;
+  var x=cx-w-14; if(x<8){x=cx+14;}
+  var y=cy-h/2; if(y<8) y=8; if(y+h>window.innerHeight-8) y=window.innerHeight-h-8;
+  tt.style.left=x+'px'; tt.style.top=y+'px';
+}
+function hideTattTooltip(){
+  var tt=document.getElementById('tatt-tooltip');
+  if(tt) tt.classList.remove('show');
+}
+
+function openTatteredModal(){
+  if(rebirthCount<1) return;
+  var modal=document.getElementById('tattered-modal');
+  if(!modal) return;
+  modal.classList.add('open');
+  var wrap=document.getElementById('tm-canvas-wrap');
+  _tattPanX=wrap.clientWidth/2;
+  _tattPanY=wrap.clientHeight/2;
+  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px)';
+  updateTatteredModalTs();
+  renderTatteredGrid();
+}
+function closeTatteredModal(){
+  var modal=document.getElementById('tattered-modal');
+  if(modal) modal.classList.remove('open');
+  hideTattTooltip();
+}
+
+function updateTatteredBtn(){
+  var btn=document.getElementById('tattered-upgrades-btn');
+  if(!btn) return;
+  if(rebirthCount<1){
     btn.classList.add('locked');
-    btn.title = 'Unlocks after your first Ascension';
+    btn.title='Unlocks after your first Ascension';
   } else {
     btn.classList.remove('locked');
-    btn.title = '';
+    btn.title='';
   }
 }
+
 
 // ── REBIRTH ───────────────────────────────────────────────────────────────────
 var FORM_IMAGES={};
@@ -2642,7 +2739,7 @@ function updateTatteredDisplay(){
   if(el) el.textContent=tatteredSouls.toLocaleString();
   var disp=document.getElementById('tattered-display');
   if(disp) disp.style.display=rebirthCount>0?'block':'none';
-  updateSoulShopTabBtn();
+  updateTatteredBtn();
 }
 
 var ASCENSION_SPECIAL=[
@@ -2744,6 +2841,7 @@ function saveGame(){
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
     soulShopOwned:soulShopOwned,
+    tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
     invokePowerStacks:invokePowerStacks,
     completedFloorsThisAscension:completedFloorsThisAscension,
@@ -2806,6 +2904,7 @@ function loadGame(){
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
+  tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
   invokePowerStacks=data.invokePowerStacks||0;
   if(data.completedFloorsThisAscension) completedFloorsThisAscension=data.completedFloorsThisAscension;
@@ -3419,6 +3518,7 @@ updateTraitsRow();
 buildMinimap();
 checkRebirthButton();
 updateTatteredDisplay();
+updateTatteredBtn();
 updateManaBar();
 renderSpellPanel();
 spawnEnemy();
@@ -3440,13 +3540,52 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
 document.querySelectorAll('.left-tab-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
     var ltab=btn.getAttribute('data-ltab');
-    if(ltab==='soul-shop' && rebirthCount < 1) return;
+    if(ltab==='soul-shop'){
+      openTatteredModal();
+      return; // don't switch left panel tabs
+    }
     document.querySelectorAll('.left-tab-btn').forEach(function(b){b.classList.remove('active');});
     document.querySelectorAll('.left-tab-pane').forEach(function(p){p.classList.remove('active');});
     btn.classList.add('active');
     document.getElementById('ltab-'+ltab).classList.add('active');
-    if(ltab==='soul-shop') renderSoulShop();
   });
+});
+
+// ── TATTERED MODAL EVENTS ─────────────────────────────────────────────────────
+document.getElementById('tm-close-btn').addEventListener('click', closeTatteredModal);
+
+document.getElementById('tm-respec-btn').addEventListener('click', function(){
+  if(tatteredUpgradesSpent<=0) return;
+  document.getElementById('respec-confirm').classList.add('open');
+});
+document.getElementById('respec-confirm-yes').addEventListener('click', function(){
+  document.getElementById('respec-confirm').classList.remove('open');
+  doRespec();
+});
+document.getElementById('respec-confirm-no').addEventListener('click', function(){
+  document.getElementById('respec-confirm').classList.remove('open');
+});
+
+// Pan drag
+var _tmWrap=document.getElementById('tm-canvas-wrap');
+_tmWrap.addEventListener('mousedown',function(e){
+  if(e.target.closest('.tm-node-ring')) return;
+  _tattDragging=true; _tattDragSX=e.clientX; _tattDragSY=e.clientY;
+  _tattDragPX=_tattPanX; _tattDragPY=_tattPanY;
+  _tmWrap.classList.add('dragging');
+});
+document.addEventListener('mousemove',function(e){
+  if(!_tattDragging) return;
+  _tattPanX=_tattDragPX+(e.clientX-_tattDragSX);
+  _tattPanY=_tattDragPY+(e.clientY-_tattDragSY);
+  document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px)';
+});
+document.addEventListener('mouseup',function(){
+  if(_tattDragging){_tattDragging=false; _tmWrap.classList.remove('dragging');}
+});
+// Close modal on backdrop click (not on grid itself)
+document.getElementById('tattered-modal').addEventListener('click',function(e){
+  if(e.target===this) closeTatteredModal();
 });
 
 function buyAllAffordable(){
