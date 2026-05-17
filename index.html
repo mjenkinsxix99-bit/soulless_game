@@ -327,6 +327,26 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ach-card .acd { font-size:10px; color:#554477; font-style:italic; margin-top:2px; line-height:1.3; }
 .ach-card.earned .acd { color:#6a5020; }
 
+/* ── Pentacle / Power tab ─────────────────────────────────────────────────── */
+#tab-power { padding:8px 0; }
+.penta-locked { text-align:center; font-size:13px; color:#332255; font-style:italic; padding:30px 20px; }
+.penta-ts-row { text-align:center; font-size:13px; color:#ff9900; letter-spacing:1px; padding-bottom:6px; }
+.penta-wrap { position:relative; width:280px; height:280px; margin:0 auto; }
+.penta-wrap svg { position:absolute; top:0; left:0; pointer-events:none; }
+.penta-node { position:absolute; width:40px; height:40px; border-radius:50%; border:2px solid #1a0d2e; background:#060410; display:flex; align-items:center; justify-content:center; font-family:Georgia,serif; font-size:16px; font-weight:bold; color:#2a1a44; cursor:not-allowed; transition:border-color 0.2s,box-shadow 0.2s,background 0.2s; z-index:10; user-select:none; -webkit-user-select:none; }
+.penta-node.available { border-color:#8855bb; color:#c090ee; cursor:pointer; animation:pentaPulse 1.5s ease-in-out infinite; }
+.penta-node.available:hover { border-color:#cc88ff; background:#120820; box-shadow:0 0 16px rgba(170,100,255,0.8); animation:none; }
+.penta-node.owned { border-color:#d4a843; background:#130e00; color:#ffd700; cursor:default; animation:pentaGlow 2s ease-in-out infinite; }
+@keyframes pentaPulse { 0%,100%{box-shadow:0 0 6px rgba(140,80,220,0.4);} 50%{box-shadow:0 0 14px rgba(170,100,255,0.7);} }
+@keyframes pentaGlow { 0%,100%{box-shadow:0 0 10px rgba(212,168,67,0.5),0 0 24px rgba(212,168,67,0.2);} 50%{box-shadow:0 0 18px rgba(212,168,67,0.75),0 0 36px rgba(212,168,67,0.35);} }
+.penta-node-tip { display:none; position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%); width:188px; background:#0a0918; border:1px solid #4433aa; border-radius:6px; padding:8px 10px; font-size:12px; color:#c0b0ff; pointer-events:none; z-index:200; line-height:1.5; }
+.penta-node-tip.below { bottom:auto; top:calc(100% + 7px); }
+.penta-node:hover .penta-node-tip { display:block; }
+.pni-name { font-size:13px; color:#d4a843; margin-bottom:2px; }
+.pni-eff { color:#88aa88; }
+.pni-cost { color:#ff9900; font-size:11px; margin-top:3px; }
+.pni-status { color:#554488; font-style:italic; font-size:11px; margin-top:2px; }
+
 </style>
 </head>
 <body>
@@ -424,6 +444,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
         <button class="tab-btn" data-tab="honors">Honors</button>
         <button class="tab-btn" data-tab="stats">Stats</button>
+        <button class="tab-btn" id="tab-btn-power" data-tab="power" style="display:none">Power</button>
       </div>
       <div id="tab-content-area">
       <div id="tab-upgrades" class="tab-pane active">
@@ -449,6 +470,18 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <div class="ph gap">Form</div>
         <div id="form-stat-row" style="font-size:14px;color:#9980dd;padding:3px 0 6px;"></div>
         <div id="traits-row"></div>
+      </div>
+      <div id="tab-power" class="tab-pane">
+        <div class="penta-locked" id="penta-locked-msg">Power awakens after your seventh ascension.</div>
+        <div id="penta-content" style="display:none">
+          <div class="penta-ts-row">Tattered Souls: <span id="penta-ts-count">0</span></div>
+          <div class="penta-wrap" id="penta-wrap">
+            <svg width="280" height="280" viewBox="0 0 280 280">
+              <polygon points="140,30 244.6,106 204.7,229 75.3,229 35.4,106" fill="none" stroke="#1a0d2e" stroke-width="1"/>
+              <path d="M140,30 L204.7,229 L35.4,106 L244.6,106 L75.3,229 Z" fill="none" stroke="#2a1845" stroke-width="1.5"/>
+            </svg>
+          </div>
+        </div>
       </div>
       </div><!-- #tab-content-area -->
     </div>
@@ -1578,6 +1611,7 @@ function onEnemyDeath(){
   var soulMult=1;
   if(rebirthForm==='androgynous') soulMult*=1.1;
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
+  if(pentacleSoulBonus>0) soulMult*=(1+pentacleSoulBonus);
   var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
@@ -1692,6 +1726,16 @@ var autoAttackEnabled=false, autoAttackInterval=3000;
 var entityDmgBonus=D(0);
 var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0;
 var critClickChance=0, critClickMult=0, dvDpsToClickRatio=0, soulAbsorbBonus=0;
+var pentacleSoulBonus=0;
+var pentacleOwned=[false,false,false,false,false];
+var PENTACLE_NODES=[
+  {name:'Power of 3',   eff:'Decreases auto-attack interval by 0.111s',  cost:5333, tipBelow:true},
+  {name:'Surge of 3',   eff:'Increases DPS of all upgrades by +33.3%',    cost:7777, tipBelow:false},
+  {name:'Harvest of 3', eff:'Increases all souls gained by +33.3%',        cost:8888, tipBelow:false},
+  {name:'Touch of 3',   eff:'Increases Critical Strike chance by +3.33%', cost:0,    tipBelow:false},
+  {name:'Wrath of 3',   eff:'Increases DPS of all upgrades by +33.3%',    cost:9999, tipBelow:false},
+];
+var PENTACLE_POS=[[120,10],[225,86],[185,210],[55,210],[15,86]];
 
 // Divine Hunger milestone effect labels (replaces generic ×7/×666 text)
 var DV_MS_EFFECTS=[
@@ -1782,6 +1826,16 @@ function recalcStats(){
     totalDps=totalDps.mul(tsBonus);
     clickDmgBonus=clickDmgBonus.mul(tsBonus);
   }
+  // Pentacle node effects
+  pentacleSoulBonus=pentacleOwned[2]?0.333:0;
+  if(pentacleOwned[1]||pentacleOwned[4]){
+    var pd=1;
+    if(pentacleOwned[1]) pd*=1.333;
+    if(pentacleOwned[4]) pd*=1.333;
+    totalDps=totalDps.mul(pd);
+  }
+  if(pentacleOwned[3]) critClickChance+=0.0333;
+  if(pentacleOwned[0]) autoAttackInterval=Math.max(500,autoAttackInterval-111);
 }
 
 var _msTip=null;
@@ -2257,6 +2311,8 @@ function doRebirthReset(chosenForm){
   updateTatteredDisplay();
   updateTraitsRow();
   checkRebirthButton();
+  updatePowerTabVisibility();
+  buildPentacleTab();
   dirtyU=true;
   document.getElementById('soul-count').textContent=fmt(souls);
   var _np=FORM_NAMEPLATES[chosenForm];
@@ -2295,6 +2351,7 @@ function saveGame(){
     tatteredSouls:tatteredSouls,
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
+    pentacleOwned:pentacleOwned.slice(),
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
     savedAt:Date.now()
@@ -2354,6 +2411,7 @@ function loadGame(){
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
+  if(data.pentacleOwned&&data.pentacleOwned.length===5) pentacleOwned=data.pentacleOwned.slice();
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
 }
@@ -2957,6 +3015,8 @@ updateTraitsRow();
 buildMinimap();
 checkRebirthButton();
 updateTatteredDisplay();
+updatePowerTabVisibility();
+buildPentacleTab();
 spawnEnemy();
 checkAchievements(true);
 renderAchievementsTab();
@@ -2970,6 +3030,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
     if(tab==='honors'){ renderAchievementsTab(); _achievementsTabDirty=false; }
+    if(tab==='power'){ buildPentacleTab(); }
   });
 });
 
@@ -3109,6 +3170,89 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   draw();
   window.addEventListener('resize',draw);
 })();
+
+// ── PENTACLE ───────────────────────────────────────────────────────────────────
+function updatePowerTabVisibility(){
+  var btn=document.getElementById('tab-btn-power');
+  if(btn) btn.style.display=rebirthCount>=6?'':'none';
+}
+
+function buildPentacleTab(){
+  var locked=document.getElementById('penta-locked-msg');
+  var content=document.getElementById('penta-content');
+  if(!locked||!content) return;
+  if(rebirthCount<6){
+    locked.style.display='';
+    content.style.display='none';
+    return;
+  }
+  locked.style.display='none';
+  content.style.display='';
+  var tsEl=document.getElementById('penta-ts-count');
+  if(tsEl) tsEl.textContent=tatteredSouls.toLocaleString();
+  var wrap=document.getElementById('penta-wrap');
+  if(!wrap) return;
+  wrap.querySelectorAll('.penta-node').forEach(function(n){n.parentNode.removeChild(n);});
+  PENTACLE_NODES.forEach(function(nd,idx){
+    var owned=pentacleOwned[idx];
+    var prevOwned=idx===0||pentacleOwned[idx-1];
+    var canAfford=!owned&&prevOwned&&tatteredSouls>=nd.cost;
+    var btn=document.createElement('div');
+    var cls='penta-node';
+    if(owned) cls+=' owned';
+    else if(canAfford) cls+=' available';
+    btn.className=cls;
+    btn.style.left=PENTACLE_POS[idx][0]+'px';
+    btn.style.top=PENTACLE_POS[idx][1]+'px';
+    btn.textContent=(idx+1).toString();
+    var tip=document.createElement('div');
+    tip.className='penta-node-tip'+(nd.tipBelow?' below':'');
+    var nameEl=document.createElement('div');
+    nameEl.className='pni-name';
+    nameEl.textContent=nd.name;
+    tip.appendChild(nameEl);
+    var effEl=document.createElement('div');
+    effEl.className='pni-eff';
+    effEl.textContent=nd.eff;
+    tip.appendChild(effEl);
+    if(!owned){
+      var costEl=document.createElement('div');
+      costEl.className='pni-cost';
+      costEl.textContent=nd.cost>0?'Cost: '+nd.cost.toLocaleString()+' Tattered Souls':'Free';
+      tip.appendChild(costEl);
+      var stEl=document.createElement('div');
+      stEl.className='pni-status';
+      if(!prevOwned) stEl.textContent='Requires node '+(idx)+' first';
+      else if(!canAfford&&nd.cost>0) stEl.textContent='Need more Tattered Souls';
+      else stEl.textContent='Click to unlock';
+      tip.appendChild(stEl);
+    } else {
+      var stEl=document.createElement('div');
+      stEl.className='pni-status';
+      stEl.textContent='Unlocked';
+      tip.appendChild(stEl);
+    }
+    btn.appendChild(tip);
+    if(canAfford&&!owned){
+      (function(i){btn.addEventListener('click',function(){buyPentacleNode(i);});})(idx);
+    }
+    wrap.appendChild(btn);
+  });
+}
+
+function buyPentacleNode(idx){
+  var nd=PENTACLE_NODES[idx];
+  if(pentacleOwned[idx]) return;
+  if(idx>0&&!pentacleOwned[idx-1]) return;
+  if(tatteredSouls<nd.cost) return;
+  tatteredSouls-=nd.cost;
+  pentacleOwned[idx]=true;
+  recalcStats();
+  updateTatteredDisplay();
+  buildPentacleTab();
+  updateEntityStatsPanel();
+  saveGame();
+}
 
 })();
 </script>
