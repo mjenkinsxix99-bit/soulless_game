@@ -2535,12 +2535,7 @@ var TATTERED_NODES = [
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
-var TATTERED_EDGES=(function(){
-  var e=[];
-  _sIds.forEach(function(id){e.push({from:'auto-progress',to:id});});
-  for(var i=0;i<_sIds.length;i++) e.push({from:_sIds[i],to:_sIds[(i+1)%_sIds.length]});
-  return e;
-})();
+var TATTERED_EDGES = [];
 
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
 
