@@ -287,7 +287,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #tm-canvas-wrap { flex:1; overflow:hidden; position:relative; cursor:grab; }
 #tm-canvas-wrap.dragging { cursor:grabbing; }
 #tm-grid { position:absolute; left:0; top:0; will-change:transform; }
-#tm-svg { position:absolute; overflow:visible; pointer-events:none; top:-400px; left:-400px; width:800px; height:800px; }
+#tm-svg { position:absolute; overflow:visible; pointer-events:none; top:-500px; left:-500px; width:1000px; height:1000px; }
 .tm-center-glyph { position:absolute; transform:translate(-50%,-50%); width:36px; height:36px; border-radius:50%; background:#06040f; border:1px solid #2a1a5a; display:flex; align-items:center; justify-content:center; font-size:16px; color:#2a1a5a; pointer-events:none; box-shadow:0 0 20px rgba(80,40,160,0.15); }
 /* node base */
 .tm-node { position:absolute; transform:translate(-50%,-50%); z-index:2; }
@@ -631,7 +631,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
   <div id="tm-canvas-wrap">
     <div id="tm-grid">
-      <svg id="tm-svg" viewBox="-400 -400 800 800"></svg>
+      <svg id="tm-svg" viewBox="-500 -500 1000 1000"></svg>
       <div class="tm-center-glyph">&#10022;</div>
     </div>
   </div>
@@ -2552,7 +2552,7 @@ var TATTERED_NODES = [
     x:-285, y:-93,  requires:[] },
   { id:'spell-twinStrikes', type:'spell', name:'Twin Strikes',      icon:'⊕', cost:2500,
     desc:'Unlocks the spell Twin Strikes. Cast for 99 Mana: each strike deals ×2 damage for 33.3s.',
-    x:-318, y:-318, requires:[] },
+    x:-265, y:-364, requires:[] },
   { id:'spell-powerOf3',    type:'spell', name:'Power of 3',        icon:'❖', cost:5000,
     desc:'Unlocks the spell Power of 3. Cast for 199 Mana: the next spell activated gives 3× its effect, then this buff is consumed.',
     x:318,  y:318,  requires:[] },
@@ -2642,6 +2642,22 @@ var TATTERED_NODES = [
   { id:'rule-dps-2',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:2333,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-241, y:-154, requires:[] },
+  // Stat nodes clustered around Twin Strikes (-265, -364) — pentacle, point straight up
+  { id:'strikes-speed',  type:'speed',  name:'Auto Speed',     icon:'', cost:2555,
+    desc:'Decreases auto damage interval by 0.111 seconds.',
+    x:-265, y:-439, requires:[] },
+  { id:'strikes-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:2999,
+    desc:'Increases your Critical Strike chance by +3.33%.',
+    x:-194, y:-387, requires:[] },
+  { id:'strikes-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:3333,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:-221, y:-303, requires:[] },
+  { id:'strikes-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:3999,
+    desc:'Increases all souls gained by 33.3%.',
+    x:-309, y:-303, requires:[] },
+  { id:'strikes-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:4666,
+    desc:'Increases DPS of all upgrades by +33.3%.',
+    x:-336, y:-387, requires:[] },
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
