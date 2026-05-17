@@ -2723,6 +2723,13 @@ var TATTERED_EDGES = [
   {from:'blade-dps',    to:'souls-souls'},
   {from:'souls-souls',  to:'rule-hp'},
   {from:'rule-hp',      to:'flurry-dps-1'},
+  // Twin Souls cluster — pentagon ring, dps-1 connects to spell
+  {from:'spell-twinSouls', to:'souls-dps-1'},
+  {from:'souls-souls',  to:'souls-strike'},
+  {from:'souls-strike', to:'souls-speed'},
+  {from:'souls-speed',  to:'souls-dps-2'},
+  {from:'souls-dps-2',  to:'souls-dps-1'},
+  {from:'souls-dps-1',  to:'souls-souls'},
   // Inner ring second chain
   {from:'crit-speed',      to:'blade-speed'},
   {from:'blade-strike-2',  to:'souls-strike'},
