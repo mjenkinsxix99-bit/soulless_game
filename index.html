@@ -273,17 +273,16 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .spell-tt-status { font-size:11px; color:#55dd88; margin-top:6px; font-style:italic; }
 .spell-tt-stacks { font-size:11px; color:#ffbb44; margin-top:4px; }
 /* ── TATTERED UPGRADES MODAL ─────────────────────────────────────────────── */
-#tattered-modal { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(2,1,14,0.95); z-index:900; flex-direction:column; }
+#tattered-modal { display:none; position:fixed; top:0;left:370px;right:0;bottom:0; background:#02010e; z-index:900; flex-direction:column; }
 #tattered-modal.open { display:flex; }
-#tm-header { display:flex; align-items:center; justify-content:space-between; padding:14px 22px; background:#05030e; border-bottom:1px solid #1e1548; flex-shrink:0; position:relative; z-index:2; }
-#tm-ts-wrap { display:flex; flex-direction:column; gap:2px; }
+#tm-header { display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:14px; padding:12px 18px; background:#05030e; border-bottom:1px solid #1e1548; flex-shrink:0; position:relative; z-index:2; }
+#tm-ts-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
 #tm-ts-label { font-size:9px; color:#7a5a20; letter-spacing:3px; text-transform:uppercase; }
 #tm-ts-val { font-size:20px; color:#d4a843; font-family:Georgia,serif; letter-spacing:2px; text-shadow:0 0 14px rgba(212,168,67,0.8); }
-#tm-hdr-right { display:flex; align-items:center; gap:10px; }
-#tm-respec-btn { background:#160808; border:1px solid #551a1a; color:#bb3333; font-family:Georgia,serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; padding:8px 16px; border-radius:5px; cursor:pointer; transition:all 0.2s; }
-#tm-respec-btn:hover { border-color:#993333; color:#ee5555; background:#220a0a; box-shadow:0 0 8px rgba(200,50,50,0.3); }
-#tm-respec-btn:disabled { opacity:0.3; cursor:default; }
-#tm-close-btn { background:transparent; border:1px solid #2a1a5a; color:#554477; font-size:20px; width:36px; height:36px; border-radius:5px; cursor:pointer; line-height:1; transition:all 0.2s; }
+#tm-respec-btn { justify-self:center; background:#1a0404; border:2px solid #cc2222; color:#ff4444; font-family:Georgia,serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; padding:8px 20px; border-radius:5px; cursor:pointer; transition:all 0.2s; text-shadow:0 0 8px rgba(255,60,60,0.6); box-shadow:0 0 10px rgba(220,30,30,0.25); }
+#tm-respec-btn:hover { border-color:#ff3333; color:#ff6666; background:#220606; box-shadow:0 0 16px rgba(255,50,50,0.4); text-shadow:0 0 12px rgba(255,80,80,0.8); }
+#tm-respec-btn:disabled { opacity:0.25; cursor:default; box-shadow:none; text-shadow:none; }
+#tm-close-btn { width:36px; height:36px; background:transparent; border:1px solid #2a1a5a; color:#554477; font-size:20px; border-radius:5px; cursor:pointer; line-height:1; transition:all 0.2s; }
 #tm-close-btn:hover { border-color:#7755aa; color:#9980dd; }
 #tm-canvas-wrap { flex:1; overflow:hidden; position:relative; cursor:grab; }
 #tm-canvas-wrap.dragging { cursor:grabbing; }
@@ -321,12 +320,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #tatt-tt-req  { font-size:10px; color:#554466; margin-top:5px; font-style:italic; }
 #tatt-tt-status { font-size:11px; color:#55dd88; margin-top:5px; font-style:italic; }
 /* respec confirm popup */
-#respec-confirm { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#08050f; border:1px solid #661818; border-radius:10px; padding:26px 30px; z-index:1200; text-align:center; width:320px; box-shadow:0 8px 44px rgba(0,0,0,0.95); }
+#respec-confirm { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#0a0410; border:2px solid #cc1111; border-radius:10px; padding:26px 30px; z-index:1200; text-align:center; width:340px; box-shadow:0 8px 44px rgba(200,10,10,0.35),0 0 80px rgba(0,0,0,0.9); }
 #respec-confirm.open { display:block; }
-#respec-confirm-title { font-size:15px; color:#ee8888; font-family:Georgia,serif; letter-spacing:2px; margin-bottom:10px; text-transform:uppercase; }
-#respec-confirm-msg { font-size:12px; color:#997788; line-height:1.7; margin-bottom:20px; }
-#respec-confirm-yes { background:#220808; border:1px solid #882222; color:#dd4444; font-family:Georgia,serif; font-size:12px; letter-spacing:1px; padding:9px 22px; border-radius:5px; cursor:pointer; margin-right:10px; transition:all 0.2s; }
-#respec-confirm-yes:hover { background:#330a0a; border-color:#cc3333; }
+#respec-confirm-title { font-size:15px; color:#ff3333; font-family:Georgia,serif; letter-spacing:3px; margin-bottom:12px; text-transform:uppercase; text-shadow:0 0 12px rgba(255,50,50,0.7); }
+#respec-confirm-msg { font-size:13px; color:#ddcccc; line-height:1.8; margin-bottom:22px; }
+#respec-confirm-refund { font-size:16px; color:#ff5555; font-weight:bold; display:block; margin-top:6px; text-shadow:0 0 10px rgba(255,60,60,0.6); }
+#respec-confirm-yes { background:#330606; border:2px solid #dd2222; color:#ff5555; font-family:Georgia,serif; font-size:12px; letter-spacing:1px; padding:9px 22px; border-radius:5px; cursor:pointer; margin-right:10px; transition:all 0.2s; text-shadow:0 0 6px rgba(255,60,60,0.5); }
+#respec-confirm-yes:hover { background:#440808; border-color:#ff3333; color:#ff7777; box-shadow:0 0 12px rgba(255,40,40,0.4); }
 #respec-confirm-no { background:#09071a; border:1px solid #2a1a5a; color:#776699; font-family:Georgia,serif; font-size:12px; letter-spacing:1px; padding:9px 22px; border-radius:5px; cursor:pointer; transition:all 0.2s; }
 #respec-confirm-no:hover { border-color:#7755aa; color:#9980dd; }
 .ubuy { font-size:14px; font-weight:bold; color:#887755; margin-right:5px; }
@@ -587,13 +587,11 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 </div>
 <div id="tattered-modal">
   <div id="tm-header">
+    <button id="tm-close-btn">&#215;</button>
+    <button id="tm-respec-btn">&#8635; Respec</button>
     <div id="tm-ts-wrap">
       <span id="tm-ts-label">Tattered Souls</span>
       <span id="tm-ts-val">0</span>
-    </div>
-    <div id="tm-hdr-right">
-      <button id="tm-respec-btn">&#8635; Respec &mdash; 90% refund</button>
-      <button id="tm-close-btn">&#215;</button>
     </div>
   </div>
   <div id="tm-canvas-wrap">
@@ -612,7 +610,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 </div>
 <div id="respec-confirm">
   <div id="respec-confirm-title">Respec?</div>
-  <div id="respec-confirm-msg">All Tattered Upgrades will be undone.<br>You will receive <strong style="color:#ee8888">90%</strong> of your spent Tattered Souls back.<br><br>This cannot be undone.</div>
+  <div id="respec-confirm-msg">Respec returns 90% of your spent Tattered Souls.<span id="respec-confirm-refund"></span></div>
   <button id="respec-confirm-yes">Respec</button>
   <button id="respec-confirm-no">Cancel</button>
 </div>
@@ -3510,6 +3508,8 @@ initUpgradeIcons();
 initMist(28);
 preloadFormImages();
 loadGame();
+// TEST — remove before release
+tatteredSouls=Math.max(tatteredSouls,1000); rebirthCount=Math.max(rebirthCount,1);
 updateHighestFloor();
 recalcStats();
 updateHpBars();
@@ -3541,8 +3541,10 @@ document.querySelectorAll('.left-tab-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
     var ltab=btn.getAttribute('data-ltab');
     if(ltab==='soul-shop'){
-      openTatteredModal();
-      return; // don't switch left panel tabs
+      var _tm=document.getElementById('tattered-modal');
+      if(_tm&&_tm.classList.contains('open')) closeTatteredModal();
+      else openTatteredModal();
+      return;
     }
     document.querySelectorAll('.left-tab-btn').forEach(function(b){b.classList.remove('active');});
     document.querySelectorAll('.left-tab-pane').forEach(function(p){p.classList.remove('active');});
@@ -3556,6 +3558,8 @@ document.getElementById('tm-close-btn').addEventListener('click', closeTatteredM
 
 document.getElementById('tm-respec-btn').addEventListener('click', function(){
   if(tatteredUpgradesSpent<=0) return;
+  var refund=Math.floor(tatteredUpgradesSpent*0.9);
+  document.getElementById('respec-confirm-refund').textContent='(+'+refund.toLocaleString()+' Tattered Souls)';
   document.getElementById('respec-confirm').classList.add('open');
 });
 document.getElementById('respec-confirm-yes').addEventListener('click', function(){
