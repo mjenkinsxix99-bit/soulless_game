@@ -2723,6 +2723,13 @@ var TATTERED_EDGES = [
   {from:'blade-dps',    to:'souls-souls'},
   {from:'souls-souls',  to:'rule-hp'},
   {from:'rule-hp',      to:'flurry-dps-1'},
+  // Rule of 3 cluster — pentagon ring, rule-hp connects to spell
+  {from:'spell-ruleOf3', to:'rule-hp'},
+  {from:'rule-hp',    to:'rule-dps-1'},
+  {from:'rule-dps-1', to:'rule-speed'},
+  {from:'rule-speed', to:'rule-souls'},
+  {from:'rule-souls', to:'rule-dps-2'},
+  {from:'rule-dps-2', to:'rule-hp'},
   // Twin Souls cluster — pentagon ring, souls-souls connects to spell
   {from:'spell-twinSouls', to:'souls-souls'},
   {from:'souls-souls',  to:'souls-strike'},
