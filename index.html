@@ -2709,7 +2709,130 @@ var TATTERED_NODES = [
 ];
 // Spokes: center → each spell node. Ring: adjacent spell nodes connected.
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
-var TATTERED_EDGES = [];
+var TATTERED_EDGES = [
+  // Center spokes
+  {from:'auto-progress',     to:'spell-flurry'},
+  {from:'auto-progress',     to:'spell-critStrike'},
+  {from:'auto-progress',     to:'spell-twinBlades'},
+  {from:'auto-progress',     to:'spell-twinSouls'},
+  {from:'auto-progress',     to:'spell-ruleOf3'},
+  // Inner pentagon ring
+  {from:'spell-flurry',      to:'spell-critStrike'},
+  {from:'spell-critStrike',  to:'spell-twinBlades'},
+  {from:'spell-twinBlades',  to:'spell-twinSouls'},
+  {from:'spell-twinSouls',   to:'spell-ruleOf3'},
+  {from:'spell-ruleOf3',     to:'spell-flurry'},
+  // Inner → outer
+  {from:'spell-flurry',      to:'spell-twinStrikes'},
+  {from:'spell-flurry',      to:'spell-powerOf3'},
+  {from:'spell-ruleOf3',     to:'spell-twinStrikes'},
+  {from:'spell-critStrike',  to:'spell-powerOf3'},
+  {from:'spell-twinSouls',   to:'spell-invokePower'},
+  {from:'spell-twinBlades',  to:'spell-manaHungry'},
+  // Outer ring
+  {from:'spell-twinStrikes', to:'spell-powerOf3'},
+  {from:'spell-twinStrikes', to:'spell-invokePower'},
+  {from:'spell-powerOf3',    to:'spell-manaHungry'},
+  // Flurry stat cluster
+  {from:'spell-flurry',  to:'flurry-dps-1'},
+  {from:'spell-flurry',  to:'flurry-souls'},
+  {from:'spell-flurry',  to:'flurry-dps-2'},
+  {from:'spell-flurry',  to:'flurry-strike'},
+  {from:'spell-flurry',  to:'flurry-speed'},
+  {from:'flurry-dps-1',  to:'flurry-souls'},
+  {from:'flurry-souls',  to:'flurry-dps-2'},
+  {from:'flurry-dps-2',  to:'flurry-strike'},
+  {from:'flurry-strike', to:'flurry-speed'},
+  {from:'flurry-speed',  to:'flurry-dps-1'},
+  // Critical Strike stat cluster
+  {from:'spell-critStrike', to:'crit-dps-1'},
+  {from:'spell-critStrike', to:'crit-strike'},
+  {from:'spell-critStrike', to:'crit-dps-2'},
+  {from:'spell-critStrike', to:'crit-souls'},
+  {from:'spell-critStrike', to:'crit-speed'},
+  {from:'crit-dps-1',  to:'crit-strike'},
+  {from:'crit-strike', to:'crit-dps-2'},
+  {from:'crit-dps-2',  to:'crit-souls'},
+  {from:'crit-souls',  to:'crit-speed'},
+  {from:'crit-speed',  to:'crit-dps-1'},
+  // Twin Blades stat cluster
+  {from:'spell-twinBlades', to:'blade-dps'},
+  {from:'spell-twinBlades', to:'blade-speed'},
+  {from:'spell-twinBlades', to:'blade-strike-1'},
+  {from:'spell-twinBlades', to:'blade-hp'},
+  {from:'spell-twinBlades', to:'blade-strike-2'},
+  {from:'blade-dps',      to:'blade-speed'},
+  {from:'blade-speed',    to:'blade-strike-1'},
+  {from:'blade-strike-1', to:'blade-hp'},
+  {from:'blade-hp',       to:'blade-strike-2'},
+  {from:'blade-strike-2', to:'blade-dps'},
+  // Twin Souls stat cluster
+  {from:'spell-twinSouls', to:'souls-souls'},
+  {from:'spell-twinSouls', to:'souls-strike'},
+  {from:'spell-twinSouls', to:'souls-speed'},
+  {from:'spell-twinSouls', to:'souls-dps-2'},
+  {from:'spell-twinSouls', to:'souls-dps-1'},
+  {from:'souls-souls',  to:'souls-strike'},
+  {from:'souls-strike', to:'souls-speed'},
+  {from:'souls-speed',  to:'souls-dps-2'},
+  {from:'souls-dps-2',  to:'souls-dps-1'},
+  {from:'souls-dps-1',  to:'souls-souls'},
+  // Rule of 3 stat cluster
+  {from:'spell-ruleOf3', to:'rule-hp'},
+  {from:'spell-ruleOf3', to:'rule-dps-1'},
+  {from:'spell-ruleOf3', to:'rule-speed'},
+  {from:'spell-ruleOf3', to:'rule-souls'},
+  {from:'spell-ruleOf3', to:'rule-dps-2'},
+  {from:'rule-hp',    to:'rule-dps-1'},
+  {from:'rule-dps-1', to:'rule-speed'},
+  {from:'rule-speed', to:'rule-souls'},
+  {from:'rule-souls', to:'rule-dps-2'},
+  {from:'rule-dps-2', to:'rule-hp'},
+  // Twin Strikes stat cluster
+  {from:'spell-twinStrikes', to:'strikes-speed'},
+  {from:'spell-twinStrikes', to:'strikes-crit'},
+  {from:'spell-twinStrikes', to:'strikes-dps-1'},
+  {from:'spell-twinStrikes', to:'strikes-souls'},
+  {from:'spell-twinStrikes', to:'strikes-dps-2'},
+  {from:'strikes-speed',  to:'strikes-crit'},
+  {from:'strikes-crit',   to:'strikes-dps-1'},
+  {from:'strikes-dps-1',  to:'strikes-souls'},
+  {from:'strikes-souls',  to:'strikes-dps-2'},
+  {from:'strikes-dps-2',  to:'strikes-speed'},
+  // Power of 3 stat cluster
+  {from:'spell-powerOf3', to:'power3-speed'},
+  {from:'spell-powerOf3', to:'power3-dps-1'},
+  {from:'spell-powerOf3', to:'power3-souls'},
+  {from:'spell-powerOf3', to:'power3-crit'},
+  {from:'spell-powerOf3', to:'power3-dps-2'},
+  {from:'power3-speed',  to:'power3-dps-1'},
+  {from:'power3-dps-1',  to:'power3-souls'},
+  {from:'power3-souls',  to:'power3-crit'},
+  {from:'power3-crit',   to:'power3-dps-2'},
+  {from:'power3-dps-2',  to:'power3-speed'},
+  // Mana Hungry stat cluster
+  {from:'spell-manaHungry', to:'mana-speed'},
+  {from:'spell-manaHungry', to:'mana-dps-1'},
+  {from:'spell-manaHungry', to:'mana-souls'},
+  {from:'spell-manaHungry', to:'mana-crit'},
+  {from:'spell-manaHungry', to:'mana-dps-2'},
+  {from:'mana-speed',  to:'mana-dps-1'},
+  {from:'mana-dps-1',  to:'mana-souls'},
+  {from:'mana-souls',  to:'mana-crit'},
+  {from:'mana-crit',   to:'mana-dps-2'},
+  {from:'mana-dps-2',  to:'mana-speed'},
+  // Invoke Power stat cluster
+  {from:'spell-invokePower', to:'invoke-speed'},
+  {from:'spell-invokePower', to:'invoke-dps-1'},
+  {from:'spell-invokePower', to:'invoke-souls'},
+  {from:'spell-invokePower', to:'invoke-strike'},
+  {from:'spell-invokePower', to:'invoke-dps-2'},
+  {from:'invoke-speed',  to:'invoke-dps-1'},
+  {from:'invoke-dps-1',  to:'invoke-souls'},
+  {from:'invoke-souls',  to:'invoke-strike'},
+  {from:'invoke-strike', to:'invoke-dps-2'},
+  {from:'invoke-dps-2',  to:'invoke-speed'},
+];
 
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
 
@@ -2782,7 +2905,7 @@ function renderTatteredGrid(){
     var line=document.createElementNS('http://www.w3.org/2000/svg','line');
     line.setAttribute('x1',fn.x); line.setAttribute('y1',fn.y);
     line.setAttribute('x2',tn.x); line.setAttribute('y2',tn.y);
-    var purchased=soulShopOwned[fn.id]>=1&&soulShopOwned[tn.id]>=1;
+    var purchased=soulShopOwned[fn.id]>=1||soulShopOwned[tn.id]>=1;
     line.setAttribute('class','tm-edge'+(purchased?' active':''));
     svg.appendChild(line);
   });
