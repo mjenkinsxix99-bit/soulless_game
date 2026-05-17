@@ -292,25 +292,30 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 /* node base */
 .tm-node { position:absolute; transform:translate(-50%,-50%); z-index:2; }
 .tm-node-ring { border-radius:50%; border:2px solid #1e1845; background:#06040f; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:border-color 0.2s, box-shadow 0.2s, background 0.2s; position:relative; }
-/* spell hub nodes */
-.tm-node.type-spell .tm-node-ring { width:78px; height:78px; border-color:#2a1e55; background:#080518; }
-.tm-node.type-spell.state-purchased .tm-node-ring { border-color:#aa77ff; background:#0d0820; box-shadow:0 0 16px rgba(160,100,255,0.5),0 0 36px rgba(120,60,220,0.2); }
-.tm-node.type-spell.state-affordable .tm-node-ring { border-color:#5533aa; background:#0a0618; box-shadow:0 0 8px rgba(80,50,180,0.25); animation:nodeAffordPulse 2s ease-in-out infinite; }
-.tm-node.type-spell.state-locked .tm-node-ring { border-color:#161230; opacity:0.45; cursor:default; }
+/* center node */
+.tm-node.type-center .tm-node-ring { width:54px; height:54px; border-color:#4a2e88; background:#0c0620; }
+.tm-node.type-center.state-purchased .tm-node-ring { border-color:#cc88ff; background:#120830; box-shadow:0 0 20px rgba(180,100,255,0.65),0 0 44px rgba(140,60,240,0.25); }
+.tm-node.type-center.state-affordable .tm-node-ring { border-color:#8855cc; background:#0f0628; box-shadow:0 0 12px rgba(120,70,220,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
+/* spell hub nodes — 40% smaller than before (78→47px) */
+.tm-node.type-spell .tm-node-ring { width:47px; height:47px; border-color:#6644bb; background:#0c0825; }
+.tm-node.type-spell.state-purchased .tm-node-ring { border-color:#cc88ff; background:#100922; box-shadow:0 0 12px rgba(180,100,255,0.5),0 0 28px rgba(140,60,220,0.2); }
+.tm-node.type-spell.state-affordable .tm-node-ring { border-color:#8855dd; background:#0d0720; box-shadow:0 0 8px rgba(120,70,220,0.35); animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-spell.state-locked .tm-node-ring { border-color:#2a1e55; opacity:0.5; cursor:default; }
 /* upgrade nodes */
-.tm-node.type-upg .tm-node-ring { width:60px; height:60px; }
+.tm-node.type-upg .tm-node-ring { width:42px; height:42px; }
 .tm-node.type-upg.state-purchased .tm-node-ring { border-color:#d4a843; background:#0d0a00; box-shadow:0 0 10px rgba(212,168,67,0.4); }
 .tm-node.type-upg.state-affordable .tm-node-ring { border-color:#886620; animation:nodeAffordPulse 2s ease-in-out infinite; }
 .tm-node.type-upg.state-locked .tm-node-ring { opacity:0.35; cursor:default; }
 @keyframes nodeAffordPulse { 0%,100%{opacity:0.7;} 50%{opacity:1;} }
-.tm-node-icon { font-size:22px; line-height:1; pointer-events:none; }
-.tm-node.type-spell .tm-node-icon { font-size:24px; }
-.tm-node-name { font-size:8px; color:#554477; letter-spacing:1px; text-align:center; margin-top:3px; pointer-events:none; max-width:70px; line-height:1.2; }
-.tm-node.state-purchased .tm-node-name { color:#7a6010; }
-.tm-node.state-affordable .tm-node-name { color:#7755cc; }
+.tm-node-icon { font-size:16px; line-height:1; pointer-events:none; }
+.tm-node.type-center .tm-node-icon { font-size:18px; }
+.tm-node-name { font-size:8px; color:#9977cc; letter-spacing:1px; text-align:center; margin-top:2px; pointer-events:none; max-width:54px; line-height:1.2; }
+.tm-node.type-center .tm-node-name { color:#aa88ee; max-width:60px; }
+.tm-node.state-purchased .tm-node-name { color:#aa8833; }
+.tm-node.state-affordable .tm-node-name { color:#bb99ff; }
 /* SVG edges */
-.tm-edge { stroke:#1a1440; stroke-width:1.5; fill:none; }
-.tm-edge.active { stroke:#3a2870; stroke-width:2; }
+.tm-edge { stroke:#1e1440; stroke-width:1.5; fill:none; }
+.tm-edge.active { stroke:#aa44ff; stroke-width:2.5; filter:drop-shadow(0 0 5px rgba(170,60,255,0.75)); }
 /* global floating tooltip (position:fixed, avoids overflow clip) */
 #tatt-tooltip { display:none; position:fixed; width:220px; background:#06041a; border:1px solid #3344aa; border-radius:8px; padding:12px 14px; z-index:1100; pointer-events:none; box-shadow:0 6px 28px rgba(0,0,40,0.9); }
 #tatt-tooltip.show { display:block; }
@@ -1588,7 +1593,7 @@ function buildMinimap(){
 function updateAutoProgressBtn(){
   var btn=document.getElementById('mm-auto');
   if(!btn) return;
-  if(rebirthCount<1){ btn.style.display='none'; return; }
+  if(!soulShopOwned['auto-progress']){ btn.style.display='none'; return; }
   btn.style.display='';
   btn.classList.toggle('ap-on', autoProgressEnabled);
   btn.classList.toggle('ap-off', !autoProgressEnabled);
@@ -2492,40 +2497,48 @@ var tatteredUpgradesSpent = 0;
 var _tattPanX = 0, _tattPanY = 0;
 var _tattDragging = false, _tattDragSX = 0, _tattDragSY = 0, _tattDragPX = 0, _tattDragPY = 0;
 
-// 9 spell nodes arranged in a circle (radius 300), one per spell.
+// Center node + 9 spell nodes arranged in a circle (radius 150 — 50% of original 300).
 // Upgrade nodes will be appended here as { id, type:'upg', name, icon, cost, desc, x, y, requires:['nodeId',...], requiresAny:['nodeId',...] }
 var TATTERED_NODES = [
+  { id:'auto-progress', type:'center', name:'Auto Progress', icon:'⟳', cost:0,
+    desc:'Unlocks the Auto Progress button. Floors advance automatically when cleared.',
+    x:0, y:0, requires:[] },
   { id:'spell-flurry',      type:'spell', name:'Flurry of Strikes', icon:'⚡', cost:10,
     desc:'Unlocks the spell Flurry of Strikes. Cast for 20 Mana: 7 strikes per second for 33.3s, each dealing click damage.',
-    x:0,    y:-300, requires:[] },
+    x:0,    y:-150, requires:[] },
   { id:'spell-critStrike',  type:'spell', name:'Critical Strike',   icon:'✦', cost:50,
     desc:'Unlocks the spell Critical Strike. Cast for 33 Mana: critical strike chance +66.6% for 33.3s.',
-    x:193,  y:-230, requires:[] },
+    x:96,   y:-115, requires:[] },
   { id:'spell-twinBlades',  type:'spell', name:'Twin Blades',       icon:'⚔', cost:100,
     desc:'Unlocks the spell Twin Blades. Cast for 33 Mana: DPS output ×2 for 33.3s.',
-    x:295,  y:-52,  requires:[] },
+    x:148,  y:-26,  requires:[] },
   { id:'spell-twinSouls',   type:'spell', name:'Twin Souls',        icon:'∞', cost:250,
     desc:'Unlocks the spell Twin Souls. Cast for 33 Mana: all souls gained ×2 for 33.3s.',
-    x:260,  y:150,  requires:[] },
+    x:130,  y:75,   requires:[] },
   { id:'spell-ruleOf3',     type:'spell', name:'Rule of 3',         icon:'Ⅲ', cost:1000,
     desc:'Unlocks the spell Rule of 3. Cast for 66 Mana: each strike instantly grants current enemy\'s death soul reward ×3 for 33.3s.',
-    x:103,  y:282,  requires:[] },
+    x:51,   y:141,  requires:[] },
   { id:'spell-twinStrikes', type:'spell', name:'Twin Strikes',      icon:'⊕', cost:2500,
     desc:'Unlocks the spell Twin Strikes. Cast for 99 Mana: each strike deals ×2 damage for 33.3s.',
-    x:-103, y:282,  requires:[] },
+    x:-51,  y:141,  requires:[] },
   { id:'spell-powerOf3',    type:'spell', name:'Power of 3',        icon:'❖', cost:5000,
     desc:'Unlocks the spell Power of 3. Cast for 199 Mana: the next spell activated gives 3× its effect, then this buff is consumed.',
-    x:-260, y:150,  requires:[] },
+    x:-130, y:75,   requires:[] },
   { id:'spell-manaHungry',  type:'spell', name:'Mana Hungry',       icon:'◉', cost:10000,
     desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3s.',
-    x:-295, y:-52,  requires:[] },
+    x:-148, y:-26,  requires:[] },
   { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:20000,
     desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Persists this Ascension.',
-    x:-193, y:-230, requires:[] },
+    x:-96,  y:-115, requires:[] },
 ];
-// Edges between nodes. Format: { from:'nodeId', to:'nodeId' }
-// Upgrade nodes and their edges will be added here by future expansions.
-var TATTERED_EDGES = [];
+// Spokes: center → each spell node. Ring: adjacent spell nodes connected.
+var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
+var TATTERED_EDGES=(function(){
+  var e=[];
+  _sIds.forEach(function(id){e.push({from:'auto-progress',to:id});});
+  for(var i=0;i<_sIds.length;i++) e.push({from:_sIds[i],to:_sIds[(i+1)%_sIds.length]});
+  return e;
+})();
 
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
 
@@ -2549,8 +2562,9 @@ function buyTatteredNode(id){
   soulShopOwned[id]=1;
   updateTatteredDisplay();
   updateTatteredModalTs();
+  updateAutoProgressBtn();
   renderTatteredGrid();
-  renderSpellPanel(); // spells become available in buy-selector immediately
+  renderSpellPanel();
   saveGame();
 }
 
@@ -2564,8 +2578,10 @@ function doRespec(){
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
   invokePowerStacks=0;
+  autoProgressEnabled=false;
   updateTatteredDisplay();
   updateTatteredModalTs();
+  updateAutoProgressBtn();
   renderTatteredGrid();
   renderSpellPanel();
   saveGame();
@@ -2636,6 +2652,9 @@ function showTattTooltip(node,state,cx,cy){
   if(soulShopOwned[node.id]>=1){
     costEl.textContent='Acquired';
     costEl.style.color='#7a6010';
+  } else if(node.cost===0){
+    costEl.textContent='Free';
+    costEl.style.color='#66dd88';
   } else {
     costEl.textContent=node.cost.toLocaleString()+' Tattered Souls';
     costEl.style.color='#d4a843';
