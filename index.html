@@ -2857,22 +2857,34 @@ function renderTatteredGrid(){
     if(c.id!=='tm-svg'&&!c.classList.contains('tm-center-glyph')) c.remove();
   });
   svg.innerHTML='';
+  function nodeRadius(n){
+    if(n.type==='center') return 27;
+    if(n.type==='spell')  return 24;
+    if(n.type==='upg')    return 21;
+    return 15;
+  }
   // Draw edges first (SVG)
   TATTERED_EDGES.forEach(function(edge){
     var fn=TATTERED_NODES.filter(function(n){return n.id===edge.from;})[0];
     var tn=TATTERED_NODES.filter(function(n){return n.id===edge.to;})[0];
     if(!fn||!tn) return;
+    var dx=tn.x-fn.x, dy=tn.y-fn.y;
+    var dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<1) return;
+    var ux=dx/dist, uy=dy/dist;
+    var x1=fn.x+ux*nodeRadius(fn), y1=fn.y+uy*nodeRadius(fn);
+    var x2=tn.x-ux*nodeRadius(tn), y2=tn.y-uy*nodeRadius(tn);
     var purchased=soulShopOwned[fn.id]>=1||soulShopOwned[tn.id]>=1;
     var cls='tm-edge'+(purchased?' active':'');
     if(edge.cp){
       var path=document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d','M '+fn.x+' '+fn.y+' Q '+edge.cp.x+' '+edge.cp.y+' '+tn.x+' '+tn.y);
+      path.setAttribute('d','M '+x1+' '+y1+' Q '+edge.cp.x+' '+edge.cp.y+' '+x2+' '+y2);
       path.setAttribute('class',cls);
       svg.appendChild(path);
     } else {
       var line=document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',fn.x); line.setAttribute('y1',fn.y);
-      line.setAttribute('x2',tn.x); line.setAttribute('y2',tn.y);
+      line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+      line.setAttribute('x2',x2); line.setAttribute('y2',y2);
       line.setAttribute('class',cls);
       svg.appendChild(line);
     }
