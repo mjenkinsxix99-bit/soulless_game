@@ -1743,7 +1743,7 @@ function updateProgressLabel(){
 function updateEnemyPanel(){
   var d=def(); if(!d) return;
   var elite=isEliteFight();
-  var en=elite?d.name:d.simpleName;
+  var en=elite?'Elite '+d.name:d.simpleName;
   document.getElementById('enemy-name-label').textContent=en;
 }
 
