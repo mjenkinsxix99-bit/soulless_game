@@ -2788,10 +2788,10 @@ var TATTERED_EDGES = [
   {from:'invoke-souls',  to:'invoke-strike'},
   {from:'invoke-strike', to:'invoke-dps-2'},
   {from:'invoke-dps-2',  to:'invoke-speed'},
-  // Outer arched connections (curved toward outside of modal)
-  {from:'invoke-dps-2',  to:'strikes-dps-2', cp:{x:-490, y:-95}},
-  {from:'strikes-speed', to:'power3-speed',  cp:{x:0,    y:-480}},
-  {from:'power3-dps-1',  to:'mana-dps-1',    cp:{x:490,  y:-95}},
+  // Outer arched connections (curved to follow outer ring, r≈358)
+  {from:'invoke-dps-2',  to:'strikes-dps-2', cp:{x:-388, y:-127}},
+  {from:'strikes-speed', to:'power3-speed',  cp:{x:0,    y:-409}},
+  {from:'power3-dps-1',  to:'mana-dps-1',    cp:{x:388,  y:-127}},
 ];
 
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
