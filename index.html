@@ -1327,6 +1327,26 @@ var ENEMY_TYPES = [
     hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[58,98,36] },
   { id:'sw_drock', name:'Drock', simpleName:'Drock', subtitle:'lurking beneath the surface',
     hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[72,112,46] },
+  { id:'fo_kwill',   name:'Kwill',   simpleName:'Kwill',   subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[80,140,60] },
+  { id:'fo_meep',    name:'Meep',    simpleName:'Meep',    subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[90,150,65] },
+  { id:'fo_melu',    name:'Melu',    simpleName:'Melu',    subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[75,130,55] },
+  { id:'fo_nib',     name:'Nib',     simpleName:'Nib',     subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[85,145,62] },
+  { id:'fo_robber',  name:'Robber',  simpleName:'Robber',  subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[70,125,50] },
+  { id:'fo_scurri',  name:'Scurri',  simpleName:'Scurri',  subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[95,155,68] },
+  { id:'fo_skawk',   name:'Skawk',   simpleName:'Skawk',   subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[78,135,57] },
+  { id:'fo_taroo',   name:'Taroo',   simpleName:'Taroo',   subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[88,148,64] },
+  { id:'fo_pepper',  name:'Pepper',  simpleName:'Pepper',  subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[72,128,52] },
+  { id:'fo_diggo',   name:'Diggo',   simpleName:'Diggo',   subtitle:'rustling where nothing should be',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[92,152,67] },
 ];
 
 
@@ -1353,7 +1373,7 @@ var FLOORS_PER_LEVEL  = 9;   // normal floors per level; elite is floor FLOORS_P
 var LEVELS_PER_REALM  = 10;
 var FLOORS_PER_REALM  = FLOORS_PER_LEVEL * LEVELS_PER_REALM; // 90 normal + 10 elites
 var WINS_PER_FLOOR    = 10;
-var REALM_NAMES       = ['Void', 'Underworld', 'Swamp'];  // indexed by curRealm-1; unnamed realms fall back to number
+var REALM_NAMES       = ['Void', 'Underworld', 'Swamp', 'Forest'];  // indexed by curRealm-1; unnamed realms fall back to number
 
 // No realm cap — break_infinity.js handles arbitrarily large HP values
 var MINIMAP_VISIBLE  = 7;
