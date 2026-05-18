@@ -181,6 +181,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #flesh-confirm-yes:hover { background: rgba(212,168,67,0.15); }
 #flesh-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
 #flesh-confirm-no:hover { border-color: #554466; color: #776699; }
+#flesh-cancel-btn { flex: 0 0 auto; padding: 12px 16px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 6px; letter-spacing: 1px; transition: border-color 0.2s, color 0.2s; }
+#flesh-cancel-btn:hover { border-color: #554466; color: #665588; }
 
 /* Settings button */
 #settings-btn { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
@@ -741,12 +743,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="flesh-box">
     <div id="flesh-title">You have become Flesh.</div>
     <div id="flesh-body">
-      You have consumed enough souls to become Flesh. Your form bonus will increase by 50%.<br><br>
+      You have consumed enough souls to become Flesh. Your form bonus will increase by 50% and gain <span id="flesh-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls.<br><br>
       You may choose to forsake your form and return to Ether, losing your bonus.<br><br>
       Either path, you will keep your Tattered Souls, Achievements, and Tattered Shop upgrades.
     </div>
     <div id="flesh-choices">
       <button id="flesh-descend-btn">Descend</button>
+      <button id="flesh-cancel-btn">Not yet</button>
       <button id="flesh-ascend-btn">Ascend</button>
     </div>
     <div id="flesh-confirm">
@@ -3848,6 +3851,7 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
   document.getElementById('rebirth-modal').classList.remove('open');
   if(rebirthCount===1){
     document.getElementById('flesh-confirm').classList.remove('show');
+    document.getElementById('flesh-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('flesh-modal').classList.add('open');
   } else {
     document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
@@ -3913,6 +3917,12 @@ document.getElementById('flesh-confirm-yes').addEventListener('click',function()
 
 document.getElementById('flesh-confirm-no').addEventListener('click',function(){
   document.getElementById('flesh-confirm').classList.remove('show');
+  _pendingFleshChoice=null;
+});
+
+document.getElementById('flesh-cancel-btn').addEventListener('click',function(){
+  document.getElementById('flesh-confirm').classList.remove('show');
+  document.getElementById('flesh-modal').classList.remove('open');
   _pendingFleshChoice=null;
 });
 
