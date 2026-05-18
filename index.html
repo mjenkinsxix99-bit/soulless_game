@@ -1941,6 +1941,7 @@ function entityAttack(isAuto, isSpell){
     var r3=enemySoulReward.mul(3);
     souls=souls.add(r3); totalSouls=totalSouls.add(r3);
     document.getElementById('soul-count').textContent=fmt(souls);
+    dirtyU=true;
   }
   if(enemyHp.lte(0)) onEnemyDeath();
 }
@@ -1965,6 +1966,7 @@ function onEnemyDeath(){
   var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
+  dirtyU=true;
 
   var d=def();
   if(!firstKillDone[d.id]){
