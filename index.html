@@ -677,32 +677,32 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div id="form-sub">You must Choose your form. Choose wisely. Changing forms is difficult.</div>
     <div id="form-grid">
       <div class="form-card" data-form="masculine">
-        <img src="artwork/masculine.png" alt="Masculine">
+        <img src="artwork/masculine.webp" alt="Masculine">
         <div class="fc-name">Masculine</div>
         <div class="fc-bonus">+10% DPS &amp; Strike Damage</div>
       </div>
       <div class="form-card" data-form="feminine">
-        <img src="artwork/feminine.png" alt="Feminine">
+        <img src="artwork/feminine.webp" alt="Feminine">
         <div class="fc-name">Feminine</div>
         <div class="fc-bonus">+10% Tattered Souls gained</div>
       </div>
       <div class="form-card" data-form="androgynous">
-        <img src="artwork/androgynous.png" alt="Androgynous">
+        <img src="artwork/androgynous.webp" alt="Androgynous">
         <div class="fc-name">Androgynous</div>
         <div class="fc-bonus">+10% Souls gained</div>
       </div>
       <div class="form-card" data-form="canine">
-        <img src="artwork/canine.png" alt="Canine">
+        <img src="artwork/canine.webp" alt="Canine">
         <div class="fc-name">Canine</div>
         <div class="fc-bonus">-10% Milestone requirement</div>
       </div>
       <div class="form-card" data-form="feline">
-        <img src="artwork/feline.png" alt="Feline">
+        <img src="artwork/feline.webp" alt="Feline">
         <div class="fc-name">Feline</div>
         <div class="fc-bonus">-10% Auto-attack interval</div>
       </div>
       <div class="form-card" data-form="equine">
-        <img src="artwork/equine.png" alt="Equine">
+        <img src="artwork/equine.webp" alt="Equine">
         <div class="fc-name">Equine</div>
         <div class="fc-bonus">+5s to Elite timer</div>
       </div>
@@ -890,18 +890,18 @@ function drawEntityCanvas(t) {
   var W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  // Use form artwork image if a rebirth form is active
+  // Use form sprite sheet if a rebirth form is active, otherwise ether image
+  var useFormSheet = _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
   var activeImg = entityImg, activeLoaded = entityImgLoaded;
-  if(_rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
-    activeImg = FORM_IMAGES[_rebirthEntityOverride];
-    activeLoaded = true;
+  if(!useFormSheet && _rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
+    activeImg = FORM_IMAGES[_rebirthEntityOverride]; activeLoaded = true;
   }
-
-  if (!activeLoaded) return;
+  if(!useFormSheet && !activeLoaded) return;
 
   var deathFade = 1;
 
-  var iw = activeImg.naturalWidth, ih = activeImg.naturalHeight;
+  var iw = useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth;
+  var ih = useFormSheet ? FORM_SPRITE_CELL_H : activeImg.naturalHeight;
   var drawH = Math.min(H * 0.9, H - 10);
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
@@ -942,7 +942,12 @@ function drawEntityCanvas(t) {
     ctx.filter = 'brightness('+(1+hf*3)+') saturate('+(1-hf*0.5)+')';
   }
 
-  ctx.drawImage(activeImg, dx, dy, drawW, drawH);
+  if(useFormSheet){
+    var fi=FORM_INDEX[_rebirthEntityOverride];
+    ctx.drawImage(formSpriteSheet,fi*FORM_SPRITE_CELL_W,0,FORM_SPRITE_CELL_W,FORM_SPRITE_CELL_H,dx,dy,drawW,drawH);
+  } else {
+    ctx.drawImage(activeImg, dx, dy, drawW, drawH);
+  }
   ctx.filter = 'none';
   ctx.restore();
 
@@ -3183,13 +3188,19 @@ function updateTatteredBtn(){
 
 
 // ── REBIRTH ───────────────────────────────────────────────────────────────────
-var FORM_IMAGES={};
-var _formImagesLoaded=false;
 var FORM_NAMES=['masculine','feminine','androgynous','canine','feline','equine'];
+var FORM_SPRITE_CELL_W = 1056;
+var FORM_SPRITE_CELL_H = 1056;
+var formSpriteSheet = new Image();
+var formSpriteSheetLoaded = false;
+formSpriteSheet.onload = function(){ formSpriteSheetLoaded = true; };
+formSpriteSheet.src = "artwork/sprites_form.webp";
+var FORM_INDEX = {masculine:0,feminine:1,androgynous:2,canine:3,feline:4,equine:5};
+var FORM_IMAGES={}; var _formImagesLoaded=false;
 function preloadFormImages(){
   FORM_NAMES.forEach(function(f){
     var img=new Image();
-    img.src='artwork/'+f+'.png';
+    img.src='artwork/'+f+'.webp';
     FORM_IMAGES[f]=img;
   });
   _formImagesLoaded=true;
