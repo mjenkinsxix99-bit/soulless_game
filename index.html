@@ -880,7 +880,7 @@ for(var _si=0;_si<12;_si++){
 
 function entityExpression() {
   var now = Date.now();
-  if (now - attackFlashTime < 400) return 'angry';
+  if (ascendCount === 0 && now - attackFlashTime < 400) return 'angry';
   return 'happy';
 }
 
@@ -973,10 +973,9 @@ function drawEntityCanvas(t) {
   });
 
   // ── EXPRESSION OVERLAY drawn on top ──
-  // Face is roughly in the lower-center of the image
-  var faceX = cx + drawW * 0.04; // slightly right (facing enemy)
-  var faceY = cy + drawH * 0.08;
-  var eyeSep = drawW * 0.14;
+  var faceX = cx - drawW * 0.02;
+  var faceY = cy + drawH * 0.04;
+  var eyeSep = drawW * 0.07;
   var eyeR   = drawW * 0.055;
 
   if (expr === 'angry') {
@@ -1914,7 +1913,7 @@ function updateEnemyDefeatsPanel(){
 function entityAttack(isAuto, isSpell){
   if(!combatActive||enemyDead) return;
   if(!isAuto && !isSpell){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
-  attackFlashTime=Date.now();
+  if(!isAuto) attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
   var hi=entityDmgMax.add(entityDmgBonus).add(bonus);
