@@ -214,6 +214,35 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #path3-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
 #path3-confirm-no:hover { border-color: #554466; color: #776699; }
 
+/* Path choice modal (Ascension 4) */
+#path4-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10004; align-items: center; justify-content: center; }
+#path4-modal.open { display: flex; }
+#path4-box { background: #0a0a18; border: 1px solid #4433aa; border-radius: 10px; padding: 30px; max-width: 560px; width: 94%; max-height: 90vh; overflow-y: auto; text-align: center; }
+#path4-title { font-size: 22px; color: #d4a843; letter-spacing: 2px; margin-bottom: 16px; font-family: Georgia,serif; }
+#path4-body { font-size: 15px; color: #9977aa; line-height: 1.7; margin-bottom: 20px; letter-spacing: 0.4px; }
+#path4-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.path4-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
+.path4-card:hover { border-color: #4433aa; background: #111128; }
+.path4-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
+.path4-card .p4-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path4-card .p4-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
+.path4-card .p4-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
+#path4-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
+#path4-descend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: transparent; border: 2px solid #662222; color: #aa4444; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, border-color 0.2s; }
+#path4-descend-btn:hover { background: rgba(140,30,30,0.15); border-color: #993333; color: #cc5555; }
+#path4-cancel-btn { flex: 0 0 auto; padding: 11px 14px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 6px; letter-spacing: 1px; transition: border-color 0.2s, color 0.2s; }
+#path4-cancel-btn:hover { border-color: #554466; color: #665588; }
+#path4-ascend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: background 0.2s, box-shadow 0.2s; opacity: 0.4; pointer-events: none; }
+#path4-ascend-btn.ready { opacity: 1; pointer-events: auto; }
+#path4-ascend-btn.ready:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+#path4-confirm { display: none; margin-top: 18px; }
+#path4-confirm.show { display: block; }
+#path4-confirm-text { font-size: 15px; color: #aa9966; font-style: italic; margin-bottom: 14px; }
+#path4-confirm-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#path4-confirm-yes:hover { background: rgba(212,168,67,0.15); }
+#path4-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#path4-confirm-no:hover { border-color: #554466; color: #776699; }
+
 /* Settings button */
 #settings-btn { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
 #settings-btn:hover { background: linear-gradient(135deg, #3a2c00, #1e1800); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
@@ -824,6 +853,44 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <p id="path3-confirm-text"></p>
       <button id="path3-confirm-yes">Yes.</button>
       <button id="path3-confirm-no">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<div id="path4-modal">
+  <div id="path4-box">
+    <div id="path4-title">Choose Your Path</div>
+    <div id="path4-body">
+      To Rise again after destruction is the truest path to Glory. Every decision yields strength.<br><br>
+      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
+      Choose your path wisely. To forge a new path is tricky.
+    </div>
+    <div id="path4-grid">
+      <div class="path4-card" data-path="holy">
+        <div class="p4-art">art pending</div>
+        <div class="p4-name">Holy</div>
+        <div class="p4-bonus">+5% Strike Damage</div>
+      </div>
+      <div class="path4-card" data-path="shadow">
+        <div class="p4-art">art pending</div>
+        <div class="p4-name">Shadow</div>
+        <div class="p4-bonus">+5% Mana Gain</div>
+      </div>
+      <div class="path4-card" data-path="mystic">
+        <div class="p4-art">art pending</div>
+        <div class="p4-name">Mystic</div>
+        <div class="p4-bonus">-5% Milestone Cost</div>
+      </div>
+    </div>
+    <div id="path4-choices">
+      <button id="path4-descend-btn">Descend</button>
+      <button id="path4-cancel-btn">Not yet</button>
+      <button id="path4-ascend-btn">Ascend</button>
+    </div>
+    <div id="path4-confirm">
+      <p id="path4-confirm-text"></p>
+      <button id="path4-confirm-yes">Yes.</button>
+      <button id="path4-confirm-no">Go Back</button>
     </div>
   </div>
 </div>
@@ -1583,6 +1650,7 @@ var tatteredSouls=0;
 var rebirthCount=0;
 var formBonusMult=1.0;
 var ascension3Path=null;
+var ascension4Path=null;
 var rebirthForm=null;
 var soundMuted=false;
 var eliteKillsTotal=0;
@@ -1644,6 +1712,7 @@ function spawnSoulCoins(){
     var _mg=3*0.00001*_floorsComp;
     if(isSpellActive('manaHungry')) _mg*=1.333;
     if(rebirthForm==='feline') _mg*=(1+0.10*formBonusMult);
+    if(ascension4Path==='shadow') _mg*=1.05;
     var _tregens={'flurry-speed':0.10,'crit-speed':0.15,'blade-speed':0.20,'souls-speed':0.30,
       'rule-speed':0.40,'strikes-speed':0.50,'power3-speed':0.65,'mana-speed':0.85,'invoke-speed':1.35};
     var _tregenSum=0;
@@ -2157,6 +2226,7 @@ var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
 function getMsThresh(i){
   var t=MS_THRESH[i];
   if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*(1-0.10*formBonusMult)));
+  if(ascension4Path==='mystic') t=Math.max(1,Math.floor(t*0.95));
   return t;
 }
 var MS_MULT=[1.777,1.777,1.666,1.777,1.777,1.777,1.666,1.777,1.777,1.999];
@@ -2211,6 +2281,7 @@ function recalcStats(){
   if(rebirthForm==='masculine') totalDps=totalDps.mul(1+0.10*formBonusMult);
   if(rebirthForm==='canine') clickDmgBonus=clickDmgBonus.mul(1+0.10*formBonusMult);
   if(ascension3Path==='holy') totalDps=totalDps.mul(1.05);
+  if(ascension4Path==='holy') clickDmgBonus=clickDmgBonus.mul(1.05);
   autoAttackInterval=3000;
   // Apply Divine Hunger milestone support effects
   var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
@@ -3268,7 +3339,7 @@ function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
   var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
-  if((rebirthCount===0||rebirthCount===1||rebirthCount===2) && doom && doom.level>=1){
+  if((rebirthCount===0||rebirthCount===1||rebirthCount===2||rebirthCount===3) && doom && doom.level>=1){
     btn.style.display='block';
   } else {
     btn.style.display='none';
@@ -3383,6 +3454,7 @@ function saveGame(){
     rebirthForm:rebirthForm,
     formBonusMult:formBonusMult,
     ascension3Path:ascension3Path,
+    ascension4Path:ascension4Path,
     soulShopOwned:soulShopOwned,
     tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
@@ -3448,6 +3520,7 @@ function loadGame(){
   rebirthForm=data.rebirthForm||null;
   formBonusMult=data.formBonusMult||1.0;
   ascension3Path=data.ascension3Path||null;
+  ascension4Path=data.ascension4Path||null;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
@@ -3933,6 +4006,12 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
     document.querySelectorAll('.path3-card').forEach(function(c){c.classList.remove('picked');});
     document.getElementById('path3-modal').classList.add('open');
     _selectedPath3=null;
+  } else if(rebirthCount===3){
+    document.getElementById('path4-confirm').classList.remove('show');
+    document.getElementById('path4-ascend-btn').classList.remove('ready');
+    document.querySelectorAll('.path4-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path4-modal').classList.add('open');
+    _selectedPath4=null;
   } else {
     document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
     document.getElementById('form-confirm-btn').classList.remove('show');
@@ -4069,6 +4148,72 @@ document.getElementById('path3-confirm-yes').addEventListener('click',function()
 document.getElementById('path3-confirm-no').addEventListener('click',function(){
   document.getElementById('path3-confirm').classList.remove('show');
   _pendingPath3Choice=null;
+});
+
+// ── PATH4 MODAL (Ascension 4) ─────────────────────────────────────────────────
+var ASCENSION4_BONUSES={holy:'+5% Strike Damage',shadow:'+5% Mana Gain',mystic:'-5% Milestone Cost'};
+
+function doPath4Reset(choice,path){
+  if(choice==='ascend'){
+    ascension4Path=path;
+    doRebirthReset(rebirthForm);
+  } else {
+    ascension4Path=null;
+    ascension3Path=null;
+    formBonusMult=1.0;
+    doRebirthReset(null);
+  }
+}
+
+var _selectedPath4=null;
+var _pendingPath4Choice=null;
+
+document.querySelectorAll('.path4-card').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.path4-card').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _selectedPath4=card.getAttribute('data-path');
+    document.getElementById('path4-ascend-btn').classList.add('ready');
+    document.getElementById('path4-confirm').classList.remove('show');
+    _pendingPath4Choice=null;
+  });
+});
+
+document.getElementById('path4-descend-btn').addEventListener('click',function(){
+  _pendingPath4Choice='descend';
+  document.getElementById('path4-confirm-text').textContent='This will destroy your form. Are you sure?';
+  document.getElementById('path4-confirm').classList.add('show');
+});
+
+document.getElementById('path4-ascend-btn').addEventListener('click',function(){
+  if(!_selectedPath4) return;
+  _pendingPath4Choice='ascend';
+  var bonus=ASCENSION4_BONUSES[_selectedPath4]||'a bonus';
+  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+  var name=_selectedPath4.charAt(0).toUpperCase()+_selectedPath4.slice(1);
+  document.getElementById('path4-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
+  document.getElementById('path4-confirm').classList.add('show');
+});
+
+document.getElementById('path4-cancel-btn').addEventListener('click',function(){
+  document.getElementById('path4-confirm').classList.remove('show');
+  document.getElementById('path4-modal').classList.remove('open');
+  _pendingPath4Choice=null;
+  _selectedPath4=null;
+});
+
+document.getElementById('path4-confirm-yes').addEventListener('click',function(){
+  if(!_pendingPath4Choice) return;
+  document.getElementById('path4-modal').classList.remove('open');
+  document.getElementById('path4-confirm').classList.remove('show');
+  doPath4Reset(_pendingPath4Choice,_selectedPath4);
+  _pendingPath4Choice=null;
+  _selectedPath4=null;
+});
+
+document.getElementById('path4-confirm-no').addEventListener('click',function(){
+  document.getElementById('path4-confirm').classList.remove('show');
+  _pendingPath4Choice=null;
 });
 
 // ── INPUT ─────────────────────────────────────────────────────────────────────
