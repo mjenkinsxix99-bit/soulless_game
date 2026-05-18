@@ -163,6 +163,165 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #form-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
 #form-no:hover { border-color: #554466; color: #776699; }
 
+/* Flesh choice modal (Ascension 2) */
+#flesh-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10002; align-items: center; justify-content: center; }
+#flesh-modal.open { display: flex; }
+#flesh-box { background: #0a0a18; border: 1px solid #882222; border-radius: 10px; padding: 30px; max-width: 480px; width: 92%; max-height: 90vh; overflow-y: auto; text-align: center; }
+#flesh-title { font-size: 22px; color: #cc6644; letter-spacing: 2px; margin-bottom: 16px; font-family: Georgia,serif; }
+#flesh-body { font-size: 15px; color: #9977aa; line-height: 1.7; margin-bottom: 24px; letter-spacing: 0.4px; }
+#flesh-choices { display: flex; gap: 16px; justify-content: center; margin-top: 4px; }
+#flesh-descend-btn { flex: 1; max-width: 180px; padding: 12px 20px; background: transparent; border: 2px solid #662222; color: #aa4444; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, border-color 0.2s; }
+#flesh-descend-btn:hover { background: rgba(140,30,30,0.15); border-color: #993333; color: #cc5555; }
+#flesh-ascend-btn { flex: 1; max-width: 180px; padding: 12px 20px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: background 0.2s, box-shadow 0.2s; }
+#flesh-ascend-btn:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+#flesh-confirm { display: none; margin-top: 18px; }
+#flesh-confirm.show { display: block; }
+#flesh-confirm-text { font-size: 15px; color: #aa9966; font-style: italic; margin-bottom: 14px; }
+#flesh-confirm-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#flesh-confirm-yes:hover { background: rgba(212,168,67,0.15); }
+#flesh-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#flesh-confirm-no:hover { border-color: #554466; color: #776699; }
+#flesh-cancel-btn { flex: 0 0 auto; padding: 12px 16px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 6px; letter-spacing: 1px; transition: border-color 0.2s, color 0.2s; }
+#flesh-cancel-btn:hover { border-color: #554466; color: #665588; }
+
+/* Path choice modal (Ascension 3) */
+#path3-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10003; align-items: center; justify-content: center; }
+#path3-modal.open { display: flex; }
+#path3-box { background: #0a0a18; border: 1px solid #4433aa; border-radius: 10px; padding: 30px; max-width: 560px; width: 94%; max-height: 90vh; overflow-y: auto; text-align: center; }
+#path3-title { font-size: 22px; color: #d4a843; letter-spacing: 2px; margin-bottom: 16px; font-family: Georgia,serif; }
+#path3-body { font-size: 15px; color: #9977aa; line-height: 1.7; margin-bottom: 20px; letter-spacing: 0.4px; }
+#path3-ts-gain { color: #c47c2a; font-weight: bold; }
+#path3-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.path3-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
+.path3-card:hover { border-color: #4433aa; background: #111128; }
+.path3-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
+.path3-card .p3-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path3-card .p3-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
+.path3-card .p3-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
+#path3-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
+#path3-descend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: transparent; border: 2px solid #662222; color: #aa4444; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, border-color 0.2s; }
+#path3-descend-btn:hover { background: rgba(140,30,30,0.15); border-color: #993333; color: #cc5555; }
+#path3-cancel-btn { flex: 0 0 auto; padding: 11px 14px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 6px; letter-spacing: 1px; transition: border-color 0.2s, color 0.2s; }
+#path3-cancel-btn:hover { border-color: #554466; color: #665588; }
+#path3-ascend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: background 0.2s, box-shadow 0.2s; opacity: 0.4; pointer-events: none; }
+#path3-ascend-btn.ready { opacity: 1; pointer-events: auto; }
+#path3-ascend-btn.ready:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+#path3-confirm { display: none; margin-top: 18px; }
+#path3-confirm.show { display: block; }
+#path3-confirm-text { font-size: 15px; color: #aa9966; font-style: italic; margin-bottom: 14px; }
+#path3-confirm-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#path3-confirm-yes:hover { background: rgba(212,168,67,0.15); }
+#path3-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#path3-confirm-no:hover { border-color: #554466; color: #776699; }
+
+/* Path choice modal (Ascension 4) */
+#path4-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10004; align-items: center; justify-content: center; }
+#path4-modal.open { display: flex; }
+#path4-box { background: #0a0a18; border: 1px solid #4433aa; border-radius: 10px; padding: 30px; max-width: 560px; width: 94%; max-height: 90vh; overflow-y: auto; text-align: center; }
+#path4-title { font-size: 22px; color: #d4a843; letter-spacing: 2px; margin-bottom: 16px; font-family: Georgia,serif; }
+#path4-body { font-size: 15px; color: #9977aa; line-height: 1.7; margin-bottom: 20px; letter-spacing: 0.4px; }
+#path4-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.path4-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
+.path4-card:hover { border-color: #4433aa; background: #111128; }
+.path4-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
+.path4-card .p4-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path4-card .p4-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
+.path4-card .p4-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
+#path4-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
+#path4-descend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: transparent; border: 2px solid #662222; color: #aa4444; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, border-color 0.2s; }
+#path4-descend-btn:hover { background: rgba(140,30,30,0.15); border-color: #993333; color: #cc5555; }
+#path4-cancel-btn { flex: 0 0 auto; padding: 11px 14px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 6px; letter-spacing: 1px; transition: border-color 0.2s, color 0.2s; }
+#path4-cancel-btn:hover { border-color: #554466; color: #665588; }
+#path4-ascend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: background 0.2s, box-shadow 0.2s; opacity: 0.4; pointer-events: none; }
+#path4-ascend-btn.ready { opacity: 1; pointer-events: auto; }
+#path4-ascend-btn.ready:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+#path4-confirm { display: none; margin-top: 18px; }
+#path4-confirm.show { display: block; }
+#path4-confirm-text { font-size: 15px; color: #aa9966; font-style: italic; margin-bottom: 14px; }
+#path4-confirm-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#path4-confirm-yes:hover { background: rgba(212,168,67,0.15); }
+#path4-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#path4-confirm-no:hover { border-color: #554466; color: #776699; }
+
+/* Path choice modal (Ascension 5) */
+#path5-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10005; align-items: center; justify-content: center; }
+#path5-modal.open { display: flex; }
+#path5-box { background: #0a0a18; border: 1px solid #4433aa; border-radius: 10px; padding: 30px; max-width: 560px; width: 94%; max-height: 90vh; overflow-y: auto; text-align: center; }
+#path5-title { font-size: 22px; color: #d4a843; letter-spacing: 2px; margin-bottom: 16px; font-family: Georgia,serif; }
+#path5-body { font-size: 15px; color: #9977aa; line-height: 1.7; margin-bottom: 20px; letter-spacing: 0.4px; }
+#path5-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.path5-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
+.path5-card:hover { border-color: #4433aa; background: #111128; }
+.path5-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
+.path5-card .p5-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path5-card .p5-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
+.path5-card .p5-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
+#path5-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
+#path5-descend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: transparent; border: 2px solid #662222; color: #aa4444; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, border-color 0.2s; }
+#path5-descend-btn:hover { background: rgba(140,30,30,0.15); border-color: #993333; color: #cc5555; }
+#path5-cancel-btn { flex: 0 0 auto; padding: 11px 14px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 6px; letter-spacing: 1px; transition: border-color 0.2s, color 0.2s; }
+#path5-cancel-btn:hover { border-color: #554466; color: #665588; }
+#path5-ascend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: background 0.2s, box-shadow 0.2s; opacity: 0.4; pointer-events: none; }
+#path5-ascend-btn.ready { opacity: 1; pointer-events: auto; }
+#path5-ascend-btn.ready:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+#path5-confirm { display: none; margin-top: 18px; }
+#path5-confirm.show { display: block; }
+#path5-confirm-text { font-size: 15px; color: #aa9966; font-style: italic; margin-bottom: 14px; }
+#path5-confirm-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#path5-confirm-yes:hover { background: rgba(212,168,67,0.15); }
+#path5-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#path5-confirm-no:hover { border-color: #554466; color: #776699; }
+
+/* Path choice modal (Ascension 6) */
+#path6-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10006; align-items: center; justify-content: center; }
+#path6-modal.open { display: flex; }
+#path6-box { background: #0a0a18; border: 1px solid #4433aa; border-radius: 10px; padding: 30px; max-width: 560px; width: 94%; max-height: 90vh; overflow-y: auto; text-align: center; }
+#path6-title { font-size: 22px; color: #d4a843; letter-spacing: 2px; margin-bottom: 16px; font-family: Georgia,serif; }
+#path6-body { font-size: 15px; color: #9977aa; line-height: 1.7; margin-bottom: 20px; letter-spacing: 0.4px; }
+#path6-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.path6-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
+.path6-card:hover { border-color: #4433aa; background: #111128; }
+.path6-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
+.path6-card .p6-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path6-card .p6-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
+.path6-card .p6-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
+#path6-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
+#path6-descend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: transparent; border: 2px solid #662222; color: #aa4444; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, border-color 0.2s; }
+#path6-descend-btn:hover { background: rgba(140,30,30,0.15); border-color: #993333; color: #cc5555; }
+#path6-cancel-btn { flex: 0 0 auto; padding: 11px 14px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 6px; letter-spacing: 1px; transition: border-color 0.2s, color 0.2s; }
+#path6-cancel-btn:hover { border-color: #554466; color: #665588; }
+#path6-ascend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: background 0.2s, box-shadow 0.2s; opacity: 0.4; pointer-events: none; }
+#path6-ascend-btn.ready { opacity: 1; pointer-events: auto; }
+#path6-ascend-btn.ready:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+#path6-confirm { display: none; margin-top: 18px; }
+#path6-confirm.show { display: block; }
+#path6-confirm-text { font-size: 15px; color: #aa9966; font-style: italic; margin-bottom: 14px; }
+#path6-confirm-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#path6-confirm-yes:hover { background: rgba(212,168,67,0.15); }
+#path6-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#path6-confirm-no:hover { border-color: #554466; color: #776699; }
+
+/* Final form modal (Ascension 7+) */
+#final-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10007; align-items: center; justify-content: center; }
+#final-modal.open { display: flex; }
+#final-box { background: #0a0a18; border: 1px solid #d4a843; border-radius: 10px; padding: 30px; max-width: 480px; width: 92%; max-height: 90vh; overflow-y: auto; text-align: center; }
+#final-title { font-size: 22px; color: #d4a843; letter-spacing: 2px; margin-bottom: 16px; font-family: Georgia,serif; }
+#final-body { font-size: 15px; color: #9977aa; line-height: 1.7; margin-bottom: 24px; letter-spacing: 0.4px; }
+#final-choices { display: flex; gap: 16px; justify-content: center; margin-top: 4px; }
+#final-descend-btn { flex: 1; max-width: 160px; padding: 12px 16px; background: transparent; border: 2px solid #662222; color: #aa4444; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, border-color 0.2s; }
+#final-descend-btn:hover { background: rgba(140,30,30,0.15); border-color: #993333; color: #cc5555; }
+#final-cancel-btn { flex: 0 0 auto; padding: 12px 14px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 6px; letter-spacing: 1px; transition: border-color 0.2s, color 0.2s; }
+#final-cancel-btn:hover { border-color: #554466; color: #665588; }
+#final-ascend-btn { flex: 1; max-width: 160px; padding: 12px 16px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: background 0.2s, box-shadow 0.2s; }
+#final-ascend-btn:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+#final-confirm { display: none; margin-top: 18px; }
+#final-confirm.show { display: block; }
+#final-confirm-text { font-size: 15px; color: #aa9966; font-style: italic; margin-bottom: 14px; }
+#final-confirm-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#final-confirm-yes:hover { background: rgba(212,168,67,0.15); }
+#final-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#final-confirm-no:hover { border-color: #554466; color: #776699; }
+
 /* Settings button */
 #settings-btn { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
 #settings-btn:hover { background: linear-gradient(135deg, #3a2c00, #1e1800); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
@@ -679,7 +838,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div class="form-card" data-form="masculine">
         <img src="artwork/masculine.webp" alt="Masculine">
         <div class="fc-name">Masculine</div>
-        <div class="fc-bonus">+10% DPS &amp; Strike Damage</div>
+        <div class="fc-bonus">+10% DPS</div>
       </div>
       <div class="form-card" data-form="feminine">
         <img src="artwork/feminine.webp" alt="Feminine">
@@ -694,17 +853,17 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div class="form-card" data-form="canine">
         <img src="artwork/canine.webp" alt="Canine">
         <div class="fc-name">Canine</div>
-        <div class="fc-bonus">-10% Milestone requirement</div>
+        <div class="fc-bonus">+10% Strike Damage</div>
       </div>
       <div class="form-card" data-form="feline">
         <img src="artwork/feline.webp" alt="Feline">
         <div class="fc-name">Feline</div>
-        <div class="fc-bonus">-10% Auto-attack interval</div>
+        <div class="fc-bonus">+10% Mana Gain</div>
       </div>
       <div class="form-card" data-form="equine">
         <img src="artwork/equine.webp" alt="Equine">
         <div class="fc-name">Equine</div>
-        <div class="fc-bonus">+5s to Elite timer</div>
+        <div class="fc-bonus">-10% Milestone requirement</div>
       </div>
     </div>
     <div id="form-confirm-area">
@@ -714,6 +873,200 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button id="form-yes">Yes. Begin.</button>
         <button id="form-no">Choose Again</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="flesh-modal">
+  <div id="flesh-box">
+    <div id="flesh-title">You have become Flesh.</div>
+    <div id="flesh-body">
+      You have consumed enough souls to become Flesh. Your form bonus will increase by 50% and gain <span id="flesh-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls.<br><br>
+      You may choose to forsake your form and return to Ether, losing your bonus.<br><br>
+      Either path, you will keep your Tattered Souls, Achievements, and Tattered Shop upgrades.
+    </div>
+    <div id="flesh-choices">
+      <button id="flesh-descend-btn">Descend</button>
+      <button id="flesh-cancel-btn">Not yet</button>
+      <button id="flesh-ascend-btn">Ascend</button>
+    </div>
+    <div id="flesh-confirm">
+      <p id="flesh-confirm-text"></p>
+      <button id="flesh-confirm-yes">Yes.</button>
+      <button id="flesh-confirm-no">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<div id="path3-modal">
+  <div id="path3-box">
+    <div id="path3-title">Choose Your Path</div>
+    <div id="path3-body">
+      Many souls have been consumed in your quest to regain glory. Many more will fall before you succeed.<br><br>
+      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
+      Choose your path wisely. The way back is difficult.
+    </div>
+    <div id="path3-grid">
+      <div class="path3-card" data-path="holy">
+        <div class="p3-art">art pending</div>
+        <div class="p3-name">Holy</div>
+        <div class="p3-bonus">+5% DPS</div>
+      </div>
+      <div class="path3-card" data-path="shadow">
+        <div class="p3-art">art pending</div>
+        <div class="p3-name">Shadow</div>
+        <div class="p3-bonus">+5% Tattered Souls</div>
+      </div>
+      <div class="path3-card" data-path="mystic">
+        <div class="p3-art">art pending</div>
+        <div class="p3-name">Mystic</div>
+        <div class="p3-bonus">+5% Souls gained</div>
+      </div>
+    </div>
+    <div id="path3-choices">
+      <button id="path3-descend-btn">Descend</button>
+      <button id="path3-cancel-btn">Not yet</button>
+      <button id="path3-ascend-btn">Ascend</button>
+    </div>
+    <div id="path3-confirm">
+      <p id="path3-confirm-text"></p>
+      <button id="path3-confirm-yes">Yes.</button>
+      <button id="path3-confirm-no">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<div id="path4-modal">
+  <div id="path4-box">
+    <div id="path4-title">Choose Your Path</div>
+    <div id="path4-body">
+      To Rise again after destruction is the truest path to Glory. Every decision yields strength.<br><br>
+      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
+      Choose your path wisely. To forge a new path is tricky.
+    </div>
+    <div id="path4-grid">
+      <div class="path4-card" data-path="holy">
+        <div class="p4-art">art pending</div>
+        <div class="p4-name">Holy</div>
+        <div class="p4-bonus">+5% Strike Damage</div>
+      </div>
+      <div class="path4-card" data-path="shadow">
+        <div class="p4-art">art pending</div>
+        <div class="p4-name">Shadow</div>
+        <div class="p4-bonus">+5% Mana Gain</div>
+      </div>
+      <div class="path4-card" data-path="mystic">
+        <div class="p4-art">art pending</div>
+        <div class="p4-name">Mystic</div>
+        <div class="p4-bonus">-5% Milestone Cost</div>
+      </div>
+    </div>
+    <div id="path4-choices">
+      <button id="path4-descend-btn">Descend</button>
+      <button id="path4-cancel-btn">Not yet</button>
+      <button id="path4-ascend-btn">Ascend</button>
+    </div>
+    <div id="path4-confirm">
+      <p id="path4-confirm-text"></p>
+      <button id="path4-confirm-yes">Yes.</button>
+      <button id="path4-confirm-no">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<div id="path5-modal">
+  <div id="path5-box">
+    <div id="path5-title">Choose Your Path</div>
+    <div id="path5-body">
+      Fall and rise again, until every soul bends to your will. Let not fear deter your journey.<br><br>
+      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
+      Choose your path wisely. No need to add to your burden by trying to go backwards.
+    </div>
+    <div id="path5-grid">
+      <div class="path5-card" data-path="holy">
+        <div class="p5-art">art pending</div>
+        <div class="p5-name">Holy</div>
+        <div class="p5-bonus">+5% Mana Gain</div>
+      </div>
+      <div class="path5-card" data-path="shadow">
+        <div class="p5-art">art pending</div>
+        <div class="p5-name">Shadow</div>
+        <div class="p5-bonus">+5% DPS</div>
+      </div>
+      <div class="path5-card" data-path="mystic">
+        <div class="p5-art">art pending</div>
+        <div class="p5-name">Mystic</div>
+        <div class="p5-bonus">+5% Strike Damage</div>
+      </div>
+    </div>
+    <div id="path5-choices">
+      <button id="path5-descend-btn">Descend</button>
+      <button id="path5-cancel-btn">Not yet</button>
+      <button id="path5-ascend-btn">Ascend</button>
+    </div>
+    <div id="path5-confirm">
+      <p id="path5-confirm-text"></p>
+      <button id="path5-confirm-yes">Yes.</button>
+      <button id="path5-confirm-no">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<div id="path6-modal">
+  <div id="path6-box">
+    <div id="path6-title">Choose Your Path</div>
+    <div id="path6-body">
+      You have become strong indeed. Perhaps stronger than before. Soon you may take revenge and challenge the gods themselves.<br><br>
+      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
+      Choose your path wisely. You do not need courage when you have the strength required.
+    </div>
+    <div id="path6-grid">
+      <div class="path6-card" data-path="steel">
+        <div class="p6-art">art pending</div>
+        <div class="p6-name">Steel</div>
+        <div class="p6-bonus">+10% DPS</div>
+      </div>
+      <div class="path6-card" data-path="leather">
+        <div class="p6-art">art pending</div>
+        <div class="p6-name">Leather</div>
+        <div class="p6-bonus">+10% Tattered Souls</div>
+      </div>
+      <div class="path6-card" data-path="knowledge">
+        <div class="p6-art">art pending</div>
+        <div class="p6-name">Knowledge</div>
+        <div class="p6-bonus">+10% Mana Generation</div>
+      </div>
+    </div>
+    <div id="path6-choices">
+      <button id="path6-descend-btn">Descend</button>
+      <button id="path6-cancel-btn">Not yet</button>
+      <button id="path6-ascend-btn">Ascend</button>
+    </div>
+    <div id="path6-confirm">
+      <p id="path6-confirm-text"></p>
+      <button id="path6-confirm-yes">Yes.</button>
+      <button id="path6-confirm-no">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<div id="final-modal">
+  <div id="final-box">
+    <div id="final-title">You have achieved your Final Form.</div>
+    <div id="final-body">
+      You have become strength itself. There is nothing that can hold you back.<br><br>
+      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
+      You have achieved your final form. There are more conquests that await you.
+    </div>
+    <div id="final-choices">
+      <button id="final-descend-btn">Descend</button>
+      <button id="final-cancel-btn">Not yet</button>
+      <button id="final-ascend-btn">Ascend</button>
+    </div>
+    <div id="final-confirm">
+      <p id="final-confirm-text"></p>
+      <button id="final-confirm-yes">Yes.</button>
+      <button id="final-confirm-no">Go Back</button>
     </div>
   </div>
 </div>
@@ -1471,6 +1824,11 @@ var ascendCount=0;
 var currentAscensionKills=0;
 var tatteredSouls=0;
 var rebirthCount=0;
+var formBonusMult=1.0;
+var ascension3Path=null;
+var ascension4Path=null;
+var ascension5Path=null;
+var ascension6Path=null;
 var rebirthForm=null;
 var soundMuted=false;
 var eliteKillsTotal=0;
@@ -1531,6 +1889,10 @@ function spawnSoulCoins(){
   if(_floorsComp>0){
     var _mg=3*0.00001*_floorsComp;
     if(isSpellActive('manaHungry')) _mg*=1.333;
+    if(rebirthForm==='feline') _mg*=(1+0.10*formBonusMult);
+    if(ascension4Path==='shadow') _mg*=1.05;
+    if(ascension5Path==='holy') _mg*=1.05;
+    if(ascension6Path==='knowledge') _mg*=1.10;
     var _tregens={'flurry-speed':0.10,'crit-speed':0.15,'blade-speed':0.20,'souls-speed':0.30,
       'rule-speed':0.40,'strikes-speed':0.50,'power3-speed':0.65,'mana-speed':0.85,'invoke-speed':1.35};
     var _tregenSum=0;
@@ -1887,7 +2249,8 @@ function onEnemyDeath(){
   spawnSoulCoins();
   document.getElementById('elite-timer-wrap').style.display='none';
   var soulMult=1;
-  if(rebirthForm==='androgynous') soulMult*=1.1;
+  if(rebirthForm==='androgynous') soulMult*=(1+0.10*formBonusMult);
+  if(ascension3Path==='mystic') soulMult*=1.05;
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
   // Spell: Twin Souls — ×2 souls gained
   if(isSpellActive('twinSouls')) soulMult*=2;
@@ -2042,7 +2405,8 @@ var DV_MS_EFFECTS=[
 var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
 function getMsThresh(i){
   var t=MS_THRESH[i];
-  if(rebirthForm==='canine') t=Math.max(1,Math.floor(t*0.9));
+  if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*(1-0.10*formBonusMult)));
+  if(ascension4Path==='mystic') t=Math.max(1,Math.floor(t*0.95));
   return t;
 }
 var MS_MULT=[1.777,1.777,1.666,1.777,1.777,1.777,1.666,1.777,1.777,1.999];
@@ -2094,11 +2458,14 @@ function recalcStats(){
     }
   });
   // Apply form bonuses
-  if(rebirthForm==='masculine'){
-    clickDmgBonus=clickDmgBonus.mul(1.1);
-    totalDps=totalDps.mul(1.1);
-  }
-  autoAttackInterval=rebirthForm==='feline'?2700:3000;
+  if(rebirthForm==='masculine') totalDps=totalDps.mul(1+0.10*formBonusMult);
+  if(rebirthForm==='canine') clickDmgBonus=clickDmgBonus.mul(1+0.10*formBonusMult);
+  if(ascension3Path==='holy') totalDps=totalDps.mul(1.05);
+  if(ascension4Path==='holy') clickDmgBonus=clickDmgBonus.mul(1.05);
+  if(ascension5Path==='shadow') totalDps=totalDps.mul(1.05);
+  if(ascension5Path==='mystic') clickDmgBonus=clickDmgBonus.mul(1.05);
+  if(ascension6Path==='steel') totalDps=totalDps.mul(1.10);
+  autoAttackInterval=3000;
   // Apply Divine Hunger milestone support effects
   var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
   if(dv){
@@ -2420,6 +2787,7 @@ var ACHIEVEMENTS=[
   {id:'form-tail',     cat:'Identity',        name:'A New Appendage',         desc:'Something follows you now',                   check:function(){return traitChoicesEver.indexOf('tail')>=0;}},
   {id:'form-weapon',   cat:'Identity',        name:'Armed',                   desc:'A tool of ending',                            check:function(){return traitChoicesEver.indexOf('weapon')>=0;}},
   {id:'form-ultimate', cat:'Identity',        name:'Ascendant',               desc:'Reach the ultimate form',                     check:function(){return stage>=3;}},
+  {id:'final-form',    cat:'Transcendence',   name:'Final Form',              desc:'Complete all seven ascensions',               check:function(){return rebirthCount>=7;}},
 ];
 
 function checkAchievements(silent){
@@ -3146,7 +3514,9 @@ function calcTatteredSoulsGain(chosenForm){
   var base=Math.floor(totalUpgradePurchases/666);
   // Feminine bonus applies to the NEWLY CHOSEN form (not the current one, since this is the gain for this rebirth)
   var form=chosenForm!==undefined?chosenForm:rebirthForm;
-  if(form==='feminine') base=Math.floor(base*1.1);
+  if(form==='feminine') base=Math.floor(base*(1+0.10*formBonusMult));
+  if(ascension3Path==='shadow') base=Math.floor(base*1.05);
+  if(ascension6Path==='leather') base=Math.floor(base*1.10);
   return Math.max(0,base);
 }
 
@@ -3154,11 +3524,7 @@ function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
   var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
-  if(rebirthCount===0 && doom && doom.level>=1){
-    btn.style.display='block';
-  } else {
-    btn.style.display='none';
-  }
+  btn.style.display=(doom&&doom.level>=1)?'block':'none';
 }
 
 function updateTatteredDisplay(){
@@ -3267,6 +3633,11 @@ function saveGame(){
     tatteredSouls:tatteredSouls,
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
+    formBonusMult:formBonusMult,
+    ascension3Path:ascension3Path,
+    ascension4Path:ascension4Path,
+    ascension5Path:ascension5Path,
+    ascension6Path:ascension6Path,
     soulShopOwned:soulShopOwned,
     tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
@@ -3330,6 +3701,11 @@ function loadGame(){
   tatteredSouls=data.tatteredSouls||0;
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
+  formBonusMult=data.formBonusMult||1.0;
+  ascension3Path=data.ascension3Path||null;
+  ascension4Path=data.ascension4Path||null;
+  ascension5Path=data.ascension5Path||null;
+  ascension6Path=data.ascension6Path||null;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
@@ -3638,13 +4014,32 @@ function buildUpgrades(){
 }
 
 var FORM_BONUSES={
-  masculine:   '+10% Strike &amp; Auto Damage',
+  masculine:   '+10% DPS',
   feminine:    '+10% Tattered Souls gained',
   androgynous: '+10% Souls gained',
-  canine:      '-10% Milestone requirement',
-  feline:      '-10% Auto-attack interval',
-  equine:      '+5s to Elite timer'
+  canine:      '+10% Strike Damage',
+  feline:      '+10% Mana Gain',
+  equine:      '-10% Milestone requirement'
 };
+
+var FORM_BONUS_ASCENDED={
+  masculine:   '+15% DPS',
+  feminine:    '+15% Tattered Souls gained',
+  androgynous: '+15% Souls gained',
+  canine:      '+15% Strike Damage',
+  feline:      '+15% Mana Gain',
+  equine:      '-15% Milestone requirement'
+};
+
+function doFleshReset(choice){
+  if(choice==='ascend'){
+    formBonusMult=1.5;
+    doRebirthReset(rebirthForm);
+  } else {
+    formBonusMult=1.0;
+    doRebirthReset(null);
+  }
+}
 
 var FORM_NAMEPLATES={
   masculine:   {label:'Masculine.', desc:'Strong.... Aggressive.'},
@@ -3786,11 +4181,43 @@ document.getElementById('rebirth-cancel').addEventListener('click',function(){
 
 document.getElementById('rebirth-ascend-now').addEventListener('click',function(){
   document.getElementById('rebirth-modal').classList.remove('open');
-  // Reset selected form state
-  document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
-  document.getElementById('form-confirm-btn').classList.remove('show');
-  document.getElementById('form-certain').classList.remove('show');
-  document.getElementById('form-modal').classList.add('open');
+  if(rebirthCount===1){
+    document.getElementById('flesh-confirm').classList.remove('show');
+    document.getElementById('flesh-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+    document.getElementById('flesh-modal').classList.add('open');
+  } else if(rebirthCount===2){
+    document.getElementById('path3-confirm').classList.remove('show');
+    document.getElementById('path3-ascend-btn').classList.remove('ready');
+    document.querySelectorAll('.path3-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path3-modal').classList.add('open');
+    _selectedPath3=null;
+  } else if(rebirthCount===3){
+    document.getElementById('path4-confirm').classList.remove('show');
+    document.getElementById('path4-ascend-btn').classList.remove('ready');
+    document.querySelectorAll('.path4-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path4-modal').classList.add('open');
+    _selectedPath4=null;
+  } else if(rebirthCount===4){
+    document.getElementById('path5-confirm').classList.remove('show');
+    document.getElementById('path5-ascend-btn').classList.remove('ready');
+    document.querySelectorAll('.path5-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path5-modal').classList.add('open');
+    _selectedPath5=null;
+  } else if(rebirthCount===5){
+    document.getElementById('path6-confirm').classList.remove('show');
+    document.getElementById('path6-ascend-btn').classList.remove('ready');
+    document.querySelectorAll('.path6-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path6-modal').classList.add('open');
+    _selectedPath6=null;
+  } else if(rebirthCount>=6){
+    document.getElementById('final-confirm').classList.remove('show');
+    document.getElementById('final-modal').classList.add('open');
+  } else {
+    document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('form-confirm-btn').classList.remove('show');
+    document.getElementById('form-certain').classList.remove('show');
+    document.getElementById('form-modal').classList.add('open');
+  }
 });
 
 var _selectedForm=null;
@@ -3823,6 +4250,355 @@ document.getElementById('form-no').addEventListener('click',function(){
   _selectedForm=null;
 });
 
+// ── FLESH MODAL (Ascension 2) ─────────────────────────────────────────────────
+var _pendingFleshChoice=null;
+
+document.getElementById('flesh-descend-btn').addEventListener('click',function(){
+  _pendingFleshChoice='descend';
+  document.getElementById('flesh-confirm-text').textContent='This will destroy your form. Are you sure?';
+  document.getElementById('flesh-confirm').classList.add('show');
+});
+
+document.getElementById('flesh-ascend-btn').addEventListener('click',function(){
+  _pendingFleshChoice='ascend';
+  var newBonus=FORM_BONUS_ASCENDED[rebirthForm]||'an increased bonus';
+  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+  document.getElementById('flesh-confirm-text').textContent='This will increase your bonus to '+newBonus+' and grant '+tsGain+' Tattered Souls. Are you sure?';
+  document.getElementById('flesh-confirm').classList.add('show');
+});
+
+document.getElementById('flesh-confirm-yes').addEventListener('click',function(){
+  if(!_pendingFleshChoice) return;
+  document.getElementById('flesh-modal').classList.remove('open');
+  document.getElementById('flesh-confirm').classList.remove('show');
+  doFleshReset(_pendingFleshChoice);
+  _pendingFleshChoice=null;
+});
+
+document.getElementById('flesh-confirm-no').addEventListener('click',function(){
+  document.getElementById('flesh-confirm').classList.remove('show');
+  _pendingFleshChoice=null;
+});
+
+document.getElementById('flesh-cancel-btn').addEventListener('click',function(){
+  document.getElementById('flesh-confirm').classList.remove('show');
+  document.getElementById('flesh-modal').classList.remove('open');
+  _pendingFleshChoice=null;
+});
+
+// ── PATH3 MODAL (Ascension 3) ─────────────────────────────────────────────────
+var ASCENSION3_BONUSES={holy:'+5% DPS',shadow:'+5% Tattered Souls',mystic:'+5% Souls gained'};
+
+function doPath3Reset(choice,path){
+  if(choice==='ascend'){
+    ascension3Path=path;
+    doRebirthReset(rebirthForm);
+  } else {
+    ascension3Path=null;
+    formBonusMult=1.0;
+    doRebirthReset(null);
+  }
+}
+
+var _selectedPath3=null;
+var _pendingPath3Choice=null;
+
+document.querySelectorAll('.path3-card').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.path3-card').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _selectedPath3=card.getAttribute('data-path');
+    document.getElementById('path3-ascend-btn').classList.add('ready');
+    document.getElementById('path3-confirm').classList.remove('show');
+    _pendingPath3Choice=null;
+  });
+});
+
+document.getElementById('path3-descend-btn').addEventListener('click',function(){
+  _pendingPath3Choice='descend';
+  document.getElementById('path3-confirm-text').textContent='This will destroy your form. Are you sure?';
+  document.getElementById('path3-confirm').classList.add('show');
+});
+
+document.getElementById('path3-ascend-btn').addEventListener('click',function(){
+  if(!_selectedPath3) return;
+  _pendingPath3Choice='ascend';
+  var bonus=ASCENSION3_BONUSES[_selectedPath3]||'a bonus';
+  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+  document.getElementById('path3-confirm-text').textContent='You will walk the '+_selectedPath3.charAt(0).toUpperCase()+_selectedPath3.slice(1)+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
+  document.getElementById('path3-confirm').classList.add('show');
+});
+
+document.getElementById('path3-cancel-btn').addEventListener('click',function(){
+  document.getElementById('path3-confirm').classList.remove('show');
+  document.getElementById('path3-modal').classList.remove('open');
+  _pendingPath3Choice=null;
+  _selectedPath3=null;
+});
+
+document.getElementById('path3-confirm-yes').addEventListener('click',function(){
+  if(!_pendingPath3Choice) return;
+  document.getElementById('path3-modal').classList.remove('open');
+  document.getElementById('path3-confirm').classList.remove('show');
+  doPath3Reset(_pendingPath3Choice,_selectedPath3);
+  _pendingPath3Choice=null;
+  _selectedPath3=null;
+});
+
+document.getElementById('path3-confirm-no').addEventListener('click',function(){
+  document.getElementById('path3-confirm').classList.remove('show');
+  _pendingPath3Choice=null;
+});
+
+// ── PATH4 MODAL (Ascension 4) ─────────────────────────────────────────────────
+var ASCENSION4_BONUSES={holy:'+5% Strike Damage',shadow:'+5% Mana Gain',mystic:'-5% Milestone Cost'};
+
+function doPath4Reset(choice,path){
+  if(choice==='ascend'){
+    ascension4Path=path;
+    doRebirthReset(rebirthForm);
+  } else {
+    ascension4Path=null;
+    ascension3Path=null;
+    formBonusMult=1.0;
+    doRebirthReset(null);
+  }
+}
+
+var _selectedPath4=null;
+var _pendingPath4Choice=null;
+
+document.querySelectorAll('.path4-card').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.path4-card').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _selectedPath4=card.getAttribute('data-path');
+    document.getElementById('path4-ascend-btn').classList.add('ready');
+    document.getElementById('path4-confirm').classList.remove('show');
+    _pendingPath4Choice=null;
+  });
+});
+
+document.getElementById('path4-descend-btn').addEventListener('click',function(){
+  _pendingPath4Choice='descend';
+  document.getElementById('path4-confirm-text').textContent='This will destroy your form. Are you sure?';
+  document.getElementById('path4-confirm').classList.add('show');
+});
+
+document.getElementById('path4-ascend-btn').addEventListener('click',function(){
+  if(!_selectedPath4) return;
+  _pendingPath4Choice='ascend';
+  var bonus=ASCENSION4_BONUSES[_selectedPath4]||'a bonus';
+  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+  var name=_selectedPath4.charAt(0).toUpperCase()+_selectedPath4.slice(1);
+  document.getElementById('path4-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
+  document.getElementById('path4-confirm').classList.add('show');
+});
+
+document.getElementById('path4-cancel-btn').addEventListener('click',function(){
+  document.getElementById('path4-confirm').classList.remove('show');
+  document.getElementById('path4-modal').classList.remove('open');
+  _pendingPath4Choice=null;
+  _selectedPath4=null;
+});
+
+document.getElementById('path4-confirm-yes').addEventListener('click',function(){
+  if(!_pendingPath4Choice) return;
+  document.getElementById('path4-modal').classList.remove('open');
+  document.getElementById('path4-confirm').classList.remove('show');
+  doPath4Reset(_pendingPath4Choice,_selectedPath4);
+  _pendingPath4Choice=null;
+  _selectedPath4=null;
+});
+
+document.getElementById('path4-confirm-no').addEventListener('click',function(){
+  document.getElementById('path4-confirm').classList.remove('show');
+  _pendingPath4Choice=null;
+});
+
+// ── PATH5 MODAL (Ascension 5) ─────────────────────────────────────────────────
+var ASCENSION5_BONUSES={holy:'+5% Mana Gain',shadow:'+5% DPS',mystic:'+5% Strike Damage'};
+
+function doPath5Reset(choice,path){
+  if(choice==='ascend'){
+    ascension5Path=path;
+    doRebirthReset(rebirthForm);
+  } else {
+    ascension5Path=null;
+    ascension4Path=null;
+    ascension3Path=null;
+    formBonusMult=1.0;
+    doRebirthReset(null);
+  }
+}
+
+var _selectedPath5=null;
+var _pendingPath5Choice=null;
+
+document.querySelectorAll('.path5-card').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.path5-card').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _selectedPath5=card.getAttribute('data-path');
+    document.getElementById('path5-ascend-btn').classList.add('ready');
+    document.getElementById('path5-confirm').classList.remove('show');
+    _pendingPath5Choice=null;
+  });
+});
+
+document.getElementById('path5-descend-btn').addEventListener('click',function(){
+  _pendingPath5Choice='descend';
+  document.getElementById('path5-confirm-text').textContent='This will destroy your form. Are you sure?';
+  document.getElementById('path5-confirm').classList.add('show');
+});
+
+document.getElementById('path5-ascend-btn').addEventListener('click',function(){
+  if(!_selectedPath5) return;
+  _pendingPath5Choice='ascend';
+  var bonus=ASCENSION5_BONUSES[_selectedPath5]||'a bonus';
+  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+  var name=_selectedPath5.charAt(0).toUpperCase()+_selectedPath5.slice(1);
+  document.getElementById('path5-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
+  document.getElementById('path5-confirm').classList.add('show');
+});
+
+document.getElementById('path5-cancel-btn').addEventListener('click',function(){
+  document.getElementById('path5-confirm').classList.remove('show');
+  document.getElementById('path5-modal').classList.remove('open');
+  _pendingPath5Choice=null;
+  _selectedPath5=null;
+});
+
+document.getElementById('path5-confirm-yes').addEventListener('click',function(){
+  if(!_pendingPath5Choice) return;
+  document.getElementById('path5-modal').classList.remove('open');
+  document.getElementById('path5-confirm').classList.remove('show');
+  doPath5Reset(_pendingPath5Choice,_selectedPath5);
+  _pendingPath5Choice=null;
+  _selectedPath5=null;
+});
+
+document.getElementById('path5-confirm-no').addEventListener('click',function(){
+  document.getElementById('path5-confirm').classList.remove('show');
+  _pendingPath5Choice=null;
+});
+
+// ── PATH6 MODAL (Ascension 6) ─────────────────────────────────────────────────
+var ASCENSION6_BONUSES={steel:'+10% DPS',leather:'+10% Tattered Souls',knowledge:'+10% Mana Generation'};
+
+function doPath6Reset(choice,path){
+  if(choice==='ascend'){
+    ascension6Path=path;
+    doRebirthReset(rebirthForm);
+  } else {
+    ascension6Path=null;
+    ascension5Path=null;
+    ascension4Path=null;
+    ascension3Path=null;
+    formBonusMult=1.0;
+    doRebirthReset(null);
+  }
+}
+
+var _selectedPath6=null;
+var _pendingPath6Choice=null;
+
+document.querySelectorAll('.path6-card').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.path6-card').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _selectedPath6=card.getAttribute('data-path');
+    document.getElementById('path6-ascend-btn').classList.add('ready');
+    document.getElementById('path6-confirm').classList.remove('show');
+    _pendingPath6Choice=null;
+  });
+});
+
+document.getElementById('path6-descend-btn').addEventListener('click',function(){
+  _pendingPath6Choice='descend';
+  document.getElementById('path6-confirm-text').textContent='This will destroy your form. Are you sure?';
+  document.getElementById('path6-confirm').classList.add('show');
+});
+
+document.getElementById('path6-ascend-btn').addEventListener('click',function(){
+  if(!_selectedPath6) return;
+  _pendingPath6Choice='ascend';
+  var bonus=ASCENSION6_BONUSES[_selectedPath6]||'a bonus';
+  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+  var name=_selectedPath6.charAt(0).toUpperCase()+_selectedPath6.slice(1);
+  document.getElementById('path6-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
+  document.getElementById('path6-confirm').classList.add('show');
+});
+
+document.getElementById('path6-cancel-btn').addEventListener('click',function(){
+  document.getElementById('path6-confirm').classList.remove('show');
+  document.getElementById('path6-modal').classList.remove('open');
+  _pendingPath6Choice=null;
+  _selectedPath6=null;
+});
+
+document.getElementById('path6-confirm-yes').addEventListener('click',function(){
+  if(!_pendingPath6Choice) return;
+  document.getElementById('path6-modal').classList.remove('open');
+  document.getElementById('path6-confirm').classList.remove('show');
+  doPath6Reset(_pendingPath6Choice,_selectedPath6);
+  _pendingPath6Choice=null;
+  _selectedPath6=null;
+});
+
+document.getElementById('path6-confirm-no').addEventListener('click',function(){
+  document.getElementById('path6-confirm').classList.remove('show');
+  _pendingPath6Choice=null;
+});
+
+// ── FINAL MODAL (Ascension 7+) ───────────────────────────────────────────────
+var _pendingFinalChoice=null;
+
+function doFinalReset(choice){
+  if(choice==='ascend'){
+    doRebirthReset(rebirthForm);
+  } else {
+    ascension6Path=null;
+    ascension5Path=null;
+    ascension4Path=null;
+    ascension3Path=null;
+    formBonusMult=1.0;
+    doRebirthReset(null);
+  }
+}
+
+document.getElementById('final-descend-btn').addEventListener('click',function(){
+  _pendingFinalChoice='descend';
+  document.getElementById('final-confirm-text').textContent='This will destroy your form. Are you sure?';
+  document.getElementById('final-confirm').classList.add('show');
+});
+
+document.getElementById('final-ascend-btn').addEventListener('click',function(){
+  _pendingFinalChoice='ascend';
+  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+  document.getElementById('final-confirm-text').textContent='You will gain '+tsGain+' Tattered Souls and begin again. Are you sure?';
+  document.getElementById('final-confirm').classList.add('show');
+});
+
+document.getElementById('final-cancel-btn').addEventListener('click',function(){
+  document.getElementById('final-confirm').classList.remove('show');
+  document.getElementById('final-modal').classList.remove('open');
+  _pendingFinalChoice=null;
+});
+
+document.getElementById('final-confirm-yes').addEventListener('click',function(){
+  if(!_pendingFinalChoice) return;
+  document.getElementById('final-modal').classList.remove('open');
+  document.getElementById('final-confirm').classList.remove('show');
+  doFinalReset(_pendingFinalChoice);
+  _pendingFinalChoice=null;
+});
+
+document.getElementById('final-confirm-no').addEventListener('click',function(){
+  document.getElementById('final-confirm').classList.remove('show');
+  _pendingFinalChoice=null;
+});
+
 // ── INPUT ─────────────────────────────────────────────────────────────────────
 document.getElementById('enemy-canvas').addEventListener('mousedown',function(e){
   if(e.button!==0) return;
@@ -3847,7 +4623,7 @@ function gameLoop(){
       if(enemyHp.lte(0)) onEnemyDeath();
     } else { lastDrainTick=now; }
     if(isEliteFight()&&eliteTimerStart>0){
-      var eliteMs=rebirthForm==='equine'?25000:20000;
+      var eliteMs=20000;
       var elapsed=now-eliteTimerStart;
       var pct=Math.max(0,1-elapsed/eliteMs);
       document.getElementById('elite-timer-bar').style.width=(pct*100)+'%';
