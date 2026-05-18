@@ -3903,7 +3903,8 @@ document.getElementById('flesh-descend-btn').addEventListener('click',function()
 document.getElementById('flesh-ascend-btn').addEventListener('click',function(){
   _pendingFleshChoice='ascend';
   var newBonus=FORM_BONUS_ASCENDED[rebirthForm]||'an increased bonus';
-  document.getElementById('flesh-confirm-text').textContent='This will increase your bonus to '+newBonus+'. Are you sure?';
+  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+  document.getElementById('flesh-confirm-text').textContent='This will increase your bonus to '+newBonus+' and grant '+tsGain+' Tattered Souls. Are you sure?';
   document.getElementById('flesh-confirm').classList.add('show');
 });
 
