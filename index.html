@@ -2095,8 +2095,8 @@ function recalcStats(){
     }
   });
   // Apply form bonuses
-  if(rebirthForm==='masculine') clickDmgBonus=clickDmgBonus.mul(1.1);
-  if(rebirthForm==='canine') totalDps=totalDps.mul(1.1);
+  if(rebirthForm==='masculine') totalDps=totalDps.mul(1.1);
+  if(rebirthForm==='canine') clickDmgBonus=clickDmgBonus.mul(1.1);
   autoAttackInterval=3000;
   // Apply Divine Hunger milestone support effects
   var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
@@ -3637,10 +3637,10 @@ function buildUpgrades(){
 }
 
 var FORM_BONUSES={
-  masculine:   '+10% Strike Damage',
+  masculine:   '+10% DPS',
   feminine:    '+10% Tattered Souls gained',
   androgynous: '+10% Souls gained',
-  canine:      '+10% DPS',
+  canine:      '+10% Strike Damage',
   feline:      '+10% Mana Gain',
   equine:      '-10% Milestone requirement'
 };
