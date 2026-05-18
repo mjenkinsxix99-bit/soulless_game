@@ -1531,6 +1531,7 @@ function spawnSoulCoins(){
   if(_floorsComp>0){
     var _mg=3*0.00001*_floorsComp;
     if(isSpellActive('manaHungry')) _mg*=1.333;
+    if(rebirthForm==='feline') _mg*=1.1;
     var _tregens={'flurry-speed':0.10,'crit-speed':0.15,'blade-speed':0.20,'souls-speed':0.30,
       'rule-speed':0.40,'strikes-speed':0.50,'power3-speed':0.65,'mana-speed':0.85,'invoke-speed':1.35};
     var _tregenSum=0;
@@ -2042,7 +2043,7 @@ var DV_MS_EFFECTS=[
 var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
 function getMsThresh(i){
   var t=MS_THRESH[i];
-  if(rebirthForm==='canine') t=Math.max(1,Math.floor(t*0.9));
+  if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*0.9));
   return t;
 }
 var MS_MULT=[1.777,1.777,1.666,1.777,1.777,1.777,1.666,1.777,1.777,1.999];
@@ -2094,11 +2095,9 @@ function recalcStats(){
     }
   });
   // Apply form bonuses
-  if(rebirthForm==='masculine'){
-    clickDmgBonus=clickDmgBonus.mul(1.1);
-    totalDps=totalDps.mul(1.1);
-  }
-  autoAttackInterval=rebirthForm==='feline'?2700:3000;
+  if(rebirthForm==='masculine') clickDmgBonus=clickDmgBonus.mul(1.1);
+  if(rebirthForm==='canine') totalDps=totalDps.mul(1.1);
+  autoAttackInterval=3000;
   // Apply Divine Hunger milestone support effects
   var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
   if(dv){
@@ -3638,12 +3637,12 @@ function buildUpgrades(){
 }
 
 var FORM_BONUSES={
-  masculine:   '+10% Strike &amp; Auto Damage',
+  masculine:   '+10% Strike Damage',
   feminine:    '+10% Tattered Souls gained',
   androgynous: '+10% Souls gained',
-  canine:      '-10% Milestone requirement',
-  feline:      '-10% Auto-attack interval',
-  equine:      '+5s to Elite timer'
+  canine:      '+10% DPS',
+  feline:      '+10% Mana Gain',
+  equine:      '-10% Milestone requirement'
 };
 
 var FORM_NAMEPLATES={
@@ -3847,7 +3846,7 @@ function gameLoop(){
       if(enemyHp.lte(0)) onEnemyDeath();
     } else { lastDrainTick=now; }
     if(isEliteFight()&&eliteTimerStart>0){
-      var eliteMs=rebirthForm==='equine'?25000:20000;
+      var eliteMs=20000;
       var elapsed=now-eliteTimerStart;
       var pct=Math.max(0,1-elapsed/eliteMs);
       document.getElementById('elite-timer-bar').style.width=(pct*100)+'%';
