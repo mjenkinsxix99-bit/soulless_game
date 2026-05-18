@@ -272,6 +272,35 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #path5-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
 #path5-confirm-no:hover { border-color: #554466; color: #776699; }
 
+/* Path choice modal (Ascension 6) */
+#path6-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10006; align-items: center; justify-content: center; }
+#path6-modal.open { display: flex; }
+#path6-box { background: #0a0a18; border: 1px solid #4433aa; border-radius: 10px; padding: 30px; max-width: 560px; width: 94%; max-height: 90vh; overflow-y: auto; text-align: center; }
+#path6-title { font-size: 22px; color: #d4a843; letter-spacing: 2px; margin-bottom: 16px; font-family: Georgia,serif; }
+#path6-body { font-size: 15px; color: #9977aa; line-height: 1.7; margin-bottom: 20px; letter-spacing: 0.4px; }
+#path6-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+.path6-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
+.path6-card:hover { border-color: #4433aa; background: #111128; }
+.path6-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
+.path6-card .p6-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path6-card .p6-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
+.path6-card .p6-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
+#path6-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
+#path6-descend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: transparent; border: 2px solid #662222; color: #aa4444; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, border-color 0.2s; }
+#path6-descend-btn:hover { background: rgba(140,30,30,0.15); border-color: #993333; color: #cc5555; }
+#path6-cancel-btn { flex: 0 0 auto; padding: 11px 14px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 6px; letter-spacing: 1px; transition: border-color 0.2s, color 0.2s; }
+#path6-cancel-btn:hover { border-color: #554466; color: #665588; }
+#path6-ascend-btn { flex: 1; max-width: 160px; padding: 11px 16px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: background 0.2s, box-shadow 0.2s; opacity: 0.4; pointer-events: none; }
+#path6-ascend-btn.ready { opacity: 1; pointer-events: auto; }
+#path6-ascend-btn.ready:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+#path6-confirm { display: none; margin-top: 18px; }
+#path6-confirm.show { display: block; }
+#path6-confirm-text { font-size: 15px; color: #aa9966; font-style: italic; margin-bottom: 14px; }
+#path6-confirm-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#path6-confirm-yes:hover { background: rgba(212,168,67,0.15); }
+#path6-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#path6-confirm-no:hover { border-color: #554466; color: #776699; }
+
 /* Settings button */
 #settings-btn { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
 #settings-btn:hover { background: linear-gradient(135deg, #3a2c00, #1e1800); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
@@ -958,6 +987,44 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <p id="path5-confirm-text"></p>
       <button id="path5-confirm-yes">Yes.</button>
       <button id="path5-confirm-no">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<div id="path6-modal">
+  <div id="path6-box">
+    <div id="path6-title">Choose Your Path</div>
+    <div id="path6-body">
+      You have become strong indeed. Perhaps stronger than before. Soon you may take revenge and challenge the gods themselves.<br><br>
+      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
+      Choose your path wisely. You do not need courage when you have the strength required.
+    </div>
+    <div id="path6-grid">
+      <div class="path6-card" data-path="steel">
+        <div class="p6-art">art pending</div>
+        <div class="p6-name">Steel</div>
+        <div class="p6-bonus">+10% DPS</div>
+      </div>
+      <div class="path6-card" data-path="leather">
+        <div class="p6-art">art pending</div>
+        <div class="p6-name">Leather</div>
+        <div class="p6-bonus">+10% Tattered Souls</div>
+      </div>
+      <div class="path6-card" data-path="knowledge">
+        <div class="p6-art">art pending</div>
+        <div class="p6-name">Knowledge</div>
+        <div class="p6-bonus">+10% Mana Generation</div>
+      </div>
+    </div>
+    <div id="path6-choices">
+      <button id="path6-descend-btn">Descend</button>
+      <button id="path6-cancel-btn">Not yet</button>
+      <button id="path6-ascend-btn">Ascend</button>
+    </div>
+    <div id="path6-confirm">
+      <p id="path6-confirm-text"></p>
+      <button id="path6-confirm-yes">Yes.</button>
+      <button id="path6-confirm-no">Go Back</button>
     </div>
   </div>
 </div>
@@ -1719,6 +1786,7 @@ var formBonusMult=1.0;
 var ascension3Path=null;
 var ascension4Path=null;
 var ascension5Path=null;
+var ascension6Path=null;
 var rebirthForm=null;
 var soundMuted=false;
 var eliteKillsTotal=0;
@@ -1782,6 +1850,7 @@ function spawnSoulCoins(){
     if(rebirthForm==='feline') _mg*=(1+0.10*formBonusMult);
     if(ascension4Path==='shadow') _mg*=1.05;
     if(ascension5Path==='holy') _mg*=1.05;
+    if(ascension6Path==='knowledge') _mg*=1.10;
     var _tregens={'flurry-speed':0.10,'crit-speed':0.15,'blade-speed':0.20,'souls-speed':0.30,
       'rule-speed':0.40,'strikes-speed':0.50,'power3-speed':0.65,'mana-speed':0.85,'invoke-speed':1.35};
     var _tregenSum=0;
@@ -2353,6 +2422,7 @@ function recalcStats(){
   if(ascension4Path==='holy') clickDmgBonus=clickDmgBonus.mul(1.05);
   if(ascension5Path==='shadow') totalDps=totalDps.mul(1.05);
   if(ascension5Path==='mystic') clickDmgBonus=clickDmgBonus.mul(1.05);
+  if(ascension6Path==='steel') totalDps=totalDps.mul(1.10);
   autoAttackInterval=3000;
   // Apply Divine Hunger milestone support effects
   var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
@@ -3403,6 +3473,7 @@ function calcTatteredSoulsGain(chosenForm){
   var form=chosenForm!==undefined?chosenForm:rebirthForm;
   if(form==='feminine') base=Math.floor(base*(1+0.10*formBonusMult));
   if(ascension3Path==='shadow') base=Math.floor(base*1.05);
+  if(ascension6Path==='leather') base=Math.floor(base*1.10);
   return Math.max(0,base);
 }
 
@@ -3410,7 +3481,7 @@ function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
   var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
-  if((rebirthCount===0||rebirthCount===1||rebirthCount===2||rebirthCount===3||rebirthCount===4) && doom && doom.level>=1){
+  if((rebirthCount===0||rebirthCount===1||rebirthCount===2||rebirthCount===3||rebirthCount===4||rebirthCount===5) && doom && doom.level>=1){
     btn.style.display='block';
   } else {
     btn.style.display='none';
@@ -3527,6 +3598,7 @@ function saveGame(){
     ascension3Path:ascension3Path,
     ascension4Path:ascension4Path,
     ascension5Path:ascension5Path,
+    ascension6Path:ascension6Path,
     soulShopOwned:soulShopOwned,
     tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
@@ -3594,6 +3666,7 @@ function loadGame(){
   ascension3Path=data.ascension3Path||null;
   ascension4Path=data.ascension4Path||null;
   ascension5Path=data.ascension5Path||null;
+  ascension6Path=data.ascension6Path||null;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
@@ -4091,6 +4164,12 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
     document.querySelectorAll('.path5-card').forEach(function(c){c.classList.remove('picked');});
     document.getElementById('path5-modal').classList.add('open');
     _selectedPath5=null;
+  } else if(rebirthCount===5){
+    document.getElementById('path6-confirm').classList.remove('show');
+    document.getElementById('path6-ascend-btn').classList.remove('ready');
+    document.querySelectorAll('.path6-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path6-modal').classList.add('open');
+    _selectedPath6=null;
   } else {
     document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
     document.getElementById('form-confirm-btn').classList.remove('show');
@@ -4360,6 +4439,74 @@ document.getElementById('path5-confirm-yes').addEventListener('click',function()
 document.getElementById('path5-confirm-no').addEventListener('click',function(){
   document.getElementById('path5-confirm').classList.remove('show');
   _pendingPath5Choice=null;
+});
+
+// ── PATH6 MODAL (Ascension 6) ─────────────────────────────────────────────────
+var ASCENSION6_BONUSES={steel:'+10% DPS',leather:'+10% Tattered Souls',knowledge:'+10% Mana Generation'};
+
+function doPath6Reset(choice,path){
+  if(choice==='ascend'){
+    ascension6Path=path;
+    doRebirthReset(rebirthForm);
+  } else {
+    ascension6Path=null;
+    ascension5Path=null;
+    ascension4Path=null;
+    ascension3Path=null;
+    formBonusMult=1.0;
+    doRebirthReset(null);
+  }
+}
+
+var _selectedPath6=null;
+var _pendingPath6Choice=null;
+
+document.querySelectorAll('.path6-card').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.path6-card').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _selectedPath6=card.getAttribute('data-path');
+    document.getElementById('path6-ascend-btn').classList.add('ready');
+    document.getElementById('path6-confirm').classList.remove('show');
+    _pendingPath6Choice=null;
+  });
+});
+
+document.getElementById('path6-descend-btn').addEventListener('click',function(){
+  _pendingPath6Choice='descend';
+  document.getElementById('path6-confirm-text').textContent='This will destroy your form. Are you sure?';
+  document.getElementById('path6-confirm').classList.add('show');
+});
+
+document.getElementById('path6-ascend-btn').addEventListener('click',function(){
+  if(!_selectedPath6) return;
+  _pendingPath6Choice='ascend';
+  var bonus=ASCENSION6_BONUSES[_selectedPath6]||'a bonus';
+  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+  var name=_selectedPath6.charAt(0).toUpperCase()+_selectedPath6.slice(1);
+  document.getElementById('path6-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
+  document.getElementById('path6-confirm').classList.add('show');
+});
+
+document.getElementById('path6-cancel-btn').addEventListener('click',function(){
+  document.getElementById('path6-confirm').classList.remove('show');
+  document.getElementById('path6-modal').classList.remove('open');
+  _pendingPath6Choice=null;
+  _selectedPath6=null;
+});
+
+document.getElementById('path6-confirm-yes').addEventListener('click',function(){
+  if(!_pendingPath6Choice) return;
+  document.getElementById('path6-modal').classList.remove('open');
+  document.getElementById('path6-confirm').classList.remove('show');
+  doPath6Reset(_pendingPath6Choice,_selectedPath6);
+  _pendingPath6Choice=null;
+  _selectedPath6=null;
+});
+
+document.getElementById('path6-confirm-no').addEventListener('click',function(){
+  document.getElementById('path6-confirm').classList.remove('show');
+  _pendingPath6Choice=null;
 });
 
 // ── INPUT ─────────────────────────────────────────────────────────────────────
