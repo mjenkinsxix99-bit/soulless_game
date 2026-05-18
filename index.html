@@ -1277,6 +1277,26 @@ var ENEMY_TYPES = [
     hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[240,100,20] },
   { id:'uw_glugg',   name:'Glugg',       simpleName:'Glugg',     subtitle:'cast down, clawing back',
     hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[180,20,20] },
+  { id:'sw_1',  name:'Swamp 1',  simpleName:'Swamp 1',  subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[60,100,40] },
+  { id:'sw_2',  name:'Swamp 2',  simpleName:'Swamp 2',  subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[70,110,45] },
+  { id:'sw_3',  name:'Swamp 3',  simpleName:'Swamp 3',  subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[55,95,35] },
+  { id:'sw_4',  name:'Swamp 4',  simpleName:'Swamp 4',  subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[65,105,42] },
+  { id:'sw_5',  name:'Swamp 5',  simpleName:'Swamp 5',  subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[50,90,30] },
+  { id:'sw_6',  name:'Swamp 6',  simpleName:'Swamp 6',  subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[75,115,48] },
+  { id:'sw_7',  name:'Swamp 7',  simpleName:'Swamp 7',  subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[60,100,38] },
+  { id:'sw_8',  name:'Swamp 8',  simpleName:'Swamp 8',  subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[68,108,44] },
+  { id:'sw_9',  name:'Swamp 9',  simpleName:'Swamp 9',  subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[58,98,36] },
+  { id:'sw_10', name:'Swamp 10', simpleName:'Swamp 10', subtitle:'lurking beneath the surface',
+    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[72,112,46] },
 ];
 
 
@@ -1303,7 +1323,7 @@ var FLOORS_PER_LEVEL  = 9;   // normal floors per level; elite is floor FLOORS_P
 var LEVELS_PER_REALM  = 10;
 var FLOORS_PER_REALM  = FLOORS_PER_LEVEL * LEVELS_PER_REALM; // 90 normal + 10 elites
 var WINS_PER_FLOOR    = 10;
-var REALM_NAMES       = ['Void', 'Underworld'];  // indexed by curRealm-1; unnamed realms fall back to number
+var REALM_NAMES       = ['Void', 'Underworld', 'Swamp'];  // indexed by curRealm-1; unnamed realms fall back to number
 
 // No realm cap — break_infinity.js handles arbitrarily large HP values
 var MINIMAP_VISIBLE  = 7;
