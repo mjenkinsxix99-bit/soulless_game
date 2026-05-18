@@ -878,11 +878,6 @@ for(var _si=0;_si<12;_si++){
   });
 }
 
-function entityExpression() {
-  var now = Date.now();
-  if (ascendCount === 0 && now - attackFlashTime < 400) return 'angry';
-  return 'happy';
-}
 
 function drawEntityCanvas(t) {
   var canvas = document.getElementById('entity-canvas');
@@ -925,7 +920,6 @@ function drawEntityCanvas(t) {
     scaleX = 1 + Math.sin(hp2 * Math.PI) * 0.06;
   }
 
-  var expr = entityExpression();
   var cx = W/2, cy = dy + drawH/2;
 
   ctx.save();
@@ -971,67 +965,6 @@ function drawEntityCanvas(t) {
     ctx.fillRect(sx - sz*1.2, sy2 - sz*0.2, sz*2.4, sz*0.4);
     ctx.fillRect(sx - sz*0.2, sy2 - sz*1.2, sz*0.4, sz*2.4);
   });
-
-  // ── EXPRESSION OVERLAY drawn on top ──
-  var faceX = cx - drawW * 0.02;
-  var faceY = cy + drawH * 0.04;
-  var eyeSep = drawW * 0.07;
-  var eyeR   = drawW * 0.055;
-
-  if (expr === 'angry') {
-    // angry brows — V shape over each eye
-    ctx.globalAlpha = deathFade * 0.85;
-    ctx.strokeStyle = '#1a0033';
-    ctx.lineWidth = Math.max(2, drawW * 0.018);
-    ctx.lineCap = 'round';
-    // left brow
-    ctx.beginPath();
-    ctx.moveTo(faceX - eyeSep - eyeR, faceY - eyeR*2.2);
-    ctx.lineTo(faceX - eyeSep + eyeR*0.5, faceY - eyeR*1.2);
-    ctx.stroke();
-    // right brow
-    ctx.beginPath();
-    ctx.moveTo(faceX + eyeSep - eyeR*0.5, faceY - eyeR*1.2);
-    ctx.lineTo(faceX + eyeSep + eyeR, faceY - eyeR*2.2);
-    ctx.stroke();
-  }
-
-  if (expr === 'scared') {
-    // raised arched brows
-    ctx.globalAlpha = deathFade * 0.85;
-    ctx.strokeStyle = '#1a0033';
-    ctx.lineWidth = Math.max(2, drawW * 0.016);
-    ctx.lineCap = 'round';
-    [-1,1].forEach(function(side) {
-      ctx.beginPath();
-      ctx.arc(faceX + side*eyeSep, faceY - eyeR*2.2, eyeR*1.1, Math.PI+0.4, Math.PI*2-0.4);
-      ctx.stroke();
-    });
-    // sweat drop
-    ctx.globalAlpha = deathFade * 0.8;
-    ctx.fillStyle = '#aaddff';
-    var sdx = faceX + eyeSep + eyeR*1.8, sdy = faceY - eyeR;
-    ctx.beginPath(); ctx.arc(sdx, sdy, eyeR*0.5, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(sdx - eyeR*0.5, sdy);
-    ctx.lineTo(sdx, sdy + eyeR*1.4);
-    ctx.lineTo(sdx + eyeR*0.5, sdy);
-    ctx.closePath(); ctx.fill();
-  }
-
-  if (expr === 'happy') {
-    // extra sparkle burst near eyes
-    ctx.globalAlpha = deathFade * 0.7;
-    ctx.fillStyle = '#ffffff';
-    var sp = Math.sin(t*0.005)*0.5+0.5;
-    var ssz = eyeR * 0.35 * sp;
-    [-1,1].forEach(function(side){
-      var ex2 = faceX + side*eyeSep*1.5, ey2 = faceY - eyeR*1.5;
-      ctx.fillRect(ex2-ssz/2, ey2-ssz/2, ssz, ssz);
-      ctx.fillRect(ex2-ssz*1.1, ey2-ssz*0.15, ssz*2.2, ssz*0.3);
-      ctx.fillRect(ex2-ssz*0.15, ey2-ssz*1.1, ssz*0.3, ssz*2.2);
-    });
-  }
 
   ctx.globalAlpha = 1;
   ctx.restore();
