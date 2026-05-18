@@ -1823,7 +1823,7 @@ function spawnEnemy(){
   var oval=document.getElementById('combat-oval');
   oval.style.width=circleSize+'px'; oval.style.height=circleSize+'px';
   // Pick enemy type
-  var realmOffset = (curRealm-1) * LEVELS_PER_REALM;
+  var realmOffset = ((curRealm-1) % REALM_NAMES.length) * LEVELS_PER_REALM;
   if(elite){
     currentEnemyTypeIdx = realmOffset + lv - 1;
   } else {
@@ -1998,7 +1998,7 @@ function onEnemyDeath(){
         curLevel=1; curFloor=1; floorWins=0;
         highestLevel=1; highestFloor=1;
         defeatedElites=[];
-        enemyPool=[(curRealm-1)*LEVELS_PER_REALM];
+        enemyPool=[((curRealm-1) % REALM_NAMES.length)*LEVELS_PER_REALM];
         minimapNewFloor=false;
         updateHighestFloor();
         buildMinimap();
