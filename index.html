@@ -163,6 +163,25 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #form-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
 #form-no:hover { border-color: #554466; color: #776699; }
 
+/* Flesh choice modal (Ascension 2) */
+#flesh-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10002; align-items: center; justify-content: center; }
+#flesh-modal.open { display: flex; }
+#flesh-box { background: #0a0a18; border: 1px solid #882222; border-radius: 10px; padding: 30px; max-width: 480px; width: 92%; max-height: 90vh; overflow-y: auto; text-align: center; }
+#flesh-title { font-size: 22px; color: #cc6644; letter-spacing: 2px; margin-bottom: 16px; font-family: Georgia,serif; }
+#flesh-body { font-size: 15px; color: #9977aa; line-height: 1.7; margin-bottom: 24px; letter-spacing: 0.4px; }
+#flesh-choices { display: flex; gap: 16px; justify-content: center; margin-top: 4px; }
+#flesh-descend-btn { flex: 1; max-width: 180px; padding: 12px 20px; background: transparent; border: 2px solid #662222; color: #aa4444; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, border-color 0.2s; }
+#flesh-descend-btn:hover { background: rgba(140,30,30,0.15); border-color: #993333; color: #cc5555; }
+#flesh-ascend-btn { flex: 1; max-width: 180px; padding: 12px 20px; background: linear-gradient(135deg, #3a1a00, #1a0800); border: 2px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: background 0.2s, box-shadow 0.2s; }
+#flesh-ascend-btn:hover { background: linear-gradient(135deg, #4a2800, #2a1200); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
+#flesh-confirm { display: none; margin-top: 18px; }
+#flesh-confirm.show { display: block; }
+#flesh-confirm-text { font-size: 15px; color: #aa9966; font-style: italic; margin-bottom: 14px; }
+#flesh-confirm-yes { padding: 8px 22px; background: transparent; border: 1px solid #d4a843; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+#flesh-confirm-yes:hover { background: rgba(212,168,67,0.15); }
+#flesh-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
+#flesh-confirm-no:hover { border-color: #554466; color: #776699; }
+
 /* Settings button */
 #settings-btn { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
 #settings-btn:hover { background: linear-gradient(135deg, #3a2c00, #1e1800); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
@@ -679,7 +698,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div class="form-card" data-form="masculine">
         <img src="artwork/masculine.webp" alt="Masculine">
         <div class="fc-name">Masculine</div>
-        <div class="fc-bonus">+10% DPS &amp; Strike Damage</div>
+        <div class="fc-bonus">+10% DPS</div>
       </div>
       <div class="form-card" data-form="feminine">
         <img src="artwork/feminine.webp" alt="Feminine">
@@ -694,17 +713,17 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div class="form-card" data-form="canine">
         <img src="artwork/canine.webp" alt="Canine">
         <div class="fc-name">Canine</div>
-        <div class="fc-bonus">-10% Milestone requirement</div>
+        <div class="fc-bonus">+10% Strike Damage</div>
       </div>
       <div class="form-card" data-form="feline">
         <img src="artwork/feline.webp" alt="Feline">
         <div class="fc-name">Feline</div>
-        <div class="fc-bonus">-10% Auto-attack interval</div>
+        <div class="fc-bonus">+10% Mana Gain</div>
       </div>
       <div class="form-card" data-form="equine">
         <img src="artwork/equine.webp" alt="Equine">
         <div class="fc-name">Equine</div>
-        <div class="fc-bonus">+5s to Elite timer</div>
+        <div class="fc-bonus">-10% Milestone requirement</div>
       </div>
     </div>
     <div id="form-confirm-area">
@@ -714,6 +733,26 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button id="form-yes">Yes. Begin.</button>
         <button id="form-no">Choose Again</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="flesh-modal">
+  <div id="flesh-box">
+    <div id="flesh-title">You have become Flesh.</div>
+    <div id="flesh-body">
+      You have consumed enough souls to become Flesh. Your form bonus will increase by 50%.<br><br>
+      You may choose to forsake your form and return to Ether, losing your bonus.<br><br>
+      Either path, you will keep your Tattered Souls, Achievements, and Tattered Shop upgrades.
+    </div>
+    <div id="flesh-choices">
+      <button id="flesh-descend-btn">Descend</button>
+      <button id="flesh-ascend-btn">Ascend</button>
+    </div>
+    <div id="flesh-confirm">
+      <p id="flesh-confirm-text"></p>
+      <button id="flesh-confirm-yes">Yes.</button>
+      <button id="flesh-confirm-no">Go Back</button>
     </div>
   </div>
 </div>
@@ -1471,6 +1510,7 @@ var ascendCount=0;
 var currentAscensionKills=0;
 var tatteredSouls=0;
 var rebirthCount=0;
+var formBonusMult=1.0;
 var rebirthForm=null;
 var soundMuted=false;
 var eliteKillsTotal=0;
@@ -1531,7 +1571,7 @@ function spawnSoulCoins(){
   if(_floorsComp>0){
     var _mg=3*0.00001*_floorsComp;
     if(isSpellActive('manaHungry')) _mg*=1.333;
-    if(rebirthForm==='feline') _mg*=1.1;
+    if(rebirthForm==='feline') _mg*=(1+0.10*formBonusMult);
     var _tregens={'flurry-speed':0.10,'crit-speed':0.15,'blade-speed':0.20,'souls-speed':0.30,
       'rule-speed':0.40,'strikes-speed':0.50,'power3-speed':0.65,'mana-speed':0.85,'invoke-speed':1.35};
     var _tregenSum=0;
@@ -1888,7 +1928,7 @@ function onEnemyDeath(){
   spawnSoulCoins();
   document.getElementById('elite-timer-wrap').style.display='none';
   var soulMult=1;
-  if(rebirthForm==='androgynous') soulMult*=1.1;
+  if(rebirthForm==='androgynous') soulMult*=(1+0.10*formBonusMult);
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
   // Spell: Twin Souls — ×2 souls gained
   if(isSpellActive('twinSouls')) soulMult*=2;
@@ -2043,7 +2083,7 @@ var DV_MS_EFFECTS=[
 var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
 function getMsThresh(i){
   var t=MS_THRESH[i];
-  if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*0.9));
+  if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*(1-0.10*formBonusMult)));
   return t;
 }
 var MS_MULT=[1.777,1.777,1.666,1.777,1.777,1.777,1.666,1.777,1.777,1.999];
@@ -2095,8 +2135,8 @@ function recalcStats(){
     }
   });
   // Apply form bonuses
-  if(rebirthForm==='masculine') totalDps=totalDps.mul(1.1);
-  if(rebirthForm==='canine') clickDmgBonus=clickDmgBonus.mul(1.1);
+  if(rebirthForm==='masculine') totalDps=totalDps.mul(1+0.10*formBonusMult);
+  if(rebirthForm==='canine') clickDmgBonus=clickDmgBonus.mul(1+0.10*formBonusMult);
   autoAttackInterval=3000;
   // Apply Divine Hunger milestone support effects
   var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
@@ -3145,7 +3185,7 @@ function calcTatteredSoulsGain(chosenForm){
   var base=Math.floor(totalUpgradePurchases/666);
   // Feminine bonus applies to the NEWLY CHOSEN form (not the current one, since this is the gain for this rebirth)
   var form=chosenForm!==undefined?chosenForm:rebirthForm;
-  if(form==='feminine') base=Math.floor(base*1.1);
+  if(form==='feminine') base=Math.floor(base*(1+0.10*formBonusMult));
   return Math.max(0,base);
 }
 
@@ -3153,7 +3193,7 @@ function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
   var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
-  if(rebirthCount===0 && doom && doom.level>=1){
+  if((rebirthCount===0||rebirthCount===1) && doom && doom.level>=1){
     btn.style.display='block';
   } else {
     btn.style.display='none';
@@ -3266,6 +3306,7 @@ function saveGame(){
     tatteredSouls:tatteredSouls,
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
+    formBonusMult:formBonusMult,
     soulShopOwned:soulShopOwned,
     tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
@@ -3329,6 +3370,7 @@ function loadGame(){
   tatteredSouls=data.tatteredSouls||0;
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
+  formBonusMult=data.formBonusMult||1.0;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
@@ -3645,6 +3687,25 @@ var FORM_BONUSES={
   equine:      '-10% Milestone requirement'
 };
 
+var FORM_BONUS_ASCENDED={
+  masculine:   '+15% DPS',
+  feminine:    '+15% Tattered Souls gained',
+  androgynous: '+15% Souls gained',
+  canine:      '+15% Strike Damage',
+  feline:      '+15% Mana Gain',
+  equine:      '-15% Milestone requirement'
+};
+
+function doFleshReset(choice){
+  if(choice==='ascend'){
+    formBonusMult=1.5;
+    doRebirthReset(rebirthForm);
+  } else {
+    formBonusMult=1.0;
+    doRebirthReset(null);
+  }
+}
+
 var FORM_NAMEPLATES={
   masculine:   {label:'Masculine.', desc:'Strong.... Aggressive.'},
   feminine:    {label:'Feminine.',  desc:'Graceful.... Alluring.'},
@@ -3785,11 +3846,15 @@ document.getElementById('rebirth-cancel').addEventListener('click',function(){
 
 document.getElementById('rebirth-ascend-now').addEventListener('click',function(){
   document.getElementById('rebirth-modal').classList.remove('open');
-  // Reset selected form state
-  document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
-  document.getElementById('form-confirm-btn').classList.remove('show');
-  document.getElementById('form-certain').classList.remove('show');
-  document.getElementById('form-modal').classList.add('open');
+  if(rebirthCount===1){
+    document.getElementById('flesh-confirm').classList.remove('show');
+    document.getElementById('flesh-modal').classList.add('open');
+  } else {
+    document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('form-confirm-btn').classList.remove('show');
+    document.getElementById('form-certain').classList.remove('show');
+    document.getElementById('form-modal').classList.add('open');
+  }
 });
 
 var _selectedForm=null;
@@ -3820,6 +3885,35 @@ document.getElementById('form-no').addEventListener('click',function(){
   document.getElementById('form-confirm-btn').classList.remove('show');
   document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
   _selectedForm=null;
+});
+
+// ── FLESH MODAL (Ascension 2) ─────────────────────────────────────────────────
+var _pendingFleshChoice=null;
+
+document.getElementById('flesh-descend-btn').addEventListener('click',function(){
+  _pendingFleshChoice='descend';
+  document.getElementById('flesh-confirm-text').textContent='This will destroy your form. Are you sure?';
+  document.getElementById('flesh-confirm').classList.add('show');
+});
+
+document.getElementById('flesh-ascend-btn').addEventListener('click',function(){
+  _pendingFleshChoice='ascend';
+  var newBonus=FORM_BONUS_ASCENDED[rebirthForm]||'an increased bonus';
+  document.getElementById('flesh-confirm-text').textContent='This will increase your bonus to '+newBonus+'. Are you sure?';
+  document.getElementById('flesh-confirm').classList.add('show');
+});
+
+document.getElementById('flesh-confirm-yes').addEventListener('click',function(){
+  if(!_pendingFleshChoice) return;
+  document.getElementById('flesh-modal').classList.remove('open');
+  document.getElementById('flesh-confirm').classList.remove('show');
+  doFleshReset(_pendingFleshChoice);
+  _pendingFleshChoice=null;
+});
+
+document.getElementById('flesh-confirm-no').addEventListener('click',function(){
+  document.getElementById('flesh-confirm').classList.remove('show');
+  _pendingFleshChoice=null;
 });
 
 // ── INPUT ─────────────────────────────────────────────────────────────────────
