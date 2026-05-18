@@ -895,7 +895,8 @@ function drawEntityCanvas(t) {
 
   var deathFade = 1;
 
-  var iw = useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth;
+  var ETHER_FRAMES = 2;
+  var iw = useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth / ETHER_FRAMES;
   var ih = useFormSheet ? FORM_SPRITE_CELL_H : activeImg.naturalHeight;
   var drawH = Math.min(H * 0.9, H - 10);
   var drawW = drawH * (iw / ih);
@@ -940,7 +941,8 @@ function drawEntityCanvas(t) {
     var fi=FORM_INDEX[_rebirthEntityOverride];
     ctx.drawImage(formSpriteSheet,fi*FORM_SPRITE_CELL_W,0,FORM_SPRITE_CELL_W,FORM_SPRITE_CELL_H,dx,dy,drawW,drawH);
   } else {
-    ctx.drawImage(activeImg, dx, dy, drawW, drawH);
+    var etherFrame = (t - attackFlashTime < 400) ? 1 : 0;
+    ctx.drawImage(activeImg, etherFrame * iw, 0, iw, ih, dx, dy, drawW, drawH);
   }
   ctx.filter = 'none';
   ctx.restore();
