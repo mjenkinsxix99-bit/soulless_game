@@ -73,7 +73,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .cname.enemy-label { color: #88cc88; text-shadow: 0 0 8px rgba(100,200,100,0.4); }
 .cname.elite-label { color: #d4a843; text-shadow: 0 0 8px rgba(212,168,67,0.5); }
 .hp-wrap { width: 330px; }
-.hp-track { height: 7px; background: #111128; border-radius: 4px; overflow: hidden; border: 1px solid #1e1845; }
+.hp-track { height: 14px; background: #111128; border-radius: 4px; overflow: hidden; border: 1px solid #1e1845; }
 .hp-fill { height: 100%; border-radius: 4px; transition: width 0.15s; }
 .hp-fill.entity-hp { background: #6655aa; }
 .hp-fill.enemy-hp { background: #336633; }
@@ -93,7 +93,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   50%      { box-shadow: 0 0 22px #ffd700, 0 0 50px rgba(255,215,0,0.9), 0 0 90px rgba(255,215,0,0.5); }
 }
 #vs { font-size: 21px; color: #1e1535; letter-spacing: 2px; font-style: italic; flex-shrink: 0; width: 60px; text-align: center; }
-#click-hint { font-size: 15px; color: #8877aa; letter-spacing: 3px; text-transform: uppercase; position:relative; z-index:1; }
+#click-hint { font-size: 30px; color: #9988cc; letter-spacing: 3px; font-weight: bold; position:relative; z-index:1; }
 #float-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 .dmg-float { position: absolute; font-size: 20px; font-weight: bold; pointer-events: none; animation: floatup 0.9s ease-out forwards; }
 .dmg-float.edamage { color: #9980dd; }
@@ -108,11 +108,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .rm-sub { font-size: 16px; color: #443366; font-style: italic; }
 #reform-btn { padding: 8px 24px; border: 1px solid #6655aa; color: #b0a0e8; background: transparent; font-family: Georgia,serif; font-size: 18px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
 #reform-btn:hover { background: rgba(102,85,170,0.15); }
-#realm-label { text-align: center; font-size: 18px; font-weight: bold; color: #ccaaff; letter-spacing: 3px; margin-bottom: 6px; text-transform: uppercase; }
-#prog-area { text-align: center; }
-#prog-label { font-size: 15px; color: #9988bb; letter-spacing: 2px; margin-bottom: 4px; }
-#prog-track { width: 510px; height: 4px; background: #111128; border-radius: 3px; overflow: hidden; border: 1px solid #1e1845; margin: 0 auto; }
-#prog-bar { height: 100%; background: #6655aa; border-radius: 3px; transition: width 0.3s; width: 0%; }
+#realm-label { position: absolute; top: 12px; left: 14px; font-size: 18px; font-weight: bold; color: #eeddff; letter-spacing: 3px; text-transform: uppercase; z-index: 3; }
 /* Ascend (Rebirth) button */
 #ascend-btn { display: none; margin-top: 6px; padding: 9px 22px; background: transparent; border: 1px solid #aa3333; color: #cc5555; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; }
 #ascend-btn:hover { background: rgba(180,50,50,0.12); box-shadow: 0 0 10px rgba(200,60,60,0.4); }
@@ -698,12 +694,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         </div>
       </div>
       <div id="ss-global-arrow">⮞</div>
-      <div id="click-hint">click the enemy to attack</div>
+      <div id="click-hint">0 / 10</div>
       <div id="realm-label">Realm: Void</div>
-      <div id="prog-area">
-        <div id="prog-label">Floor 1 — 0 / 10</div>
-        <div id="prog-track"><div id="prog-bar"></div></div>
-      </div>
       <!-- MINIMAP moved here, near level/floor info -->
       <div id="minimap-panel">
         <div id="mm-new-arrow">&#8659;</div>
@@ -2112,9 +2104,8 @@ function spawnEnemy(){
   var elite=isEliteFight();
   var lv=curLevel, fl=curFloor;
 
-  // Resize enemy canvas: elites get a larger card
   var ecv=document.getElementById('enemy-canvas');
-  var sz=elite?480:330;
+  var sz=330;
   ecv.width=sz; ecv.height=sz;
   ecv.style.width=sz+'px'; ecv.style.height=sz+'px';
   // hp-wrap width follows the canvas width
@@ -2165,27 +2156,19 @@ function spawnEnemy(){
   buildMinimap();
 }
 
-function setHint(){
-  var d=def(); if(!d) return;
-  document.getElementById('click-hint').textContent=
-    (autoAttackEnabled&&firstKillDone[d.id])
-      ?'auto-attacking — click the enemy to strike'
-      :'click the enemy to attack';
-}
+function setHint(){}
 
 function updateProgressLabel(){
   var elite=isEliteFight();
-  var d=def()||ENEMY_TYPES[curLevel-1];
   var rn=document.getElementById('realm-label');
   if(rn) rn.textContent='Realm: '+realmName(curRealm);
-  if(elite){
-    document.getElementById('prog-label').textContent=d.name+' — defeat to advance';
-    document.getElementById('prog-bar').style.width='100%';
-  } else {
-    var gf=absGlobalFloor(curRealm,curLevel,curFloor);
-    document.getElementById('prog-label').textContent=
-      'Floor '+gf+' — '+Math.min(floorWins,WINS_PER_FLOOR)+' / '+WINS_PER_FLOOR;
-    document.getElementById('prog-bar').style.width=(floorWins/WINS_PER_FLOOR*100)+'%';
+  var kc=document.getElementById('click-hint');
+  if(kc){
+    if(elite){
+      kc.textContent='';
+    } else {
+      kc.textContent=Math.min(floorWins,WINS_PER_FLOOR)+' / '+WINS_PER_FLOOR;
+    }
   }
 }
 
