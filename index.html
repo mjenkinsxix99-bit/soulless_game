@@ -2418,9 +2418,9 @@ function getPurchMult(level){
   return D(13).pow(regularMults).mul(D(999).pow(thousandMults));
 }
 function getMileMult(u){
-  var m=1;
-  for(var i=0;i<10;i++){ if(u.milestones[i]) m*=MS_MULT[i]; }
-  return m;
+  var bonus=0;
+  for(var i=0;i<10;i++){ if(u.milestones[i]) bonus+=(MS_MULT[i]-1); }
+  return 1+bonus;
 }
 function recalcStats(){
   clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; autoAttackEnabled=false;
