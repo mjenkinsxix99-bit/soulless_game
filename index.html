@@ -689,7 +689,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
           <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
         </div>
-        <div id="elite-timer-wrap" style="display:none;flex-direction:column;align-items:center;gap:4px;margin-top:6px;">
+        <div id="elite-timer-wrap" style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:6px;visibility:hidden;">
           <div id="elite-timer-label" style="color:#33aa33;font-size:14px;letter-spacing:1px;">Time to Defeat: 20s</div>
           <div class="hp-wrap">
             <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
@@ -2140,12 +2140,12 @@ function spawnEnemy(){
 
   if(elite){
     eliteTimerStart=Date.now();
-    document.getElementById('elite-timer-wrap').style.display='flex';
+    document.getElementById('elite-timer-wrap').style.visibility='visible';
     document.getElementById('elite-timer-bar').style.width='100%';
     document.getElementById('elite-timer-label').textContent='Time to Defeat: 20s';
   } else {
     eliteTimerStart=0;
-    document.getElementById('elite-timer-wrap').style.display='none';
+    document.getElementById('elite-timer-wrap').style.visibility='hidden';
   }
 
   updateEnemyPanel();
@@ -2229,7 +2229,7 @@ function onEnemyDeath(){
   if(enemyDead) return;
   combatActive=false; enemyDead=true; eliteTimerStart=0;
   spawnSoulCoins();
-  document.getElementById('elite-timer-wrap').style.display='none';
+  document.getElementById('elite-timer-wrap').style.visibility='hidden';
   var soulMult=1;
   if(rebirthForm==='androgynous') soulMult*=(1+0.10*formBonusMult);
   if(ascension3Path==='mystic') soulMult*=1.05;
@@ -2337,7 +2337,7 @@ function onEnemyDeath(){
 function onEliteDpsCheckFail(){
   combatActive=false; eliteTimerStart=0;
   hitFlashTime=0; attackFlashTime=0;
-  document.getElementById('elite-timer-wrap').style.display='none';
+  document.getElementById('elite-timer-wrap').style.visibility='hidden';
   curFloor=FLOORS_PER_LEVEL; floorWins=0;
   if(autoProgressEnabled){ autoProgressEnabled=false; saveGame(); }
   buildMinimap();
