@@ -560,6 +560,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 /* Minimap panel repositioned inside battlefield */
 #minimap-panel { position:relative; flex-shrink:0; padding:2px 14px; background:transparent; margin-top:0; }
 #minimap-inner { display:flex;gap:8px;align-items:center;justify-content:center;padding:6px 0; }
+#mm-cells { display:flex; gap:8px; align-items:center; min-height:46px; }
 
 /* ── ACHIEVEMENT BANNER ──────────────────────────────────────────────────── */
 #ach-banner {
@@ -688,9 +689,11 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
           <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
         </div>
-        <div class="hp-wrap" id="elite-timer-wrap" style="display:none;margin-top:4px;">
-          <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
-          <div class="hp-numbers"><span id="elite-timer-label" style="color:#33aa33;font-size:13px;">20s</span><span style="color:#33aa33;font-size:13px;">DPS check</span></div>
+        <div id="elite-timer-wrap" style="display:none;flex-direction:column;align-items:center;gap:4px;margin-top:6px;">
+          <div id="elite-timer-label" style="color:#33aa33;font-size:14px;letter-spacing:1px;">Time to Defeat: 20s</div>
+          <div class="hp-wrap">
+            <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
+          </div>
         </div>
       </div>
       <div id="minimap-panel">
@@ -2017,10 +2020,6 @@ function buildMinimap(){
   // Keep exactly MINIMAP_VISIBLE cells if possible
   if(end-start<MINIMAP_VISIBLE-1) start=Math.max(0,end-MINIMAP_VISIBLE+1);
 
-  cellsEl.style.display='flex';
-  cellsEl.style.gap='8px';
-  cellsEl.style.alignItems='center';
-
   for(var j=start;j<=end;j++){
     var r=rooms[j];
     var done=floorDone(r.level,r.floor);
@@ -2141,9 +2140,9 @@ function spawnEnemy(){
 
   if(elite){
     eliteTimerStart=Date.now();
-    document.getElementById('elite-timer-wrap').style.display='';
+    document.getElementById('elite-timer-wrap').style.display='flex';
     document.getElementById('elite-timer-bar').style.width='100%';
-    document.getElementById('elite-timer-label').textContent='20s';
+    document.getElementById('elite-timer-label').textContent='Time to Defeat: 20s';
   } else {
     eliteTimerStart=0;
     document.getElementById('elite-timer-wrap').style.display='none';
@@ -4611,7 +4610,7 @@ function gameLoop(){
       var pct=Math.max(0,1-elapsed/eliteMs);
       document.getElementById('elite-timer-bar').style.width=(pct*100)+'%';
       var secs=Math.ceil((eliteMs-elapsed)/1000);
-      document.getElementById('elite-timer-label').textContent=Math.max(0,secs)+'s';
+      document.getElementById('elite-timer-label').textContent='Time to Defeat: '+Math.max(0,secs)+'s';
       if(pct<=0) onEliteDpsCheckFail();
     }
   }
