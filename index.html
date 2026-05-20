@@ -72,7 +72,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .cname.entity-label { color: #b8aaee; text-shadow: 0 0 8px rgba(180,160,255,0.5); }
 .cname.enemy-label { color: #88cc88; text-shadow: 0 0 8px rgba(100,200,100,0.4); }
 .cname.elite-label { color: #d4a843; text-shadow: 0 0 8px rgba(212,168,67,0.5); }
-.hp-wrap { width: 330px; }
+.hp-wrap { width: 220px; }
 .hp-track { height: 14px; background: #111128; border-radius: 4px; overflow: hidden; border: 1px solid #1e1845; }
 .hp-fill { height: 100%; border-radius: 4px; transition: width 0.15s; }
 .hp-fill.entity-hp { background: #6655aa; }
@@ -558,7 +558,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 @keyframes mm-drop { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(8px)} }
 
 /* Minimap panel repositioned inside battlefield */
-#minimap-panel { position:relative; flex-shrink:0; padding:6px 14px; background:transparent; margin-top:4px; }
+#minimap-panel { position:relative; flex-shrink:0; padding:2px 14px; background:transparent; margin-top:0; }
 #minimap-inner { display:flex;gap:8px;align-items:center;justify-content:center;padding:6px 0; }
 
 /* ── ACHIEVEMENT BANNER ──────────────────────────────────────────────────── */
@@ -679,11 +679,11 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <canvas id="bg-canvas"></canvas>
       <div id="combat-oval"></div>
       <div id="enemy-zone">
-        <div class="cname enemy-label" id="enemy-name-label">Wisper</div>
         <div class="canvas-wrap" style="position:relative;">
           <canvas id="enemy-canvas" width="330" height="330"></canvas>
           <div id="crown"></div>
         </div>
+        <div class="cname enemy-label" id="enemy-name-label">Wisper</div>
         <div class="hp-wrap">
           <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
           <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
@@ -693,10 +693,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <div class="hp-numbers"><span id="elite-timer-label" style="color:#33aa33;font-size:13px;">20s</span><span style="color:#33aa33;font-size:13px;">DPS check</span></div>
         </div>
       </div>
-      <div id="ss-global-arrow">⮞</div>
-      <div id="click-hint">0 / 10</div>
-      <div id="realm-label">Realm: Void</div>
-      <!-- MINIMAP moved here, near level/floor info -->
       <div id="minimap-panel">
         <div id="mm-new-arrow">&#8659;</div>
         <div id="minimap-inner">
@@ -706,6 +702,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
         </div>
       </div>
+      <div id="ss-global-arrow">⮞</div>
+      <div id="click-hint">0 / 10</div>
+      <div id="realm-label">Realm: Void</div>
 
       <div id="reform-msg">
         <div class="rm-title">Oh No! Get stronger uwu!</div>
@@ -1740,7 +1739,7 @@ var WINS_PER_FLOOR    = 10;
 var REALM_NAMES       = ['Void', 'Underworld', 'Swamp', 'Forest', 'Limbo'];  // indexed by curRealm-1; unnamed realms fall back to number
 
 // No realm cap — break_infinity.js handles arbitrarily large HP values
-var MINIMAP_VISIBLE  = 7;
+var MINIMAP_VISIBLE  = 5;
 var minimapNewFloor  = false;
 var autoProgressEnabled = false;
 
@@ -2012,8 +2011,8 @@ function buildMinimap(){
     if(floorUnlocked(rooms[i].level,rooms[i].floor)){nextRoom=rooms[i];break;}
   }
 
-  // Current floor pinned to centre (index 3 of 7)
-  var start=Math.max(0,curIdx-3);
+  // Current floor pinned to centre (index 2 of 5)
+  var start=Math.max(0,curIdx-2);
   var end=Math.min(rooms.length-1,start+MINIMAP_VISIBLE-1);
   // Keep exactly MINIMAP_VISIBLE cells if possible
   if(end-start<MINIMAP_VISIBLE-1) start=Math.max(0,end-MINIMAP_VISIBLE+1);
@@ -2108,8 +2107,9 @@ function spawnEnemy(){
   var sz=330;
   ecv.width=sz; ecv.height=sz;
   ecv.style.width=sz+'px'; ecv.style.height=sz+'px';
-  // hp-wrap width follows the canvas width
-  document.getElementById('enemy-zone').querySelectorAll('.hp-wrap').forEach(function(w){w.style.width=sz+'px';});
+  // bar width: elite is 50% wider than regular
+  var barWidth=elite?330:220;
+  document.getElementById('enemy-zone').querySelectorAll('.hp-wrap').forEach(function(w){w.style.width=barWidth+'px';});
   // resize the circle to fully enshroud the canvas with comfortable margin
   var circleSize=sz+600;
   var oval=document.getElementById('combat-oval');
