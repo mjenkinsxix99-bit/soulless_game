@@ -65,7 +65,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     rgba(0,0,0,0.02) 74%,
     transparent 86%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
-#enemy-zone { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:8px; z-index:2; }
+#enemy-zone { position:absolute; left:50%; top:calc(36% + 35px); transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:8px; z-index:2; }
 #enemy-zone .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cname { font-size: 19px; font-weight: bold; letter-spacing: 2px; color: #9988cc; text-transform: uppercase; }
@@ -365,7 +365,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #mok.ready:hover { background: rgba(212,168,67,0.1); }
 
 /* MINIMAP */
-#minimap-panel { width:100%;flex-shrink:0;padding:8px 14px;border-top:1px solid #1e1845;background:#08080e; }
+#minimap-panel { flex-shrink:0;padding:8px 14px;border-top:none;background:transparent; }
 #minimap-inner { display:flex;gap:8px;align-items:center;justify-content:center;padding:6px 0; }
 .mm-group { display:inline-flex;gap:2px;align-items:center;margin-right:6px; }
 .mm-cell { display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:6px;font-size:16px;font-family:Georgia,serif;font-weight:bold;cursor:pointer;border:1px solid rgba(210,185,120,0.3);color:rgba(230,210,150,0.5);background:rgba(255,240,180,0.05);flex-shrink:0;transition:border-color 0.15s,background 0.15s; }
@@ -558,7 +558,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 @keyframes mm-drop { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(8px)} }
 
 /* Minimap panel repositioned inside battlefield */
-#minimap-panel { position:relative; flex-shrink:0; padding:2px 14px; background:transparent; margin-top:0; }
+#minimap-panel { flex-shrink:0; padding:2px 14px; background:transparent; }
 #minimap-inner { display:flex;gap:8px;align-items:center;justify-content:center;padding:6px 0; }
 #mm-cells { display:flex; gap:8px; align-items:center; min-height:46px; }
 
@@ -695,14 +695,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
             <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
           </div>
         </div>
-      </div>
-      <div id="minimap-panel">
-        <div id="mm-new-arrow">&#8659;</div>
-        <div id="minimap-inner">
-          <button class="mm-nav" id="mm-prev" title="Scroll left">&#9664;</button>
-          <div id="mm-cells"></div>
-          <button class="mm-nav" id="mm-next" title="Scroll right">&#9654;</button>
-          <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
+        <div id="minimap-panel">
+          <div id="mm-new-arrow">&#8659;</div>
+          <div id="minimap-inner">
+            <button class="mm-nav" id="mm-prev" title="Scroll left">&#9664;</button>
+            <div id="mm-cells"></div>
+            <button class="mm-nav" id="mm-next" title="Scroll right">&#9654;</button>
+            <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
+          </div>
         </div>
       </div>
       <div id="ss-global-arrow">⮞</div>
