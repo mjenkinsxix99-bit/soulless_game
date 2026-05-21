@@ -1395,7 +1395,6 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   }
 
   var iw = sd.w, ih = sd.h;
-  // Elite canvas is 320px; leave ~70px at top for the halo, push sprite down
   var drawH = elite ? Math.min(H * 0.72, H - 10) * 0.8 : Math.min(H * 0.78, H - 10) * 0.6;
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
@@ -1432,32 +1431,6 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   ctx.translate(cx, cy);
   ctx.scale(scaleX, scaleY);
   ctx.translate(-cx, -cy);
-
-  // Golden halo for elites — drawn before sprite so it floats above the head
-  if (elite && !dead) {
-    var haloPulse = Math.sin(t * 0.003) * 0.5 + 0.5;
-    var haloRx = drawW * 0.38;
-    var haloRy = haloRx * 0.28;
-    // Place halo centre so its top edge is ~10px above sprite top (dy)
-    var haloYpos = dy - haloRy - 10;
-    ctx.save();
-    ctx.globalAlpha = (0.75 + haloPulse * 0.25) * deathFade;
-    ctx.strokeStyle = '#ffd700';
-    ctx.lineWidth = 5 + haloPulse * 3;
-    ctx.shadowColor = '#ffd700';
-    ctx.shadowBlur = 20 + haloPulse * 18;
-    ctx.beginPath();
-    ctx.ellipse(W / 2, haloYpos, haloRx, haloRy, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    // inner bright ring
-    ctx.globalAlpha = (0.35 + haloPulse * 0.2) * deathFade;
-    ctx.lineWidth = 2;
-    ctx.shadowBlur = 6;
-    ctx.beginPath();
-    ctx.ellipse(W / 2, haloYpos, haloRx * 0.78, haloRy * 0.78, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
-  }
 
   // White flash on hit
   if (!dead && hitAge < 220) {
