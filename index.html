@@ -1433,6 +1433,30 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   ctx.scale(scaleX, scaleY);
   ctx.translate(-cx, -cy);
 
+  // Golden halo for elites — drawn before sprite so it sits above the head
+  if (elite && !dead) {
+    var haloPulse = Math.sin(t * 0.003) * 0.5 + 0.5;
+    var haloRx = drawW * 0.38;
+    var haloRy = haloRx * 0.28;
+    var haloYpos = dy - haloRy - 10;
+    ctx.save();
+    ctx.globalAlpha = (0.75 + haloPulse * 0.25) * deathFade;
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 5 + haloPulse * 3;
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 20 + haloPulse * 18;
+    ctx.beginPath();
+    ctx.ellipse(W / 2, haloYpos, haloRx, haloRy, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = (0.35 + haloPulse * 0.2) * deathFade;
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.ellipse(W / 2, haloYpos, haloRx * 0.78, haloRy * 0.78, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // White flash on hit
   if (!dead && hitAge < 220) {
     var hf = 1 - hitAge / 220;
@@ -2115,7 +2139,7 @@ function spawnEnemy(){
 
   enemyDead=false; enemyDeathTime=0; combatActive=true;
 
-  document.getElementById('crown').style.display=elite?'block':'none';
+  document.getElementById('crown').style.display='none';
   document.getElementById('enemy-hp-bar').className='hp-fill enemy-hp'+(elite?' elite':'');
   document.getElementById('enemy-name-label').className='cname '+(elite?'elite-label':'enemy-label');
 
