@@ -737,7 +737,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div id="right">
       <div id="damage-summary">
         <div class="ds-row"><span class="ds-label">Strike Damage</span><span class="ds-val" id="ds-strike">—</span></div>
-        <div class="ds-row"><span class="ds-label">Auto Damage</span><span class="ds-val" id="ds-auto">—</span></div>
+        <div class="ds-row"><span class="ds-label">DPS</span><span class="ds-val" id="ds-auto">—</span></div>
       </div>
       <div class="tab-bar">
         <button class="tab-btn active" data-tab="upgrades">Upgrades</button>
@@ -2137,7 +2137,7 @@ function spawnEnemy(){
   enemySoulReward = elite ? eliteSouls(lv) : floorSouls(lv,fl);
   enemySpeed   = elite ? Math.max(800, Math.round(2000-(absFloor(lv,FLOORS_PER_LEVEL))*11)) : floorSpeed(lv,fl);
 
-  enemyDead=false; enemyDeathTime=0; combatActive=true;
+  enemyDead=false; enemyDeathTime=0; combatActive=true; lastAutoAttack=Date.now();
 
   document.getElementById('crown').style.display='none';
   document.getElementById('enemy-hp-bar').className='hp-fill enemy-hp'+(elite?' elite':'');
@@ -3570,7 +3570,7 @@ function doRebirthReset(chosenForm){
   currentAscensionKills=0;
 
   // Reset mana & spell state
-  mana=0; completedFloorsThisAscension=[]; invokePowerStacks=0;
+  mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0;
   for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
 
@@ -4051,7 +4051,7 @@ function updateEntityStatsPanel(){
   var dMin=entityDmgMin.add(entityDmgBonus).add(clickDmgBonus.floor());
   var dMax=entityDmgMax.add(entityDmgBonus).add(clickDmgBonus.floor());
   var strikeStr=fmt(dMin)+'–'+fmt(dMax);
-  var autoStr=autoAttackEnabled?(fmt(totalDps.mul(autoAttackInterval/1000).floor())+' dmg / '+(autoAttackInterval/1000).toFixed(1)+'s'):'—';
+  var autoStr=autoAttackEnabled?(fmt(totalDps)+' / s'):'—';
   document.getElementById('es-dmg').textContent=strikeStr;
   document.getElementById('es-auto').textContent=autoStr;
   document.getElementById('es-vamp').textContent=enemyHpDrainPct>0?(+(enemyHpDrainPct*100).toFixed(4))+'% HP/s':'—';
@@ -4609,9 +4609,18 @@ function gameLoop(){
   var now=Date.now();
 
   if(combatActive&&!enemyDead){
-    if(autoAttackEnabled&&def()&&firstKillDone[def().id]&&now-lastAutoAttack>=autoAttackInterval){
-      lastAutoAttack=now;entityAttack(true);
-    }
+    if(autoAttackEnabled&&def()&&firstKillDone[def().id]){
+      var _dt=(now-lastAutoAttack)/1000;
+      lastAutoAttack=now;
+      var _dpsDmg=totalDps.mul(_dt);
+      if(isSpellActive('twinBlades')) _dpsDmg=_dpsDmg.mul(2);
+      if(invokePowerStacks>0) _dpsDmg=_dpsDmg.mul(1+invokePowerStacks*0.0666);
+      if(_dpsDmg.gt(0)){
+        enemyHp=Decimal.max(D(0),enemyHp.sub(_dpsDmg));
+        updateHpBars();
+        if(enemyHp.lte(0)) onEnemyDeath();
+      }
+    } else { lastAutoAttack=now; }
     if(enemyHpDrainPct>0){
       var drainAmt=enemyMaxHp.mul(enemyHpDrainPct).mul((now-lastDrainTick)/1000);
       lastDrainTick=now;
