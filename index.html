@@ -377,6 +377,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .mm-cell.elite.done { border-color:#7a6c28;color:#9b8a3a;background:#141000; }
 .mm-cell.elite.current { border-color:#ffd700;color:#ffd700;background:#1a1400;animation:pulse-gold 1.5s ease-in-out infinite; }
 .mm-sep { width:2px;height:36px;background:#2a2050;margin:0 4px;flex-shrink:0; }
+.mm-realm-sep { width:3px;height:40px;background:#5a3a80;margin:0 6px;flex-shrink:0; }
 @keyframes pulse-gold { 0%,100%{box-shadow:0 0 5px rgba(255,215,0,0.35);} 50%{box-shadow:0 0 12px rgba(255,215,0,0.85),0 0 22px rgba(255,215,0,0.4);} }
 .tab-bar { display:flex; gap:0; border-bottom:1px solid #1e1845; flex-shrink:0; margin-bottom:0; }
 .tab-btn { background:transparent; border:none; border-bottom:2px solid transparent; color:#554477; font-family:Georgia,serif; font-size:12px; letter-spacing:2px; text-transform:uppercase; padding:6px 14px; cursor:pointer; transition:color 0.15s,border-color 0.15s; margin-bottom:-1px; }
@@ -1943,8 +1944,11 @@ function globalFloor(level,floor){ return (level-1)*(FLOORS_PER_LEVEL+1)+floor; 
 function realmName(realm){ return REALM_NAMES[realm-1]||('Realm '+realm); }
 
 // ── MINIMAP ───────────────────────────────────────────────────────────────────
-function floorDone(level, floor){
-  // A floor is done if we are past it, or it equals current and wins >= 10
+function floorDone(level, floor, realm){
+  realm = realm === undefined ? curRealm : realm;
+  if(realm < curRealm) return true;
+  if(realm > curRealm) return false;
+  // same realm as current position
   if(level < curLevel) return true;
   if(level === curLevel){
     if(floor < curFloor) return true;
@@ -1952,13 +1956,17 @@ function floorDone(level, floor){
   }
   return false;
 }
-function floorUnlocked(level, floor){
+function floorUnlocked(level, floor, realm){
+  realm = realm === undefined ? highestRealm : realm;
+  if(realm < highestRealm) return true;
+  if(realm > highestRealm) return false;
+  // same realm as frontier
   if(level > highestLevel) return false;
   if(level < highestLevel) return true;
   // same level as highest
   if(floor <= highestFloor) return true;
-  // elite floor unlocked only if last normal floor is done
-  if(floor===FLOORS_PER_LEVEL+1 && highestFloor >= FLOORS_PER_LEVEL && floorDone(level,FLOORS_PER_LEVEL)) return true;
+  // elite unlocked once all normal floors of this level are done
+  if(floor===FLOORS_PER_LEVEL+1 && highestFloor >= FLOORS_PER_LEVEL) return true;
   return false;
 }
 
@@ -1966,25 +1974,27 @@ function buildMinimap(){
   var cellsEl=document.getElementById('mm-cells');
   cellsEl.innerHTML='';
 
-  // Flat room list
+  // Flat room list across all realms reached
   var rooms=[];
-  for(var lv=1;lv<=LEVELS_PER_REALM;lv++){
-    for(var fl=1;fl<=FLOORS_PER_LEVEL+1;fl++) rooms.push({level:lv,floor:fl,isElite:fl===FLOORS_PER_LEVEL+1});
+  for(var rl=1;rl<=highestRealm;rl++){
+    for(var lv=1;lv<=LEVELS_PER_REALM;lv++){
+      for(var fl=1;fl<=FLOORS_PER_LEVEL+1;fl++) rooms.push({realm:rl,level:lv,floor:fl,isElite:fl===FLOORS_PER_LEVEL+1});
+    }
   }
 
   // Current room index
   var curIdx=0;
   for(var i=0;i<rooms.length;i++){
-    if(rooms[i].level===curLevel&&rooms[i].floor===curFloor){curIdx=i;break;}
+    if(rooms[i].realm===curRealm&&rooms[i].level===curLevel&&rooms[i].floor===curFloor){curIdx=i;break;}
   }
 
   // Previous and next navigable rooms
   var prevRoom=null, nextRoom=null;
   for(var i=curIdx-1;i>=0;i--){
-    if(floorUnlocked(rooms[i].level,rooms[i].floor)){prevRoom=rooms[i];break;}
+    if(floorUnlocked(rooms[i].level,rooms[i].floor,rooms[i].realm)){prevRoom=rooms[i];break;}
   }
   for(var i=curIdx+1;i<rooms.length;i++){
-    if(floorUnlocked(rooms[i].level,rooms[i].floor)){nextRoom=rooms[i];break;}
+    if(floorUnlocked(rooms[i].level,rooms[i].floor,rooms[i].realm)){nextRoom=rooms[i];break;}
   }
 
   // Current floor pinned to centre (index 2 of 5)
@@ -1995,15 +2005,22 @@ function buildMinimap(){
 
   for(var j=start;j<=end;j++){
     var r=rooms[j];
-    var done=floorDone(r.level,r.floor);
-    var cur=(r.level===curLevel&&r.floor===curFloor);
-    var locked=!floorUnlocked(r.level,r.floor);
-    var isNext=(nextRoom&&r.level===nextRoom.level&&r.floor===nextRoom.floor);
+    var done=floorDone(r.level,r.floor,r.realm);
+    var cur=(r.realm===curRealm&&r.level===curLevel&&r.floor===curFloor);
+    var locked=!floorUnlocked(r.level,r.floor,r.realm);
+    var isNext=(nextRoom&&r.realm===nextRoom.realm&&r.level===nextRoom.level&&r.floor===nextRoom.floor);
 
-    if(r.floor===1&&j>start){
-      var sep=document.createElement('div');
-      sep.className='mm-sep';
-      cellsEl.appendChild(sep);
+    if(j>start){
+      if(r.level===1&&r.floor===1){
+        // Realm boundary separator
+        var rsep=document.createElement('div');
+        rsep.className='mm-realm-sep';
+        cellsEl.appendChild(rsep);
+      } else if(r.floor===1){
+        var sep=document.createElement('div');
+        sep.className='mm-sep';
+        cellsEl.appendChild(sep);
+      }
     }
 
     var cell=document.createElement('div');
@@ -2014,16 +2031,16 @@ function buildMinimap(){
     else if(done)   cls+=' done';
     else if(locked) cls+=' locked';
     cell.className=cls;
-    cell.textContent=r.isElite?'★':absGlobalFloor(curRealm,r.level,r.floor);
-    cell.title='Level '+r.level+', '+(r.isElite?'Elite (Floor '+absGlobalFloor(curRealm,r.level,r.floor)+')':'Floor '+absGlobalFloor(curRealm,r.level,r.floor));
+    cell.textContent=r.isElite?'★':absGlobalFloor(r.realm,r.level,r.floor);
+    cell.title='Realm '+r.realm+' Level '+r.level+', '+(r.isElite?'Elite':'Floor '+absGlobalFloor(r.realm,r.level,r.floor));
 
     if(!locked){
-      (function(l,f){
+      (function(rl,l,f){
         cell.addEventListener('click',function(){
           minimapNewFloor=false;
-          navigateTo(l,f);
+          navigateTo(l,f,rl);
         });
-      })(r.level,r.floor);
+      })(r.realm,r.level,r.floor);
     }
     cellsEl.appendChild(cell);
   }
@@ -2049,22 +2066,13 @@ function updateAutoProgressBtn(){
   btn.classList.toggle('ap-off', !autoProgressEnabled);
 }
 
-function navigateTo(level, floor){
-  // Can only go to completed floors or current
-  if(!floorUnlocked(level,floor)) return;
-  // Can't go forward past highest reached
-  if(level > highestLevel) return;
-  if(level === highestLevel && floor > highestFloor && !(floor===FLOORS_PER_LEVEL+1&&highestFloor>=FLOORS_PER_LEVEL)) return;
+function navigateTo(level, floor, realm){
+  realm = realm === undefined ? curRealm : realm;
+  if(!floorUnlocked(level,floor,realm)) return;
 
   combatActive=false; enemyDead=true;
-  curLevel=level; curFloor=floor;
-  // If navigating to a completed floor, reset wins to 0 so they grind again
-  // (floor is marked done by position tracking, not win counter)
-  if(floorDone(level,floor) && !(level===curLevel&&floor===curFloor)){
-    floorWins=0;
-  } else {
-    floorWins=0;
-  }
+  curRealm=realm; curLevel=level; curFloor=floor;
+  floorWins=0;
   setTimeout(spawnEnemy,400);
   buildMinimap();
   updateProgressLabel();
@@ -2235,20 +2243,22 @@ function onEnemyDeath(){
     if(namedEliteFirstKills.indexOf(typeIdx2)<0) namedEliteFirstKills.push(typeIdx2);
     if(defeatedElites.indexOf(typeIdx2)<0){
       defeatedElites.push(typeIdx2);
-      // add next type to pool if not already there
-      var nextType=typeIdx2+1;
-      var realmEnd=curRealm*LEVELS_PER_REALM;
-      if(nextType<realmEnd && nextType<ENEMY_TYPES.length && enemyPool.indexOf(nextType)<0){
-        enemyPool.push(nextType);
-      }
-      // Unlock next level on minimap for click-to-advance (first kill only)
-      if(curLevel<LEVELS_PER_REALM){
-        var nextLv=curLevel+1;
-        if(nextLv>highestLevel){highestLevel=nextLv;highestFloor=1;minimapNewFloor=true;}
+      if(curRealm===highestRealm){
+        // add next type to pool if not already there
+        var nextType=typeIdx2+1;
+        var realmEnd=curRealm*LEVELS_PER_REALM;
+        if(nextType<realmEnd && nextType<ENEMY_TYPES.length && enemyPool.indexOf(nextType)<0){
+          enemyPool.push(nextType);
+        }
+        // Unlock next level on minimap for click-to-advance (first kill only)
+        if(curLevel<LEVELS_PER_REALM){
+          var nextLv=curLevel+1;
+          if(nextLv>highestLevel){highestLevel=nextLv;highestFloor=1;minimapNewFloor=true;}
+        }
       }
     }
 
-    if(curLevel>=LEVELS_PER_REALM){
+    if(curLevel>=LEVELS_PER_REALM&&curRealm===highestRealm){
       updateHighestFloor(); checkAchievements();
       document.getElementById('click-hint').textContent='Realm '+curRealm+' complete! Advancing to Realm '+(curRealm+1)+'…';
       setTimeout(function(){
@@ -2268,7 +2278,7 @@ function onEnemyDeath(){
       return;
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
-    if(autoProgressEnabled){
+    if(autoProgressEnabled&&curLevel<LEVELS_PER_REALM){
       (function(nl){ setTimeout(function(){ navigateTo(nl,1); },1200); })(curLevel+1);
     } else {
       setTimeout(spawnEnemy,1200);
@@ -2284,10 +2294,10 @@ function onEnemyDeath(){
         if(completedFloorsThisAscension.indexOf(_fk)<0) completedFloorsThisAscension.push(_fk);
         var nextFloor=curFloor+1;
         if(nextFloor<=FLOORS_PER_LEVEL){
-          if(curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; minimapNewFloor=true; }
+          if(curRealm===highestRealm&&curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; minimapNewFloor=true; }
         } else {
           // All normal floors done — unlock elite
-          if(curLevel===highestLevel&&highestFloor<FLOORS_PER_LEVEL+1){ highestFloor=FLOORS_PER_LEVEL+1; minimapNewFloor=true; }
+          if(curRealm===highestRealm&&curLevel===highestLevel&&highestFloor<FLOORS_PER_LEVEL+1){ highestFloor=FLOORS_PER_LEVEL+1; minimapNewFloor=true; }
         }
       }
     }
@@ -2643,7 +2653,7 @@ REP_UPGRADES.forEach(calcMilestoneCosts);
 // ── ACHIEVEMENT SYSTEM ────────────────────────────────────────────────────────
 function absGlobalFloor(realm,level,floor){ return (realm-1)*100+globalFloor(level,floor); }
 function updateHighestFloor(){
-  var af=absGlobalFloor(curRealm,highestLevel,highestFloor);
+  var af=absGlobalFloor(highestRealm,highestLevel,highestFloor);
   if(af>highestGlobalFloorEver) highestGlobalFloorEver=af;
 }
 
@@ -4879,12 +4889,12 @@ document.querySelectorAll('.buy-btn').forEach(function(btn){
 document.getElementById('mm-prev').addEventListener('click',function(){
   var r=this._room; if(!r) return;
   minimapNewFloor=false;
-  navigateTo(r.level,r.floor);
+  navigateTo(r.level,r.floor,r.realm);
 });
 document.getElementById('mm-next').addEventListener('click',function(){
   var r=this._room; if(!r) return;
   minimapNewFloor=false;
-  navigateTo(r.level,r.floor);
+  navigateTo(r.level,r.floor,r.realm);
 });
 document.getElementById('mm-auto').addEventListener('click',function(){
   if(rebirthCount<1) return;
