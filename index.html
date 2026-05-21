@@ -3570,7 +3570,7 @@ function doRebirthReset(chosenForm){
   currentAscensionKills=0;
 
   // Reset mana & spell state
-  mana=0; completedFloorsThisAscension=[]; invokePowerStacks=0;
+  mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0;
   for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
 
