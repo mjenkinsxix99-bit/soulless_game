@@ -2282,7 +2282,7 @@ function onEnemyDeath(){
       }
     }
 
-    if(curLevel>=LEVELS_PER_REALM&&curRealm===highestRealm){
+    if(curLevel>=LEVELS_PER_REALM&&curRealm===highestRealm&&rebirthCount>0){
       updateHighestFloor(); checkAchievements();
       document.getElementById('click-hint').textContent='Realm '+curRealm+' complete! Advancing to Realm '+(curRealm+1)+'…';
       setTimeout(function(){
@@ -4609,7 +4609,7 @@ function gameLoop(){
   var now=Date.now();
 
   if(combatActive&&!enemyDead){
-    if(autoAttackEnabled&&def()&&firstKillDone[def().id]){
+    if(autoAttackEnabled&&def()){
       var _dt=(now-lastAutoAttack)/1000;
       lastAutoAttack=now;
       var _dpsDmg=totalDps.mul(_dt);
