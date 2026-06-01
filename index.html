@@ -1872,6 +1872,7 @@ var currentAscensionKills=0;
 var tatteredSouls=0;
 var rebirthCount=0;
 var _offlineSavedAt=0;
+var _frontierWins=0;
 var formBonusMult=1.0;
 var ascension3Path=null;
 var ascension4Path=null;
@@ -2151,10 +2152,13 @@ function navigateTo(level, floor, realm){
   if(!floorUnlocked(level,floor,realm)) return;
 
   combatActive=false; enemyDead=true;
+  // Save wins if leaving the frontier floor
+  var wasAtFrontier=(curRealm===highestRealm&&curLevel===highestLevel&&curFloor===highestFloor);
+  if(wasAtFrontier) _frontierWins=floorWins;
   var atFrontier=(realm===highestRealm&&level===highestLevel&&floor===highestFloor);
   var beyondFrontier=(realm>highestRealm)||(realm===highestRealm&&(level>highestLevel||(level===highestLevel&&floor>highestFloor)));
   curRealm=realm; curLevel=level; curFloor=floor;
-  floorWins=atFrontier?floorWins:(beyondFrontier?0:WINS_PER_FLOOR);
+  floorWins=atFrontier?_frontierWins:(beyondFrontier?0:WINS_PER_FLOOR);
   setTimeout(spawnEnemy,400);
   buildMinimap();
   updateProgressLabel();
@@ -2335,7 +2339,7 @@ function onEnemyDeath(){
         // Unlock next level on minimap for click-to-advance (first kill only)
         if(curLevel<LEVELS_PER_REALM){
           var nextLv=curLevel+1;
-          if(nextLv>highestLevel){highestLevel=nextLv;highestFloor=1;minimapNewFloor=true;}
+          if(nextLv>highestLevel){highestLevel=nextLv;highestFloor=1;_frontierWins=0;minimapNewFloor=true;}
         }
       }
     }
@@ -2376,10 +2380,10 @@ function onEnemyDeath(){
         if(completedFloorsThisAscension.indexOf(_fk)<0) completedFloorsThisAscension.push(_fk);
         var nextFloor=curFloor+1;
         if(nextFloor<=FLOORS_PER_LEVEL){
-          if(curRealm===highestRealm&&curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; minimapNewFloor=true; }
+          if(curRealm===highestRealm&&curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; _frontierWins=0; minimapNewFloor=true; }
         } else {
           // All normal floors done — unlock elite
-          if(curRealm===highestRealm&&curLevel===highestLevel&&highestFloor<FLOORS_PER_LEVEL+1){ highestFloor=FLOORS_PER_LEVEL+1; minimapNewFloor=true; }
+          if(curRealm===highestRealm&&curLevel===highestLevel&&highestFloor<FLOORS_PER_LEVEL+1){ highestFloor=FLOORS_PER_LEVEL+1; _frontierWins=0; minimapNewFloor=true; }
         }
       }
     }
@@ -3700,6 +3704,7 @@ function saveGame(){
     completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
+    frontierWins:_frontierWins,
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -3769,6 +3774,7 @@ function loadGame(){
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
+  _frontierWins=data.frontierWins||0;
   _offlineSavedAt=data.savedAt||0;
 }
 
