@@ -3780,9 +3780,16 @@ function deleteSave(){
 // ── OFFLINE PROGRESS ──────────────────────────────────────────────────────────
 var OFFLINE_CAP_SECONDS = 6 * 3600; // 6 hours
 
+var OFFLINE_TS_KEY='soulless_offline_ts';
+
 function applyOfflineProgress(savedAt){
-  if(!savedAt) return;
-  var elapsed = Math.min((Date.now() - savedAt) / 1000, OFFLINE_CAP_SECONDS);
+  // Use the dedicated timestamp key if available — more reliable than the main save
+  var storedTs=parseInt(localStorage.getItem(OFFLINE_TS_KEY)||'0',10);
+  var ref=storedTs||savedAt||0;
+  // Write current time immediately so the next session has an accurate reference
+  try{ localStorage.setItem(OFFLINE_TS_KEY, String(Date.now())); } catch(e){}
+  if(!ref) return;
+  var elapsed = Math.min((Date.now() - ref) / 1000, OFFLINE_CAP_SECONDS);
   if(elapsed < 30) return; // ignore trivial reloads
 
   // souls/sec = DPS / 5, matching kill-reward math (soulsPerKill = HP/5, timePerKill = HP/DPS)
