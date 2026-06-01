@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formless</title>
+<title>Soulless</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Georgia, serif; overflow: hidden; }
@@ -117,6 +117,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #tattered-display { display: none; text-align: center; }
 #tattered-display .num { font-size: 22px; color: #ff8800; font-weight: bold; text-shadow: 0 0 5px rgba(255,180,0,1), 0 0 12px rgba(255,120,0,1), 0 0 24px rgba(255,80,0,0.8), 0 0 48px rgba(255,60,0,0.4); animation: tatteredPulse 2s ease-in-out infinite; }
 #tattered-display .lbl { font-size: 11px; color: #ff9900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,140,0,0.9), 0 0 18px rgba(255,80,0,0.5); }
+
+/* Offline progress modal */
+#offline-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 19999; align-items: center; justify-content: center; pointer-events: all; }
+#offline-modal.open { display: flex; }
+#offline-box { background: #07070f; border: 1px solid #3a1a55; border-radius: 10px; padding: 38px 42px; max-width: 420px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(100,40,180,0.35); }
+#offline-lore { font-size: 17px; color: #9977bb; font-style: italic; line-height: 1.7; letter-spacing: 0.6px; margin-bottom: 24px; }
+#offline-souls-gained { font-size: 26px; color: #c47c2a; font-weight: bold; letter-spacing: 1px; min-height: 1.2em; }
+#offline-time-away { font-size: 13px; color: #554466; margin-top: 10px; letter-spacing: 0.4px; }
 
 /* Rebirth confirmation modal */
 #rebirth-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; align-items: center; justify-content: center; }
@@ -343,6 +351,11 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #hard-reset-no:hover { border-color: #554466; color: #776699; }
 #settings-close { margin-top: 18px; padding: 6px 18px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; }
 #settings-close:hover { border-color: #554466; color: #665588; }
+.save-transfer-row { display: flex; gap: 10px; margin-top: 14px; }
+#export-save-btn, #import-save-label { flex: 1; padding: 10px 0; background: transparent; border: 1px solid #3a2d6a; color: #7766aa; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; text-align: center; transition: border-color 0.2s, color 0.2s; display: inline-block; }
+#export-save-btn:hover, #import-save-label:hover { border-color: #6655cc; color: #c0b0ff; }
+#import-save-file { display: none; }
+#import-save-msg { font-size: 12px; color: #556644; margin-top: 8px; min-height: 1.4em; letter-spacing: 0.3px; }
 .stat-row { display: flex; justify-content: space-between; font-size: 15px; color: #776699; padding: 3px 0; border-bottom: 1px solid #0f0f1e; }
 .stat-row .sv { color: #7766aa; }
 .stat-row .sv.good { color: #88aa88; }
@@ -550,16 +563,15 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   animation:pulse-red 1.2s ease-in-out infinite; }
 @keyframes pulse-red { 0%,100%{box-shadow:0 0 8px rgba(255,40,40,0.5);} 50%{box-shadow:0 0 18px rgba(255,40,40,0.9),0 0 34px rgba(255,40,40,0.4);} }
 
-/* New-floor bouncing red arrow — offset right of centre to point at next cell */
+/* New-floor bouncing red arrow — sits below minimap pointing up at next cell */
 #mm-new-arrow { display:none; position:absolute;
-  left:calc(50% + 54px); transform:translateX(-50%);
-  top:-28px; font-size:28px; color:#ff2222;
+  bottom:-26px; font-size:22px; color:#ff2222;
   text-shadow:0 0 10px rgba(255,40,40,0.9),0 0 22px rgba(255,40,40,0.5);
-  animation:mm-drop 0.55s ease-in-out infinite alternate; pointer-events:none; z-index:10; }
-@keyframes mm-drop { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(8px)} }
+  animation:mm-rise 0.55s ease-in-out infinite alternate; pointer-events:none; z-index:10; transform:translateX(-50%); }
+@keyframes mm-rise { 0%{transform:translateX(-50%) translateY(6px)} 100%{transform:translateX(-50%) translateY(-4px)} }
 
 /* Minimap panel repositioned inside battlefield */
-#minimap-panel { flex-shrink:0; padding:2px 14px; background:transparent; }
+#minimap-panel { flex-shrink:0; padding:2px 14px; background:transparent; position:relative; }
 #minimap-inner { display:flex;gap:8px;align-items:center;justify-content:center;padding:6px 0; }
 #mm-cells { display:flex; gap:8px; align-items:center; min-height:46px; }
 
@@ -636,7 +648,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 <body>
 <div id="game">
   <div id="topbar">
-    <div class="title">FORMLESS</div>
+    <div class="title">SOULLESS</div>
     <div id="souls-display">
       <div class="num" id="soul-count">0</div>
       <div class="lbl">souls collected</div>
@@ -697,13 +709,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
           </div>
         </div>
         <div id="minimap-panel">
-          <div id="mm-new-arrow">&#8659;</div>
           <div id="minimap-inner">
             <button class="mm-nav" id="mm-prev" title="Scroll left">&#9664;</button>
             <div id="mm-cells"></div>
             <button class="mm-nav" id="mm-next" title="Scroll right">&#9654;</button>
             <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
           </div>
+          <div id="mm-new-arrow">&#9650;</div>
         </div>
         <div id="click-hint">0 / 10</div>
       </div>
@@ -809,6 +821,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div id="ms"></div>
     <div id="mc"></div>
     <div id="mok">EMBRACE FORM</div>
+  </div>
+</div>
+
+<div id="offline-modal">
+  <div id="offline-box">
+    <div id="offline-lore">You have consumed souls in your absence.<br>Feeding your hunger.</div>
+    <div id="offline-souls-gained"></div>
+    <div id="offline-time-away"></div>
   </div>
 </div>
 
@@ -1080,6 +1100,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <button id="hard-reset-yes">Wipe Everything</button>
       <button id="hard-reset-no">Cancel</button>
     </div>
+    <div class="save-transfer-row">
+      <button id="export-save-btn">Export Save</button>
+      <label id="import-save-label">Import Save
+        <input type="file" id="import-save-file" accept=".soulless,.json">
+      </label>
+    </div>
+    <div id="import-save-msg"></div>
     <button id="hard-reset-btn">Hard Reset</button>
     <br>
     <button id="settings-close">Close</button>
@@ -1762,11 +1789,6 @@ var enemyPool = [0];
 // Absolute floor index for HP scaling (normal floors only; floor 1 of level 2 = FLOORS_PER_LEVEL+1)
 function absFloor(level, floor){ return (curRealm-1)*FLOORS_PER_REALM + (level-1)*FLOORS_PER_LEVEL + floor; }
 
-// Global floor number: each level = 9 normal floors + 1 elite = 10 floors per level
-function globalFloor(level, floor){
-  return (curRealm-1)*100 + (level-1)*10 + Math.min(floor, FLOORS_PER_LEVEL+1);
-}
-
 // Piecewise HP scaling using break_infinity Decimal throughout
 // Phase 1 (1–130):      1.33x per floor
 // Phase 2 (131–999):    1.166x per floor
@@ -1794,13 +1816,13 @@ function computeEnemyHp(gf){
 }
 
 function floorHp(level, floor){
-  return computeEnemyHp(globalFloor(level, floor)).ceil();
+  return computeEnemyHp(absGlobalFloor(curRealm, level, floor)).ceil();
 }
 function floorSouls(level, floor){
   return floorHp(level, floor).div(5).ceil();
 }
 function eliteHp(level){
-  var gf=globalFloor(level, FLOORS_PER_LEVEL+1);
+  var gf=absGlobalFloor(curRealm, level, FLOORS_PER_LEVEL+1);
   var mult=10+0.6*Math.floor(gf/666);
   return computeEnemyHp(gf).mul(mult).ceil();
 }
@@ -1843,6 +1865,8 @@ var ascendCount=0;
 var currentAscensionKills=0;
 var tatteredSouls=0;
 var rebirthCount=0;
+var _offlineSavedAt=0;
+var _frontierWins=0;
 var formBonusMult=1.0;
 var ascension3Path=null;
 var ascension4Path=null;
@@ -2016,8 +2040,8 @@ function floorUnlocked(level, floor, realm){
   if(level < highestLevel) return true;
   // same level as highest
   if(floor <= highestFloor) return true;
-  // elite unlocked once all normal floors of this level are done
-  if(floor===FLOORS_PER_LEVEL+1 && highestFloor >= FLOORS_PER_LEVEL) return true;
+  // elite unlocked only after all normal floors of this level are completed
+  if(floor===FLOORS_PER_LEVEL+1 && highestFloor >= FLOORS_PER_LEVEL+1) return true;
   return false;
 }
 
@@ -2102,9 +2126,23 @@ function buildMinimap(){
   if(prevBtn){prevBtn._room=prevRoom; prevBtn.disabled=!prevRoom;}
   if(nextBtn){nextBtn._room=nextRoom; nextBtn.disabled=!nextRoom;}
 
-  // Red arrow: show above minimap pointing to next available floor
+  // Red arrow: show below minimap pointing up at next available floor cell
   var arrowEl=document.getElementById('mm-new-arrow');
-  if(arrowEl) arrowEl.style.display=(minimapNewFloor&&nextRoom)?'block':'none';
+  if(arrowEl){
+    var show=(minimapNewFloor&&nextRoom);
+    arrowEl.style.display=show?'block':'none';
+    if(show){
+      requestAnimationFrame(function(){
+        var nextCell=cellsEl.querySelector('.next-available');
+        if(nextCell){
+          var panelEl=document.getElementById('minimap-panel');
+          var panelRect=panelEl.getBoundingClientRect();
+          var cellRect=nextCell.getBoundingClientRect();
+          arrowEl.style.left=(cellRect.left+cellRect.width/2-panelRect.left)+'px';
+        }
+      });
+    }
+  }
   updateAutoProgressBtn();
 }
 
@@ -2122,8 +2160,13 @@ function navigateTo(level, floor, realm){
   if(!floorUnlocked(level,floor,realm)) return;
 
   combatActive=false; enemyDead=true;
+  // Save wins if leaving the frontier floor
+  var wasAtFrontier=(curRealm===highestRealm&&curLevel===highestLevel&&curFloor===highestFloor);
+  if(wasAtFrontier) _frontierWins=floorWins;
+  var atFrontier=(realm===highestRealm&&level===highestLevel&&floor===highestFloor);
+  var beyondFrontier=(realm>highestRealm)||(realm===highestRealm&&(level>highestLevel||(level===highestLevel&&floor>highestFloor)));
   curRealm=realm; curLevel=level; curFloor=floor;
-  floorWins=0;
+  floorWins=atFrontier?_frontierWins:(beyondFrontier?0:WINS_PER_FLOOR);
   setTimeout(spawnEnemy,400);
   buildMinimap();
   updateProgressLabel();
@@ -2304,7 +2347,7 @@ function onEnemyDeath(){
         // Unlock next level on minimap for click-to-advance (first kill only)
         if(curLevel<LEVELS_PER_REALM){
           var nextLv=curLevel+1;
-          if(nextLv>highestLevel){highestLevel=nextLv;highestFloor=1;minimapNewFloor=true;}
+          if(nextLv>highestLevel){highestLevel=nextLv;highestFloor=1;_frontierWins=0;minimapNewFloor=true;}
         }
       }
     }
@@ -2345,10 +2388,10 @@ function onEnemyDeath(){
         if(completedFloorsThisAscension.indexOf(_fk)<0) completedFloorsThisAscension.push(_fk);
         var nextFloor=curFloor+1;
         if(nextFloor<=FLOORS_PER_LEVEL){
-          if(curRealm===highestRealm&&curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; minimapNewFloor=true; }
+          if(curRealm===highestRealm&&curLevel===highestLevel&&nextFloor>highestFloor){ highestFloor=nextFloor; _frontierWins=0; minimapNewFloor=true; }
         } else {
           // All normal floors done — unlock elite
-          if(curRealm===highestRealm&&curLevel===highestLevel&&highestFloor<FLOORS_PER_LEVEL+1){ highestFloor=FLOORS_PER_LEVEL+1; minimapNewFloor=true; }
+          if(curRealm===highestRealm&&curLevel===highestLevel&&highestFloor<FLOORS_PER_LEVEL+1){ highestFloor=FLOORS_PER_LEVEL+1; _frontierWins=0; minimapNewFloor=true; }
         }
       }
     }
@@ -2588,94 +2631,94 @@ function hideMsTip(){
 function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
 var REP_UPGRADES=[
   {id:'ss',name:'Spirit Slash',  cost:5,     costScale:1.0666, level:0, type:'click',  perLevel:1,
-    desc:function(){return '+1 damage per click';},
+    desc:function(){return '+'+fmt(1)+' damage per click';},
     vis:function(){return true;}, milestones:mkMs()},
   {id:'dh',name:'Deeper Hunger', cost:50,    costScale:1.06, level:0, type:'dps',    perLevel:5,
-    desc:function(){return '+5 damage per second';},
+    desc:function(){return '+'+fmt(5)+' damage per second';},
     vis:function(){return REP_UPGRADES[0].level>=1;}, milestones:mkMs()},
   {id:'sr',name:'Soul Resonance',cost:300,   costScale:1.09, level:0, type:'dps',    perLevel:20,
-    desc:function(){return '+20 damage per second';},
+    desc:function(){return '+'+fmt(20)+' damage per second';},
     vis:function(){return REP_UPGRADES[1].level>=1;}, milestones:mkMs()},
   {id:'sl',name:'Spectral Lure', cost:1000,  costScale:1.07, level:0, type:'dps',    perLevel:75,
-    desc:function(){return '+75 damage per second';},
+    desc:function(){return '+'+fmt(75)+' damage per second';},
     vis:function(){return REP_UPGRADES[2].level>=1;}, milestones:mkMs()},
   {id:'dv',name:'Divine Hunger', cost:5000,  costScale:1.07, level:0, type:'drain',  perLevel:0.0003,
     desc:function(){return '+0.03% enemy HP/s drain. Milestones unlock support bonuses.';},
     vis:function(){return REP_UPGRADES[3].level>=1;}, milestones:mkMs()},
   {id:'vs',name:'Void Sense',    cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
-    desc:function(){return '+900 damage per second';},
+    desc:function(){return '+'+fmt(900)+' damage per second';},
     vis:function(){return REP_UPGRADES[4].level>=1;}, milestones:mkMs()},
   {id:'fm',name:'Feeding Mask',  cost:100000, costScale:1.06, level:0, type:'dps',   perLevel:3500,
-    desc:function(){return '+3,500 damage per second';},
+    desc:function(){return '+'+fmt(3500)+' damage per second';},
     vis:function(){return REP_UPGRADES[5].level>=1;}, milestones:mkMs()},
   {id:'bb',name:'Bitter Bite',   cost:400000, costScale:1.07, level:0, type:'dps',   perLevel:10500,
-    desc:function(){return '+10,500 damage per second';},
+    desc:function(){return '+'+fmt(10500)+' damage per second';},
     vis:function(){return REP_UPGRADES[6].level>=1;}, milestones:mkMs()},
   {id:'as',name:'Angelic Seduction', cost:2500000, costScale:1.06, level:0, type:'dps', perLevel:47500,
-    desc:function(){return '+47,500 damage per second';},
+    desc:function(){return '+'+fmt(47500)+' damage per second';},
     vis:function(){return REP_UPGRADES[7].level>=1;}, milestones:mkMs()},
   {id:'ee',name:'Elemental Ecstasy', cost:15000000, costScale:1.06, level:0, type:'dps', perLevel:200000,
-    desc:function(){return '+200,000 damage per second';},
+    desc:function(){return '+'+fmt(200000)+' damage per second';},
     vis:function(){return REP_UPGRADES[8].level>=1;}, milestones:mkMs()},
   {id:'pf',name:'Piercing Fear',    cost:100000000, costScale:1.07, level:0, type:'dps', perLevel:950000,
-    desc:function(){return '+950,000 damage per second';},
+    desc:function(){return '+'+fmt(950000)+' damage per second';},
     vis:function(){return REP_UPGRADES[9].level>=1;}, milestones:mkMs()},
   {id:'cd',name:'Crushing Desire',  cost:800000000, costScale:1.08, level:0, type:'dps', perLevel:4000000,
-    desc:function(){return '+4,000,000 damage per second';},
+    desc:function(){return '+'+fmt(4000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[10].level>=1;}, milestones:mkMs()},
   {id:'cs',name:'Chaotic Strike',   cost:6500000000, costScale:1.07, level:0, type:'dps', perLevel:20000000,
-    desc:function(){return '+20,000,000 damage per second';},
+    desc:function(){return '+'+fmt(20000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[11].level>=1;}, milestones:mkMs()},
   {id:'md',name:'Mortal Deception', cost:50000000000, costScale:1.06, level:0, type:'dps', perLevel:70000000,
-    desc:function(){return '+70,000,000 damage per second';},
+    desc:function(){return '+'+fmt(70000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[12].level>=1;}, milestones:mkMs()},
   {id:'sg',name:'Sinful Gaze',      cost:425000000000, costScale:1.07, level:0, type:'dps', perLevel:450000000,
-    desc:function(){return '+450,000,000 damage per second';},
+    desc:function(){return '+'+fmt(450000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[13].level>=1;}, milestones:mkMs()},
   {id:'ah',name:'Anima Harvest',    cost:3800000000000, costScale:1.08, level:0, type:'dps', perLevel:3000000000,
-    desc:function(){return '+3,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(3000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[14].level>=1;}, milestones:mkMs()},
   {id:'sk',name:'Searing Spark',    cost:35000000000000, costScale:1.07, level:0, type:'dps', perLevel:20000000000,
-    desc:function(){return '+20,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(20000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[15].level>=1;}, milestones:mkMs()},
   {id:'cp',name:'Corrupt Psyche',   cost:330000000000000, costScale:1.06, level:0, type:'dps', perLevel:125000000000,
-    desc:function(){return '+125,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(125000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[16].level>=1;}, milestones:mkMs()},
   {id:'st',name:'Spirit Target',    cost:3e15, costScale:1.07, level:0, type:'dps', perLevel:800000000000,
-    desc:function(){return '+800,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(800000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[17].level>=1;}, milestones:mkMs()},
   {id:'sb',name:'Soul Blast',       cost:25e15, costScale:1.08, level:0, type:'dps', perLevel:5000000000000,
-    desc:function(){return '+5,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(5000000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[18].level>=1;}, milestones:mkMs()},
   {id:'dm',name:'Doom',             cost:300e15, costScale:1.07, level:0, type:'dps', perLevel:50000000000000,
-    desc:function(){return '+50,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(50000000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[19].level>=1;}, milestones:mkMs()},
   {id:'nt',name:'Night Terror',     cost:10e18, costScale:1.06, level:0, type:'dps', perLevel:1e15,
-    desc:function(){return '+1,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(1e15)+' damage per second';},
     vis:function(){return REP_UPGRADES[20].level>=1;}, milestones:mkMs()},
   {id:'ir',name:'Infernal Rage',    cost:325e18, costScale:1.07, level:0, type:'dps', perLevel:30e15,
-    desc:function(){return '+30,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(30e15)+' damage per second';},
     vis:function(){return REP_UPGRADES[21].level>=1;}, milestones:mkMs()},
   {id:'td',name:'Tainted Dreams',   cost:15e21, costScale:1.08, level:0, type:'dps', perLevel:950e15,
-    desc:function(){return '+950,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(950e15)+' damage per second';},
     vis:function(){return REP_UPGRADES[22].level>=1;}, milestones:mkMs()},
   {id:'mf',name:'Manifestation',    cost:4.75e24, costScale:1.07, level:0, type:'dps', perLevel:200e18,
-    desc:function(){return '+200,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(200e18)+' damage per second';},
     vis:function(){return REP_UPGRADES[23].level>=1;}, milestones:mkMs()},
   {id:'bs',name:'Brimstone',        cost:2e27, costScale:1.06, level:0, type:'dps', perLevel:75e21,
-    desc:function(){return '+75,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(75e21)+' damage per second';},
     vis:function(){return REP_UPGRADES[24].level>=1;}, milestones:mkMs()},
   {id:'ct',name:'Chaos Tide',       cost:325e27, costScale:1.07, level:0, type:'dps', perLevel:850e21,
-    desc:function(){return '+850,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(850e21)+' damage per second';},
     vis:function(){return REP_UPGRADES[25].level>=1;}, milestones:mkMs()},
   {id:'rn',name:'Ragefire Nova',    cost:12e30, costScale:1.08, level:0, type:'dps', perLevel:32e24,
-    desc:function(){return '+32,000,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(32e24)+' damage per second';},
     vis:function(){return REP_UPGRADES[26].level>=1;}, milestones:mkMs()},
   {id:'ac',name:'Abyssal Call',     cost:780e30, costScale:1.07, level:0, type:'dps', perLevel:675e24,
-    desc:function(){return '+675,000,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(675e24)+' damage per second';},
     vis:function(){return REP_UPGRADES[27].level>=1;}, milestones:mkMs()},
   {id:'bf',name:'Balefire',         cost:99e33, costScale:1.06, level:0, type:'dps', perLevel:50e27,
-    desc:function(){return '+50,000,000,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(50e27)+' damage per second';},
     vis:function(){return REP_UPGRADES[28].level>=1;}, milestones:mkMs()},
 ];
 
@@ -3669,6 +3712,7 @@ function saveGame(){
     completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
+    frontierWins:_frontierWins,
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -3738,10 +3782,69 @@ function loadGame(){
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
+  _frontierWins=data.frontierWins||0;
+  _offlineSavedAt=data.savedAt||0;
 }
 
 function deleteSave(){
   try{ localStorage.removeItem(SAVE_KEY); } catch(e){}
+}
+
+// ── OFFLINE PROGRESS ──────────────────────────────────────────────────────────
+var OFFLINE_CAP_SECONDS = 6 * 3600; // 6 hours
+
+var OFFLINE_TS_KEY='soulless_offline_ts';
+
+function applyOfflineProgress(savedAt){
+  // Use the dedicated timestamp key if available — more reliable than the main save
+  var storedTs=parseInt(localStorage.getItem(OFFLINE_TS_KEY)||'0',10);
+  var ref=storedTs||savedAt||0;
+  // Write current time immediately so the next session has an accurate reference
+  try{ localStorage.setItem(OFFLINE_TS_KEY, String(Date.now())); } catch(e){}
+  if(!ref) return;
+  var elapsed = Math.min((Date.now() - ref) / 1000, OFFLINE_CAP_SECONDS);
+  if(elapsed < 30) return; // ignore trivial reloads
+
+  // souls/sec = DPS / 5, matching kill-reward math (soulsPerKill = HP/5, timePerKill = HP/DPS)
+  var soulMult = 1;
+  if(rebirthForm==='androgynous') soulMult *= (1 + 0.10 * formBonusMult);
+  if(ascension3Path==='mystic')   soulMult *= 1.05;
+  var soulsPerSecond = totalDps.div(5).mul(soulMult);
+  var gained = soulsPerSecond.mul(elapsed).floor();
+  if(gained.lte(0)) return;
+
+  souls = souls.add(gained);
+  totalSouls = totalSouls.add(gained);
+
+  // Format away time
+  var h = Math.floor(elapsed / 3600);
+  var m = Math.floor((elapsed % 3600) / 60);
+  var s = Math.floor(elapsed % 60);
+  var timeStr = h > 0 ? h+'h '+m+'m' : (m > 0 ? m+'m '+s+'s' : s+'s');
+
+  var modal = document.getElementById('offline-modal');
+  var soulsEl = document.getElementById('offline-souls-gained');
+  var timeEl = document.getElementById('offline-time-away');
+  timeEl.textContent = 'Away for ' + timeStr;
+  soulsEl.textContent = '';
+  modal.classList.add('open');
+
+  saveGame();
+
+  // Count-up animation over 1.6 seconds then auto-close
+  var steps = 40, step = 0;
+  var interval = setInterval(function(){
+    step++;
+    var shown = gained.mul(step).div(steps).floor();
+    soulsEl.textContent = '+' + fmt(shown) + ' souls';
+    if(step >= steps){
+      clearInterval(interval);
+      setTimeout(function(){
+        modal.classList.remove('open');
+        document.getElementById('soul-count').textContent = fmt(souls);
+      }, 600);
+    }
+  }, 40);
 }
 
 // ── UPGRADE ICONS ─────────────────────────────────────────────────────────────
@@ -4781,6 +4884,51 @@ document.getElementById('hard-reset-yes').addEventListener('click',function(){
   location.reload();
 });
 
+document.getElementById('export-save-btn').addEventListener('click',function(){
+  saveGame();
+  var raw;
+  try{ raw=localStorage.getItem(SAVE_KEY); } catch(e){ return; }
+  if(!raw) return;
+  var encoded = btoa(unescape(encodeURIComponent(raw)));
+  var blob = new Blob([encoded], {type:'text/plain'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'soulless_save.soulless';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+document.getElementById('import-save-file').addEventListener('change',function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var msg = document.getElementById('import-save-msg');
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      var decoded = decodeURIComponent(escape(atob(ev.target.result.trim())));
+      var data = JSON.parse(decoded);
+      if(!data || !data.souls){
+        msg.style.color='#883333';
+        msg.textContent='Invalid save file.';
+        return;
+      }
+      try{ localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(e){
+        msg.style.color='#883333';
+        msg.textContent='Could not write save.';
+        return;
+      }
+      msg.style.color='#556644';
+      msg.textContent='Save imported. Reloading…';
+      setTimeout(function(){ location.reload(); }, 900);
+    } catch(err){
+      msg.style.color='#883333';
+      msg.textContent='Failed to read save file.';
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+});
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
 initMist(28);
@@ -4788,6 +4936,7 @@ preloadFormImages();
 loadGame();
 updateHighestFloor();
 recalcStats();
+applyOfflineProgress(_offlineSavedAt);
 updateHpBars();
 updateEntityStatsPanel();
 updateTraitsRow();
