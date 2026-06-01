@@ -553,13 +553,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 /* New-floor bouncing red arrow — offset right of centre to point at next cell */
 #mm-new-arrow { display:none; position:absolute;
   left:calc(50% + 54px); transform:translateX(-50%);
-  top:-28px; font-size:28px; color:#ff2222;
+  top:4px; font-size:28px; color:#ff2222;
   text-shadow:0 0 10px rgba(255,40,40,0.9),0 0 22px rgba(255,40,40,0.5);
   animation:mm-drop 0.55s ease-in-out infinite alternate; pointer-events:none; z-index:10; }
 @keyframes mm-drop { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(8px)} }
 
 /* Minimap panel repositioned inside battlefield */
-#minimap-panel { flex-shrink:0; padding:2px 14px; background:transparent; }
+#minimap-panel { flex-shrink:0; padding:2px 14px; background:transparent; position:relative; }
 #minimap-inner { display:flex;gap:8px;align-items:center;justify-content:center;padding:6px 0; }
 #mm-cells { display:flex; gap:8px; align-items:center; min-height:46px; }
 
@@ -2016,8 +2016,8 @@ function floorUnlocked(level, floor, realm){
   if(level < highestLevel) return true;
   // same level as highest
   if(floor <= highestFloor) return true;
-  // elite unlocked once all normal floors of this level are done
-  if(floor===FLOORS_PER_LEVEL+1 && highestFloor >= FLOORS_PER_LEVEL) return true;
+  // elite unlocked only after all normal floors of this level are completed
+  if(floor===FLOORS_PER_LEVEL+1 && highestFloor >= FLOORS_PER_LEVEL+1) return true;
   return false;
 }
 
@@ -2122,8 +2122,10 @@ function navigateTo(level, floor, realm){
   if(!floorUnlocked(level,floor,realm)) return;
 
   combatActive=false; enemyDead=true;
+  var atFrontier=(realm===highestRealm&&level===highestLevel&&floor===highestFloor);
+  var beyondFrontier=(realm>highestRealm)||(realm===highestRealm&&(level>highestLevel||(level===highestLevel&&floor>highestFloor)));
   curRealm=realm; curLevel=level; curFloor=floor;
-  floorWins=0;
+  floorWins=atFrontier?floorWins:(beyondFrontier?0:WINS_PER_FLOOR);
   setTimeout(spawnEnemy,400);
   buildMinimap();
   updateProgressLabel();
@@ -2588,94 +2590,94 @@ function hideMsTip(){
 function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
 var REP_UPGRADES=[
   {id:'ss',name:'Spirit Slash',  cost:5,     costScale:1.0666, level:0, type:'click',  perLevel:1,
-    desc:function(){return '+1 damage per click';},
+    desc:function(){return '+'+fmt(1)+' damage per click';},
     vis:function(){return true;}, milestones:mkMs()},
   {id:'dh',name:'Deeper Hunger', cost:50,    costScale:1.06, level:0, type:'dps',    perLevel:5,
-    desc:function(){return '+5 damage per second';},
+    desc:function(){return '+'+fmt(5)+' damage per second';},
     vis:function(){return REP_UPGRADES[0].level>=1;}, milestones:mkMs()},
   {id:'sr',name:'Soul Resonance',cost:300,   costScale:1.09, level:0, type:'dps',    perLevel:20,
-    desc:function(){return '+20 damage per second';},
+    desc:function(){return '+'+fmt(20)+' damage per second';},
     vis:function(){return REP_UPGRADES[1].level>=1;}, milestones:mkMs()},
   {id:'sl',name:'Spectral Lure', cost:1000,  costScale:1.07, level:0, type:'dps',    perLevel:75,
-    desc:function(){return '+75 damage per second';},
+    desc:function(){return '+'+fmt(75)+' damage per second';},
     vis:function(){return REP_UPGRADES[2].level>=1;}, milestones:mkMs()},
   {id:'dv',name:'Divine Hunger', cost:5000,  costScale:1.07, level:0, type:'drain',  perLevel:0.0003,
     desc:function(){return '+0.03% enemy HP/s drain. Milestones unlock support bonuses.';},
     vis:function(){return REP_UPGRADES[3].level>=1;}, milestones:mkMs()},
   {id:'vs',name:'Void Sense',    cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
-    desc:function(){return '+900 damage per second';},
+    desc:function(){return '+'+fmt(900)+' damage per second';},
     vis:function(){return REP_UPGRADES[4].level>=1;}, milestones:mkMs()},
   {id:'fm',name:'Feeding Mask',  cost:100000, costScale:1.06, level:0, type:'dps',   perLevel:3500,
-    desc:function(){return '+3,500 damage per second';},
+    desc:function(){return '+'+fmt(3500)+' damage per second';},
     vis:function(){return REP_UPGRADES[5].level>=1;}, milestones:mkMs()},
   {id:'bb',name:'Bitter Bite',   cost:400000, costScale:1.07, level:0, type:'dps',   perLevel:10500,
-    desc:function(){return '+10,500 damage per second';},
+    desc:function(){return '+'+fmt(10500)+' damage per second';},
     vis:function(){return REP_UPGRADES[6].level>=1;}, milestones:mkMs()},
   {id:'as',name:'Angelic Seduction', cost:2500000, costScale:1.06, level:0, type:'dps', perLevel:47500,
-    desc:function(){return '+47,500 damage per second';},
+    desc:function(){return '+'+fmt(47500)+' damage per second';},
     vis:function(){return REP_UPGRADES[7].level>=1;}, milestones:mkMs()},
   {id:'ee',name:'Elemental Ecstasy', cost:15000000, costScale:1.06, level:0, type:'dps', perLevel:200000,
-    desc:function(){return '+200,000 damage per second';},
+    desc:function(){return '+'+fmt(200000)+' damage per second';},
     vis:function(){return REP_UPGRADES[8].level>=1;}, milestones:mkMs()},
   {id:'pf',name:'Piercing Fear',    cost:100000000, costScale:1.07, level:0, type:'dps', perLevel:950000,
-    desc:function(){return '+950,000 damage per second';},
+    desc:function(){return '+'+fmt(950000)+' damage per second';},
     vis:function(){return REP_UPGRADES[9].level>=1;}, milestones:mkMs()},
   {id:'cd',name:'Crushing Desire',  cost:800000000, costScale:1.08, level:0, type:'dps', perLevel:4000000,
-    desc:function(){return '+4,000,000 damage per second';},
+    desc:function(){return '+'+fmt(4000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[10].level>=1;}, milestones:mkMs()},
   {id:'cs',name:'Chaotic Strike',   cost:6500000000, costScale:1.07, level:0, type:'dps', perLevel:20000000,
-    desc:function(){return '+20,000,000 damage per second';},
+    desc:function(){return '+'+fmt(20000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[11].level>=1;}, milestones:mkMs()},
   {id:'md',name:'Mortal Deception', cost:50000000000, costScale:1.06, level:0, type:'dps', perLevel:70000000,
-    desc:function(){return '+70,000,000 damage per second';},
+    desc:function(){return '+'+fmt(70000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[12].level>=1;}, milestones:mkMs()},
   {id:'sg',name:'Sinful Gaze',      cost:425000000000, costScale:1.07, level:0, type:'dps', perLevel:450000000,
-    desc:function(){return '+450,000,000 damage per second';},
+    desc:function(){return '+'+fmt(450000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[13].level>=1;}, milestones:mkMs()},
   {id:'ah',name:'Anima Harvest',    cost:3800000000000, costScale:1.08, level:0, type:'dps', perLevel:3000000000,
-    desc:function(){return '+3,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(3000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[14].level>=1;}, milestones:mkMs()},
   {id:'sk',name:'Searing Spark',    cost:35000000000000, costScale:1.07, level:0, type:'dps', perLevel:20000000000,
-    desc:function(){return '+20,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(20000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[15].level>=1;}, milestones:mkMs()},
   {id:'cp',name:'Corrupt Psyche',   cost:330000000000000, costScale:1.06, level:0, type:'dps', perLevel:125000000000,
-    desc:function(){return '+125,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(125000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[16].level>=1;}, milestones:mkMs()},
   {id:'st',name:'Spirit Target',    cost:3e15, costScale:1.07, level:0, type:'dps', perLevel:800000000000,
-    desc:function(){return '+800,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(800000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[17].level>=1;}, milestones:mkMs()},
   {id:'sb',name:'Soul Blast',       cost:25e15, costScale:1.08, level:0, type:'dps', perLevel:5000000000000,
-    desc:function(){return '+5,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(5000000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[18].level>=1;}, milestones:mkMs()},
   {id:'dm',name:'Doom',             cost:300e15, costScale:1.07, level:0, type:'dps', perLevel:50000000000000,
-    desc:function(){return '+50,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(50000000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[19].level>=1;}, milestones:mkMs()},
   {id:'nt',name:'Night Terror',     cost:10e18, costScale:1.06, level:0, type:'dps', perLevel:1e15,
-    desc:function(){return '+1,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(1e15)+' damage per second';},
     vis:function(){return REP_UPGRADES[20].level>=1;}, milestones:mkMs()},
   {id:'ir',name:'Infernal Rage',    cost:325e18, costScale:1.07, level:0, type:'dps', perLevel:30e15,
-    desc:function(){return '+30,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(30e15)+' damage per second';},
     vis:function(){return REP_UPGRADES[21].level>=1;}, milestones:mkMs()},
   {id:'td',name:'Tainted Dreams',   cost:15e21, costScale:1.08, level:0, type:'dps', perLevel:950e15,
-    desc:function(){return '+950,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(950e15)+' damage per second';},
     vis:function(){return REP_UPGRADES[22].level>=1;}, milestones:mkMs()},
   {id:'mf',name:'Manifestation',    cost:4.75e24, costScale:1.07, level:0, type:'dps', perLevel:200e18,
-    desc:function(){return '+200,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(200e18)+' damage per second';},
     vis:function(){return REP_UPGRADES[23].level>=1;}, milestones:mkMs()},
   {id:'bs',name:'Brimstone',        cost:2e27, costScale:1.06, level:0, type:'dps', perLevel:75e21,
-    desc:function(){return '+75,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(75e21)+' damage per second';},
     vis:function(){return REP_UPGRADES[24].level>=1;}, milestones:mkMs()},
   {id:'ct',name:'Chaos Tide',       cost:325e27, costScale:1.07, level:0, type:'dps', perLevel:850e21,
-    desc:function(){return '+850,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(850e21)+' damage per second';},
     vis:function(){return REP_UPGRADES[25].level>=1;}, milestones:mkMs()},
   {id:'rn',name:'Ragefire Nova',    cost:12e30, costScale:1.08, level:0, type:'dps', perLevel:32e24,
-    desc:function(){return '+32,000,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(32e24)+' damage per second';},
     vis:function(){return REP_UPGRADES[26].level>=1;}, milestones:mkMs()},
   {id:'ac',name:'Abyssal Call',     cost:780e30, costScale:1.07, level:0, type:'dps', perLevel:675e24,
-    desc:function(){return '+675,000,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(675e24)+' damage per second';},
     vis:function(){return REP_UPGRADES[27].level>=1;}, milestones:mkMs()},
   {id:'bf',name:'Balefire',         cost:99e33, costScale:1.06, level:0, type:'dps', perLevel:50e27,
-    desc:function(){return '+50,000,000,000,000,000,000,000,000,000 damage per second';},
+    desc:function(){return '+'+fmt(50e27)+' damage per second';},
     vis:function(){return REP_UPGRADES[28].level>=1;}, milestones:mkMs()},
 ];
 
