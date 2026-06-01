@@ -1790,11 +1790,6 @@ var enemyPool = [0];
 // Absolute floor index for HP scaling (normal floors only; floor 1 of level 2 = FLOORS_PER_LEVEL+1)
 function absFloor(level, floor){ return (curRealm-1)*FLOORS_PER_REALM + (level-1)*FLOORS_PER_LEVEL + floor; }
 
-// Global floor number: each level = 9 normal floors + 1 elite = 10 floors per level
-function globalFloor(level, floor){
-  return (curRealm-1)*100 + (level-1)*10 + Math.min(floor, FLOORS_PER_LEVEL+1);
-}
-
 // Piecewise HP scaling using break_infinity Decimal throughout
 // Phase 1 (1–130):      1.33x per floor
 // Phase 2 (131–999):    1.166x per floor
@@ -1822,13 +1817,13 @@ function computeEnemyHp(gf){
 }
 
 function floorHp(level, floor){
-  return computeEnemyHp(globalFloor(level, floor)).ceil();
+  return computeEnemyHp(absGlobalFloor(curRealm, level, floor)).ceil();
 }
 function floorSouls(level, floor){
   return floorHp(level, floor).div(5).ceil();
 }
 function eliteHp(level){
-  var gf=globalFloor(level, FLOORS_PER_LEVEL+1);
+  var gf=absGlobalFloor(curRealm, level, FLOORS_PER_LEVEL+1);
   var mult=10+0.6*Math.floor(gf/666);
   return computeEnemyHp(gf).mul(mult).ceil();
 }
