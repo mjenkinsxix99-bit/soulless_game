@@ -118,6 +118,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #tattered-display .num { font-size: 22px; color: #ff8800; font-weight: bold; text-shadow: 0 0 5px rgba(255,180,0,1), 0 0 12px rgba(255,120,0,1), 0 0 24px rgba(255,80,0,0.8), 0 0 48px rgba(255,60,0,0.4); animation: tatteredPulse 2s ease-in-out infinite; }
 #tattered-display .lbl { font-size: 11px; color: #ff9900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,140,0,0.9), 0 0 18px rgba(255,80,0,0.5); }
 
+/* Offline progress modal */
+#offline-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 19999; align-items: center; justify-content: center; pointer-events: all; }
+#offline-modal.open { display: flex; }
+#offline-box { background: #07070f; border: 1px solid #3a1a55; border-radius: 10px; padding: 38px 42px; max-width: 420px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(100,40,180,0.35); }
+#offline-lore { font-size: 17px; color: #9977bb; font-style: italic; line-height: 1.7; letter-spacing: 0.6px; margin-bottom: 24px; }
+#offline-souls-gained { font-size: 26px; color: #c47c2a; font-weight: bold; letter-spacing: 1px; min-height: 1.2em; }
+#offline-time-away { font-size: 13px; color: #554466; margin-top: 10px; letter-spacing: 0.4px; }
+
 /* Rebirth confirmation modal */
 #rebirth-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; align-items: center; justify-content: center; }
 #rebirth-modal.open { display: flex; }
@@ -809,6 +817,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div id="ms"></div>
     <div id="mc"></div>
     <div id="mok">EMBRACE FORM</div>
+  </div>
+</div>
+
+<div id="offline-modal">
+  <div id="offline-box">
+    <div id="offline-lore">You have consumed souls in your absence.<br>Feeding your hunger.</div>
+    <div id="offline-souls-gained"></div>
+    <div id="offline-time-away"></div>
   </div>
 </div>
 
@@ -1843,6 +1859,7 @@ var ascendCount=0;
 var currentAscensionKills=0;
 var tatteredSouls=0;
 var rebirthCount=0;
+var _offlineSavedAt=0;
 var formBonusMult=1.0;
 var ascension3Path=null;
 var ascension4Path=null;
@@ -3740,10 +3757,59 @@ function loadGame(){
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
+  _offlineSavedAt=data.savedAt||0;
 }
 
 function deleteSave(){
   try{ localStorage.removeItem(SAVE_KEY); } catch(e){}
+}
+
+// ── OFFLINE PROGRESS ──────────────────────────────────────────────────────────
+var OFFLINE_CAP_SECONDS = 6 * 3600; // 6 hours
+
+function applyOfflineProgress(savedAt){
+  if(!savedAt) return;
+  var elapsed = Math.min((Date.now() - savedAt) / 1000, OFFLINE_CAP_SECONDS);
+  if(elapsed < 30) return; // ignore trivial reloads
+
+  // souls/sec = DPS / 5, matching kill-reward math (soulsPerKill = HP/5, timePerKill = HP/DPS)
+  var soulMult = 1;
+  if(rebirthForm==='androgynous') soulMult *= (1 + 0.10 * formBonusMult);
+  if(ascension3Path==='mystic')   soulMult *= 1.05;
+  var soulsPerSecond = totalDps.div(5).mul(soulMult);
+  var gained = soulsPerSecond.mul(elapsed).floor();
+  if(gained.lte(0)) return;
+
+  souls = souls.add(gained);
+  totalSouls = totalSouls.add(gained);
+  saveGame();
+
+  // Format away time
+  var h = Math.floor(elapsed / 3600);
+  var m = Math.floor((elapsed % 3600) / 60);
+  var timeStr = h > 0 ? h+'h '+m+'m' : m+'m';
+
+  var modal = document.getElementById('offline-modal');
+  var soulsEl = document.getElementById('offline-souls-gained');
+  var timeEl = document.getElementById('offline-time-away');
+  timeEl.textContent = 'Away for ' + timeStr;
+  soulsEl.textContent = '';
+  modal.classList.add('open');
+
+  // Count-up animation over 1.6 seconds then auto-close
+  var steps = 40, step = 0;
+  var interval = setInterval(function(){
+    step++;
+    var shown = gained.mul(step).div(steps).floor();
+    soulsEl.textContent = '+' + fmt(shown) + ' souls';
+    if(step >= steps){
+      clearInterval(interval);
+      setTimeout(function(){
+        modal.classList.remove('open');
+        document.getElementById('soul-count').textContent = fmt(souls);
+      }, 600);
+    }
+  }, 40);
 }
 
 // ── UPGRADE ICONS ─────────────────────────────────────────────────────────────
@@ -4790,6 +4856,7 @@ preloadFormImages();
 loadGame();
 updateHighestFloor();
 recalcStats();
+applyOfflineProgress(_offlineSavedAt);
 updateHpBars();
 updateEntityStatsPanel();
 updateTraitsRow();
