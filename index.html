@@ -3788,7 +3788,7 @@ var OFFLINE_CAP_SECONDS = 6 * 3600; // 6 hours
 function applyOfflineProgress(savedAt){
   if(!savedAt) return;
   var elapsed = Math.min((Date.now() - savedAt) / 1000, OFFLINE_CAP_SECONDS);
-  if(elapsed < 5) return; // ignore sub-5s reloads
+  if(elapsed < 30) return; // ignore trivial reloads
 
   // souls/sec = DPS / 5, matching kill-reward math (soulsPerKill = HP/5, timePerKill = HP/DPS)
   var soulMult = 1;
