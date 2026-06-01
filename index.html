@@ -351,6 +351,11 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #hard-reset-no:hover { border-color: #554466; color: #776699; }
 #settings-close { margin-top: 18px; padding: 6px 18px; background: transparent; border: 1px solid #332244; color: #443366; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; }
 #settings-close:hover { border-color: #554466; color: #665588; }
+.save-transfer-row { display: flex; gap: 10px; margin-top: 14px; }
+#export-save-btn, #import-save-label { flex: 1; padding: 10px 0; background: transparent; border: 1px solid #3a2d6a; color: #7766aa; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; text-align: center; transition: border-color 0.2s, color 0.2s; display: inline-block; }
+#export-save-btn:hover, #import-save-label:hover { border-color: #6655cc; color: #c0b0ff; }
+#import-save-file { display: none; }
+#import-save-msg { font-size: 12px; color: #556644; margin-top: 8px; min-height: 1.4em; letter-spacing: 0.3px; }
 .stat-row { display: flex; justify-content: space-between; font-size: 15px; color: #776699; padding: 3px 0; border-bottom: 1px solid #0f0f1e; }
 .stat-row .sv { color: #7766aa; }
 .stat-row .sv.good { color: #88aa88; }
@@ -1096,6 +1101,13 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <button id="hard-reset-yes">Wipe Everything</button>
       <button id="hard-reset-no">Cancel</button>
     </div>
+    <div class="save-transfer-row">
+      <button id="export-save-btn">Export Save</button>
+      <label id="import-save-label">Import Save
+        <input type="file" id="import-save-file" accept=".soulless,.json">
+      </label>
+    </div>
+    <div id="import-save-msg"></div>
     <button id="hard-reset-btn">Hard Reset</button>
     <br>
     <button id="settings-close">Close</button>
@@ -4847,6 +4859,51 @@ document.getElementById('hard-reset-no').addEventListener('click',function(){
 document.getElementById('hard-reset-yes').addEventListener('click',function(){
   deleteSave();
   location.reload();
+});
+
+document.getElementById('export-save-btn').addEventListener('click',function(){
+  saveGame();
+  var raw;
+  try{ raw=localStorage.getItem(SAVE_KEY); } catch(e){ return; }
+  if(!raw) return;
+  var encoded = btoa(unescape(encodeURIComponent(raw)));
+  var blob = new Blob([encoded], {type:'text/plain'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'soulless_save.soulless';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+document.getElementById('import-save-file').addEventListener('change',function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var msg = document.getElementById('import-save-msg');
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      var decoded = decodeURIComponent(escape(atob(ev.target.result.trim())));
+      var data = JSON.parse(decoded);
+      if(!data || !data.souls){
+        msg.style.color='#883333';
+        msg.textContent='Invalid save file.';
+        return;
+      }
+      try{ localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(e){
+        msg.style.color='#883333';
+        msg.textContent='Could not write save.';
+        return;
+      }
+      msg.style.color='#556644';
+      msg.textContent='Save imported. Reloading…';
+      setTimeout(function(){ location.reload(); }, 900);
+    } catch(err){
+      msg.style.color='#883333';
+      msg.textContent='Failed to read save file.';
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
 });
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
