@@ -3788,7 +3788,7 @@ var OFFLINE_CAP_SECONDS = 6 * 3600; // 6 hours
 function applyOfflineProgress(savedAt){
   if(!savedAt) return;
   var elapsed = Math.min((Date.now() - savedAt) / 1000, OFFLINE_CAP_SECONDS);
-  if(elapsed < 30) return; // ignore trivial reloads
+  if(elapsed < 5) return; // ignore sub-5s reloads
 
   // souls/sec = DPS / 5, matching kill-reward math (soulsPerKill = HP/5, timePerKill = HP/DPS)
   var soulMult = 1;
@@ -3800,12 +3800,12 @@ function applyOfflineProgress(savedAt){
 
   souls = souls.add(gained);
   totalSouls = totalSouls.add(gained);
-  saveGame();
 
   // Format away time
   var h = Math.floor(elapsed / 3600);
   var m = Math.floor((elapsed % 3600) / 60);
-  var timeStr = h > 0 ? h+'h '+m+'m' : m+'m';
+  var s = Math.floor(elapsed % 60);
+  var timeStr = h > 0 ? h+'h '+m+'m' : (m > 0 ? m+'m '+s+'s' : s+'s');
 
   var modal = document.getElementById('offline-modal');
   var soulsEl = document.getElementById('offline-souls-gained');
@@ -3813,6 +3813,8 @@ function applyOfflineProgress(savedAt){
   timeEl.textContent = 'Away for ' + timeStr;
   soulsEl.textContent = '';
   modal.classList.add('open');
+
+  saveGame();
 
   // Count-up animation over 1.6 seconds then auto-close
   var steps = 40, step = 0;
