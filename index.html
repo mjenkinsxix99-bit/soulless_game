@@ -1762,20 +1762,47 @@ var enemyPool = [0];
 // Absolute floor index for HP scaling (normal floors only; floor 1 of level 2 = FLOORS_PER_LEVEL+1)
 function absFloor(level, floor){ return (curRealm-1)*FLOORS_PER_REALM + (level-1)*FLOORS_PER_LEVEL + floor; }
 
-function computeFloorHp(af){
-  return D(10).mul(D(1.0777).pow(af - 1));
+// Global floor number: each level = 9 normal floors + 1 elite = 10 floors per level
+function globalFloor(level, floor){
+  return (curRealm-1)*100 + (level-1)*10 + Math.min(floor, FLOORS_PER_LEVEL+1);
 }
+
+// Piecewise HP scaling using break_infinity Decimal throughout
+// Phase 1 (1–130):      1.33x per floor
+// Phase 2 (131–999):    1.166x per floor
+// Phase 3 (1000–222222): sliding 1.166→1.55 (log-space trapezoidal)
+// Phase 4 (222223+):    1.55x per floor
+function computeEnemyHp(gf){
+  if(gf<=130){
+    return D(10).mul(D(1.33).pow(gf-1));
+  }
+  var hp130=D(10).mul(D(1.33).pow(129));
+  if(gf<=999){
+    return hp130.mul(D(1.166).pow(gf-130));
+  }
+  var hp999=hp130.mul(D(1.166).pow(869));
+  if(gf<=222222){
+    var n=gf-999;
+    var logR0=Math.log(1.166);
+    var logR1=Math.log(1.166+(1.55-1.166)*(gf-1000)/(222222-1000));
+    return hp999.mul(D(Math.E).pow(n*(logR0+logR1)/2));
+  }
+  // Phase 4 — anchor at floor 222222 then apply 1.55x per floor
+  var n222=222222-999;
+  var hp222222=hp999.mul(D(Math.E).pow(n222*(Math.log(1.166)+Math.log(1.55))/2));
+  return hp222222.mul(D(1.55).pow(gf-222222));
+}
+
 function floorHp(level, floor){
-  return computeFloorHp(absFloor(level, floor)).ceil();
+  return computeEnemyHp(globalFloor(level, floor)).ceil();
 }
 function floorSouls(level, floor){
   return floorHp(level, floor).div(5).ceil();
 }
 function eliteHp(level){
-  // Base = 10 regular enemies of that floor; every 666 absolute floors add 0.6 enemies
-  var af = absFloor(level, FLOORS_PER_LEVEL);
-  var mult = 10 + 0.6 * Math.floor(af / 666);
-  return computeFloorHp(af).mul(mult).ceil();
+  var gf=globalFloor(level, FLOORS_PER_LEVEL+1);
+  var mult=10+0.6*Math.floor(gf/666);
+  return computeEnemyHp(gf).mul(mult).ceil();
 }
 function eliteSouls(level){
   return eliteHp(level).div(5).ceil();
