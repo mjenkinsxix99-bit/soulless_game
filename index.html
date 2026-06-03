@@ -118,6 +118,81 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #tattered-display .num { font-size: 22px; color: #ff8800; font-weight: bold; text-shadow: 0 0 5px rgba(255,180,0,1), 0 0 12px rgba(255,120,0,1), 0 0 24px rgba(255,80,0,0.8), 0 0 48px rgba(255,60,0,0.4); animation: tatteredPulse 2s ease-in-out infinite; }
 #tattered-display .lbl { font-size: 11px; color: #ff9900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,140,0,0.9), 0 0 18px rgba(255,80,0,0.5); }
 
+/* Tutorial tooltip */
+#tutorial-overlay { display: none; position: fixed; inset: 0; z-index: 20000; }
+#tutorial-overlay.open { display: block; }
+#tutorial-overlay::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+#tutorial-tip {
+  position: absolute;
+  background: #0d0d1a;
+  border: 1px solid #7a2a2a;
+  border-radius: 8px;
+  padding: 18px 22px 16px;
+  max-width: 280px;
+  width: 280px;
+  color: #d8c4b0;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.8), 0 0 16px rgba(120,40,40,0.3);
+  pointer-events: auto;
+}
+#tutorial-tip p { margin: 0 0 14px; font-style: italic; color: #c8a888; letter-spacing: 0.4px; }
+#tutorial-ok {
+  padding: 7px 30px;
+  background: #7a2a2a;
+  color: #e8d8c8;
+  border: 1px solid #aa4444;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  transition: background 0.2s;
+}
+#tutorial-ok:hover { background: #993333; }
+.tut-arrow-down {
+  position: absolute;
+  width: 0; height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-top: 17px solid #7a2a2a;
+  bottom: -17px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.tut-arrow-down::after {
+  content: '';
+  position: absolute;
+  width: 0; height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 15px solid #0d0d1a;
+  top: -17px;
+  left: -11px;
+}
+.tut-arrow-up {
+  position: absolute;
+  width: 0; height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-bottom: 17px solid #7a2a2a;
+  top: -17px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.tut-arrow-up::after {
+  content: '';
+  position: absolute;
+  width: 0; height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-bottom: 15px solid #0d0d1a;
+  top: 2px;
+  left: -11px;
+}
+
 /* Offline progress modal */
 #offline-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 19999; align-items: center; justify-content: center; pointer-events: all; }
 #offline-modal.open { display: flex; }
@@ -834,6 +909,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div id="ms"></div>
     <div id="mc"></div>
     <div id="mok">EMBRACE FORM</div>
+  </div>
+</div>
+
+<div id="tutorial-overlay">
+  <div id="tutorial-tip">
+    <p id="tutorial-text"></p>
+    <button id="tutorial-ok">OK</button>
+    <div class="tut-arrow-down" id="tutorial-arrow"></div>
   </div>
 </div>
 
@@ -4970,6 +5053,60 @@ document.getElementById('import-save-file').addEventListener('change',function(e
   e.target.value='';
 });
 
+// ── TUTORIAL SYSTEM ───────────────────────────────────────────────────────────
+function showTutorialTip(text, targetEl, onDone) {
+  var overlay = document.getElementById('tutorial-overlay');
+  var tip     = document.getElementById('tutorial-tip');
+  var textEl  = document.getElementById('tutorial-text');
+  var arrow   = document.getElementById('tutorial-arrow');
+  var okBtn   = document.getElementById('tutorial-ok');
+
+  textEl.textContent = text;
+
+  // Position tip relative to target element
+  function positionTip() {
+    var rect = targetEl.getBoundingClientRect();
+    var tipW = 280;
+    var tipH = tip.offsetHeight || 110;
+    var margin = 20; // gap between tip and target
+
+    var targetCX = rect.left + rect.width / 2;
+    var left = targetCX - tipW / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tipW - 8));
+
+    var arrowOffset = (targetCX - left) - 13;
+    arrowOffset = Math.max(10, Math.min(arrowOffset, tipW - 26));
+
+    // Try placing tip above the target
+    var top = rect.top - tipH - margin - 17;
+    if (top < 8) {
+      // Not enough room above — place below instead
+      top = rect.bottom + margin + 17;
+      arrow.className = 'tut-arrow-up';
+      arrow.style.left = arrowOffset + 'px';
+      arrow.style.bottom = '';
+    } else {
+      arrow.className = 'tut-arrow-down';
+      arrow.style.left = arrowOffset + 'px';
+      arrow.style.bottom = '';
+    }
+
+    tip.style.left = left + 'px';
+    tip.style.top  = top + 'px';
+  }
+
+  overlay.classList.add('open');
+  // Wait one frame for tip to render so offsetHeight is accurate
+  requestAnimationFrame(function() {
+    positionTip();
+  });
+
+  okBtn.onclick = function() {
+    overlay.classList.remove('open');
+    if (onDone) onDone();
+  };
+}
+
 // ── INTRO SEQUENCE ────────────────────────────────────────────────────────────
 var INTRO_PANELS = [
   {
@@ -5133,7 +5270,23 @@ updateManaBar();
 renderSpellPanel();
 updateMuteToggle();
 syncIntroToggleUI();
-if(!_hadSave && showIntro){ showIntroSequence(null); }
+if(!_hadSave && showIntro){
+  showIntroSequence(function(){
+    if(showTutorial){
+      showTutorialTip(
+        'This is an enemy, your source for souls. Drink deeply of their pain...',
+        document.getElementById('enemy-canvas'),
+        null
+      );
+    }
+  });
+} else if(!_hadSave && !showIntro && showTutorial){
+  showTutorialTip(
+    'This is an enemy, your source for souls. Drink deeply of their pain...',
+    document.getElementById('enemy-canvas'),
+    null
+  );
+}
 spawnEnemy();
 checkAchievements(true);
 renderAchievementsTab();
