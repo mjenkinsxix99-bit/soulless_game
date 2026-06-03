@@ -326,6 +326,21 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #final-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
 #final-confirm-no:hover { border-color: #554466; color: #776699; }
 
+/* ── INTRO SEQUENCE ─────────────────────────────────────────────────────────── */
+#intro-overlay { display:none; position:fixed; inset:0; z-index:99999; background:#000; flex-direction:column; align-items:center; justify-content:center; }
+#intro-overlay.open { display:flex; }
+#intro-panel { position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; }
+#intro-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+#intro-text-wrap { position:relative; z-index:2; width:100%; max-width:860px; padding:0 40px 20px; text-align:center; }
+#intro-text { font-size:18px; color:#e8e0ff; font-family:Georgia,serif; font-style:italic; line-height:1.75; letter-spacing:0.5px; text-shadow:0 0 18px rgba(0,0,0,1),0 2px 6px rgba(0,0,0,0.95),0 0 40px rgba(0,0,0,0.9); margin-bottom:28px; }
+#intro-gradient { position:absolute; bottom:0; left:0; right:0; height:65%; background:linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 40%, transparent 100%); z-index:1; pointer-events:none; }
+#intro-btn { position:relative; z-index:2; padding:10px 34px; background:transparent; border:1px solid #c0b0e8; color:#c0b0e8; font-family:Georgia,serif; font-size:16px; letter-spacing:3px; cursor:pointer; border-radius:4px; transition:border-color 0.2s,color 0.2s,background 0.2s; }
+#intro-btn:hover { border-color:#e8e0ff; color:#ffffff; background:rgba(180,160,255,0.08); }
+#intro-overlay.fading { opacity:0; transition:opacity 0.7s ease; }
+#intro-panel.fading-out { opacity:0; transition:opacity 0.5s ease; }
+#intro-panel.fading-in { opacity:0; animation:introPanelIn 0.5s ease forwards; }
+@keyframes introPanelIn { from{opacity:0;} to{opacity:1;} }
+
 /* Settings button */
 #settings-btn { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
 #settings-btn:hover { background: linear-gradient(135deg, #3a2c00, #1e1800); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
@@ -338,9 +353,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1540; }
 .settings-row:last-of-type { border-bottom: none; }
 .settings-label { font-size: 15px; color: #9988bb; letter-spacing: 1px; }
-#mute-toggle { padding: 6px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
-#mute-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
-#mute-toggle.muted { border-color: #d4a843; color: #d4a843; }
+#mute-toggle, #intro-toggle, #tutorial-toggle { padding: 6px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
+#mute-toggle:hover, #intro-toggle:hover, #tutorial-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
+#mute-toggle.muted, #intro-toggle.muted, #tutorial-toggle.muted { border-color: #554477; color: #554477; }
 #hard-reset-btn { margin-top: 22px; padding: 10px 24px; background: transparent; border: 1px solid #882222; color: #994444; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; width: 100%; transition: background 0.2s, color 0.2s; }
 #hard-reset-btn:hover { background: rgba(140,30,30,0.15); color: #cc5555; }
 #hard-reset-confirm { display: none; margin-top: 14px; }
@@ -1086,6 +1101,18 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
 </div>
 
+<!-- Intro sequence overlay -->
+<div id="intro-overlay">
+  <div id="intro-panel">
+    <img id="intro-img" src="" alt="">
+    <div id="intro-gradient"></div>
+    <div id="intro-text-wrap">
+      <div id="intro-text"></div>
+      <button id="intro-btn">Next</button>
+    </div>
+  </div>
+</div>
+
 <button id="settings-btn">⚙</button>
 
 <div id="settings-modal">
@@ -1094,6 +1121,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div class="settings-row">
       <span class="settings-label">Sound</span>
       <button id="mute-toggle">On</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Show Intro</span>
+      <button id="intro-toggle">On</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Show Tutorial</span>
+      <button id="tutorial-toggle">On</button>
     </div>
     <div id="hard-reset-confirm">
       <p>This will wipe ALL progress. Are you certain?</p>
@@ -1123,6 +1158,9 @@ function rndD(lo,hi){
 }
 
 (function(){
+
+var showIntro = true;
+var showTutorial = true;
 
 var VOID_SPRITE_CELL_W = 330;
 var VOID_SPRITE_CELL_H = 427;
@@ -3712,6 +3750,8 @@ function saveGame(){
     completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
+    showIntro:showIntro,
+    showTutorial:showTutorial,
     frontierWins:_frontierWins,
     savedAt:Date.now()
   };
@@ -3720,11 +3760,11 @@ function saveGame(){
 
 function loadGame(){
   var raw;
-  try{ raw=localStorage.getItem(SAVE_KEY); } catch(e){ return; }
-  if(!raw) return;
+  try{ raw=localStorage.getItem(SAVE_KEY); } catch(e){ return false; }
+  if(!raw) return false;
   var data;
-  try{ data=JSON.parse(raw); } catch(e){ return; }
-  if(!data) return;
+  try{ data=JSON.parse(raw); } catch(e){ return false; }
+  if(!data) return false;
   souls=D(data.souls||0);
   totalSouls=D(data.totalSouls||0);
   stage=data.stage||0;
@@ -3782,8 +3822,11 @@ function loadGame(){
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
+  showIntro=(data.showIntro!==undefined)?data.showIntro:true;
+  showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
   _frontierWins=data.frontierWins||0;
   _offlineSavedAt=data.savedAt||0;
+  return true;
 }
 
 function deleteSave(){
@@ -4852,6 +4895,7 @@ document.getElementById('settings-btn').addEventListener('click',function(){
   document.getElementById('hard-reset-confirm').style.display='none';
   document.getElementById('hard-reset-btn').style.display='';
   updateMuteToggle();
+  syncIntroToggleUI();
   document.getElementById('settings-modal').classList.add('open');
 });
 
@@ -4929,11 +4973,103 @@ document.getElementById('import-save-file').addEventListener('change',function(e
   e.target.value='';
 });
 
+// ── INTRO SEQUENCE ────────────────────────────────────────────────────────────
+var INTRO_PANELS = [
+  {
+    img: 'artwork/intro/intro_panel_1.webp',
+    text: 'Once, a great empire stood at the height of its power. Millions gave their devotion, their lives — their very souls... to you. Under your rule the people prospered, and their love for you made the gods jealous. When their priests proclaimed you a deity, their anger led the gods to prove their power was unmatched.',
+    btn: 'Next'
+  },
+  {
+    img: 'artwork/intro/intro_panel_2.webp',
+    text: 'Then came the Reckoning! A force beyond comprehension descended, and in a single moment, every soul was torn from its vessel. The torrent of lightning tore bodies and spirit alike, destroying everything along its path. What once was beauty and prosperity, now lay in nothing but ruin. You were not immune. All your power, your body, your identity — all laid waste.',
+    btn: 'Next'
+  },
+  {
+    img: 'artwork/intro/intro_panel_3.webp',
+    text: 'You were destroyed by those that created you. Reduced to nothing but the ether from which you had been created. All you had built.... destroyed. Your people... punished. This would not go without retribution. Souls will feed you, but will not quench the fire that burns. Choose your path to power that will allow you to enslave the gods themselves....',
+    btn: 'Begin'
+  }
+];
+
+var _introCurrent = 0;
+var _introResolve = null;
+
+function showIntroSequence(onDone) {
+  _introCurrent = 0;
+  var overlay = document.getElementById('intro-overlay');
+  var panel   = document.getElementById('intro-panel');
+  var img     = document.getElementById('intro-img');
+  var text    = document.getElementById('intro-text');
+  var btn     = document.getElementById('intro-btn');
+
+  function showPanel(idx) {
+    var p = INTRO_PANELS[idx];
+    text.textContent = p.text;
+    btn.textContent  = p.btn;
+
+    if(idx === 0) {
+      img.src = p.img;
+      panel.style.opacity = '1';
+      overlay.classList.add('open');
+    } else {
+      panel.style.transition = 'opacity 0.5s ease';
+      panel.style.opacity = '0';
+      setTimeout(function(){
+        img.src = p.img;
+        panel.style.opacity = '1';
+      }, 520);
+    }
+  }
+
+  btn.onclick = function() {
+    _introCurrent++;
+    if(_introCurrent < INTRO_PANELS.length) {
+      showPanel(_introCurrent);
+    } else {
+      overlay.style.transition = 'opacity 0.7s ease';
+      overlay.style.opacity = '0';
+      setTimeout(function(){
+        overlay.classList.remove('open');
+        overlay.style.opacity = '';
+        overlay.style.transition = '';
+        panel.style.transition = '';
+        panel.style.opacity = '';
+        if(onDone) onDone();
+      }, 720);
+    }
+  };
+
+  showPanel(0);
+}
+
+// ── SETTINGS TOGGLES ──────────────────────────────────────────────────────────
+function syncIntroToggleUI(){
+  var introToggle = document.getElementById('intro-toggle');
+  var tutorialToggle = document.getElementById('tutorial-toggle');
+  introToggle.textContent = showIntro ? 'On' : 'Off';
+  introToggle.classList.toggle('muted', !showIntro);
+  tutorialToggle.textContent = showTutorial ? 'On' : 'Off';
+  tutorialToggle.classList.toggle('muted', !showTutorial);
+}
+
+document.getElementById('intro-toggle').addEventListener('click', function(){
+  showIntro = !showIntro;
+  syncIntroToggleUI();
+  saveGame();
+});
+
+document.getElementById('tutorial-toggle').addEventListener('click', function(){
+  showTutorial = !showTutorial;
+  syncIntroToggleUI();
+  saveGame();
+});
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
 initMist(28);
 preloadFormImages();
-loadGame();
+var _hadSave = loadGame();
 updateHighestFloor();
 recalcStats();
 applyOfflineProgress(_offlineSavedAt);
@@ -4946,6 +5082,9 @@ updateTatteredDisplay();
 updateTatteredBtn();
 updateManaBar();
 renderSpellPanel();
+updateMuteToggle();
+syncIntroToggleUI();
+if(!_hadSave && showIntro){ showIntroSequence(null); }
 spawnEnemy();
 checkAchievements(true);
 renderAchievementsTab();
