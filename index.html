@@ -1242,6 +1242,14 @@ function rndD(lo,hi){
 var showIntro = true;
 var showTutorial = true;
 
+var _tutShown = {
+  souls: false, upgrades: false, deeperHunger: false, milestone: false,
+  upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
+  ascension: false, honors: false, tatteredShop: false
+};
+var _tutQueue = [];
+var _tutActive = false;
+
 var VOID_SPRITE_CELL_W = 330;
 var VOID_SPRITE_CELL_H = 427;
 var VOID_SPRITE_DIMS = [
@@ -2336,6 +2344,7 @@ function spawnEnemy(){
     document.getElementById('elite-timer-wrap').style.visibility='visible';
     document.getElementById('elite-timer-bar').style.width='100%';
     document.getElementById('elite-timer-label').textContent='Time to Defeat: 20s';
+    if(!_tutShown.elite){ _tutShown.elite=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('Each Level has an Elite enemy. The ruler of the level. Defeat them within the time limit to proceed.',document.getElementById('enemy-canvas'),null); },800); } }
   } else {
     eliteTimerStart=0;
     document.getElementById('elite-timer-wrap').style.visibility='hidden';
@@ -2438,6 +2447,7 @@ function onEnemyDeath(){
   var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
+  if(!_tutShown.souls){ _tutShown.souls=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('These are the souls you have collected. Currency to help you grow stronger.',document.getElementById('souls-display'),null); },800); } }
   dirtyU=true;
 
   var d=def();
@@ -2511,6 +2521,7 @@ function onEnemyDeath(){
           // All normal floors done — unlock elite
           if(curRealm===highestRealm&&curLevel===highestLevel&&highestFloor<FLOORS_PER_LEVEL+1){ highestFloor=FLOORS_PER_LEVEL+1; _frontierWins=0; minimapNewFloor=true; }
         }
+        if(!_tutShown.floorCleared){ _tutShown.floorCleared=true; if(showTutorial){ setTimeout(function(){ var cell=document.querySelector('.mm-cell.next-available')||document.getElementById('minimap-panel'); showTutorialTip('Floor Cleared! Click to proceed to the next floor. Stronger, more rewarding.',cell,null); },400); } }
       }
     }
     if(autoProgressEnabled&&floorWins>=WINS_PER_FLOOR){
@@ -2536,6 +2547,7 @@ function onEliteDpsCheckFail(){
   curFloor=FLOORS_PER_LEVEL; floorWins=0;
   if(autoProgressEnabled){ autoProgressEnabled=false; saveGame(); }
   buildMinimap();
+  if(!_tutShown.eliteFail){ _tutShown.eliteFail=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You are not strong enough to Proceed. You must grow stronger. More souls. Feed the hunger.',document.getElementById('enemy-canvas'),null); },700); } }
   setTimeout(spawnEnemy,600);
 }
 
@@ -2995,6 +3007,7 @@ function checkAchievements(silent){
 function queueAchievement(a){
   _achQueue.push(a);
   if(!_achActive) drainAchQueue();
+  if(!_tutShown.honors){ _tutShown.honors=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('Many honors await you. View your conquests, plan your vengeance.',document.querySelector('[data-tab="honors"]'),null); },3500); } }
 }
 function drainAchQueue(){
   if(_achQueue.length===0){_achActive=false;return;}
@@ -3709,7 +3722,9 @@ function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
   var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
-  btn.style.display=(doom&&doom.level>=1)?'block':'none';
+  var canAscend=doom&&doom.level>=1;
+  btn.style.display=canAscend?'block':'none';
+  if(canAscend&&!_tutShown.ascension){ _tutShown.ascension=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You have grown strong enough to Ascend, if you choose. You will gain Tattered Souls which make you stronger that can be sacrificed to gain power. Own as many of each upgrade as you can. Every 666 purchases gives you 1 Tattered Soul.',document.getElementById('ascend-btn'),null); },400); } }
 }
 
 function updateTatteredDisplay(){
@@ -3772,6 +3787,7 @@ function doRebirthReset(chosenForm){
   // Apply rebirth
   rebirthCount++;
   rebirthForm=chosenForm;
+  if(rebirthCount===1&&!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You may sacrifice Tattered Souls for the promise of more strength. Weigh your choices carefully. Visit the shop and claim Auto-Progress as a free gift.',document.getElementById('tattered-upgrades-btn'),null); },1500); } }
 
   // Reload entity image as chosen form image
   _rebirthEntityOverride=chosenForm;
@@ -3832,6 +3848,7 @@ function saveGame(){
     soundMuted:soundMuted,
     showIntro:showIntro,
     showTutorial:showTutorial,
+    tutShown:_tutShown,
     frontierWins:_frontierWins,
     savedAt:Date.now()
   };
@@ -3904,6 +3921,7 @@ function loadGame(){
   soundMuted=data.soundMuted||false;
   showIntro=(data.showIntro!==undefined)?data.showIntro:true;
   showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
+  if(data.tutShown) _tutShown=Object.assign(_tutShown,data.tutShown);
   _frontierWins=data.frontierWins||0;
   _offlineSavedAt=data.savedAt||0;
   return true;
@@ -4171,6 +4189,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
       u.cost=c;
       u.level+=n;
       totalUpgradePurchases+=n;
+      if(!_tutShown.upgrades200&&totalUpgradePurchases>=200){ _tutShown.upgrades200=true; if(showTutorial){ (function(mult){ setTimeout(function(){ showTutorialTip('200 upgrades gives you a \xd7'+mult+' damage bonus! Every 100 more will give you another boost!',document.getElementById('upgrade-list'),null); },200); })(getPurchMult(totalUpgradePurchases).toString()); } }
       recalcStats();
       buildUpgrades(); lastRebuildU=Date.now(); dirtyU=false;
       updateEntityStatsPanel();
@@ -4209,6 +4228,7 @@ function patchMilestoneRow(card, u){
       var avail=threshMet&&prevLit;
       box.className='ms-box'+(avail?' avail':'');
       box.style.cssText=avail?'border-color:'+MS_COLORS[i]+';--ms-c:'+MS_GLOW[i]+';':'';
+      if(avail&&!_tutShown.milestone){ _tutShown.milestone=true; if(showTutorial){ (function(b){ setTimeout(function(){ showTutorialTip('Upgrades for your attacks that will help boost your power. Own 200 upgrades for even higher damage!',b,null); },200); })(box); } }
     }
   });
 }
@@ -4235,6 +4255,8 @@ function buildUpgrades(){
       can=souls.gte(cost);
     }
     var bought=u.level>0;
+    if(can&&!_tutShown.upgrades){ _tutShown.upgrades=true; if(showTutorial){ (function(){ setTimeout(function(){ showTutorialTip('Supernatural power, spend Souls to make yourself stronger.',document.getElementById('upgrade-list'),null); },200); })(); } }
+    if(u.id==='dh'&&!_tutShown.deeperHunger){ _tutShown.deeperHunger=true; if(showTutorial){ (function(){ setTimeout(function(){ var card=document.querySelector('.ucard[data-uid="dh"]')||document.getElementById('upgrade-list'); showTutorialTip('There are many Spiritual Attacks to aid in your rise to power. These are separate from your Spirit Slash clicking attack, their damage is constant as Damage per second (DPS). Reach Doom to have enough strength to Ascend.',card,null); },200); })(); } }
 
     var card=el.querySelector('.ucard[data-uid="'+u.id+'"]');
     if(card){
@@ -5055,6 +5077,15 @@ document.getElementById('import-save-file').addEventListener('change',function(e
 
 // ── TUTORIAL SYSTEM ───────────────────────────────────────────────────────────
 function showTutorialTip(text, targetEl, onDone) {
+  if (_tutActive) {
+    _tutQueue.push({text: text, targetEl: targetEl, onDone: onDone});
+    return;
+  }
+  _showTutTipNow(text, targetEl, onDone);
+}
+
+function _showTutTipNow(text, targetEl, onDone) {
+  _tutActive = true;
   var overlay = document.getElementById('tutorial-overlay');
   var tip     = document.getElementById('tutorial-tip');
   var textEl  = document.getElementById('tutorial-text');
@@ -5063,47 +5094,46 @@ function showTutorialTip(text, targetEl, onDone) {
 
   textEl.textContent = text;
 
-  // Position tip relative to target element
   function positionTip() {
-    var rect = targetEl.getBoundingClientRect();
+    var rect = targetEl ? targetEl.getBoundingClientRect() : null;
+    if (!rect || (rect.width === 0 && rect.height === 0)) {
+      tip.style.left = (window.innerWidth / 2 - 140) + 'px';
+      tip.style.top  = (window.innerHeight / 2 - 60) + 'px';
+      arrow.style.display = 'none';
+      return;
+    }
+    arrow.style.display = '';
     var tipW = 280;
     var tipH = tip.offsetHeight || 110;
-    var margin = 20; // gap between tip and target
-
+    var margin = 20;
     var targetCX = rect.left + rect.width / 2;
     var left = targetCX - tipW / 2;
     left = Math.max(8, Math.min(left, window.innerWidth - tipW - 8));
-
     var arrowOffset = (targetCX - left) - 13;
     arrowOffset = Math.max(10, Math.min(arrowOffset, tipW - 26));
-
-    // Try placing tip above the target
     var top = rect.top - tipH - margin - 17;
     if (top < 8) {
-      // Not enough room above — place below instead
       top = rect.bottom + margin + 17;
       arrow.className = 'tut-arrow-up';
-      arrow.style.left = arrowOffset + 'px';
-      arrow.style.bottom = '';
     } else {
       arrow.className = 'tut-arrow-down';
-      arrow.style.left = arrowOffset + 'px';
-      arrow.style.bottom = '';
     }
-
+    arrow.style.left = arrowOffset + 'px';
     tip.style.left = left + 'px';
     tip.style.top  = top + 'px';
   }
 
   overlay.classList.add('open');
-  // Wait one frame for tip to render so offsetHeight is accurate
-  requestAnimationFrame(function() {
-    positionTip();
-  });
+  requestAnimationFrame(positionTip);
 
   okBtn.onclick = function() {
     overlay.classList.remove('open');
+    _tutActive = false;
     if (onDone) onDone();
+    if (_tutQueue.length > 0) {
+      var next = _tutQueue.shift();
+      setTimeout(function() { _showTutTipNow(next.text, next.targetEl, next.onDone); }, 300);
+    }
   };
 }
 
