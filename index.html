@@ -118,6 +118,83 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #tattered-display .num { font-size: 22px; color: #ff8800; font-weight: bold; text-shadow: 0 0 5px rgba(255,180,0,1), 0 0 12px rgba(255,120,0,1), 0 0 24px rgba(255,80,0,0.8), 0 0 48px rgba(255,60,0,0.4); animation: tatteredPulse 2s ease-in-out infinite; }
 #tattered-display .lbl { font-size: 11px; color: #ff9900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,140,0,0.9), 0 0 18px rgba(255,80,0,0.5); }
 
+/* Tutorial tooltip */
+#tutorial-overlay { display: none; position: fixed; inset: 0; z-index: 20000; }
+#tutorial-overlay.open { display: block; }
+#tutorial-overlay::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+#tutorial-tip {
+  position: absolute;
+  background: #0d0d1a;
+  border: 1px solid #7a2a2a;
+  border-radius: 8px;
+  padding: 18px 22px 16px;
+  max-width: 280px;
+  width: 280px;
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.8), 0 0 16px rgba(120,40,40,0.3);
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+#tutorial-tip p { margin: 0 0 14px; font-style: italic; color: #ffffff; letter-spacing: 0.4px; }
+#tutorial-ok {
+  padding: 7px 30px;
+  background: #7a2a2a;
+  color: #e8d8c8;
+  border: 1px solid #aa4444;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  transition: background 0.2s;
+}
+#tutorial-ok:hover { background: #993333; }
+.tut-arrow-down {
+  position: absolute;
+  width: 0; height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-top: 17px solid #7a2a2a;
+  bottom: -17px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.tut-arrow-down::after {
+  content: '';
+  position: absolute;
+  width: 0; height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 15px solid #0d0d1a;
+  top: -17px;
+  left: -11px;
+}
+.tut-arrow-up {
+  position: absolute;
+  width: 0; height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-bottom: 17px solid #7a2a2a;
+  top: -17px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.tut-arrow-up::after {
+  content: '';
+  position: absolute;
+  width: 0; height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-bottom: 15px solid #0d0d1a;
+  top: 2px;
+  left: -11px;
+}
+
 /* Offline progress modal */
 #offline-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 19999; align-items: center; justify-content: center; pointer-events: all; }
 #offline-modal.open { display: flex; }
@@ -335,9 +412,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #intro-text-wrap { position:relative; z-index:2; width:100%; max-width:820px; padding:0 48px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:0; }
 .intro-line { font-size:19px; color:#e8e0ff; font-family:Georgia,serif; font-style:italic; line-height:1.8; letter-spacing:0.5px; text-shadow:0 0 20px rgba(0,0,0,1),0 2px 8px rgba(0,0,0,1),0 0 50px rgba(0,0,0,1); opacity:0; transform:translateY(12px); transition:opacity 0.45s ease, transform 0.45s ease; margin:0; padding:0; }
 .intro-line.visible { opacity:1; transform:translateY(0); }
-#intro-btn { margin-top:36px; padding:10px 34px; background:transparent; border:1px solid #c0b0e8; color:#c0b0e8; font-family:Georgia,serif; font-size:16px; letter-spacing:3px; cursor:pointer; border-radius:4px; transition:border-color 0.2s,color 0.2s,background 0.2s; opacity:0; pointer-events:none; transition:opacity 0.4s ease, border-color 0.2s, color 0.2s, background 0.2s; }
+#intro-btn { margin-top:36px; padding:10px 34px; background:#ffffff; border:1px solid #ffffff; color:#000000; font-family:Georgia,serif; font-size:16px; letter-spacing:3px; cursor:pointer; border-radius:4px; opacity:0; pointer-events:none; transition:opacity 0.4s ease, background 0.2s, color 0.2s; }
 #intro-btn.show { opacity:1; pointer-events:auto; }
-#intro-btn:hover { border-color:#e8e0ff; color:#ffffff; background:rgba(180,160,255,0.08); }
+#intro-btn:hover { background:#e0e0e0; border-color:#e0e0e0; color:#000000; }
 
 /* Settings button */
 #settings-btn { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
@@ -837,6 +914,14 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
 </div>
 
+<div id="tutorial-overlay">
+  <div id="tutorial-tip">
+    <p id="tutorial-text"></p>
+    <button id="tutorial-ok">OK</button>
+    <div class="tut-arrow-down" id="tutorial-arrow"></div>
+  </div>
+</div>
+
 <div id="offline-modal">
   <div id="offline-box">
     <div id="offline-lore">You have consumed souls in your absence.<br>Feeding your hunger.</div>
@@ -1158,6 +1243,14 @@ function rndD(lo,hi){
 
 var showIntro = true;
 var showTutorial = true;
+
+var _tutShown = {
+  souls: false, upgrades: false, deeperHunger: false, milestone: false,
+  upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
+  ascension: false, honors: false, tatteredShop: false
+};
+var _tutQueue = [];
+var _tutActive = false;
 
 var VOID_SPRITE_CELL_W = 330;
 var VOID_SPRITE_CELL_H = 427;
@@ -2253,6 +2346,7 @@ function spawnEnemy(){
     document.getElementById('elite-timer-wrap').style.visibility='visible';
     document.getElementById('elite-timer-bar').style.width='100%';
     document.getElementById('elite-timer-label').textContent='Time to Defeat: 20s';
+    if(!_tutShown.elite){ _tutShown.elite=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('Each Level has an Elite enemy. The ruler of the level. Defeat them within the time limit to proceed.',document.getElementById('enemy-canvas'),null); },800); } }
   } else {
     eliteTimerStart=0;
     document.getElementById('elite-timer-wrap').style.visibility='hidden';
@@ -2355,6 +2449,7 @@ function onEnemyDeath(){
   var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
+  if(!_tutShown.souls){ _tutShown.souls=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('These are the souls you have collected. Currency to help you grow stronger.',document.getElementById('souls-display'),null); },800); } }
   dirtyU=true;
 
   var d=def();
@@ -2428,6 +2523,7 @@ function onEnemyDeath(){
           // All normal floors done — unlock elite
           if(curRealm===highestRealm&&curLevel===highestLevel&&highestFloor<FLOORS_PER_LEVEL+1){ highestFloor=FLOORS_PER_LEVEL+1; _frontierWins=0; minimapNewFloor=true; }
         }
+        if(!_tutShown.floorCleared){ _tutShown.floorCleared=true; if(showTutorial){ setTimeout(function(){ var cell=document.querySelector('.mm-cell.next-available')||document.getElementById('minimap-panel'); showTutorialTip('Floor Cleared! Click to proceed to the next floor. Stronger, more rewarding.',cell,null); },400); } }
       }
     }
     if(autoProgressEnabled&&floorWins>=WINS_PER_FLOOR){
@@ -2453,6 +2549,7 @@ function onEliteDpsCheckFail(){
   curFloor=FLOORS_PER_LEVEL; floorWins=0;
   if(autoProgressEnabled){ autoProgressEnabled=false; saveGame(); }
   buildMinimap();
+  if(!_tutShown.eliteFail){ _tutShown.eliteFail=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You are not strong enough to Proceed. You must grow stronger. More souls. Feed the hunger.',document.getElementById('enemy-canvas'),null); },700); } }
   setTimeout(spawnEnemy,600);
 }
 
@@ -2912,6 +3009,7 @@ function checkAchievements(silent){
 function queueAchievement(a){
   _achQueue.push(a);
   if(!_achActive) drainAchQueue();
+  if(!_tutShown.honors){ _tutShown.honors=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('Many honors await you. View your conquests, plan your vengeance.',document.querySelector('[data-tab="honors"]'),null); },3500); } }
 }
 function drainAchQueue(){
   if(_achQueue.length===0){_achActive=false;return;}
@@ -3626,7 +3724,9 @@ function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
   var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
-  btn.style.display=(doom&&doom.level>=1)?'block':'none';
+  var canAscend=doom&&doom.level>=1;
+  btn.style.display=canAscend?'block':'none';
+  if(canAscend&&!_tutShown.ascension){ _tutShown.ascension=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You have grown strong enough to Ascend, if you choose. You will gain Tattered Souls which make you stronger that can be sacrificed to gain power. Own as many of each upgrade as you can. Every 666 purchases gives you 1 Tattered Soul.',document.getElementById('ascend-btn'),null); },400); } }
 }
 
 function updateTatteredDisplay(){
@@ -3689,6 +3789,7 @@ function doRebirthReset(chosenForm){
   // Apply rebirth
   rebirthCount++;
   rebirthForm=chosenForm;
+  if(rebirthCount===1&&!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You may sacrifice Tattered Souls for the promise of more strength. Weigh your choices carefully. Visit the shop and claim Auto-Progress as a free gift.',document.getElementById('tattered-upgrades-btn'),null); },1500); } }
 
   // Reload entity image as chosen form image
   _rebirthEntityOverride=chosenForm;
@@ -3749,6 +3850,7 @@ function saveGame(){
     soundMuted:soundMuted,
     showIntro:showIntro,
     showTutorial:showTutorial,
+    tutShown:_tutShown,
     frontierWins:_frontierWins,
     savedAt:Date.now()
   };
@@ -3821,6 +3923,7 @@ function loadGame(){
   soundMuted=data.soundMuted||false;
   showIntro=(data.showIntro!==undefined)?data.showIntro:true;
   showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
+  if(data.tutShown) _tutShown=Object.assign(_tutShown,data.tutShown);
   _frontierWins=data.frontierWins||0;
   _offlineSavedAt=data.savedAt||0;
   return true;
@@ -4088,6 +4191,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
       u.cost=c;
       u.level+=n;
       totalUpgradePurchases+=n;
+      if(!_tutShown.upgrades200&&totalUpgradePurchases>=200){ _tutShown.upgrades200=true; if(showTutorial){ (function(mult){ setTimeout(function(){ showTutorialTip('200 upgrades gives you a \xd7'+mult+' damage bonus! Every 100 more will give you another boost!',document.getElementById('upgrade-list'),null); },200); })(getPurchMult(totalUpgradePurchases).toString()); } }
       recalcStats();
       buildUpgrades(); lastRebuildU=Date.now(); dirtyU=false;
       updateEntityStatsPanel();
@@ -4126,6 +4230,7 @@ function patchMilestoneRow(card, u){
       var avail=threshMet&&prevLit;
       box.className='ms-box'+(avail?' avail':'');
       box.style.cssText=avail?'border-color:'+MS_COLORS[i]+';--ms-c:'+MS_GLOW[i]+';':'';
+      if(avail&&!_tutShown.milestone){ _tutShown.milestone=true; if(showTutorial){ (function(b){ setTimeout(function(){ showTutorialTip('Upgrades for your attacks that will help boost your power. Own 200 upgrades for even higher damage!',b,null); },200); })(box); } }
     }
   });
 }
@@ -4152,6 +4257,8 @@ function buildUpgrades(){
       can=souls.gte(cost);
     }
     var bought=u.level>0;
+    if(can&&!_tutShown.upgrades){ _tutShown.upgrades=true; if(showTutorial){ (function(){ setTimeout(function(){ showTutorialTip('Supernatural power, spend Souls to make yourself stronger.',document.getElementById('upgrade-list'),null); },200); })(); } }
+    if(u.id==='dh'&&!_tutShown.deeperHunger){ _tutShown.deeperHunger=true; if(showTutorial){ (function(){ setTimeout(function(){ var card=document.querySelector('.ucard[data-uid="dh"]')||document.getElementById('upgrade-list'); showTutorialTip('There are many Spiritual Attacks to aid in your rise to power. These are separate from your Spirit Slash clicking attack, their damage is constant as Damage per second (DPS). Reach Doom to have enough strength to Ascend.',card,null); },200); })(); } }
 
     var card=el.querySelector('.ucard[data-uid="'+u.id+'"]');
     if(card){
@@ -4970,6 +5077,68 @@ document.getElementById('import-save-file').addEventListener('change',function(e
   e.target.value='';
 });
 
+// ── TUTORIAL SYSTEM ───────────────────────────────────────────────────────────
+function showTutorialTip(text, targetEl, onDone) {
+  if (_tutActive) {
+    _tutQueue.push({text: text, targetEl: targetEl, onDone: onDone});
+    return;
+  }
+  _showTutTipNow(text, targetEl, onDone);
+}
+
+function _showTutTipNow(text, targetEl, onDone) {
+  _tutActive = true;
+  var overlay = document.getElementById('tutorial-overlay');
+  var tip     = document.getElementById('tutorial-tip');
+  var textEl  = document.getElementById('tutorial-text');
+  var arrow   = document.getElementById('tutorial-arrow');
+  var okBtn   = document.getElementById('tutorial-ok');
+
+  textEl.textContent = text;
+
+  function positionTip() {
+    var rect = targetEl ? targetEl.getBoundingClientRect() : null;
+    if (!rect || (rect.width === 0 && rect.height === 0)) {
+      tip.style.left = (window.innerWidth / 2 - 140) + 'px';
+      tip.style.top  = (window.innerHeight / 2 - 60) + 'px';
+      arrow.style.display = 'none';
+      return;
+    }
+    arrow.style.display = '';
+    var tipW = 280;
+    var tipH = tip.offsetHeight || 110;
+    var margin = 20;
+    var targetCX = rect.left + rect.width / 2;
+    var left = targetCX - tipW / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tipW - 8));
+    var arrowOffset = (targetCX - left) - 13;
+    arrowOffset = Math.max(10, Math.min(arrowOffset, tipW - 26));
+    var top = rect.top - tipH - margin - 17;
+    if (top < 8) {
+      top = rect.bottom + margin + 17;
+      arrow.className = 'tut-arrow-up';
+    } else {
+      arrow.className = 'tut-arrow-down';
+    }
+    arrow.style.left = arrowOffset + 'px';
+    tip.style.left = left + 'px';
+    tip.style.top  = top + 'px';
+  }
+
+  overlay.classList.add('open');
+  requestAnimationFrame(positionTip);
+
+  okBtn.onclick = function() {
+    overlay.classList.remove('open');
+    _tutActive = false;
+    if (onDone) onDone();
+    if (_tutQueue.length > 0) {
+      var next = _tutQueue.shift();
+      setTimeout(function() { _showTutTipNow(next.text, next.targetEl, next.onDone); }, 300);
+    }
+  };
+}
+
 // ── INTRO SEQUENCE ────────────────────────────────────────────────────────────
 var INTRO_PANELS = [
   {
@@ -5064,8 +5233,15 @@ function showIntroSequence(onDone) {
       panel.style.opacity = '0';
       setTimeout(function(){
         img.src = p.img;
-        panel.style.opacity = '1';
-        setTimeout(function(){ animateLines(p.sentences, null); }, 200);
+        // Double rAF: give the browser two frames to paint the new image
+        // at opacity 0 before starting the fade-in, preventing the old
+        // panel from flashing during the compositing step.
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){
+            panel.style.opacity = '1';
+            setTimeout(function(){ animateLines(p.sentences, null); }, 200);
+          });
+        });
       }, 460);
     }
   }
@@ -5133,7 +5309,23 @@ updateManaBar();
 renderSpellPanel();
 updateMuteToggle();
 syncIntroToggleUI();
-if(!_hadSave && showIntro){ showIntroSequence(null); }
+if(!_hadSave && showIntro){
+  showIntroSequence(function(){
+    if(showTutorial){
+      showTutorialTip(
+        'This is an enemy, your source for souls. Click to drink deeply of their pain...',
+        document.getElementById('enemy-canvas'),
+        null
+      );
+    }
+  });
+} else if(!_hadSave && !showIntro && showTutorial){
+  showTutorialTip(
+    'This is an enemy, your source for souls. Click to drink deeply of their pain...',
+    document.getElementById('enemy-canvas'),
+    null
+  );
+}
 spawnEnemy();
 checkAchievements(true);
 renderAchievementsTab();
