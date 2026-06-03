@@ -329,17 +329,15 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 /* ── INTRO SEQUENCE ─────────────────────────────────────────────────────────── */
 #intro-overlay { display:none; position:fixed; inset:0; z-index:99999; background:#000; flex-direction:column; align-items:center; justify-content:center; }
 #intro-overlay.open { display:flex; }
-#intro-panel { position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; }
+#intro-panel { position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; }
 #intro-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
-#intro-text-wrap { position:relative; z-index:2; width:100%; max-width:860px; padding:0 40px 20px; text-align:center; }
-#intro-text { font-size:18px; color:#e8e0ff; font-family:Georgia,serif; font-style:italic; line-height:1.75; letter-spacing:0.5px; text-shadow:0 0 18px rgba(0,0,0,1),0 2px 6px rgba(0,0,0,0.95),0 0 40px rgba(0,0,0,0.9); margin-bottom:28px; }
-#intro-gradient { position:absolute; bottom:0; left:0; right:0; height:65%; background:linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 40%, transparent 100%); z-index:1; pointer-events:none; }
-#intro-btn { position:relative; z-index:2; padding:10px 34px; background:transparent; border:1px solid #c0b0e8; color:#c0b0e8; font-family:Georgia,serif; font-size:16px; letter-spacing:3px; cursor:pointer; border-radius:4px; transition:border-color 0.2s,color 0.2s,background 0.2s; }
+#intro-gradient { position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:1; pointer-events:none; }
+#intro-text-wrap { position:relative; z-index:2; width:100%; max-width:820px; padding:0 48px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:0; }
+.intro-line { font-size:19px; color:#e8e0ff; font-family:Georgia,serif; font-style:italic; line-height:1.8; letter-spacing:0.5px; text-shadow:0 0 20px rgba(0,0,0,1),0 2px 8px rgba(0,0,0,1),0 0 50px rgba(0,0,0,1); opacity:0; transform:translateY(12px); transition:opacity 0.45s ease, transform 0.45s ease; margin:0; padding:0; }
+.intro-line.visible { opacity:1; transform:translateY(0); }
+#intro-btn { margin-top:36px; padding:10px 34px; background:transparent; border:1px solid #c0b0e8; color:#c0b0e8; font-family:Georgia,serif; font-size:16px; letter-spacing:3px; cursor:pointer; border-radius:4px; transition:border-color 0.2s,color 0.2s,background 0.2s; opacity:0; pointer-events:none; transition:opacity 0.4s ease, border-color 0.2s, color 0.2s, background 0.2s; }
+#intro-btn.show { opacity:1; pointer-events:auto; }
 #intro-btn:hover { border-color:#e8e0ff; color:#ffffff; background:rgba(180,160,255,0.08); }
-#intro-overlay.fading { opacity:0; transition:opacity 0.7s ease; }
-#intro-panel.fading-out { opacity:0; transition:opacity 0.5s ease; }
-#intro-panel.fading-in { opacity:0; animation:introPanelIn 0.5s ease forwards; }
-@keyframes introPanelIn { from{opacity:0;} to{opacity:1;} }
 
 /* Settings button */
 #settings-btn { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
@@ -1107,7 +1105,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <img id="intro-img" src="" alt="">
     <div id="intro-gradient"></div>
     <div id="intro-text-wrap">
-      <div id="intro-text"></div>
       <button id="intro-btn">Next</button>
     </div>
   </div>
@@ -4977,48 +4974,99 @@ document.getElementById('import-save-file').addEventListener('change',function(e
 var INTRO_PANELS = [
   {
     img: 'artwork/intro/intro_panel_1.webp',
-    text: 'Once, a great empire stood at the height of its power. Millions gave their devotion, their lives — their very souls... to you. Under your rule the people prospered, and their love for you made the gods jealous. When their priests proclaimed you a deity, their anger led the gods to prove their power was unmatched.',
+    sentences: [
+      'Once, a great empire stood at the height of its power.',
+      'Millions gave their devotion, their lives — their very souls... to you.',
+      'Under your rule the people prospered, and their love for you made the gods jealous.',
+      'When their priests proclaimed you a deity, their anger led the gods to prove their power was unmatched.'
+    ],
     btn: 'Next'
   },
   {
     img: 'artwork/intro/intro_panel_2.webp',
-    text: 'Then came the Reckoning! A force beyond comprehension descended, and in a single moment, every soul was torn from its vessel. The torrent of lightning tore bodies and spirit alike, destroying everything along its path. What once was beauty and prosperity, now lay in nothing but ruin. You were not immune. All your power, your body, your identity — all laid waste.',
+    sentences: [
+      'Then came the Reckoning!',
+      'A force beyond comprehension descended, and in a single moment, every soul was torn from its vessel.',
+      'The torrent of lightning tore bodies and spirit alike, destroying everything along its path.',
+      'What once was beauty and prosperity, now lay in nothing but ruin.',
+      'You were not immune. All your power, your body, your identity — all laid waste.'
+    ],
     btn: 'Next'
   },
   {
     img: 'artwork/intro/intro_panel_3.webp',
-    text: 'You were destroyed by those that created you. Reduced to nothing but the ether from which you had been created. All you had built.... destroyed. Your people... punished. This would not go without retribution. Souls will feed you, but will not quench the fire that burns. Choose your path to power that will allow you to enslave the gods themselves....',
+    sentences: [
+      'You were destroyed by those that created you.',
+      'Reduced to nothing but the ether from which you had been created.',
+      'All you had built.... destroyed. Your people... punished.',
+      'This would not go without retribution.',
+      'Souls will feed you, but will not quench the fire that burns.',
+      'Choose your path to power that will allow you to enslave the gods themselves....'
+    ],
     btn: 'Begin'
   }
 ];
 
 var _introCurrent = 0;
-var _introResolve = null;
+var _introAnimTimer = null;
 
 function showIntroSequence(onDone) {
   _introCurrent = 0;
-  var overlay = document.getElementById('intro-overlay');
-  var panel   = document.getElementById('intro-panel');
-  var img     = document.getElementById('intro-img');
-  var text    = document.getElementById('intro-text');
-  var btn     = document.getElementById('intro-btn');
+  var overlay  = document.getElementById('intro-overlay');
+  var panel    = document.getElementById('intro-panel');
+  var img      = document.getElementById('intro-img');
+  var wrap     = document.getElementById('intro-text-wrap');
+  var btn      = document.getElementById('intro-btn');
+
+  function clearLines() {
+    wrap.querySelectorAll('.intro-line').forEach(function(el){ el.parentNode.removeChild(el); });
+  }
+
+  function animateLines(sentences, onComplete) {
+    if(_introAnimTimer) clearTimeout(_introAnimTimer);
+    clearLines();
+    btn.classList.remove('show');
+
+    // Build all line elements before btn
+    var lines = sentences.map(function(s){
+      var el = document.createElement('p');
+      el.className = 'intro-line';
+      el.textContent = s;
+      wrap.insertBefore(el, btn);
+      return el;
+    });
+
+    var delay = 120; // ms before first line
+    var stagger = 380; // ms between each line appearing
+
+    lines.forEach(function(el, i){
+      _introAnimTimer = setTimeout(function(){
+        el.classList.add('visible');
+        if(i === lines.length - 1){
+          // After last line finishes its transition, show button
+          setTimeout(function(){ btn.classList.add('show'); if(onComplete) onComplete(); }, 500);
+        }
+      }, delay + i * stagger);
+    });
+  }
 
   function showPanel(idx) {
     var p = INTRO_PANELS[idx];
-    text.textContent = p.text;
-    btn.textContent  = p.btn;
+    btn.textContent = p.btn;
 
     if(idx === 0) {
       img.src = p.img;
-      panel.style.opacity = '1';
       overlay.classList.add('open');
+      panel.style.opacity = '1';
+      setTimeout(function(){ animateLines(p.sentences, null); }, 200);
     } else {
-      panel.style.transition = 'opacity 0.5s ease';
+      panel.style.transition = 'opacity 0.45s ease';
       panel.style.opacity = '0';
       setTimeout(function(){
         img.src = p.img;
         panel.style.opacity = '1';
-      }, 520);
+        setTimeout(function(){ animateLines(p.sentences, null); }, 200);
+      }, 460);
     }
   }
 
@@ -5035,6 +5083,7 @@ function showIntroSequence(onDone) {
         overlay.style.transition = '';
         panel.style.transition = '';
         panel.style.opacity = '';
+        clearLines();
         if(onDone) onDone();
       }, 720);
     }
