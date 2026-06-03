@@ -5233,8 +5233,15 @@ function showIntroSequence(onDone) {
       panel.style.opacity = '0';
       setTimeout(function(){
         img.src = p.img;
-        panel.style.opacity = '1';
-        setTimeout(function(){ animateLines(p.sentences, null); }, 200);
+        // Double rAF: give the browser two frames to paint the new image
+        // at opacity 0 before starting the fade-in, preventing the old
+        // panel from flashing during the compositing step.
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){
+            panel.style.opacity = '1';
+            setTimeout(function(){ animateLines(p.sentences, null); }, 200);
+          });
+        });
       }, 460);
     }
   }
