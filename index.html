@@ -6035,71 +6035,71 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 })();
 
 // ── dev mode ─────────────────────────────────────────────────────────────────
-(function(){
-  var _ov=null;
+var _devOv=null;
 
-  function _showRealmSelect(){
-    document.getElementById('settings-modal').classList.remove('open');
-    if(!_ov){
-      _ov=document.createElement('div');
-      _ov.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:Georgia,serif;';
-      var title=document.createElement('div');
-      title.textContent='Realm Select';
-      title.style.cssText='color:#d4a843;font-size:22px;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px;';
-      _ov.appendChild(title);
-      var grid=document.createElement('div');
-      grid.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:10px;';
-      REALM_NAMES.forEach(function(name,i){
-        var btn=document.createElement('button');
-        btn.textContent=(i+1)+'. '+name;
-        btn.style.cssText='padding:10px 18px;background:#1a1535;border:1px solid #4433aa;color:#c0b0ff;font-family:Georgia,serif;font-size:14px;letter-spacing:1px;cursor:pointer;border-radius:4px;';
-        btn.onmouseenter=function(){this.style.background='#2a2545';};
-        btn.onmouseleave=function(){this.style.background='#1a1535';};
-        btn.onclick=function(){
-          var r=i+1;
-          curRealm=r; curLevel=1; curFloor=1; floorWins=0;
-          if(r>highestRealm){ highestRealm=r; highestLevel=1; highestFloor=1; }
-          enemyPool=[((r-1)%REALM_NAMES.length)*LEVELS_PER_REALM];
-          currentEnemyTypeIdx=enemyPool[0];
-          spawnEnemy(); updateProgressLabel(); updateEnemyPanel();
-          _ov.style.display='none';
-        };
-        grid.appendChild(btn);
-      });
-      _ov.appendChild(grid);
-      var close=document.createElement('button');
-      close.textContent='Close';
-      close.style.cssText='margin-top:12px;padding:8px 28px;background:transparent;border:1px solid #554466;color:#776699;font-family:Georgia,serif;font-size:13px;cursor:pointer;border-radius:4px;';
-      close.onclick=function(){ _ov.style.display='none'; };
-      _ov.appendChild(close);
-      document.body.appendChild(_ov);
-    } else {
-      _ov.style.display='flex';
-    }
+function _showRealmSelect(){
+  document.getElementById('settings-modal').classList.remove('open');
+  if(!_devOv){
+    _devOv=document.createElement('div');
+    _devOv.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:Georgia,serif;';
+    var title=document.createElement('div');
+    title.textContent='Realm Select';
+    title.style.cssText='color:#d4a843;font-size:22px;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px;';
+    _devOv.appendChild(title);
+    var grid=document.createElement('div');
+    grid.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:10px;';
+    REALM_NAMES.forEach(function(name,i){
+      var btn=document.createElement('button');
+      btn.textContent=(i+1)+'. '+name;
+      btn.style.cssText='padding:10px 18px;background:#1a1535;border:1px solid #4433aa;color:#c0b0ff;font-family:Georgia,serif;font-size:14px;letter-spacing:1px;cursor:pointer;border-radius:4px;';
+      btn.onmouseenter=function(){this.style.background='#2a2545';};
+      btn.onmouseleave=function(){this.style.background='#1a1535';};
+      btn.onclick=function(){
+        var r=i+1;
+        curRealm=r; curLevel=1; curFloor=1; floorWins=0;
+        if(r>highestRealm){ highestRealm=r; highestLevel=1; highestFloor=1; }
+        enemyPool=[((r-1)%REALM_NAMES.length)*LEVELS_PER_REALM];
+        currentEnemyTypeIdx=enemyPool[0];
+        spawnEnemy(); updateProgressLabel(); updateEnemyPanel();
+        _devOv.style.display='none';
+      };
+      grid.appendChild(btn);
+    });
+    _devOv.appendChild(grid);
+    var close=document.createElement('button');
+    close.textContent='Close';
+    close.style.cssText='margin-top:12px;padding:8px 28px;background:transparent;border:1px solid #554466;color:#776699;font-family:Georgia,serif;font-size:13px;cursor:pointer;border-radius:4px;';
+    close.onclick=function(){ _devOv.style.display='none'; };
+    _devOv.appendChild(close);
+    document.body.appendChild(_devOv);
+  } else {
+    _devOv.style.display='flex';
   }
+}
 
-  document.getElementById('dev-mode-btn').addEventListener('click',function(){
-    var prompt=document.getElementById('dev-mode-prompt');
-    prompt.style.display=prompt.style.display==='none'?'block':'none';
+document.getElementById('dev-mode-btn').addEventListener('click',function(){
+  var p=document.getElementById('dev-mode-prompt');
+  p.style.display=p.style.display==='none'?'block':'none';
+  document.getElementById('dev-mode-pass').value='';
+  document.getElementById('dev-mode-err').textContent='';
+});
+
+document.getElementById('dev-mode-submit').addEventListener('click',function(){
+  var val=document.getElementById('dev-mode-pass').value;
+  if(val==='@4Monster28'){
+    document.getElementById('dev-mode-prompt').style.display='none';
     document.getElementById('dev-mode-pass').value='';
     document.getElementById('dev-mode-err').textContent='';
-  });
+    _showRealmSelect();
+  } else {
+    document.getElementById('dev-mode-err').textContent='Incorrect passcode.';
+  }
+});
 
-  document.getElementById('dev-mode-submit').addEventListener('click',function(){
-    var val=document.getElementById('dev-mode-pass').value;
-    if(val==='@4Monster28'){
-      document.getElementById('dev-mode-prompt').style.display='none';
-      document.getElementById('dev-mode-pass').value='';
-      document.getElementById('dev-mode-err').textContent='';
-      _showRealmSelect();
-    } else {
-      document.getElementById('dev-mode-err').textContent='Incorrect passcode.';
-    }
-  });
+document.getElementById('dev-mode-pass').addEventListener('keydown',function(e){
+  if(e.key==='Enter') document.getElementById('dev-mode-submit').click();
+});
 
-  document.getElementById('dev-mode-pass').addEventListener('keydown',function(e){
-    if(e.key==='Enter') document.getElementById('dev-mode-submit').click();
-  });
 })();
 
 </script>
