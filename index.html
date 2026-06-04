@@ -6017,11 +6017,16 @@ document.getElementById('mm-auto').addEventListener('click',function(){
         9:'artwork/skyland_background.webp',
         10:'artwork/heaven_background.webp'
       };
+      var REALM_BG_SCALE={
+        3:0.50
+      };
       var bgImg=document.getElementById('realm-bg-img');
       if(bgImg){
         var imgSrc=REALM_BG_IMAGES[realm]||'';
         if(imgSrc){
+          var scale=REALM_BG_SCALE[realm]||0.60;
           bgImg.src=imgSrc;
+          bgImg.style.transform='translateX(-50%) scale('+scale+')';
           bgImg.style.display='block';
           c.style.display='none';
         } else {
