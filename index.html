@@ -55,7 +55,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard-body { flex: 1; min-width: 0; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
-#realm-bg-img { display:none; position:absolute; bottom:390px; left:50%; transform:translateX(-50%) scale(0.60); transform-origin:bottom center; pointer-events:none; z-index:1; width:auto; height:auto; }
+#realm-bg-img { display:none; position:absolute; bottom:-250px; left:50%; transform:translateX(-50%) scale(0.60); transform-origin:bottom center; pointer-events:none; z-index:-1; width:auto; height:auto; }
 #combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
   width:930px; height:930px; border-radius:50%;
   background:radial-gradient(circle at center,
@@ -66,7 +66,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     rgba(0,0,0,0.02) 74%,
     transparent 86%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
-#enemy-zone { position:absolute; left:50%; top:calc(36% + 150px); transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:8px; z-index:2; }
+#combat-wrap { position:absolute; left:50%; top:calc(36% + 150px); transform:translate(-50%,-50%); z-index:2; }
+#enemy-zone { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
 #enemy-zone .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cname { font-size: 19px; font-weight: bold; letter-spacing: 2px; color: #9988cc; text-transform: uppercase; }
@@ -782,9 +783,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="battlefield">
       <canvas id="bg-canvas"></canvas>
-      <img id="realm-bg-img" src="" alt="" />
-      <div id="combat-oval"></div>
-      <div id="enemy-zone">
+      <div id="combat-wrap">
+        <img id="realm-bg-img" src="" alt="" />
+        <div id="enemy-zone">
         <div class="canvas-wrap" style="position:relative;">
           <canvas id="enemy-canvas" width="330" height="330"></canvas>
           <div id="crown"></div>
@@ -811,6 +812,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         </div>
         <div id="click-hint">0 / 10</div>
       </div>
+      </div><!-- /combat-wrap -->
+      <div id="combat-oval"></div>
       <div id="ss-global-arrow">⮞</div>
       <div id="realm-label">Realm: Void</div>
 
