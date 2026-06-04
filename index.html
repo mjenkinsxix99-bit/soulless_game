@@ -6033,7 +6033,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
   function _check(){
     if(_buf.length<_max) return;
-    for(var i=0;i<_max;i++) if((_buf[i]^_k)!==(_seq[i]^_k^_k)) return;
+    for(var i=0;i<_max;i++) if(_buf[i]!==(_seq[i]^_k)) return;
     _buf=[];
     _show();
   }
