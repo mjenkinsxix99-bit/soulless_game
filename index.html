@@ -55,6 +55,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard-body { flex: 1; min-width: 0; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
+#realm-bg-img { display:none; position:absolute; bottom:60px; left:50%; transform:translateX(-50%); pointer-events:none; z-index:1; width:auto; height:auto; }
 #combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
   width:930px; height:930px; border-radius:50%;
   background:radial-gradient(circle at center,
@@ -781,6 +782,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="battlefield">
       <canvas id="bg-canvas"></canvas>
+      <img id="realm-bg-img" src="" alt="" />
       <div id="combat-oval"></div>
       <div id="enemy-zone">
         <div class="canvas-wrap" style="position:relative;">
@@ -6002,6 +6004,25 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       lastRealm=realm;
       resize();
       W=c.width; H=c.height;
+
+      // Realm image backgrounds
+      var REALM_BG_IMAGES={
+        2:'artwork/underworld_background.webp'
+      };
+      var bgImg=document.getElementById('realm-bg-img');
+      if(bgImg){
+        var imgSrc=REALM_BG_IMAGES[realm]||'';
+        if(imgSrc){
+          bgImg.src=imgSrc;
+          bgImg.style.display='block';
+          c.style.display='none';
+        } else {
+          bgImg.style.display='none';
+          bgImg.src='';
+          c.style.display='';
+        }
+      }
+
       if(realm===1){
         // Void: static, drawn once; CSS rotation handles animation
         c.style.animation='bgSlowRotate 120s linear infinite';
