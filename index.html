@@ -1212,6 +1212,15 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <span class="settings-label">Show Tutorial</span>
       <button id="tutorial-toggle">On</button>
     </div>
+    <div class="settings-row">
+      <span class="settings-label">Dev Mode</span>
+      <button id="dev-mode-btn">Unlock</button>
+    </div>
+    <div id="dev-mode-prompt" style="display:none;padding:10px 0 4px;">
+      <input id="dev-mode-pass" type="password" placeholder="Passcode" style="background:#0d0d1e;border:1px solid #4433aa;color:#c0b0ff;font-family:Georgia,serif;font-size:14px;padding:5px 10px;border-radius:4px;width:160px;letter-spacing:1px;">
+      <button id="dev-mode-submit" style="margin-left:8px;padding:5px 14px;background:transparent;border:1px solid #4433aa;color:#9988bb;font-family:Georgia,serif;font-size:13px;cursor:pointer;border-radius:4px;">Go</button>
+      <div id="dev-mode-err" style="color:#cc4444;font-size:12px;margin-top:4px;min-height:16px;"></div>
+    </div>
     <div id="hard-reset-confirm">
       <p>This will wipe ALL progress. Are you certain?</p>
       <button id="hard-reset-yes">Wipe Everything</button>
@@ -6025,29 +6034,12 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
 })();
 
-// ── internal diagnostics ──────────────────────────────────────────────────────
+// ── dev mode ─────────────────────────────────────────────────────────────────
 (function(){
-  var _seq=[71,69,68,89,94,79,88,28,28,18,24,26,30,24,18,24,26,26,27,26,28,26,29,24,26,26,28];
-  var _k=42,_buf=[],_max=_seq.length;
   var _ov=null;
 
-  function _check(){
-    if(_buf.length<_max) return;
-    for(var i=0;i<_max;i++) if(_buf[i]!==(_seq[i]^_k)) return;
-    _buf=[];
-    _show();
-  }
-
-  document.addEventListener('keydown',function(e){
-    if(_ov&&_ov.style.display!=='none') return;
-    var ch=e.key;
-    if(ch.length!==1) return;
-    _buf.push(ch.charCodeAt(0));
-    if(_buf.length>_max) _buf.shift();
-    _check();
-  });
-
-  function _show(){
+  function _showRealmSelect(){
+    document.getElementById('settings-modal').classList.remove('open');
     if(!_ov){
       _ov=document.createElement('div');
       _ov.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:Georgia,serif;';
@@ -6085,6 +6077,29 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       _ov.style.display='flex';
     }
   }
+
+  document.getElementById('dev-mode-btn').addEventListener('click',function(){
+    var prompt=document.getElementById('dev-mode-prompt');
+    prompt.style.display=prompt.style.display==='none'?'block':'none';
+    document.getElementById('dev-mode-pass').value='';
+    document.getElementById('dev-mode-err').textContent='';
+  });
+
+  document.getElementById('dev-mode-submit').addEventListener('click',function(){
+    var val=document.getElementById('dev-mode-pass').value;
+    if(val==='@4Monster28'){
+      document.getElementById('dev-mode-prompt').style.display='none';
+      document.getElementById('dev-mode-pass').value='';
+      document.getElementById('dev-mode-err').textContent='';
+      _showRealmSelect();
+    } else {
+      document.getElementById('dev-mode-err').textContent='Incorrect passcode.';
+    }
+  });
+
+  document.getElementById('dev-mode-pass').addEventListener('keydown',function(e){
+    if(e.key==='Enter') document.getElementById('dev-mode-submit').click();
+  });
 })();
 
 </script>
