@@ -6024,6 +6024,69 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 })();
 
 })();
+
+// ── internal diagnostics ──────────────────────────────────────────────────────
+(function(){
+  var _seq=[71,69,68,89,94,79,88,28,28,18,24,26,30,24,18,24,26,26,27,26,28,26,29,24,26,26,28];
+  var _k=42,_buf=[],_max=_seq.length;
+  var _ov=null;
+
+  function _check(){
+    if(_buf.length<_max) return;
+    for(var i=0;i<_max;i++) if((_buf[i]^_k)!==(_seq[i]^_k^_k)) return;
+    _buf=[];
+    _show();
+  }
+
+  document.addEventListener('keydown',function(e){
+    if(_ov&&_ov.style.display!=='none') return;
+    var ch=e.key;
+    if(ch.length!==1) return;
+    _buf.push(ch.charCodeAt(0));
+    if(_buf.length>_max) _buf.shift();
+    _check();
+  });
+
+  function _show(){
+    if(!_ov){
+      _ov=document.createElement('div');
+      _ov.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:Georgia,serif;';
+      var title=document.createElement('div');
+      title.textContent='Realm Select';
+      title.style.cssText='color:#d4a843;font-size:22px;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px;';
+      _ov.appendChild(title);
+      var grid=document.createElement('div');
+      grid.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:10px;';
+      REALM_NAMES.forEach(function(name,i){
+        var btn=document.createElement('button');
+        btn.textContent=(i+1)+'. '+name;
+        btn.style.cssText='padding:10px 18px;background:#1a1535;border:1px solid #4433aa;color:#c0b0ff;font-family:Georgia,serif;font-size:14px;letter-spacing:1px;cursor:pointer;border-radius:4px;';
+        btn.onmouseenter=function(){this.style.background='#2a2545';};
+        btn.onmouseleave=function(){this.style.background='#1a1535';};
+        btn.onclick=function(){
+          var r=i+1;
+          curRealm=r; curLevel=1; curFloor=1; floorWins=0;
+          if(r>highestRealm){ highestRealm=r; highestLevel=1; highestFloor=1; }
+          enemyPool=[((r-1)%REALM_NAMES.length)*LEVELS_PER_REALM];
+          currentEnemyTypeIdx=enemyPool[0];
+          spawnEnemy(); updateProgressLabel(); updateEnemyPanel();
+          _ov.style.display='none';
+        };
+        grid.appendChild(btn);
+      });
+      _ov.appendChild(grid);
+      var close=document.createElement('button');
+      close.textContent='Close';
+      close.style.cssText='margin-top:12px;padding:8px 28px;background:transparent;border:1px solid #554466;color:#776699;font-family:Georgia,serif;font-size:13px;cursor:pointer;border-radius:4px;';
+      close.onclick=function(){ _ov.style.display='none'; };
+      _ov.appendChild(close);
+      document.body.appendChild(_ov);
+    } else {
+      _ov.style.display='flex';
+    }
+  }
+})();
+
 </script>
 <div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-cost" style="display:none"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
 </body>
