@@ -1252,100 +1252,90 @@ var _tutShown = {
 var _tutQueue = [];
 var _tutActive = false;
 
-var VOID_SPRITE_CELL_W = 330;
-var VOID_SPRITE_CELL_H = 427;
-var VOID_SPRITE_DIMS = [
-  {w:284,h:396,px:23,py:15},
-  {w:298,h:424,px:16,py:1},
-  {w:269,h:349,px:30,py:39},
-  {w:293,h:380,px:18,py:23},
-  {w:305,h:391,px:12,py:18},
-  {w:261,h:391,px:34,py:18},
-  {w:234,h:424,px:48,py:1},
-  {w:236,h:378,px:47,py:24},
-  {w:330,h:403,px:0,py:12},
-  {w:292,h:427,px:19,py:0}
-];
+// Standard 256×256 dims shared by all new spritesheets
+var STD_DIMS = (function(){var a=[];for(var i=0;i<10;i++)a.push({w:256,h:256,px:0,py:0});return a;})();
+var STD_CELL_W = 256;
+var STD_CELL_H = 256;
+
+var VOID_SPRITE_CELL_W = STD_CELL_W;
+var VOID_SPRITE_CELL_H = STD_CELL_H;
+var VOID_SPRITE_DIMS = STD_DIMS;
 var voidSpriteSheet = new Image();
 var voidSpriteSheetLoaded = false;
 voidSpriteSheet.onload = function(){ voidSpriteSheetLoaded = true; };
-voidSpriteSheet.src = "artwork/sprites_void.webp";
+voidSpriteSheet.src = "artwork/sprites_void_new.png";
 
-var UW_SPRITE_CELL_W = 352;
-var UW_SPRITE_CELL_H = 352;
-var UW_SPRITE_DIMS = [
-  {w:256,h:256,px:48,py:48},
-  {w:352,h:352,px:0,py:0},
-  {w:256,h:256,px:48,py:48},
-  {w:256,h:256,px:48,py:48},
-  {w:344,h:344,px:4,py:4},
-  {w:256,h:256,px:48,py:48},
-  {w:256,h:256,px:48,py:48},
-  {w:256,h:256,px:48,py:48},
-  {w:256,h:256,px:48,py:48},
-  {w:256,h:256,px:48,py:48}
-];
+var UW_SPRITE_CELL_W = STD_CELL_W;
+var UW_SPRITE_CELL_H = STD_CELL_H;
+var UW_SPRITE_DIMS = STD_DIMS;
 var uwSpriteSheet = new Image();
 var uwSpriteSheetLoaded = false;
 uwSpriteSheet.onload = function(){ uwSpriteSheetLoaded = true; };
-uwSpriteSheet.src = "artwork/sprites_underworld.webp";
+uwSpriteSheet.src = "artwork/sprites_underworld_new.png";
 
-var SW_SPRITE_CELL_W = 256;
-var SW_SPRITE_CELL_H = 256;
-var SW_SPRITE_DIMS = [
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0}
-];
+var PG_SPRITE_CELL_W = STD_CELL_W;
+var PG_SPRITE_CELL_H = STD_CELL_H;
+var PG_SPRITE_DIMS = STD_DIMS;
+var pgSpriteSheet = new Image();
+var pgSpriteSheetLoaded = false;
+pgSpriteSheet.onload = function(){ pgSpriteSheetLoaded = true; };
+pgSpriteSheet.src = "artwork/sprites_purgatory.png";
+
+var UD_SPRITE_CELL_W = STD_CELL_W;
+var UD_SPRITE_CELL_H = STD_CELL_H;
+var UD_SPRITE_DIMS = STD_DIMS;
+var udSpriteSheet = new Image();
+var udSpriteSheetLoaded = false;
+udSpriteSheet.onload = function(){ udSpriteSheetLoaded = true; };
+udSpriteSheet.src = "artwork/sprites_undead.png";
+
+var HD_SPRITE_CELL_W = STD_CELL_W;
+var HD_SPRITE_CELL_H = STD_CELL_H;
+var HD_SPRITE_DIMS = STD_DIMS;
+var hdSpriteSheet = new Image();
+var hdSpriteSheetLoaded = false;
+hdSpriteSheet.onload = function(){ hdSpriteSheetLoaded = true; };
+hdSpriteSheet.src = "artwork/sprites_hades.png";
+
+var US_SPRITE_CELL_W = STD_CELL_W;
+var US_SPRITE_CELL_H = STD_CELL_H;
+var US_SPRITE_DIMS = STD_DIMS;
+var usSpriteSheet = new Image();
+var usSpriteSheetLoaded = false;
+usSpriteSheet.onload = function(){ usSpriteSheetLoaded = true; };
+usSpriteSheet.src = "artwork/sprites_undersea.png";
+
+var SW_SPRITE_CELL_W = STD_CELL_W;
+var SW_SPRITE_CELL_H = STD_CELL_H;
+var SW_SPRITE_DIMS = STD_DIMS;
 var swSpriteSheet = new Image();
 var swSpriteSheetLoaded = false;
 swSpriteSheet.onload = function(){ swSpriteSheetLoaded = true; };
-swSpriteSheet.src = "artwork/sprites_swamp.webp";
+swSpriteSheet.src = "artwork/sprites_swamp_new.png";
 
-var FO_SPRITE_CELL_W = 256;
-var FO_SPRITE_CELL_H = 256;
-var FO_SPRITE_DIMS = [
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0}
-];
+var FO_SPRITE_CELL_W = STD_CELL_W;
+var FO_SPRITE_CELL_H = STD_CELL_H;
+var FO_SPRITE_DIMS = STD_DIMS;
 var foSpriteSheet = new Image();
 var foSpriteSheetLoaded = false;
 foSpriteSheet.onload = function(){ foSpriteSheetLoaded = true; };
-foSpriteSheet.src = "artwork/sprites_forest.webp";
+foSpriteSheet.src = "artwork/sprites_forest_new.png";
 
-var LI_SPRITE_CELL_W = 256;
-var LI_SPRITE_CELL_H = 256;
-var LI_SPRITE_DIMS = [
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0},
-  {w:256,h:256,px:0,py:0}
-];
-var liSpriteSheet = new Image();
-var liSpriteSheetLoaded = false;
-liSpriteSheet.onload = function(){ liSpriteSheetLoaded = true; };
-liSpriteSheet.src = "artwork/sprites_limbo.webp";
+var SK_SPRITE_CELL_W = STD_CELL_W;
+var SK_SPRITE_CELL_H = STD_CELL_H;
+var SK_SPRITE_DIMS = STD_DIMS;
+var skSpriteSheet = new Image();
+var skSpriteSheetLoaded = false;
+skSpriteSheet.onload = function(){ skSpriteSheetLoaded = true; };
+skSpriteSheet.src = "artwork/sprites_skyland.png";
+
+var HV_SPRITE_CELL_W = STD_CELL_W;
+var HV_SPRITE_CELL_H = STD_CELL_H;
+var HV_SPRITE_DIMS = STD_DIMS;
+var hvSpriteSheet = new Image();
+var hvSpriteSheetLoaded = false;
+hvSpriteSheet.onload = function(){ hvSpriteSheetLoaded = true; };
+hvSpriteSheet.src = "artwork/sprites_heaven.png";
 
 var ENTITY_IMG_SRC = "artwork/sprites_ether.webp";
 var entityImg = new Image();
@@ -1554,7 +1544,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   var drawH = elite ? Math.min(H * 0.72, H - 10) * 0.8 : Math.min(H * 0.78, H - 10) * 0.6;
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
-  var float = dead ? 0 : Math.sin(t * (floatSpeed || 0.0013)) * 6;
+  var float = (dead || !floatSpeed) ? 0 : Math.sin(t * floatSpeed) * 6;
   // Elite: bias sprite toward bottom of canvas (0.75 of remaining space above)
   var dy = elite ? (H - drawH) * 0.75 + float : (H - drawH) / 2 + float;
   var cx = W / 2, cy = dy + drawH / 2;
@@ -1689,183 +1679,279 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   ctx.globalCompositeOperation = 'source-over';
 }
 
+// Void (realm 1) — float
+// Spritesheet order: Wisper(0),Banshee(1),Booki(2),Haaate(3),Hollo(4),Mr.Glair(5),Ms.Wale(6),Phlegm(7),Shiver(8),Queen Shayd(9)
 function drawWispSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0018,0); }
-function drawShadeSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0013,1); }
+function drawShadeSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0013,4); }
 function drawSpecterSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0015,2); }
 function drawHauntSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0011,3); }
-function drawWraithSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0016,4); }
-function drawShiverSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0009,5); }
-function drawGhoulSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0010,6); }
+function drawWraithSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0016,6); }
+function drawShiverSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0009,8); }
+function drawGhoulSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0010,5); }
 function drawPhlegmSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0007,7); }
-function drawBansheeSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0014,8); }
+function drawBansheeSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0014,1); }
 function drawDemonSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,voidSpriteSheet,voidSpriteSheetLoaded,0.0008,9); }
 
-function drawBlickSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0014,0,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
-function drawBongoSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0010,1,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
-function drawChuckSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0016,2,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
-function drawDeeSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0012,3,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
-function drawDighSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0009,4,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
-function drawDongoSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0011,5,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
-function drawFluckySprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0018,6,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
-function drawSeethSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0013,7,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
-function drawStinkoSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0007,8,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
-function drawGluggSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0.0015,9,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+// Underworld (realm 2) — grounded
+// Spritesheet order: Blick(0),Bongo(1),Chuck(2),Dee(3),Digh(4),Dongo(5),Glugg(6),Rongo(7),Stinky(8),Seethe(9)
+function drawBlickSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,0,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+function drawBongoSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,1,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+function drawChuckSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,2,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+function drawDeeSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,3,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+function drawDighSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,4,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+function drawDongoSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,5,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+function drawGluggSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,6,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+function drawRongoSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,7,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+function drawStinkySprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,8,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
+function drawSeetheSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,uwSpriteSheet,uwSpriteSheetLoaded,0,9,UW_SPRITE_CELL_W,UW_SPRITE_CELL_H,UW_SPRITE_DIMS); }
 
-function drawHoobitSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0012,0,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
-function drawChamoSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0015,1,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
-function drawCrukSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0009,2,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
-function drawDartignonSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0013,3,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
-function drawLaziliSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0011,4,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
-function drawNootSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0017,5,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
-function drawRibbiSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0014,6,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
-function drawRobertiSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0010,7,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
-function drawTurkleSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0008,8,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
-function drawDrockSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0.0016,9,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+// Purgatory (realm 3) — grounded
+// Spritesheet order: Devienne(0),Glutny(1),Greidi(2),Kovet(3),Onvee(4),Pryde(5),Sleth(6),Sluth(7),Wroth(8),Rath(9)
+function drawDevienneSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,0,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
+function drawGlutnySprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,1,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
+function drawGreidiSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,2,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
+function drawKovetSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,3,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
+function drawOnveeSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,4,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
+function drawPrydeSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,5,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
+function drawSlethSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,6,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
+function drawSluthSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,7,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
+function drawWrothSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,8,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
+function drawRathSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,pgSpriteSheet,pgSpriteSheetLoaded,0,9,PG_SPRITE_CELL_W,PG_SPRITE_CELL_H,PG_SPRITE_DIMS); }
 
-function drawKwillSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0013,0,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
-function drawMeepSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0017,1,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
-function drawMeluSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0011,2,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
-function drawNibSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0015,3,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
-function drawRobberSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0009,4,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
-function drawScurriSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0014,5,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
-function drawSkawkSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0016,6,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
-function drawTarooSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0010,7,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
-function drawPepperSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0012,8,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
-function drawDiggoSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0.0008,9,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+// Undead (realm 4) — grounded
+// Spritesheet order: Basha(0),Bonejangle(1),Brain(2),Dr.Jack(3),Dracack(4),Etta(5),Feemur(6),Fronk(7),Heddina(8),Royalich(9)
+function drawBashaSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,0,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
+function drawBonejangleSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,1,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
+function drawBrainSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,2,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
+function drawDrJackSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,3,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
+function drawDracackSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,4,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
+function drawEttaSprite(c,t,d,e)       { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,5,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
+function drawFeemurSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,6,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
+function drawFronkSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,7,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
+function drawHeddinaSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,8,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
+function drawRoyalichSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,udSpriteSheet,udSpriteSheetLoaded,0,9,UD_SPRITE_CELL_W,UD_SPRITE_CELL_H,UD_SPRITE_DIMS); }
 
-function drawBeccaSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0014,0,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
-function drawCarlSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0011,1,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
-function drawKevinSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0016,2,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
-function drawLeelaSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0009,3,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
-function drawMatildaSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0013,4,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
-function drawMikeSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0017,5,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
-function drawPeteSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0010,6,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
-function drawSaraSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0015,7,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
-function drawStevenSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0012,8,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
-function drawGabeSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,liSpriteSheet,liSpriteSheetLoaded,0.0018,9,LI_SPRITE_CELL_W,LI_SPRITE_CELL_H,LI_SPRITE_DIMS); }
+// Hades (realm 5) — grounded
+// Spritesheet order: Aligos(0),Aria(1),Chasme(2),Endras(3),Firfur(4),Gricelle(5),Paag(6),Vroke(7),Vymp(8),Molok(9)
+function drawAligosSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,0,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+function drawAriaSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,1,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+function drawChasmeSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,2,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+function drawEndrasSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,3,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+function drawFirfurSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,4,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+function drawGricelleSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,5,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+function drawPaagSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,6,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+function drawVrokeSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,7,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+function drawVympSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,8,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+function drawMolokSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,hdSpriteSheet,hdSpriteSheetLoaded,0,9,HD_SPRITE_CELL_W,HD_SPRITE_CELL_H,HD_SPRITE_DIMS); }
+
+// Undersea (realm 6) — grounded
+// Spritesheet order: C.Snek(0),HalfshellSpartan(1),Jelleeza(2),KapKreb(3),Rayes(4),Shrak(5),Spike(6),Squidica(7),Tentaclan(8),Orking(9)
+function drawCSnekSprite(c,t,d,e)         { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,0,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+function drawHalfshellSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,1,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+function drawJelleezaSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,2,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+function drawKapKrebSprite(c,t,d,e)       { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,3,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+function drawRayesSprite(c,t,d,e)         { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,4,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+function drawShrakSprite(c,t,d,e)         { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,5,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+function drawSpikeSprite(c,t,d,e)         { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,6,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+function drawSquidicaSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,7,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+function drawTentaclanSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,8,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+function drawOrkingSprite(c,t,d,e)        { drawEnemySprite(c,t,d,e,usSpriteSheet,usSpriteSheetLoaded,0,9,US_SPRITE_CELL_W,US_SPRITE_CELL_H,US_SPRITE_DIMS); }
+
+// Swamp (realm 7) — grounded
+// Spritesheet order: Chamo(0),Crocette(1),Gatorado(2),Nagai(3),Nootina(4),Nuut(5),Shellitor(6),Slither(7),VoodooLiz(8),Cruk(9)
+function drawChamoSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,0,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+function drawCrocetteSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,1,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+function drawGatoradoSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,2,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+function drawNagaiSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,3,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+function drawNootinaSprte(c,t,d,e)    { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,4,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+function drawNuutSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,5,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+function drawShelitorSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,6,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+function drawSlitherSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,7,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+function drawVoodooLizSprite(c,t,d,e) { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,8,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+function drawCrukSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,swSpriteSheet,swSpriteSheetLoaded,0,9,SW_SPRITE_CELL_W,SW_SPRITE_CELL_H,SW_SPRITE_DIMS); }
+
+// Forest (realm 8) — grounded
+// Spritesheet order: Diggo(0),Kwill(1),Melu(2),Nib(3),Pepper(4),Robber(5),Scurri(6),Skawk(7),Taroo(8),Booker(9)
+function drawDiggoSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,0,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+function drawKwillSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,1,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+function drawMeluSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,2,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+function drawNibSprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,3,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+function drawPepperSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,4,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+function drawRobberSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,5,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+function drawScurriSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,6,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+function drawSkawkSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,7,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+function drawTarooSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,8,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+function drawBookerSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,foSpriteSheet,foSpriteSheetLoaded,0,9,FO_SPRITE_CELL_W,FO_SPRITE_CELL_H,FO_SPRITE_DIMS); }
+
+// Skyland (realm 9) — float (birds!)
+// Spritesheet order: Bashinga(0),Bommer(1),Buzz(2),Capt.C.Gull(3),Crowbo(4),Duckfu(5),Hoory(6),Jaysassin(7),RayVen(8),Condoria(9)
+function drawBashinaSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0016,0,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+function drawBommerSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0012,1,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+function drawBuzzSprite(c,t,d,e)       { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0018,2,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+function drawCaptCGullSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0010,3,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+function drawCrowboSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0014,4,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+function drawDuckfuSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0009,5,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+function drawHoorySprite(c,t,d,e)      { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0013,6,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+function drawJaysassinSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0017,7,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+function drawRayVenSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0011,8,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+function drawCondoriaSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,skSpriteSheet,skSpriteSheetLoaded,0.0008,9,SK_SPRITE_CELL_W,SK_SPRITE_CELL_H,SK_SPRITE_DIMS); }
+
+// Heaven (realm 10) — grounded
+// Spritesheet order: Becca(0),Carl(1),Gabe(2),Kevin(3),Leela(4),Matilda(5),Mike(6),Pete(7),Sara(8),Steven(9)
+function drawBeccaSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,0,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
+function drawCarlSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,1,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
+function drawGabeSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,2,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
+function drawKevinSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,3,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
+function drawLeelaSprite(c,t,d,e)    { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,4,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
+function drawMatildaSprite(c,t,d,e)  { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,5,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
+function drawMikeSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,6,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
+function drawPeteSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,7,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
+function drawSaraSprite(c,t,d,e)     { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,8,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
+function drawStevenSprite(c,t,d,e)   { drawEnemySprite(c,t,d,e,hvSpriteSheet,hvSpriteSheetLoaded,0,9,HV_SPRITE_CELL_W,HV_SPRITE_CELL_H,HV_SPRITE_DIMS); }
 
 // ── ENEMY TYPES ───────────────────────────────────────────────────────────────
+// 10 realms × 10 entries each = 100 total
+// Within each realm: positions 0-8 are regular enemies, position 9 is the realm boss (final elite)
 var ENEMY_TYPES = [
-  { id:'wisp',    name:'Wisper',       simpleName:'Wisper',    subtitle:'a wandering soul',
-    hp:30,  dmgMin:3,  dmgMax:5,  speed:2000, souls:5,
-    eliteHp:140, eliteDmgMin:10, eliteDmgMax:16, eliteSouls:30,
-    color:[200,255,200] },
-  { id:'shade',   name:'Hollo',    simpleName:'Hollo',   subtitle:'a husk of what once was',
-    hp:120, dmgMin:12, dmgMax:18, speed:2200, souls:20,
-    eliteHp:500, eliteDmgMin:35, eliteDmgMax:55, eliteSouls:120,
-    color:[120,120,230] },
-  { id:'specter', name:'Booki', simpleName:'Booki', subtitle:'wept until nothing was left',
-    hp:400, dmgMin:35, dmgMax:55, speed:1800, souls:75,
-    eliteHp:1600, eliteDmgMin:100, eliteDmgMax:150, eliteSouls:450,
-    color:[220,120,220] },
-  { id:'haunt', name:'Haaate',     simpleName:'Haaate',   subtitle:'fury given no form',
-    hp:1200, dmgMin:80, dmgMax:120, speed:1600, souls:250,
-    eliteHp:4500, eliteDmgMin:220, eliteDmgMax:320, eliteSouls:1500,
-    color:[220,40,40] },
-  { id:'wraith', name:'Ms. Wale',   simpleName:'Ms. Wale',  subtitle:'bound and screaming',
-    hp:3500, dmgMin:180, dmgMax:260, speed:1500, souls:800,
-    eliteHp:14000, eliteDmgMin:500, eliteDmgMax:700, eliteSouls:5000,
-    color:[180,200,255] },
-  { id:'shiver', name:'Shiver',  simpleName:'Shiver',   subtitle:'cold that remembers being alive',
-    hp:10000, dmgMin:400, dmgMax:600, speed:1400, souls:2500,
-    eliteHp:40000, eliteDmgMin:1100, eliteDmgMax:1600, eliteSouls:15000,
-    color:[160,200,255] },
-  { id:'ghoul', name:'Mr. Glair',     simpleName:'Mr. Glair',   subtitle:'hollow hunger, endless reach',
-    hp:28000, dmgMin:900, dmgMax:1300, speed:1300, souls:7500,
-    eliteHp:110000, eliteDmgMin:2500, eliteDmgMax:3500, eliteSouls:45000,
-    color:[120,220,120] },
-  { id:'phlegm', name:'Phlegm',   simpleName:'Phlegm', subtitle:'rot given will',
-    hp:80000, dmgMin:2000, dmgMax:3000, speed:1200, souls:22000,
-    eliteHp:320000, eliteDmgMin:6000, eliteDmgMax:8500, eliteSouls:130000,
-    color:[140,200,80] },
-  { id:'banshee', name:'Banshee',  simpleName:'Banshee', subtitle:'a scream with no end',
-    hp:220000, dmgMin:5000, dmgMax:7500, speed:1100, souls:65000,
-    eliteHp:880000, eliteDmgMin:16000, eliteDmgMax:22000, eliteSouls:400000,
-    color:[220,230,160] },
-  { id:'demon', name:'Queen Shayd',  simpleName:'Queen Shayd',   subtitle:'sent from somewhere worse',
+  // ── REALM 1: VOID ────────────────────────────────────────────────────────────
+  { id:'wisp',    name:'Wisper',     simpleName:'Wisper',     subtitle:'a wandering soul',
+    hp:30,     dmgMin:3,     dmgMax:5,     speed:2000, souls:5,
+    eliteHp:140,      eliteDmgMin:10,    eliteDmgMax:16,    eliteSouls:30,      color:[200,255,200] },
+  { id:'shade',   name:'Hollo',      simpleName:'Hollo',      subtitle:'a husk of what once was',
+    hp:120,    dmgMin:12,    dmgMax:18,    speed:2200, souls:20,
+    eliteHp:500,      eliteDmgMin:35,    eliteDmgMax:55,    eliteSouls:120,     color:[120,120,230] },
+  { id:'specter', name:'Booki',      simpleName:'Booki',      subtitle:'wept until nothing was left',
+    hp:400,    dmgMin:35,    dmgMax:55,    speed:1800, souls:75,
+    eliteHp:1600,     eliteDmgMin:100,   eliteDmgMax:150,   eliteSouls:450,     color:[220,120,220] },
+  { id:'haunt',   name:'Haaate',     simpleName:'Haaate',     subtitle:'fury given no form',
+    hp:1200,   dmgMin:80,    dmgMax:120,   speed:1600, souls:250,
+    eliteHp:4500,     eliteDmgMin:220,   eliteDmgMax:320,   eliteSouls:1500,    color:[220,40,40] },
+  { id:'wraith',  name:'Ms. Wale',   simpleName:'Ms. Wale',   subtitle:'bound and screaming',
+    hp:3500,   dmgMin:180,   dmgMax:260,   speed:1500, souls:800,
+    eliteHp:14000,    eliteDmgMin:500,   eliteDmgMax:700,   eliteSouls:5000,    color:[180,200,255] },
+  { id:'shiver',  name:'Shiver',     simpleName:'Shiver',     subtitle:'cold that remembers being alive',
+    hp:10000,  dmgMin:400,   dmgMax:600,   speed:1400, souls:2500,
+    eliteHp:40000,    eliteDmgMin:1100,  eliteDmgMax:1600,  eliteSouls:15000,   color:[160,200,255] },
+  { id:'ghoul',   name:'Mr. Glair',  simpleName:'Mr. Glair',  subtitle:'hollow hunger, endless reach',
+    hp:28000,  dmgMin:900,   dmgMax:1300,  speed:1300, souls:7500,
+    eliteHp:110000,   eliteDmgMin:2500,  eliteDmgMax:3500,  eliteSouls:45000,   color:[120,220,120] },
+  { id:'phlegm',  name:'Phlegm',     simpleName:'Phlegm',     subtitle:'rot given will',
+    hp:80000,  dmgMin:2000,  dmgMax:3000,  speed:1200, souls:22000,
+    eliteHp:320000,   eliteDmgMin:6000,  eliteDmgMax:8500,  eliteSouls:130000,  color:[140,200,80] },
+  { id:'banshee', name:'Banshee',    simpleName:'Banshee',    subtitle:'a scream with no end',
+    hp:220000, dmgMin:5000,  dmgMax:7500,  speed:1100, souls:65000,
+    eliteHp:880000,   eliteDmgMin:16000, eliteDmgMax:22000, eliteSouls:400000,  color:[220,230,160] },
+  { id:'demon',   name:'Queen Shayd',simpleName:'Queen Shayd',subtitle:'sent from somewhere worse',
     hp:650000, dmgMin:14000, dmgMax:20000, speed:1000, souls:200000,
-    eliteHp:2600000, eliteDmgMin:45000, eliteDmgMax:65000, eliteSouls:1200000,
-    color:[220,40,40] },
-  { id:'uw_blick',   name:'Blick',       simpleName:'Blick',     subtitle:'a smoldering remnant',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[220,80,40] },
-  { id:'uw_bongo',   name:'Bongo',       simpleName:'Bongo',     subtitle:'what remains after burning',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[180,60,30] },
-  { id:'uw_chuck',   name:'Chuck',       simpleName:'Chuck',     subtitle:'alive just long enough to sting',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[200,70,20] },
-  { id:'uw_dee',     name:'Dee',         simpleName:'Dee',       subtitle:'patient heat without flame',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[190,50,20] },
-  { id:'uw_digh',    name:'Digh',        simpleName:'Digh',      subtitle:'the memory of something living',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[160,40,20] },
-  { id:'uw_dongo',   name:'Dongo',       simpleName:'Dongo',     subtitle:'hunger with no direction',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[230,90,30] },
-  { id:'uw_flucky',  name:'Flucky',      simpleName:'Flucky',    subtitle:'the pain that lingers',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[210,60,25] },
-  { id:'uw_seeth',   name:'Seeth',       simpleName:'Seeth',     subtitle:'marked and never forgiven',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[200,45,30] },
-  { id:'uw_stinko',  name:'Stinko',      simpleName:'Stinko',    subtitle:'too angry to die fully',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[240,100,20] },
-  { id:'uw_glugg',   name:'Glugg',       simpleName:'Glugg',     subtitle:'cast down, clawing back',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[180,20,20] },
-  { id:'sw_hoobit',  name:'Hoobit',  simpleName:'Hoobit',  subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[60,100,40] },
-  { id:'sw_chamo',  name:'Chamo',  simpleName:'Chamo',  subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[70,110,45] },
-  { id:'sw_cruk',  name:'Cruk',  simpleName:'Cruk',  subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[55,95,35] },
-  { id:'sw_dartignon',  name:'Dartignon',  simpleName:'Dartignon',  subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[65,105,42] },
-  { id:'sw_lazili',  name:'Lazili',  simpleName:'Lazili',  subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[50,90,30] },
-  { id:'sw_noot',  name:'Noot',  simpleName:'Noot',  subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[75,115,48] },
-  { id:'sw_ribbi',  name:'Ribbi',  simpleName:'Ribbi',  subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[60,100,38] },
-  { id:'sw_roberti',  name:'Roberti',  simpleName:'Roberti',  subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[68,108,44] },
-  { id:'sw_turkle',  name:'Turkle',  simpleName:'Turkle',  subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[58,98,36] },
-  { id:'sw_drock', name:'Drock', simpleName:'Drock', subtitle:'lurking beneath the surface',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[72,112,46] },
-  { id:'fo_kwill',   name:'Kwill',   simpleName:'Kwill',   subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[80,140,60] },
-  { id:'fo_meep',    name:'Meep',    simpleName:'Meep',    subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[90,150,65] },
-  { id:'fo_melu',    name:'Melu',    simpleName:'Melu',    subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[75,130,55] },
-  { id:'fo_nib',     name:'Nib',     simpleName:'Nib',     subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[85,145,62] },
-  { id:'fo_robber',  name:'Robber',  simpleName:'Robber',  subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[70,125,50] },
-  { id:'fo_scurri',  name:'Scurri',  simpleName:'Scurri',  subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[95,155,68] },
-  { id:'fo_skawk',   name:'Skawk',   simpleName:'Skawk',   subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[78,135,57] },
-  { id:'fo_taroo',   name:'Taroo',   simpleName:'Taroo',   subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[88,148,64] },
-  { id:'fo_pepper',  name:'Pepper',  simpleName:'Pepper',  subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[72,128,52] },
-  { id:'fo_diggo',   name:'Diggo',   simpleName:'Diggo',   subtitle:'rustling where nothing should be',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[92,152,67] },
-  { id:'li_becca',   name:'Becca',   simpleName:'Becca',   subtitle:'not sure how she ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[180,180,210] },
-  { id:'li_carl',    name:'Carl',    simpleName:'Carl',    subtitle:'not sure how he ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[170,170,200] },
-  { id:'li_kevin',   name:'Kevin',   simpleName:'Kevin',   subtitle:'not sure how he ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[190,190,215] },
-  { id:'li_leela',   name:'Leela',   simpleName:'Leela',   subtitle:'not sure how she ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[175,175,205] },
-  { id:'li_matilda', name:'Matilda', simpleName:'Matilda', subtitle:'not sure how she ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[185,185,212] },
-  { id:'li_mike',    name:'Mike',    simpleName:'Mike',    subtitle:'not sure how he ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[165,165,198] },
-  { id:'li_pete',    name:'Pete',    simpleName:'Pete',    subtitle:'not sure how he ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[195,195,218] },
-  { id:'li_sara',    name:'Sara',    simpleName:'Sara',    subtitle:'not sure how she ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[178,178,208] },
-  { id:'li_steven',  name:'Steven',  simpleName:'Steven',  subtitle:'not sure how he ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[168,168,202] },
-  { id:'li_gabe',    name:'Gabe',    simpleName:'Gabe',    subtitle:'not sure how he ended up here',
-    hp:0, dmgMin:0, dmgMax:0, speed:2000, souls:0, eliteHp:0, eliteDmgMin:0, eliteDmgMax:0, eliteSouls:0, color:[188,188,214] },
+    eliteHp:2600000,  eliteDmgMin:45000, eliteDmgMax:65000, eliteSouls:1200000, color:[220,40,40] },
+
+  // ── REALM 2: UNDERWORLD ──────────────────────────────────────────────────────
+  { id:'uw_blick',  name:'Blick',  simpleName:'Blick',  subtitle:'a smoldering remnant',              hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[220,80,40] },
+  { id:'uw_bongo',  name:'Bongo',  simpleName:'Bongo',  subtitle:'what remains after burning',         hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[180,60,30] },
+  { id:'uw_chuck',  name:'Chuck',  simpleName:'Chuck',  subtitle:'alive just long enough to sting',    hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,70,20] },
+  { id:'uw_dee',    name:'Dee',    simpleName:'Dee',    subtitle:'patient heat without flame',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[190,50,20] },
+  { id:'uw_digh',   name:'Digh',   simpleName:'Digh',   subtitle:'the memory of something living',     hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[160,40,20] },
+  { id:'uw_dongo',  name:'Dongo',  simpleName:'Dongo',  subtitle:'hunger with no direction',            hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[230,90,30] },
+  { id:'uw_glugg',  name:'Glugg',  simpleName:'Glugg',  subtitle:'cast down, clawing back',             hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[210,60,25] },
+  { id:'uw_rongo',  name:'Rongo',  simpleName:'Rongo',  subtitle:'dragged here against its will',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,45,30] },
+  { id:'uw_stinky', name:'Stinky', simpleName:'Stinky', subtitle:'too angry to die fully',              hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[240,100,20] },
+  { id:'uw_seethe', name:'Seethe', simpleName:'Seethe', subtitle:'the fire that never goes out',        hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[180,20,20] },
+
+  // ── REALM 3: PURGATORY ───────────────────────────────────────────────────────
+  { id:'pg_devienne',name:'Devienne',simpleName:'Devienne',subtitle:'waiting without knowing why',  hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[140,120,160] },
+  { id:'pg_glutny',  name:'Glutny',  simpleName:'Glutny',  subtitle:'endless appetite, nothing left',hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[160,100,140] },
+  { id:'pg_greidi',  name:'Greidi',  simpleName:'Greidi',  subtitle:'wants what others have',        hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[130,110,150] },
+  { id:'pg_kovet',   name:'Kovet',   simpleName:'Kovet',   subtitle:'covets everything it sees',     hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[150,130,170] },
+  { id:'pg_onvee',   name:'Onvee',   simpleName:'Onvee',   subtitle:'burning with jealousy',         hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[120,100,140] },
+  { id:'pg_pryde',   name:'Pryde',   simpleName:'Pryde',   subtitle:'refuses to bow',                hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[170,140,190] },
+  { id:'pg_sleth',   name:'Sleth',   simpleName:'Sleth',   subtitle:'unmoved and unmoving',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[110,90,130] },
+  { id:'pg_sluth',   name:'Sluth',   simpleName:'Sluth',   subtitle:'too tired to leave',            hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[135,115,155] },
+  { id:'pg_wroth',   name:'Wroth',   simpleName:'Wroth',   subtitle:'simmering at everything',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[180,80,100] },
+  { id:'pg_rath',    name:'Rath',    simpleName:'Rath',    subtitle:'king of this grey place',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,60,80] },
+
+  // ── REALM 4: UNDEAD ──────────────────────────────────────────────────────────
+  { id:'ud_basha',     name:'Basha',      simpleName:'Basha',      subtitle:'still hungry after death',   hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,160,80] },
+  { id:'ud_bonejangle',name:'Bonejangle', simpleName:'Bonejangle', subtitle:'rattles when it moves',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,200,160] },
+  { id:'ud_brain',     name:'Brain',      simpleName:'Brain',      subtitle:'just the brain, somehow',    hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[220,100,100] },
+  { id:'ud_drjack',    name:'Dr. Jack',   simpleName:'Dr. Jack',   subtitle:'was a doctor once',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[160,180,160] },
+  { id:'ud_dracack',   name:'Dracack',    simpleName:'Dracack',    subtitle:'crawled out of somewhere cold',hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[60,80,160] },
+  { id:'ud_etta',      name:'Etta',       simpleName:'Etta',       subtitle:'stitched back together wrong',hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[180,140,100] },
+  { id:'ud_feemur',    name:'Feemur',     simpleName:'Feemur',     subtitle:'more bone than sense',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[210,200,170] },
+  { id:'ud_fronk',     name:'Fronk',      simpleName:'Fronk',      subtitle:'shambling with purpose',     hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[100,140,100] },
+  { id:'ud_heddina',   name:'Heddina',    simpleName:'Heddina',    subtitle:'carries her own head',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[140,100,140] },
+  { id:'ud_royalich',  name:'Royalich',   simpleName:'Royalich',   subtitle:'the undying king',           hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,60,120] },
+
+  // ── REALM 5: HADES ───────────────────────────────────────────────────────────
+  { id:'hd_aligos',   name:'Aligos',   simpleName:'Aligos',   subtitle:'the plague given legs',      hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[180,40,40] },
+  { id:'hd_aria',     name:'Aria',     simpleName:'Aria',     subtitle:'beautiful and terrible',     hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,80,120] },
+  { id:'hd_chasme',   name:'Chasme',   simpleName:'Chasme',   subtitle:'buzzes where silence should be',hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[120,80,40] },
+  { id:'hd_endras',   name:'Endras',   simpleName:'Endras',   subtitle:'corruption personified',    hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[100,60,20] },
+  { id:'hd_firfur',   name:'Firfur',   simpleName:'Firfur',   subtitle:'fanned by hellwinds',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[220,100,20] },
+  { id:'hd_gricelle', name:'Gricelle', simpleName:'Gricelle', subtitle:'cold cruelty in warm flesh', hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[160,60,80] },
+  { id:'hd_paag',     name:'Paag',     simpleName:'Paag',     subtitle:'born from the pit floor',   hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,20,20] },
+  { id:'hd_vroke',    name:'Vroke',    simpleName:'Vroke',    subtitle:'breaks what it touches',    hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[140,40,20] },
+  { id:'hd_vymp',     name:'Vymp',     simpleName:'Vymp',     subtitle:'drains the last warmth',    hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[60,20,80] },
+  { id:'hd_molok',    name:'Molok',    simpleName:'Molok',    subtitle:'lord of the hellfire deep', hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[240,60,0] },
+
+  // ── REALM 6: UNDERSEA ────────────────────────────────────────────────────────
+  { id:'us_csnek',     name:'C. Snek',           simpleName:'C. Snek',           subtitle:'slithers where it should not',  hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[60,160,120] },
+  { id:'us_halfshell', name:'Halfshell Spartan',  simpleName:'Halfshell Spartan', subtitle:'armed and aggressive',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,140,100] },
+  { id:'us_jelleeza',  name:'Jelleeza',           simpleName:'Jelleeza',          subtitle:'stings without warning',        hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[180,200,240] },
+  { id:'us_kapkreb',   name:'Kap Kreb',           simpleName:'Kap Kreb',          subtitle:'commands the shallows',         hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,80,60] },
+  { id:'us_rayes',     name:'Rayes',              simpleName:'Rayes',             subtitle:'glides unseen from below',      hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[40,80,160] },
+  { id:'us_shrak',     name:'Shrak',              simpleName:'Shrak',             subtitle:'always circling',               hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,100,140] },
+  { id:'us_spike',     name:'Spike',              simpleName:'Spike',             subtitle:'touches back',                  hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,160,60] },
+  { id:'us_squidica',  name:'Squidica',           simpleName:'Squidica',          subtitle:'many arms, one grudge',         hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[100,60,160] },
+  { id:'us_tentaclan', name:'Tentaclan',          simpleName:'Tentaclan',         subtitle:'reaches from the dark water',   hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[60,100,180] },
+  { id:'us_orking',    name:'Orking',             simpleName:'Orking',            subtitle:'ruler of the deep',             hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[20,60,120] },
+
+  // ── REALM 7: SWAMP ───────────────────────────────────────────────────────────
+  { id:'sw_chamo',     name:'Chamo',      simpleName:'Chamo',      subtitle:'blends in too well',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,140,60] },
+  { id:'sw_crocette',  name:'Crocette',   simpleName:'Crocette',   subtitle:'waits at the waterline',      hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[60,120,40] },
+  { id:'sw_gatorado',  name:'Gatorado',   simpleName:'Gatorado',   subtitle:'too fast for its size',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[70,130,50] },
+  { id:'sw_nagai',     name:'Nagai',      simpleName:'Nagai',      subtitle:'long and patient',            hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[100,160,60] },
+  { id:'sw_nootina',   name:'Nootina',    simpleName:'Nootina',    subtitle:'darting through the reeds',   hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[90,150,55] },
+  { id:'sw_nuut',      name:'Nuut',       simpleName:'Nuut',       subtitle:'small but relentless',        hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[110,170,70] },
+  { id:'sw_shellitor', name:'Shellitor',  simpleName:'Shellitor',  subtitle:'armored in the murk',         hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[140,180,80] },
+  { id:'sw_slither',   name:'Slither',    simpleName:'Slither',    subtitle:'leaves no tracks',            hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[60,100,40] },
+  { id:'sw_voodooliz', name:'Voodoo Liz', simpleName:'Voodoo Liz', subtitle:'hexes before it strikes',    hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[160,100,180] },
+  { id:'sw_cruk',      name:'Cruk',       simpleName:'Cruk',       subtitle:'lord of the swamp',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[40,80,20] },
+
+  // ── REALM 8: FOREST ──────────────────────────────────────────────────────────
+  { id:'fo_diggo',  name:'Diggo',  simpleName:'Diggo',  subtitle:'digs under everything',         hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[140,100,60] },
+  { id:'fo_kwill',  name:'Kwill',  simpleName:'Kwill',  subtitle:'rustling where nothing should be',hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,140,60] },
+  { id:'fo_melu',   name:'Melu',   simpleName:'Melu',   subtitle:'moves like shadow through leaves', hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[60,120,40] },
+  { id:'fo_nib',    name:'Nib',    simpleName:'Nib',    subtitle:'tiny teeth, big attitude',        hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[100,160,70] },
+  { id:'fo_pepper', name:'Pepper', simpleName:'Pepper', subtitle:'scatters like sparks',            hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[180,120,40] },
+  { id:'fo_robber', name:'Robber', simpleName:'Robber', subtitle:'takes what it finds',             hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[100,80,60] },
+  { id:'fo_scurri', name:'Scurri', simpleName:'Scurri', subtitle:'quick across the forest floor',   hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[120,100,60] },
+  { id:'fo_skawk',  name:'Skawk',  simpleName:'Skawk',  subtitle:'warns the whole forest',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[60,80,40] },
+  { id:'fo_taroo',  name:'Taroo',  simpleName:'Taroo',  subtitle:'ancient and unhurried',           hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,60,40] },
+  { id:'fo_booker', name:'Booker', simpleName:'Booker', subtitle:'king of the forest',              hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[40,60,20] },
+
+  // ── REALM 9: SKYLAND ─────────────────────────────────────────────────────────
+  { id:'sk_bashinga',   name:'Bashinga',       simpleName:'Bashinga',       subtitle:'dives without warning',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[120,160,220] },
+  { id:'sk_bommer',     name:'Bommer',         simpleName:'Bommer',         subtitle:'drops things from above',     hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,180,60] },
+  { id:'sk_buzz',       name:'Buzz',           simpleName:'Buzz',           subtitle:'never stops moving',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[240,220,80] },
+  { id:'sk_captcgull',  name:'Capt. C. Gull',  simpleName:'Capt. C. Gull',  subtitle:'rules the coast with iron',   hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,200,200] },
+  { id:'sk_crowbo',     name:'Crowbo',         simpleName:'Crowbo',         subtitle:'cunning and cruel',           hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[40,40,40] },
+  { id:'sk_duckfu',     name:'Duckfu',         simpleName:'Duckfu',         subtitle:'deceptively dangerous',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,120,60] },
+  { id:'sk_hoory',      name:'Hoory',          simpleName:'Hoory',          subtitle:'swoops with precision',       hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[180,160,100] },
+  { id:'sk_jaysassin',  name:'Jaysassin',      simpleName:'Jaysassin',      subtitle:'strikes from the treeline',   hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[60,100,180] },
+  { id:'sk_rayven',     name:'Ray Ven',        simpleName:'Ray Ven',        subtitle:'shadow on the ground below',  hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[80,60,100] },
+  { id:'sk_condoria',   name:'Condoria',       simpleName:'Condoria',       subtitle:'queen of the skies',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[160,100,60] },
+
+  // ── REALM 10: HEAVEN ─────────────────────────────────────────────────────────
+  { id:'hv_becca',   name:'Becca',   simpleName:'Becca',   subtitle:'not sure how she ended up here',  hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[220,220,255] },
+  { id:'hv_carl',    name:'Carl',    simpleName:'Carl',    subtitle:'a little too comfortable here',    hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[210,210,245] },
+  { id:'hv_gabe',    name:'Gabe',    simpleName:'Gabe',    subtitle:'technically an angel',             hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[240,230,180] },
+  { id:'hv_kevin',   name:'Kevin',   simpleName:'Kevin',   subtitle:'nobody knows why he is here',     hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,200,230] },
+  { id:'hv_leela',   name:'Leela',   simpleName:'Leela',   subtitle:'means well',                      hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[230,220,255] },
+  { id:'hv_matilda', name:'Matilda', simpleName:'Matilda', subtitle:'earned her place',                 hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[255,240,200] },
+  { id:'hv_mike',    name:'Mike',    simpleName:'Mike',    subtitle:'surprisingly aggressive',          hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[200,220,240] },
+  { id:'hv_pete',    name:'Pete',    simpleName:'Pete',    subtitle:'guards the gate too seriously',    hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[220,200,180] },
+  { id:'hv_sara',    name:'Sara',    simpleName:'Sara',    subtitle:'radiant and formidable',           hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[255,220,160] },
+  { id:'hv_steven',  name:'Steven',  simpleName:'Steven',  subtitle:'lord commander of heaven',        hp:0,dmgMin:0,dmgMax:0,speed:2000,souls:0,eliteHp:0,eliteDmgMin:0,eliteDmgMax:0,eliteSouls:0,color:[255,255,200] },
 ];
 
 
@@ -1892,7 +1978,7 @@ var FLOORS_PER_LEVEL  = 9;   // normal floors per level; elite is floor FLOORS_P
 var LEVELS_PER_REALM  = 10;
 var FLOORS_PER_REALM  = FLOORS_PER_LEVEL * LEVELS_PER_REALM; // 90 normal + 10 elites
 var WINS_PER_FLOOR    = 10;
-var REALM_NAMES       = ['Void', 'Underworld', 'Swamp', 'Forest', 'Limbo'];  // indexed by curRealm-1; unnamed realms fall back to number
+var REALM_NAMES       = ['Void', 'Underworld', 'Purgatory', 'Undead', 'Hades', 'Undersea', 'Swamp', 'Forest', 'Skyland', 'Heaven'];  // indexed by curRealm-1; unnamed realms fall back to number
 
 // No realm cap — break_infinity.js handles arbitrarily large HP values
 var MINIMAP_VISIBLE  = 5;
@@ -4920,56 +5006,116 @@ function gameLoop(){
 
   var ecv=document.getElementById('enemy-canvas');
   var eid=def()?def().id:'wisp';
-  if(eid==='wisp')         drawWispSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='shade')   drawShadeSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='specter') drawSpecterSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='haunt')   drawHauntSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='wraith')  drawWraithSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='shiver')  drawShiverSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='ghoul')   drawGhoulSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='phlegm')  drawPhlegmSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='banshee') drawBansheeSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='demon')   drawDemonSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_blick')  drawBlickSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_bongo')  drawBongoSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_chuck')  drawChuckSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_dee')    drawDeeSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_digh')   drawDighSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_dongo')  drawDongoSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_flucky') drawFluckySprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_seeth')  drawSeethSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_stinko') drawStinkoSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='uw_glugg')    drawGluggSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_hoobit')    drawHoobitSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_chamo')     drawChamoSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_cruk')      drawCrukSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_dartignon') drawDartignonSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_lazili')    drawLaziliSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_noot')      drawNootSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_ribbi')     drawRibbiSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_roberti')   drawRobertiSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_turkle')    drawTurkleSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='sw_drock')     drawDrockSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_kwill')    drawKwillSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_meep')     drawMeepSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_melu')     drawMeluSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_nib')      drawNibSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_robber')   drawRobberSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_scurri')   drawScurriSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_skawk')    drawSkawkSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_taroo')    drawTarooSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_pepper')   drawPepperSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='fo_diggo')    drawDiggoSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_becca')    drawBeccaSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_carl')     drawCarlSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_kevin')    drawKevinSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_leela')    drawLeelaSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_matilda')  drawMatildaSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_mike')     drawMikeSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_pete')     drawPeteSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_sara')     drawSaraSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_steven')   drawStevenSprite(ecv,now,enemyDead,isEliteFight());
-  else if(eid==='li_gabe')     drawGabeSprite(ecv,now,enemyDead,isEliteFight());
+  var _elite=isEliteFight();
+  if(eid==='wisp')           drawWispSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='shade')     drawShadeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='specter')   drawSpecterSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='haunt')     drawHauntSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='wraith')    drawWraithSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='shiver')    drawShiverSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ghoul')     drawGhoulSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='phlegm')    drawPhlegmSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='banshee')   drawBansheeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='demon')     drawDemonSprite(ecv,now,enemyDead,_elite);
+  // Underworld
+  else if(eid==='uw_blick')  drawBlickSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='uw_bongo')  drawBongoSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='uw_chuck')  drawChuckSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='uw_dee')    drawDeeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='uw_digh')   drawDighSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='uw_dongo')  drawDongoSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='uw_glugg')  drawGluggSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='uw_rongo')  drawRongoSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='uw_stinky') drawStinkySprite(ecv,now,enemyDead,_elite);
+  else if(eid==='uw_seethe') drawSeetheSprite(ecv,now,enemyDead,_elite);
+  // Purgatory
+  else if(eid==='pg_devienne') drawDevienneSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='pg_glutny')   drawGlutnySprite(ecv,now,enemyDead,_elite);
+  else if(eid==='pg_greidi')   drawGreidiSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='pg_kovet')    drawKovetSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='pg_onvee')    drawOnveeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='pg_pryde')    drawPrydeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='pg_sleth')    drawSlethSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='pg_sluth')    drawSluthSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='pg_wroth')    drawWrothSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='pg_rath')     drawRathSprite(ecv,now,enemyDead,_elite);
+  // Undead
+  else if(eid==='ud_basha')      drawBashaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ud_bonejangle') drawBonejangleSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ud_brain')      drawBrainSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ud_drjack')     drawDrJackSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ud_dracack')    drawDracackSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ud_etta')       drawEttaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ud_feemur')     drawFeemurSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ud_fronk')      drawFronkSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ud_heddina')    drawHeddinaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='ud_royalich')   drawRoyalichSprite(ecv,now,enemyDead,_elite);
+  // Hades
+  else if(eid==='hd_aligos')   drawAligosSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hd_aria')     drawAriaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hd_chasme')   drawChasmeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hd_endras')   drawEndrasSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hd_firfur')   drawFirfurSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hd_gricelle') drawGricelleSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hd_paag')     drawPaagSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hd_vroke')    drawVrokeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hd_vymp')     drawVympSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hd_molok')    drawMolokSprite(ecv,now,enemyDead,_elite);
+  // Undersea
+  else if(eid==='us_csnek')     drawCSnekSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='us_halfshell') drawHalfshellSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='us_jelleeza')  drawJelleezaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='us_kapkreb')   drawKapKrebSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='us_rayes')     drawRayesSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='us_shrak')     drawShrakSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='us_spike')     drawSpikeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='us_squidica')  drawSquidicaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='us_tentaclan') drawTentaclanSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='us_orking')    drawOrkingSprite(ecv,now,enemyDead,_elite);
+  // Swamp
+  else if(eid==='sw_chamo')     drawChamoSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sw_crocette')  drawCrocetteSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sw_gatorado')  drawGatoradoSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sw_nagai')     drawNagaiSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sw_nootina')   drawNootinaSprte(ecv,now,enemyDead,_elite);
+  else if(eid==='sw_nuut')      drawNuutSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sw_shellitor') drawShelitorSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sw_slither')   drawSlitherSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sw_voodooliz') drawVoodooLizSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sw_cruk')      drawCrukSprite(ecv,now,enemyDead,_elite);
+  // Forest
+  else if(eid==='fo_diggo')  drawDiggoSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='fo_kwill')  drawKwillSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='fo_melu')   drawMeluSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='fo_nib')    drawNibSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='fo_pepper') drawPepperSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='fo_robber') drawRobberSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='fo_scurri') drawScurriSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='fo_skawk')  drawSkawkSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='fo_taroo')  drawTarooSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='fo_booker') drawBookerSprite(ecv,now,enemyDead,_elite);
+  // Skyland
+  else if(eid==='sk_bashinga')  drawBashinaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sk_bommer')    drawBommerSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sk_buzz')      drawBuzzSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sk_captcgull') drawCaptCGullSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sk_crowbo')    drawCrowboSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sk_duckfu')    drawDuckfuSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sk_hoory')     drawHoorySprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sk_jaysassin') drawJaysassinSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sk_rayven')    drawRayVenSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='sk_condoria')  drawCondoriaSprite(ecv,now,enemyDead,_elite);
+  // Heaven
+  else if(eid==='hv_becca')   drawBeccaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hv_carl')    drawCarlSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hv_gabe')    drawGabeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hv_kevin')   drawKevinSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hv_leela')   drawLeelaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hv_matilda') drawMatildaSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hv_mike')    drawMikeSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hv_pete')    drawPeteSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hv_sara')    drawSaraSprite(ecv,now,enemyDead,_elite);
+  else if(eid==='hv_steven')  drawStevenSprite(ecv,now,enemyDead,_elite);
   else { tickMist(enemyDead); drawMist(ecv,def()?def().color:[200,255,200],enemyDead,1); }
 
   if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;}
@@ -5492,9 +5638,13 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   saveGame();
 });
 
-(function initVoidBackground(){
+(function initRealmBackground(){
   var bf=document.getElementById('battlefield');
   var c=document.getElementById('bg-canvas');
+  var particles=[];
+  var lastRealm=-1;
+  var rafId=null;
+
   function mulberry32(seed){
     var a=seed;
     return function(){
@@ -5504,11 +5654,14 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       return((t^t>>>14)>>>0)/4294967296;
     };
   }
-  function draw(){
-    var diag=Math.ceil(Math.hypot(bf.offsetWidth,bf.offsetHeight));
-    c.width=diag;
-    c.height=diag;
-    var W=c.width, H=c.height;
+
+  function resize(){
+    var diag=Math.ceil(Math.hypot(bf.offsetWidth||800,bf.offsetHeight||600));
+    c.width=diag; c.height=diag;
+  }
+
+  // ── VOID (realm 1) — rotating star-field ─────────────────────────────────
+  function drawVoid(W,H){
     var ctx=c.getContext('2d');
     ctx.clearRect(0,0,W,H);
     var swirls=[
@@ -5521,10 +5674,8 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     ];
     swirls.forEach(function(s){
       var g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r);
-      g.addColorStop(0,s.col);
-      g.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=g;
-      ctx.fillRect(0,0,W,H);
+      g.addColorStop(0,s.col); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
     });
     var rng=mulberry32(7919);
     var count=Math.floor(W*H/2200);
@@ -5533,16 +5684,343 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       var dx=(sx/W-0.5)*2, dy=(sy/H-0.5)*2;
       var dist=Math.min(1,Math.sqrt(dx*dx+dy*dy));
       if(rng()>dist) continue;
-      var opacity=0.2+rng()*0.65;
-      var size=0.4+rng()*1.4;
-      ctx.beginPath();
-      ctx.arc(sx,sy,size,0,Math.PI*2);
-      ctx.fillStyle='rgba(220,210,255,'+opacity.toFixed(2)+')';
-      ctx.fill();
+      var op=0.2+rng()*0.65, sz=0.4+rng()*1.4;
+      ctx.beginPath(); ctx.arc(sx,sy,sz,0,Math.PI*2);
+      ctx.fillStyle='rgba(220,210,255,'+op.toFixed(2)+')'; ctx.fill();
     }
   }
-  draw();
-  window.addEventListener('resize',draw);
+
+  // ── Generic particle background helper ───────────────────────────────────
+  function spawnParticles(cfg){
+    particles=[];
+    var rng=mulberry32(cfg.seed||1234);
+    for(var i=0;i<cfg.count;i++){
+      particles.push({
+        x:rng()*2000, y:rng()*1200,
+        vx:(rng()-0.5)*cfg.vx, vy:cfg.vy*(0.5+rng()),
+        r:cfg.rMin+rng()*(cfg.rMax-cfg.rMin),
+        op:cfg.opMin+rng()*(cfg.opMax-cfg.opMin),
+        phase:rng()*Math.PI*2
+      });
+    }
+  }
+
+  function drawParticleBase(W,H,bgFn,ptFn){
+    var ctx=c.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+    bgFn(ctx,W,H);
+    ptFn(ctx,W,H);
+  }
+
+  // ── UNDERWORLD (realm 2) — fiery cavern with rising embers ───────────────
+  function initUnderworld(){
+    spawnParticles({count:120,seed:2222,vx:0.4,vy:-0.6,rMin:1,rMax:3.5,opMin:0.4,opMax:0.9});
+  }
+  function drawUnderworld(W,H,t){
+    drawParticleBase(W,H,function(ctx){
+      ctx.fillStyle='#080000'; ctx.fillRect(0,0,W,H);
+      var g=ctx.createRadialGradient(W*0.5,H*0.85,0,W*0.5,H*0.85,W*0.8);
+      g.addColorStop(0,'rgba(180,40,0,0.35)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      g=ctx.createRadialGradient(W*0.2,H*0.9,0,W*0.2,H*0.9,W*0.5);
+      g.addColorStop(0,'rgba(220,80,0,0.2)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      g=ctx.createRadialGradient(W*0.8,H*0.95,0,W*0.8,H*0.95,W*0.45);
+      g.addColorStop(0,'rgba(200,60,0,0.18)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    },function(ctx){
+      var speed=0.00012;
+      particles.forEach(function(p){
+        var age=(t*speed+p.phase/(Math.PI*2))%1;
+        var px=(p.x+Math.sin(t*0.0003+p.phase)*18)%W;
+        var py=((p.y-t*p.vy*0.05)%H+H)%H;
+        var flicker=0.6+0.4*Math.sin(t*0.005+p.phase);
+        var r=p.r*(0.7+0.3*flicker);
+        var glow=ctx.createRadialGradient(px,py,0,px,py,r*4);
+        glow.addColorStop(0,'rgba(255,'+(80+Math.floor(flicker*60))+',0,'+(p.op*flicker).toFixed(2)+')');
+        glow.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=glow; ctx.fillRect(px-r*4,py-r*4,r*8,r*8);
+      });
+    });
+  }
+
+  // ── PURGATORY (realm 3) — grey drifting fog ──────────────────────────────
+  function initPurgatory(){
+    spawnParticles({count:60,seed:3333,vx:0.8,vy:-0.08,rMin:30,rMax:80,opMin:0.04,opMax:0.1});
+  }
+  function drawPurgatory(W,H,t){
+    drawParticleBase(W,H,function(ctx){
+      ctx.fillStyle='#101018'; ctx.fillRect(0,0,W,H);
+      var g=ctx.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,W*0.7);
+      g.addColorStop(0,'rgba(80,75,100,0.3)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    },function(ctx){
+      particles.forEach(function(p){
+        var px=((p.x+t*p.vx*0.04+Math.sin(t*0.0002+p.phase)*40)%W+W)%W;
+        var py=((p.y+t*p.vy*0.04)%H+H)%H;
+        var pulse=0.7+0.3*Math.sin(t*0.001+p.phase);
+        var g=ctx.createRadialGradient(px,py,0,px,py,p.r*pulse);
+        g.addColorStop(0,'rgba(160,155,190,'+(p.op*pulse).toFixed(3)+')');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=g; ctx.fillRect(px-p.r,py-p.r,p.r*2,p.r*2);
+      });
+    });
+  }
+
+  // ── UNDEAD (realm 4) — sickly green graveyard mist ───────────────────────
+  function initUndead(){
+    spawnParticles({count:80,seed:4444,vx:0.3,vy:-0.12,rMin:2,rMax:5,opMin:0.3,opMax:0.8});
+  }
+  function drawUndead(W,H,t){
+    drawParticleBase(W,H,function(ctx){
+      ctx.fillStyle='#050a05'; ctx.fillRect(0,0,W,H);
+      var g=ctx.createRadialGradient(W*0.5,H*0.6,0,W*0.5,H*0.6,W*0.75);
+      g.addColorStop(0,'rgba(20,60,20,0.4)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      g=ctx.createRadialGradient(W*0.2,H*0.8,0,W*0.2,H*0.8,W*0.4);
+      g.addColorStop(0,'rgba(40,80,10,0.2)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    },function(ctx){
+      particles.forEach(function(p){
+        var px=((p.x+Math.sin(t*0.0004+p.phase)*25+t*p.vx*0.03)%W+W)%W;
+        var py=((p.y-t*p.vy*0.04)%H+H)%H;
+        var flicker=0.5+0.5*Math.sin(t*0.003+p.phase);
+        var g=ctx.createRadialGradient(px,py,0,px,py,p.r*3);
+        g.addColorStop(0,'rgba(80,220,80,'+(p.op*flicker).toFixed(2)+')');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=g; ctx.fillRect(px-p.r*3,py-p.r*3,p.r*6,p.r*6);
+      });
+    });
+  }
+
+  // ── HADES (realm 5) — deep crimson hellfire ───────────────────────────────
+  function initHades(){
+    spawnParticles({count:100,seed:5555,vx:0.5,vy:-0.8,rMin:1.5,rMax:4,opMin:0.3,opMax:0.85});
+  }
+  function drawHades(W,H,t){
+    drawParticleBase(W,H,function(ctx){
+      ctx.fillStyle='#0a0000'; ctx.fillRect(0,0,W,H);
+      var g=ctx.createRadialGradient(W*0.5,H,0,W*0.5,H,W*0.9);
+      g.addColorStop(0,'rgba(200,0,0,0.4)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      g=ctx.createRadialGradient(W*0.15,H*0.95,0,W*0.15,H*0.95,W*0.5);
+      g.addColorStop(0,'rgba(240,60,0,0.25)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      g=ctx.createRadialGradient(W*0.85,H*0.92,0,W*0.85,H*0.92,W*0.45);
+      g.addColorStop(0,'rgba(220,40,0,0.22)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    },function(ctx){
+      particles.forEach(function(p){
+        var px=(p.x+Math.sin(t*0.0006+p.phase)*12)%W;
+        var py=((p.y-t*p.vy*0.06)%H+H)%H;
+        var flicker=0.5+0.5*Math.sin(t*0.008+p.phase);
+        var heat=Math.floor(flicker*120);
+        var g=ctx.createRadialGradient(px,py,0,px,py,p.r*5);
+        g.addColorStop(0,'rgba(255,'+(20+heat)+',0,'+(p.op*flicker).toFixed(2)+')');
+        g.addColorStop(0.4,'rgba(180,0,0,'+(p.op*0.4*flicker).toFixed(2)+')');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=g; ctx.fillRect(px-p.r*5,py-p.r*5,p.r*10,p.r*10);
+      });
+    });
+  }
+
+  // ── UNDERSEA (realm 6) — deep ocean with rising bubbles ──────────────────
+  function initUndersea(){
+    spawnParticles({count:90,seed:6666,vx:0.2,vy:-0.4,rMin:1,rMax:4,opMin:0.2,opMax:0.6});
+  }
+  function drawUndersea(W,H,t){
+    drawParticleBase(W,H,function(ctx){
+      ctx.fillStyle='#000d18'; ctx.fillRect(0,0,W,H);
+      var g=ctx.createRadialGradient(W*0.5,H*0.4,0,W*0.5,H*0.4,W*0.7);
+      g.addColorStop(0,'rgba(0,60,120,0.4)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      g=ctx.createRadialGradient(W*0.8,H*0.2,0,W*0.8,H*0.2,W*0.4);
+      g.addColorStop(0,'rgba(0,180,160,0.12)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      g=ctx.createRadialGradient(W*0.15,H*0.35,0,W*0.15,H*0.35,W*0.3);
+      g.addColorStop(0,'rgba(40,120,200,0.15)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    },function(ctx){
+      particles.forEach(function(p){
+        var px=(p.x+Math.sin(t*0.0005+p.phase)*20)%W;
+        var py=((p.y-t*p.vy*0.05)%H+H)%H;
+        var pulse=0.6+0.4*Math.sin(t*0.002+p.phase);
+        ctx.save();
+        ctx.globalAlpha=p.op*pulse;
+        ctx.strokeStyle='rgba(140,200,255,0.8)';
+        ctx.lineWidth=0.8;
+        ctx.beginPath();
+        ctx.arc(px,py,p.r,0,Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      });
+    });
+  }
+
+  // ── SWAMP (realm 7) — murky greens with fireflies ────────────────────────
+  function initSwamp(){
+    spawnParticles({count:70,seed:7777,vx:0.3,vy:-0.05,rMin:1,rMax:2.5,opMin:0.3,opMax:0.9});
+  }
+  function drawSwamp(W,H,t){
+    drawParticleBase(W,H,function(ctx){
+      ctx.fillStyle='#04080a'; ctx.fillRect(0,0,W,H);
+      var g=ctx.createRadialGradient(W*0.5,H*0.7,0,W*0.5,H*0.7,W*0.8);
+      g.addColorStop(0,'rgba(20,50,10,0.45)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      g=ctx.createRadialGradient(W*0.3,H*0.9,0,W*0.3,H*0.9,W*0.5);
+      g.addColorStop(0,'rgba(30,60,0,0.25)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    },function(ctx){
+      particles.forEach(function(p){
+        var px=((p.x+Math.sin(t*0.0003+p.phase)*30+t*p.vx*0.04)%W+W)%W;
+        var py=((p.y+Math.cos(t*0.0004+p.phase)*15)%H+H)%H;
+        var flicker=Math.pow(0.5+0.5*Math.sin(t*0.004+p.phase*3),2);
+        var g=ctx.createRadialGradient(px,py,0,px,py,p.r*5);
+        g.addColorStop(0,'rgba(180,255,80,'+(p.op*flicker).toFixed(2)+')');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=g; ctx.fillRect(px-p.r*5,py-p.r*5,p.r*10,p.r*10);
+      });
+    });
+  }
+
+  // ── FOREST (realm 8) — dark woods with falling leaves ────────────────────
+  function initForest(){
+    spawnParticles({count:80,seed:8888,vx:0.6,vy:0.5,rMin:2,rMax:5,opMin:0.25,opMax:0.7});
+  }
+  function drawForest(W,H,t){
+    drawParticleBase(W,H,function(ctx){
+      ctx.fillStyle='#020804'; ctx.fillRect(0,0,W,H);
+      var g=ctx.createRadialGradient(W*0.5,H*0.3,0,W*0.5,H*0.3,W*0.7);
+      g.addColorStop(0,'rgba(10,40,5,0.5)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      g=ctx.createRadialGradient(W*0.7,H*0.1,0,W*0.7,H*0.1,W*0.4);
+      g.addColorStop(0,'rgba(20,60,10,0.3)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    },function(ctx){
+      particles.forEach(function(p){
+        var px=((p.x+t*p.vx*0.05+Math.sin(t*0.0006+p.phase)*22)%W+W)%W;
+        var py=((p.y+t*p.vy*0.04)%H+H)%H;
+        var angle=t*0.001+p.phase;
+        var fade=0.6+0.4*Math.sin(t*0.002+p.phase);
+        ctx.save();
+        ctx.globalAlpha=p.op*fade;
+        ctx.translate(px,py);
+        ctx.rotate(angle);
+        ctx.fillStyle='rgba(60,120,30,0.9)';
+        ctx.beginPath();
+        ctx.ellipse(0,0,p.r,p.r*0.45,0,0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      });
+    });
+  }
+
+  // ── SKYLAND (realm 9) — open sky with drifting clouds ────────────────────
+  function initSkyland(){
+    spawnParticles({count:30,seed:9999,vx:0.5,vy:0,rMin:40,rMax:100,opMin:0.06,opMax:0.16});
+  }
+  function drawSkyland(W,H,t){
+    drawParticleBase(W,H,function(ctx){
+      var sky=ctx.createLinearGradient(0,0,0,H);
+      sky.addColorStop(0,'#0a1a3a');
+      sky.addColorStop(1,'#1a3a6a');
+      ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+      var g=ctx.createRadialGradient(W*0.6,H*0.2,0,W*0.6,H*0.2,W*0.5);
+      g.addColorStop(0,'rgba(120,160,220,0.2)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    },function(ctx){
+      particles.forEach(function(p){
+        var px=((p.x+t*p.vx*0.04)%W+W)%W;
+        var py=p.y+Math.sin(t*0.0004+p.phase)*20;
+        var puff=0.8+0.2*Math.sin(t*0.0008+p.phase);
+        var g=ctx.createRadialGradient(px,py,0,px,py,p.r*puff);
+        g.addColorStop(0,'rgba(200,220,255,'+(p.op*puff).toFixed(3)+')');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=g; ctx.fillRect(px-p.r,py-p.r,p.r*2,p.r*2);
+      });
+    });
+  }
+
+  // ── HEAVEN (realm 10) — golden light beams ───────────────────────────────
+  function initHeaven(){
+    spawnParticles({count:60,seed:1010,vx:0.1,vy:-0.3,rMin:1,rMax:3,opMin:0.2,opMax:0.7});
+  }
+  function drawHeaven(W,H,t){
+    drawParticleBase(W,H,function(ctx){
+      ctx.fillStyle='#0e1020'; ctx.fillRect(0,0,W,H);
+      var g=ctx.createRadialGradient(W*0.5,H*0.1,0,W*0.5,H*0.1,W*0.9);
+      g.addColorStop(0,'rgba(220,200,100,0.22)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      // light beams
+      var numBeams=5;
+      for(var b=0;b<numBeams;b++){
+        var bx=W*(0.1+b*0.2)+Math.sin(t*0.0003+b)*W*0.06;
+        var pulse=0.5+0.5*Math.sin(t*0.0008+b*1.3);
+        var bg=ctx.createLinearGradient(bx,0,bx+W*0.08,H);
+        bg.addColorStop(0,'rgba(255,240,160,'+(0.06*pulse).toFixed(3)+')');
+        bg.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.save();
+        ctx.globalAlpha=1;
+        ctx.fillStyle=bg;
+        ctx.beginPath();
+        ctx.moveTo(bx-W*0.02,0); ctx.lineTo(bx+W*0.1,0);
+        ctx.lineTo(bx+W*0.2,H); ctx.lineTo(bx+W*0.05,H);
+        ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }
+    },function(ctx){
+      particles.forEach(function(p){
+        var px=(p.x+Math.sin(t*0.0004+p.phase)*15)%W;
+        var py=((p.y-t*p.vy*0.04)%H+H)%H;
+        var pulse=0.5+0.5*Math.sin(t*0.003+p.phase);
+        var g=ctx.createRadialGradient(px,py,0,px,py,p.r*4);
+        g.addColorStop(0,'rgba(255,240,140,'+(p.op*pulse).toFixed(2)+')');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=g; ctx.fillRect(px-p.r*4,py-p.r*4,p.r*8,p.r*8);
+      });
+    });
+  }
+
+  var initFns=[null,initUnderworld,initPurgatory,initUndead,initHades,initUndersea,initSwamp,initForest,initSkyland,initHeaven];
+  var drawFns=[null,drawUnderworld,drawPurgatory,drawUndead,drawHades,drawUndersea,drawSwamp,drawForest,drawSkyland,drawHeaven];
+
+  function tick(now){
+    var realm=(typeof curRealm!=='undefined'?curRealm:1);
+    var W=c.width, H=c.height;
+    var ctx=c.getContext('2d');
+
+    if(realm!==lastRealm){
+      lastRealm=realm;
+      resize();
+      W=c.width; H=c.height;
+      if(realm===1){
+        // Void: static, drawn once; CSS rotation handles animation
+        c.style.animation='bgSlowRotate 120s linear infinite';
+        drawVoid(W,H);
+      } else {
+        c.style.animation='none';
+        var ri=(realm-1)%10; // 0-indexed within our 10 realms
+        if(initFns[ri]) initFns[ri]();
+      }
+    }
+
+    if(realm!==1){
+      var ri=(realm-1)%10;
+      if(drawFns[ri]) drawFns[ri](W,H,now);
+    }
+
+    rafId=requestAnimationFrame(tick);
+  }
+
+  resize();
+  drawVoid(c.width,c.height);
+  c.style.animation='bgSlowRotate 120s linear infinite';
+  lastRealm=1;
+  requestAnimationFrame(tick);
+
+  window.addEventListener('resize',function(){
+    lastRealm=-1; // force reinit on next tick
+  });
 })();
 
 })();
