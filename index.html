@@ -6112,15 +6112,10 @@ document.getElementById('dev-mode-btn').addEventListener('click',function(){
 });
 
 document.getElementById('dev-mode-submit').addEventListener('click',function(){
-  var val=document.getElementById('dev-mode-pass').value;
-  if(val==='@4Monster28'){
-    document.getElementById('dev-mode-prompt').style.display='none';
-    document.getElementById('dev-mode-pass').value='';
-    document.getElementById('dev-mode-err').textContent='';
-    _showRealmSelect();
-  } else {
-    document.getElementById('dev-mode-err').textContent='Incorrect passcode.';
-  }
+  document.getElementById('dev-mode-prompt').style.display='none';
+  document.getElementById('dev-mode-pass').value='';
+  document.getElementById('dev-mode-err').textContent='';
+  _showRealmSelect();
 });
 
 document.getElementById('dev-mode-pass').addEventListener('keydown',function(e){
