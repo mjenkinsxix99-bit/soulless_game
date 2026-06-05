@@ -6036,15 +6036,15 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       };
       var REALM_BG_OFFSET={
         1:100,
-        2:0,
-        3:0,
-        4:0,
-        5:0,
-        6:0,
-        7:0,
-        8:0,
-        9:0,
-        10:0
+        2:100,
+        3:100,
+        4:100,
+        5:100,
+        6:100,
+        7:100,
+        8:100,
+        9:100,
+        10:100
       };
       var bgImg=document.getElementById('realm-bg-img');
       if(bgImg){
@@ -6057,9 +6057,9 @@ document.getElementById('mm-auto').addEventListener('click',function(){
           bgImg.style.transform='translateX(calc(-50% + '+offset+'px)) scale('+scale+')';
           bgImg.style.display='block';
           c.style.display='none';
-          // Left panel bg — Void only for now
+          // Left panel bg — all realms
           if(bgImgLeft){
-            if(realm===1){
+            if(imgSrc){
               bgImgLeft.src=imgSrc;
               bgImgLeft.style.transform='scale('+scale+')';
               bgImgLeft.style.display='block';
