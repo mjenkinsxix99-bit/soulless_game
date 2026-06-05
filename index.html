@@ -2469,7 +2469,10 @@ function setHint(){}
 function updateProgressLabel(){
   var elite=isEliteFight();
   var rn=document.getElementById('realm-label');
-  if(rn) rn.textContent='Realm: '+realmName(curRealm);
+  if(rn){
+    rn.textContent='Realm: '+realmName(curRealm);
+    rn.style.color=(curRealm===10)?'#4a1a6e':'';
+  }
   var kc=document.getElementById('click-hint');
   if(kc){
     if(elite){
