@@ -6010,6 +6010,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
       // Realm image backgrounds
       var REALM_BG_IMAGES={
+        1:'artwork/void_background.webp',
         2:'artwork/underworld_background.webp',
         3:'artwork/purgatory_background.webp',
         4:'artwork/undead_background.webp',
@@ -6046,7 +6047,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
         }
       }
 
-      if(realm===1){
+      if(realm===1 && !REALM_BG_IMAGES[1]){
         // Void: static, drawn once; CSS rotation handles animation
         c.style.animation='bgSlowRotate 120s linear infinite';
         drawVoid(W,H);
