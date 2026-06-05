@@ -1353,11 +1353,14 @@ var hvSpriteSheetLoaded = false;
 hvSpriteSheet.onload = function(){ hvSpriteSheetLoaded = true; };
 hvSpriteSheet.src = "artwork/sprites_heaven.png";
 
-var ENTITY_IMG_SRC = "artwork/sprites_ether.webp";
-var entityImg = new Image();
-entityImg.src = ENTITY_IMG_SRC;
-var entityImgLoaded = false;
-entityImg.onload = function(){ entityImgLoaded = true; };
+var entityImgNormal = new Image();
+var entityImgAttack = new Image();
+var entityImgNormalLoaded = false;
+var entityImgAttackLoaded = false;
+entityImgNormal.onload = function(){ entityImgNormalLoaded = true; };
+entityImgAttack.onload = function(){ entityImgAttackLoaded = true; };
+entityImgNormal.src = "artwork/ether_normal.webp";
+entityImgAttack.src = "artwork/ether_attack.webp";
 
 
 
@@ -1396,7 +1399,9 @@ function drawEntityCanvas(t) {
 
   // Use form sprite sheet if a rebirth form is active, otherwise ether image
   var useFormSheet = _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
-  var activeImg = entityImg, activeLoaded = entityImgLoaded;
+  var isAttacking = (t - attackFlashTime < 400);
+  var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
+  var activeLoaded = isAttacking ? entityImgAttackLoaded : entityImgNormalLoaded;
   if(!useFormSheet && _rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
     activeImg = FORM_IMAGES[_rebirthEntityOverride]; activeLoaded = true;
   }
@@ -1404,8 +1409,7 @@ function drawEntityCanvas(t) {
 
   var deathFade = 1;
 
-  var ETHER_FRAMES = 2;
-  var iw = useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth / ETHER_FRAMES;
+  var iw = useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth;
   var ih = useFormSheet ? FORM_SPRITE_CELL_H : activeImg.naturalHeight;
   var drawH = Math.min(H * 0.9, H - 10);
   var drawW = drawH * (iw / ih);
@@ -1450,8 +1454,7 @@ function drawEntityCanvas(t) {
     var fi=FORM_INDEX[_rebirthEntityOverride];
     ctx.drawImage(formSpriteSheet,fi*FORM_SPRITE_CELL_W,0,FORM_SPRITE_CELL_W,FORM_SPRITE_CELL_H,dx,dy,drawW,drawH);
   } else {
-    var etherFrame = (t - attackFlashTime < 400) ? 1 : 0;
-    ctx.drawImage(activeImg, etherFrame * iw, 0, iw, ih, dx, dy, drawW, drawH);
+    ctx.drawImage(activeImg, 0, 0, iw, ih, dx, dy, drawW, drawH);
   }
   ctx.filter = 'none';
   ctx.restore();
