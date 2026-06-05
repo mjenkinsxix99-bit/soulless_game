@@ -1598,7 +1598,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   ctx.translate(-cx, -cy);
 
   // Ground shadow — ellipse at base of sprite, scales with sprite width
-  if(!dead && !floatSpeed){
+  if(!dead){
     var shadowRx = drawW * 0.38;
     var shadowRy = shadowRx * 0.18;
     var shadowY = dy + drawH - shadowRy * 0.5;
