@@ -6083,9 +6083,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   }
 
   resize();
-  drawVoid(c.width,c.height);
-  c.style.animation='bgSlowRotate 120s linear infinite';
-  lastRealm=1;
+  lastRealm=-1;
   requestAnimationFrame(tick);
 
   window.addEventListener('resize',function(){
