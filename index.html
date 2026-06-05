@@ -6034,14 +6034,27 @@ document.getElementById('mm-auto').addEventListener('click',function(){
         9:0.85,
         10:0.85
       };
+      var REALM_BG_OFFSET={
+        1:0,
+        2:0,
+        3:0,
+        4:0,
+        5:0,
+        6:0,
+        7:0,
+        8:0,
+        9:0,
+        10:0
+      };
       var bgImg=document.getElementById('realm-bg-img');
       if(bgImg){
         var imgSrc=REALM_BG_IMAGES[realm]||'';
         var bgImgLeft=document.getElementById('realm-bg-img-left');
         if(imgSrc){
           var scale=REALM_BG_SCALE[realm]||0.60;
+          var offset=REALM_BG_OFFSET[realm]||0;
           bgImg.src=imgSrc;
-          bgImg.style.transform='translateX(-50%) scale('+scale+')';
+          bgImg.style.transform='translateX(calc(-50% + '+offset+'px)) scale('+scale+')';
           bgImg.style.display='block';
           c.style.display='none';
           // Left panel bg — Void only for now
