@@ -1602,7 +1602,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
     var shadowRx = drawW * 0.48;
     var shadowRy = shadowRx * 0.22;
     // Floaters: shadow fixed at ground; grounded: shadow follows sprite base
-    var shadowY = floatSpeed ? (H - shadowRy - 8) : (dy + drawH - shadowRy * 0.5);
+    var shadowY = floatSpeed ? (H - shadowRy - 18) : (dy + drawH - shadowRy * 0.5);
     ctx.save();
     ctx.globalAlpha = 0.90 * deathFade;
     var shadowGrad = ctx.createRadialGradient(W/2, shadowY, 0, W/2, shadowY, shadowRx);
