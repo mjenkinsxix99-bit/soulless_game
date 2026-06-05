@@ -1599,14 +1599,15 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
 
   // Ground shadow — ellipse scales with sprite width
   if(!dead){
-    var shadowRx = drawW * 0.38;
-    var shadowRy = shadowRx * 0.18;
+    var shadowRx = drawW * 0.48;
+    var shadowRy = shadowRx * 0.22;
     // Floaters: shadow fixed at ground; grounded: shadow follows sprite base
     var shadowY = floatSpeed ? (H - shadowRy - 8) : (dy + drawH - shadowRy * 0.5);
     ctx.save();
-    ctx.globalAlpha = 0.85 * deathFade;
+    ctx.globalAlpha = 0.90 * deathFade;
     var shadowGrad = ctx.createRadialGradient(W/2, shadowY, 0, W/2, shadowY, shadowRx);
     shadowGrad.addColorStop(0, 'rgba(0,0,0,1)');
+    shadowGrad.addColorStop(0.6, 'rgba(0,0,0,0.6)');
     shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = shadowGrad;
     ctx.beginPath();
