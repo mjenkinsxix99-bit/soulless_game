@@ -1603,9 +1603,9 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
     var shadowRy = shadowRx * 0.18;
     var shadowY = dy + drawH - shadowRy * 0.5;
     ctx.save();
-    ctx.globalAlpha = 0.35 * deathFade;
+    ctx.globalAlpha = 0.7 * deathFade;
     var shadowGrad = ctx.createRadialGradient(W/2, shadowY, 0, W/2, shadowY, shadowRx);
-    shadowGrad.addColorStop(0, 'rgba(0,0,0,0.7)');
+    shadowGrad.addColorStop(0, 'rgba(0,0,0,1)');
     shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = shadowGrad;
     ctx.beginPath();
