@@ -55,7 +55,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard-body { flex: 1; min-width: 0; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
-#realm-bg-img-left { display:none; position:absolute; bottom:365px; left:0; pointer-events:none; z-index:0; width:auto; height:auto; transform-origin:bottom left; }
+#realm-bg-img-left { display:none; position:absolute; bottom:0; left:0; pointer-events:none; z-index:0; width:auto; height:auto; transform-origin:bottom left; }
 #realm-bg-img { display:none; position:absolute; bottom:260px; left:50%; transform:translateX(-50%) scale(0.60); transform-origin:bottom center; pointer-events:none; z-index:-1; width:auto; height:auto; }
 #combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
   width:930px; height:930px; border-radius:50%;
@@ -628,7 +628,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #respec-confirm-no:hover { border-color:#7755aa; color:#9980dd; }
 .ubuy { font-size:14px; font-weight:bold; color:#887755; margin-right:5px; }
 /* Entity display in left panel */
-#left-entity { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; position:relative; z-index:1; }
+#left-entity { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; position:relative; }
 
 /* Spirit Slash soul-prompt arrow — floats outside the right panel, pointing at the card */
 #ss-global-arrow { display:none; position:absolute; right:14px; top:88px; z-index:20;
@@ -758,7 +758,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
   <div id="main">
     <div id="left">
-      <img id="realm-bg-img-left" src="" alt="" />
       <div id="left-header">
         <div id="entity-stage-label" class="cname entity-label">You are Ether.</div>
         <div id="stage-desc">Shapeless. Hungry.</div>
@@ -770,7 +769,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div id="left-tab-content">
         <div id="ltab-entity" class="left-tab-pane active">
           <div id="left-entity">
-            <div class="canvas-wrap" style="margin-top:6px;">
+            <img id="realm-bg-img-left" src="" alt="" />
+            <div class="canvas-wrap" style="margin-top:6px;position:relative;z-index:1;">
               <canvas id="entity-canvas" width="330" height="330"></canvas>
             </div>
             <div class="hp-wrap" style="visibility:hidden">
