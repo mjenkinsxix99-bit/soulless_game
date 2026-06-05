@@ -1597,6 +1597,23 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   ctx.scale(scaleX, scaleY);
   ctx.translate(-cx, -cy);
 
+  // Ground shadow — ellipse at base of sprite, scales with sprite width
+  if(!dead && !floatSpeed){
+    var shadowRx = drawW * 0.38;
+    var shadowRy = shadowRx * 0.18;
+    var shadowY = dy + drawH - shadowRy * 0.5;
+    ctx.save();
+    ctx.globalAlpha = 0.35 * deathFade;
+    var shadowGrad = ctx.createRadialGradient(W/2, shadowY, 0, W/2, shadowY, shadowRx);
+    shadowGrad.addColorStop(0, 'rgba(0,0,0,0.7)');
+    shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = shadowGrad;
+    ctx.beginPath();
+    ctx.ellipse(W/2, shadowY, shadowRx, shadowRy, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   // Golden halo for elites — drawn before sprite so it sits above the head
   if (elite && !dead) {
     var haloPulse = Math.sin(t * 0.003) * 0.5 + 0.5;
