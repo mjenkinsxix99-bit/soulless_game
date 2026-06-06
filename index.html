@@ -1397,20 +1397,22 @@ function drawEntityCanvas(t) {
   var W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  // Use form sprite sheet if a rebirth form is active, otherwise ether image
-  var useFormSheet = _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
+  // Male ascension sheet takes priority when form is masculine and sheet is loaded
+  var useMaleAscSheet = rebirthForm === 'masculine' && rebirthCount >= 1 && maleAscSheetLoaded;
+  // Use generic form sprite sheet for other forms
+  var useFormSheet = !useMaleAscSheet && _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
   var isAttacking = (t - attackFlashTime < 400);
   var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
   var activeLoaded = isAttacking ? entityImgAttackLoaded : entityImgNormalLoaded;
-  if(!useFormSheet && _rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
+  if(!useMaleAscSheet && !useFormSheet && _rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
     activeImg = FORM_IMAGES[_rebirthEntityOverride]; activeLoaded = true;
   }
-  if(!useFormSheet && !activeLoaded) return;
+  if(!useMaleAscSheet && !useFormSheet && !activeLoaded) return;
 
   var deathFade = 1;
 
-  var iw = useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth;
-  var ih = useFormSheet ? FORM_SPRITE_CELL_H : activeImg.naturalHeight;
+  var iw = useMaleAscSheet ? MALE_ASC_CELL : (useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth);
+  var ih = useMaleAscSheet ? MALE_ASC_CELL : (useFormSheet ? FORM_SPRITE_CELL_H : activeImg.naturalHeight);
   var drawH = Math.min(H * 0.9, H - 10);
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
@@ -1450,7 +1452,12 @@ function drawEntityCanvas(t) {
     ctx.filter = 'brightness('+(1+hf*3)+') saturate('+(1-hf*0.5)+')';
   }
 
-  if(useFormSheet){
+  if(useMaleAscSheet){
+    var gpos = getMaleAscGridPos(rebirthCount, ascension3Path, ascension4Path, ascension5Path, ascension6Path);
+    var gcol = gpos % MALE_ASC_COLS;
+    var grow = Math.floor(gpos / MALE_ASC_COLS);
+    ctx.drawImage(maleAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
+  } else if(useFormSheet){
     var fi=FORM_INDEX[_rebirthEntityOverride];
     ctx.drawImage(formSpriteSheet,fi*FORM_SPRITE_CELL_W,0,FORM_SPRITE_CELL_W,FORM_SPRITE_CELL_H,dx,dy,drawW,drawH);
   } else {
@@ -3828,6 +3835,31 @@ var formSpriteSheetLoaded = false;
 formSpriteSheet.onload = function(){ formSpriteSheetLoaded = true; };
 formSpriteSheet.src = "artwork/sprites_form.webp";
 var FORM_INDEX = {masculine:0,feminine:1,androgynous:2,canine:3,feline:4,equine:5};
+
+// ── MALE ASCENSION SPRITE SHEET ───────────────────────────────────────────────
+var MALE_ASC_CELL = 512;
+var MALE_ASC_COLS = 9;
+var maleAscSheet = new Image();
+var maleAscSheetLoaded = false;
+maleAscSheet.onload = function(){ maleAscSheetLoaded = true; };
+maleAscSheet.src = 'artwork/sprites_male.webp';
+// game path names → artwork index (shadow='dark'=0, holy=1, mystic=2; knowledge='wisdom'=2)
+var _MALE_P3 = {shadow:0, holy:1, mystic:2};
+var _MALE_P4 = {shadow:0, holy:1, mystic:2};
+var _MALE_P5 = {shadow:0, holy:1, mystic:2};
+var _MALE_P6 = {leather:0, steel:1, knowledge:2};
+function getMaleAscGridPos(rc, p3, p4, p5, p6){
+  if(rc <= 1) return 0;
+  if(rc === 2) return 1;
+  var i3 = p3 ? (_MALE_P3[p3]||0) : 0;
+  if(rc === 3) return 2 + i3;
+  var i4 = p4 ? (_MALE_P4[p4]||0) : 0;
+  if(rc === 4) return 9  + i3*3  + i4;
+  var i5 = p5 ? (_MALE_P5[p5]||0) : 0;
+  if(rc === 5) return 18 + i3*9  + i4*3 + i5;
+  var i6 = p6 ? (_MALE_P6[p6]||0) : 0;
+  return            45 + i3*27 + i4*9 + i5*3 + i6;
+}
 var FORM_IMAGES={}; var _formImagesLoaded=false;
 function preloadFormImages(){
   FORM_NAMES.forEach(function(f){
