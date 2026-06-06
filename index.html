@@ -1401,8 +1401,9 @@ function drawEntityCanvas(t) {
   var useFemaleAscSheet = rebirthForm === 'feminine' && rebirthCount >= 1 && femaleAscSheetLoaded;
   var useMaleAscSheet = !useFemaleAscSheet && rebirthForm === 'masculine' && rebirthCount >= 1 && maleAscSheetLoaded;
   var useAndroAscSheet = !useFemaleAscSheet && !useMaleAscSheet && rebirthForm === 'androgynous' && rebirthCount >= 1 && androAscSheetLoaded;
+  var useFelineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && rebirthForm === 'feline' && rebirthCount >= 1 && felineAscSheetLoaded;
   // Use generic form sprite sheet for other forms
-  var useAscSheet = useMaleAscSheet || useFemaleAscSheet || useAndroAscSheet;
+  var useAscSheet = useMaleAscSheet || useFemaleAscSheet || useAndroAscSheet || useFelineAscSheet;
   var useFormSheet = !useAscSheet && _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
   var isAttacking = (t - attackFlashTime < 400);
   var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
@@ -1470,6 +1471,11 @@ function drawEntityCanvas(t) {
     var gcol = gpos % MALE_ASC_COLS;
     var grow = Math.floor(gpos / MALE_ASC_COLS);
     ctx.drawImage(androAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
+  } else if(useFelineAscSheet){
+    var gpos = getFelineAscGridPos(rebirthCount, ascension3Path, ascension4Path, ascension5Path, ascension6Path);
+    var gcol = gpos % MALE_ASC_COLS;
+    var grow = Math.floor(gpos / MALE_ASC_COLS);
+    ctx.drawImage(felineAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
   } else if(useFormSheet){
     var fi=FORM_INDEX[_rebirthEntityOverride];
     ctx.drawImage(formSpriteSheet,fi*FORM_SPRITE_CELL_W,0,FORM_SPRITE_CELL_W,FORM_SPRITE_CELL_H,dx,dy,drawW,drawH);
@@ -3848,6 +3854,28 @@ var formSpriteSheetLoaded = false;
 formSpriteSheet.onload = function(){ formSpriteSheetLoaded = true; };
 formSpriteSheet.src = "artwork/sprites_form.webp";
 var FORM_INDEX = {masculine:0,feminine:1,androgynous:2,canine:3,feline:4,equine:5};
+
+// ── FELINE ASCENSION SPRITE SHEET ────────────────────────────────────────────
+var felineAscSheet = new Image();
+var felineAscSheetLoaded = false;
+felineAscSheet.onload = function(){ felineAscSheetLoaded = true; };
+felineAscSheet.src = 'artwork/sprites_feline.webp';
+var _FEL_P3 = {shadow:0, holy:1, mystic:2};
+var _FEL_P4 = {shadow:0, holy:1, mystic:2};
+var _FEL_P5 = {shadow:0, holy:1, mystic:2};
+var _FEL_P6 = {leather:0, steel:1, knowledge:2};
+function getFelineAscGridPos(rc, p3, p4, p5, p6){
+  if(rc <= 1) return 0;
+  if(rc === 2) return 1;
+  var i3 = p3 ? (_FEL_P3[p3]||0) : 0;
+  if(rc === 3) return 2 + i3;
+  var i4 = p4 ? (_FEL_P4[p4]||0) : 0;
+  if(rc === 4) return 9  + i3*3  + i4;
+  var i5 = p5 ? (_FEL_P5[p5]||0) : 0;
+  if(rc === 5) return 18 + i3*9  + i4*3 + i5;
+  var i6 = p6 ? (_FEL_P6[p6]||0) : 0;
+  return            45 + i3*27 + i4*9 + i5*3 + i6;
+}
 
 // ── ANDROGYNOUS ASCENSION SPRITE SHEET ───────────────────────────────────────
 var androAscSheet = new Image();
