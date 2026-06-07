@@ -4177,6 +4177,8 @@ function saveGame(){
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
+  // Keep offline timestamp current so closure time is accurate
+  try{ localStorage.setItem(OFFLINE_TS_KEY, String(Date.now())); } catch(e){}
 }
 
 function loadGame(){
@@ -4261,15 +4263,25 @@ var OFFLINE_CAP_SECONDS = 6 * 3600; // 6 hours
 
 var OFFLINE_TS_KEY='soulless_offline_ts';
 
+var SESSION_KEY='soulless_session_active';
+
 function applyOfflineProgress(savedAt){
+  // Detect refresh vs true new session using sessionStorage.
+  // sessionStorage persists through F5/Ctrl+R but is cleared when the tab is closed.
+  var isRefresh = !!sessionStorage.getItem(SESSION_KEY);
+  sessionStorage.setItem(SESSION_KEY,'1');
+
   // Use the dedicated timestamp key if available — more reliable than the main save
   var storedTs=parseInt(localStorage.getItem(OFFLINE_TS_KEY)||'0',10);
   var ref=storedTs||savedAt||0;
-  // Write current time immediately so the next session has an accurate reference
+  // Update the stored timestamp so it's current (also updated in saveGame)
   try{ localStorage.setItem(OFFLINE_TS_KEY, String(Date.now())); } catch(e){}
+
+  // Skip offline progress on page refresh — only apply after a true session gap
+  if(isRefresh) return;
   if(!ref) return;
   var elapsed = Math.min((Date.now() - ref) / 1000, OFFLINE_CAP_SECONDS);
-  if(elapsed < 30) return; // ignore trivial reloads
+  if(elapsed < 30) return;
 
   // souls/sec = DPS / 5, matching kill-reward math (soulsPerKill = HP/5, timePerKill = HP/DPS)
   var soulMult = 1;
