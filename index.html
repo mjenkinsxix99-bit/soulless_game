@@ -1397,20 +1397,28 @@ function drawEntityCanvas(t) {
   var W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  // Use form sprite sheet if a rebirth form is active, otherwise ether image
-  var useFormSheet = _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
+  // Form-specific ascension sheets
+  var useFemaleAscSheet = rebirthForm === 'feminine' && rebirthCount >= 1 && femaleAscSheetLoaded;
+  var useMaleAscSheet = !useFemaleAscSheet && rebirthForm === 'masculine' && rebirthCount >= 1 && maleAscSheetLoaded;
+  var useAndroAscSheet = !useFemaleAscSheet && !useMaleAscSheet && rebirthForm === 'androgynous' && rebirthCount >= 1 && androAscSheetLoaded;
+  var useFelineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && rebirthForm === 'feline' && rebirthCount >= 1 && felineAscSheetLoaded;
+  var useCanineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && !useFelineAscSheet && rebirthForm === 'canine' && rebirthCount >= 1 && canineAscSheetLoaded;
+  var useEquineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && !useFelineAscSheet && !useCanineAscSheet && rebirthForm === 'equine' && rebirthCount >= 1 && equineAscSheetLoaded;
+  // Use generic form sprite sheet for other forms
+  var useAscSheet = useMaleAscSheet || useFemaleAscSheet || useAndroAscSheet || useFelineAscSheet || useCanineAscSheet || useEquineAscSheet;
+  var useFormSheet = !useAscSheet && _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
   var isAttacking = (t - attackFlashTime < 400);
   var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
   var activeLoaded = isAttacking ? entityImgAttackLoaded : entityImgNormalLoaded;
-  if(!useFormSheet && _rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
+  if(!useAscSheet && !useFormSheet && _rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
     activeImg = FORM_IMAGES[_rebirthEntityOverride]; activeLoaded = true;
   }
-  if(!useFormSheet && !activeLoaded) return;
+  if(!useAscSheet && !useFormSheet && !activeLoaded) return;
 
   var deathFade = 1;
 
-  var iw = useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth;
-  var ih = useFormSheet ? FORM_SPRITE_CELL_H : activeImg.naturalHeight;
+  var iw = useAscSheet ? MALE_ASC_CELL : (useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth);
+  var ih = useAscSheet ? MALE_ASC_CELL : (useFormSheet ? FORM_SPRITE_CELL_H : activeImg.naturalHeight);
   var drawH = Math.min(H * 0.9, H - 10);
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
@@ -1450,7 +1458,37 @@ function drawEntityCanvas(t) {
     ctx.filter = 'brightness('+(1+hf*3)+') saturate('+(1-hf*0.5)+')';
   }
 
-  if(useFormSheet){
+  if(useMaleAscSheet){
+    var gpos = getMaleAscGridPos(rebirthCount, ascension3Path, ascension4Path, ascension5Path, ascension6Path);
+    var gcol = gpos % MALE_ASC_COLS;
+    var grow = Math.floor(gpos / MALE_ASC_COLS);
+    ctx.drawImage(maleAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
+  } else if(useFemaleAscSheet){
+    var gpos = getFemaleAscGridPos(rebirthCount, ascension3Path, ascension4Path, ascension5Path, ascension6Path);
+    var gcol = gpos % MALE_ASC_COLS;
+    var grow = Math.floor(gpos / MALE_ASC_COLS);
+    ctx.drawImage(femaleAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
+  } else if(useAndroAscSheet){
+    var gpos = getAndroAscGridPos(rebirthCount, ascension3Path, ascension4Path, ascension5Path, ascension6Path);
+    var gcol = gpos % MALE_ASC_COLS;
+    var grow = Math.floor(gpos / MALE_ASC_COLS);
+    ctx.drawImage(androAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
+  } else if(useFelineAscSheet){
+    var gpos = getFelineAscGridPos(rebirthCount, ascension3Path, ascension4Path, ascension5Path, ascension6Path);
+    var gcol = gpos % MALE_ASC_COLS;
+    var grow = Math.floor(gpos / MALE_ASC_COLS);
+    ctx.drawImage(felineAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
+  } else if(useCanineAscSheet){
+    var gpos = getCanineAscGridPos(rebirthCount, ascension3Path, ascension4Path, ascension5Path, ascension6Path);
+    var gcol = gpos % MALE_ASC_COLS;
+    var grow = Math.floor(gpos / MALE_ASC_COLS);
+    ctx.drawImage(canineAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
+  } else if(useEquineAscSheet){
+    var gpos = getEquineAscGridPos(rebirthCount, ascension3Path, ascension4Path, ascension5Path, ascension6Path);
+    var gcol = gpos % MALE_ASC_COLS;
+    var grow = Math.floor(gpos / MALE_ASC_COLS);
+    ctx.drawImage(equineAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
+  } else if(useFormSheet){
     var fi=FORM_INDEX[_rebirthEntityOverride];
     ctx.drawImage(formSpriteSheet,fi*FORM_SPRITE_CELL_W,0,FORM_SPRITE_CELL_W,FORM_SPRITE_CELL_H,dx,dy,drawW,drawH);
   } else {
@@ -2126,6 +2164,7 @@ var ascension5Path=null;
 var ascension6Path=null;
 var rebirthForm=null;
 var soundMuted=false;
+var devModeEnabled=false;
 var eliteKillsTotal=0;
 var highestGlobalFloorEver=0;
 var achievementsEarned=[];
@@ -3827,6 +3866,141 @@ var formSpriteSheetLoaded = false;
 formSpriteSheet.onload = function(){ formSpriteSheetLoaded = true; };
 formSpriteSheet.src = "artwork/sprites_form.webp";
 var FORM_INDEX = {masculine:0,feminine:1,androgynous:2,canine:3,feline:4,equine:5};
+
+// ── FELINE ASCENSION SPRITE SHEET ────────────────────────────────────────────
+var felineAscSheet = new Image();
+var felineAscSheetLoaded = false;
+felineAscSheet.onload = function(){ felineAscSheetLoaded = true; };
+felineAscSheet.src = 'artwork/sprites_feline.webp';
+var _FEL_P3 = {shadow:0, holy:1, mystic:2};
+var _FEL_P4 = {shadow:0, holy:1, mystic:2};
+var _FEL_P5 = {shadow:0, holy:1, mystic:2};
+var _FEL_P6 = {leather:0, steel:1, knowledge:2};
+function getFelineAscGridPos(rc, p3, p4, p5, p6){
+  if(rc <= 1) return 0;
+  if(rc === 2) return 1;
+  var i3 = p3 ? (_FEL_P3[p3]||0) : 0;
+  if(rc === 3) return 2 + i3;
+  var i4 = p4 ? (_FEL_P4[p4]||0) : 0;
+  if(rc === 4) return 9  + i3*3  + i4;
+  var i5 = p5 ? (_FEL_P5[p5]||0) : 0;
+  if(rc === 5) return 18 + i3*9  + i4*3 + i5;
+  var i6 = p6 ? (_FEL_P6[p6]||0) : 0;
+  return            45 + i3*27 + i4*9 + i5*3 + i6;
+}
+
+// ── EQUINE ASCENSION SPRITE SHEET ────────────────────────────────────────────
+var equineAscSheet = new Image();
+var equineAscSheetLoaded = false;
+equineAscSheet.onload = function(){ equineAscSheetLoaded = true; };
+equineAscSheet.src = 'artwork/sprites_equine.webp';
+var _EQU_P3 = {shadow:0, holy:1, mystic:2};
+var _EQU_P4 = {shadow:0, holy:1, mystic:2};
+var _EQU_P5 = {shadow:0, holy:1, mystic:2};
+var _EQU_P6 = {leather:0, steel:1, knowledge:2};
+function getEquineAscGridPos(rc, p3, p4, p5, p6){
+  if(rc <= 1) return 0;
+  if(rc === 2) return 1;
+  var i3 = p3 ? (_EQU_P3[p3]||0) : 0;
+  if(rc === 3) return 2 + i3;
+  var i4 = p4 ? (_EQU_P4[p4]||0) : 0;
+  if(rc === 4) return 9  + i3*3  + i4;
+  var i5 = p5 ? (_EQU_P5[p5]||0) : 0;
+  if(rc === 5) return 18 + i3*9  + i4*3 + i5;
+  var i6 = p6 ? (_EQU_P6[p6]||0) : 0;
+  return            45 + i3*27 + i4*9 + i5*3 + i6;
+}
+
+// ── CANINE ASCENSION SPRITE SHEET ────────────────────────────────────────────
+var canineAscSheet = new Image();
+var canineAscSheetLoaded = false;
+canineAscSheet.onload = function(){ canineAscSheetLoaded = true; };
+canineAscSheet.src = 'artwork/sprites_canine.webp';
+var _CAN_P3 = {shadow:0, holy:1, mystic:2};
+var _CAN_P4 = {shadow:0, holy:1, mystic:2};
+var _CAN_P5 = {shadow:0, holy:1, mystic:2};
+var _CAN_P6 = {leather:0, steel:1, knowledge:2};
+function getCanineAscGridPos(rc, p3, p4, p5, p6){
+  if(rc <= 1) return 0;
+  if(rc === 2) return 1;
+  var i3 = p3 ? (_CAN_P3[p3]||0) : 0;
+  if(rc === 3) return 2 + i3;
+  var i4 = p4 ? (_CAN_P4[p4]||0) : 0;
+  if(rc === 4) return 9  + i3*3  + i4;
+  var i5 = p5 ? (_CAN_P5[p5]||0) : 0;
+  if(rc === 5) return 18 + i3*9  + i4*3 + i5;
+  var i6 = p6 ? (_CAN_P6[p6]||0) : 0;
+  return            45 + i3*27 + i4*9 + i5*3 + i6;
+}
+
+// ── ANDROGYNOUS ASCENSION SPRITE SHEET ───────────────────────────────────────
+var androAscSheet = new Image();
+var androAscSheetLoaded = false;
+androAscSheet.onload = function(){ androAscSheetLoaded = true; };
+androAscSheet.src = 'artwork/sprites_andro.webp';
+var _ANDRO_P3 = {shadow:0, holy:1, mystic:2};
+var _ANDRO_P4 = {shadow:0, holy:1, mystic:2};
+var _ANDRO_P5 = {shadow:0, holy:1, mystic:2};
+var _ANDRO_P6 = {leather:0, steel:1, knowledge:2};
+function getAndroAscGridPos(rc, p3, p4, p5, p6){
+  if(rc <= 1) return 0;
+  if(rc === 2) return 1;
+  var i3 = p3 ? (_ANDRO_P3[p3]||0) : 0;
+  if(rc === 3) return 2 + i3;
+  var i4 = p4 ? (_ANDRO_P4[p4]||0) : 0;
+  if(rc === 4) return 9  + i3*3  + i4;
+  var i5 = p5 ? (_ANDRO_P5[p5]||0) : 0;
+  if(rc === 5) return 18 + i3*9  + i4*3 + i5;
+  var i6 = p6 ? (_ANDRO_P6[p6]||0) : 0;
+  return            45 + i3*27 + i4*9 + i5*3 + i6;
+}
+
+// ── FEMALE ASCENSION SPRITE SHEET ────────────────────────────────────────────
+var femaleAscSheet = new Image();
+var femaleAscSheetLoaded = false;
+femaleAscSheet.onload = function(){ femaleAscSheetLoaded = true; };
+femaleAscSheet.src = 'artwork/sprites_female.webp';
+var _FEM_P3 = {shadow:0, holy:1, mystic:2};
+var _FEM_P4 = {shadow:0, holy:1, mystic:2};
+var _FEM_P5 = {shadow:0, holy:1, mystic:2};
+var _FEM_P6 = {leather:0, steel:1, knowledge:2};
+function getFemaleAscGridPos(rc, p3, p4, p5, p6){
+  if(rc <= 1) return 0;
+  if(rc === 2) return 1;
+  var i3 = p3 ? (_FEM_P3[p3]||0) : 0;
+  if(rc === 3) return 2 + i3;
+  var i4 = p4 ? (_FEM_P4[p4]||0) : 0;
+  if(rc === 4) return 9  + i3*3  + i4;
+  var i5 = p5 ? (_FEM_P5[p5]||0) : 0;
+  if(rc === 5) return 18 + i3*9  + i4*3 + i5;
+  var i6 = p6 ? (_FEM_P6[p6]||0) : 0;
+  return            45 + i3*27 + i4*9 + i5*3 + i6;
+}
+
+// ── MALE ASCENSION SPRITE SHEET ───────────────────────────────────────────────
+var MALE_ASC_CELL = 512;
+var MALE_ASC_COLS = 9;
+var maleAscSheet = new Image();
+var maleAscSheetLoaded = false;
+maleAscSheet.onload = function(){ maleAscSheetLoaded = true; };
+maleAscSheet.src = 'artwork/sprites_male.webp';
+// game path names → artwork index (shadow='dark'=0, holy=1, mystic=2; knowledge='wisdom'=2)
+var _MALE_P3 = {shadow:0, holy:1, mystic:2};
+var _MALE_P4 = {shadow:0, holy:1, mystic:2};
+var _MALE_P5 = {shadow:0, holy:1, mystic:2};
+var _MALE_P6 = {leather:0, steel:1, knowledge:2};
+function getMaleAscGridPos(rc, p3, p4, p5, p6){
+  if(rc <= 1) return 0;
+  if(rc === 2) return 1;
+  var i3 = p3 ? (_MALE_P3[p3]||0) : 0;
+  if(rc === 3) return 2 + i3;
+  var i4 = p4 ? (_MALE_P4[p4]||0) : 0;
+  if(rc === 4) return 9  + i3*3  + i4;
+  var i5 = p5 ? (_MALE_P5[p5]||0) : 0;
+  if(rc === 5) return 18 + i3*9  + i4*3 + i5;
+  var i6 = p6 ? (_MALE_P6[p6]||0) : 0;
+  return            45 + i3*27 + i4*9 + i5*3 + i6;
+}
 var FORM_IMAGES={}; var _formImagesLoaded=false;
 function preloadFormImages(){
   FORM_NAMES.forEach(function(f){
@@ -3975,6 +4149,7 @@ function saveGame(){
     completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
+    devModeEnabled:devModeEnabled,
     showIntro:showIntro,
     showTutorial:showTutorial,
     tutShown:_tutShown,
@@ -4048,6 +4223,7 @@ function loadGame(){
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
+  devModeEnabled=data.devModeEnabled||false;
   showIntro=(data.showIntro!==undefined)?data.showIntro:true;
   showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
   if(data.tutShown) _tutShown=Object.assign(_tutShown,data.tutShown);
@@ -5187,6 +5363,7 @@ document.getElementById('settings-btn').addEventListener('click',function(){
   document.getElementById('hard-reset-btn').style.display='';
   updateMuteToggle();
   syncIntroToggleUI();
+  syncDevModeUI();
   document.getElementById('settings-modal').classList.add('open');
 });
 
@@ -6173,6 +6350,7 @@ function _showRealmSelect(){
 }
 
 document.getElementById('dev-mode-btn').addEventListener('click',function(){
+  if(devModeEnabled){ _showRealmSelect(); return; }
   var p=document.getElementById('dev-mode-prompt');
   p.style.display=p.style.display==='none'?'block':'none';
   document.getElementById('dev-mode-pass').value='';
@@ -6183,8 +6361,26 @@ document.getElementById('dev-mode-submit').addEventListener('click',function(){
   document.getElementById('dev-mode-prompt').style.display='none';
   document.getElementById('dev-mode-pass').value='';
   document.getElementById('dev-mode-err').textContent='';
+  devModeEnabled=true;
+  syncDevModeUI();
+  saveGame();
+  checkRebirthButton();
   _showRealmSelect();
 });
+
+function syncDevModeUI(){
+  var btn=document.getElementById('dev-mode-btn');
+  if(!btn) return;
+  if(devModeEnabled){
+    btn.textContent='Enabled';
+    btn.style.borderColor='#44aa66';
+    btn.style.color='#66cc88';
+  } else {
+    btn.textContent='Unlock';
+    btn.style.borderColor='';
+    btn.style.color='';
+  }
+}
 
 document.getElementById('dev-mode-pass').addEventListener('keydown',function(e){
   if(e.key==='Enter') document.getElementById('dev-mode-submit').click();
