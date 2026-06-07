@@ -1410,9 +1410,6 @@ function drawEntityCanvas(t) {
   var isAttacking = (t - attackFlashTime < 400);
   var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
   var activeLoaded = isAttacking ? entityImgAttackLoaded : entityImgNormalLoaded;
-  if(!useAscSheet && !useFormSheet && _rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
-    activeImg = FORM_IMAGES[_rebirthEntityOverride]; activeLoaded = true;
-  }
   if(!useAscSheet && !useFormSheet && !activeLoaded) return;
 
   var deathFade = 1;
@@ -4001,15 +3998,7 @@ function getMaleAscGridPos(rc, p3, p4, p5, p6){
   var i6 = p6 ? (_MALE_P6[p6]||0) : 0;
   return            45 + i3*27 + i4*9 + i5*3 + i6;
 }
-var FORM_IMAGES={}; var _formImagesLoaded=false;
-function preloadFormImages(){
-  FORM_NAMES.forEach(function(f){
-    var img=new Image();
-    img.src='artwork/'+f+'.webp';
-    FORM_IMAGES[f]=img;
-  });
-  _formImagesLoaded=true;
-}
+function preloadFormImages(){}
 
 function calcTatteredSoulsGain(chosenForm){
   var base=Math.floor(totalUpgradePurchases/666);
