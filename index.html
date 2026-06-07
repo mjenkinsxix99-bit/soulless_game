@@ -4118,6 +4118,28 @@ var _rebirthEntityOverride=null;
 
 // ── SAVE / LOAD ───────────────────────────────────────────────────────────────
 var SAVE_KEY='formless_save_v1';
+var SETTINGS_KEY='formless_settings_v1';
+
+function saveSettings(){
+  try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify({
+    soundMuted:soundMuted,
+    devModeEnabled:devModeEnabled,
+    showTutorial:showTutorial,
+    showIntro:showIntro
+  })); } catch(e){}
+}
+
+function loadSettings(){
+  try{
+    var raw=localStorage.getItem(SETTINGS_KEY);
+    if(!raw) return;
+    var d=JSON.parse(raw);
+    if(d.soundMuted!==undefined) soundMuted=d.soundMuted;
+    if(d.devModeEnabled!==undefined) devModeEnabled=d.devModeEnabled;
+    if(d.showTutorial!==undefined) showTutorial=d.showTutorial;
+    if(d.showIntro!==undefined) showIntro=d.showIntro;
+  } catch(e){}
+}
 var _lastAutoSave=0;
 
 function saveGame(){
@@ -5382,7 +5404,7 @@ document.getElementById('settings-modal').addEventListener('click',function(e){
 document.getElementById('mute-toggle').addEventListener('click',function(){
   soundMuted=!soundMuted;
   updateMuteToggle();
-  saveGame();
+  saveGame(); saveSettings();
 });
 
 document.getElementById('hard-reset-btn').addEventListener('click',function(){
@@ -5649,19 +5671,20 @@ function syncIntroToggleUI(){
 document.getElementById('intro-toggle').addEventListener('click', function(){
   showIntro = !showIntro;
   syncIntroToggleUI();
-  saveGame();
+  saveGame(); saveSettings();
 });
 
 document.getElementById('tutorial-toggle').addEventListener('click', function(){
   showTutorial = !showTutorial;
   syncIntroToggleUI();
-  saveGame();
+  saveGame(); saveSettings();
 });
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
 initMist(28);
 preloadFormImages();
+loadSettings();
 var _hadSave = loadGame();
 updateHighestFloor();
 recalcStats();
@@ -6395,7 +6418,7 @@ document.getElementById('dev-mode-submit').addEventListener('click',function(){
   document.getElementById('dev-mode-err').textContent='';
   devModeEnabled=true;
   syncDevModeUI();
-  saveGame();
+  saveGame(); saveSettings();
   checkRebirthButton();
   _showRealmSelect();
 });
