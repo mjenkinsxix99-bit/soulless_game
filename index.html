@@ -4082,7 +4082,15 @@ function doRebirthReset(chosenForm){
   });
 
   // Apply rebirth
-  rebirthCount++;
+  if(chosenForm === null){
+    rebirthCount = 0;
+    ascension3Path = null;
+    ascension4Path = null;
+    ascension5Path = null;
+    ascension6Path = null;
+  } else {
+    rebirthCount++;
+  }
   rebirthForm=chosenForm;
   if(rebirthCount===1&&!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You may sacrifice Tattered Souls for the promise of more strength. Weigh your choices carefully. Visit the shop and claim Auto-Progress as a free gift.',document.getElementById('tattered-upgrades-btn'),null); },1500); } }
 
