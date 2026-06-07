@@ -1406,13 +1406,11 @@ function drawEntityCanvas(t) {
   var useEquineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && !useFelineAscSheet && !useCanineAscSheet && rebirthForm === 'equine' && rebirthCount >= 1 && equineAscSheetLoaded;
   // Use generic form sprite sheet for other forms
   var useAscSheet = useMaleAscSheet || useFemaleAscSheet || useAndroAscSheet || useFelineAscSheet || useCanineAscSheet || useEquineAscSheet;
-  var useFormSheet = !useAscSheet && _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
+  var useFormSheet = !useAscSheet && rebirthCount < 1 && _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
   var isAttacking = (t - attackFlashTime < 400);
   var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
   var activeLoaded = isAttacking ? entityImgAttackLoaded : entityImgNormalLoaded;
-  // If an asc sheet should be used but isn't loaded yet, bail — don't flash old artwork
-  if(rebirthCount >= 1 && !useAscSheet && !useFormSheet) return;
-  if(!useAscSheet && !useFormSheet && !activeLoaded) return;
+if(!useAscSheet && !useFormSheet && !activeLoaded) return;
 
   var deathFade = 1;
 
