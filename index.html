@@ -6247,6 +6247,30 @@ document.getElementById('mm-auto').addEventListener('click',function(){
         9:-120,
         10:-205
       };
+      // Left panel background — scale and offset independent of the middle panel
+      var REALM_BG_LEFT_SCALE={
+        1:1.15,
+        3:0.50,
+        4:1.10,
+        5:1.25,
+        6:1.00,
+        7:1.00,
+        8:1.00,
+        9:0.85,
+        10:0.85
+      };
+      var REALM_BG_LEFT_OFFSET={
+        1:100,
+        2:130,
+        3:-150,
+        4:-110,
+        5:35,
+        6:-105,
+        7:-110,
+        8:-140,
+        9:-120,
+        10:-205
+      };
       var bgImg=document.getElementById('realm-bg-img');
       if(bgImg){
         var imgSrc=REALM_BG_IMAGES[realm]||'';
@@ -6258,11 +6282,13 @@ document.getElementById('mm-auto').addEventListener('click',function(){
           bgImg.style.transform='translateX(calc(-50% + '+offset+'px)) scale('+scale+')';
           bgImg.style.display='block';
           c.style.display='none';
-          // Left panel bg — all realms
+          // Left panel bg — all realms (independent scale/offset)
           if(bgImgLeft){
             if(imgSrc){
+              var leftScale=REALM_BG_LEFT_SCALE[realm]||0.60;
+              var leftOffset=REALM_BG_LEFT_OFFSET[realm]||0;
               bgImgLeft.src=imgSrc;
-              bgImgLeft.style.transform='scale('+scale+')';
+              bgImgLeft.style.transform='translateX(calc(-50% + '+leftOffset+'px)) scale('+leftScale+')';
               bgImgLeft.style.display='block';
             } else {
               bgImgLeft.style.display='none';
