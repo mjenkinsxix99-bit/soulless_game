@@ -6284,7 +6284,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
           var scale=REALM_BG_SCALE[realm]||0.60;
           var offset=REALM_BG_OFFSET[realm]||0;
           bgImg.src=imgSrc;
-          bgImg.style.transform='translateX(0px) translateY(-200px) scale('+scale+')';
+          bgImg.style.transform='translateX(0px) translateY(-400px) scale('+scale+')';
           bgImg.style.display='block';
           c.style.display='none';
           // Left panel bg — all realms (independent scale/offset)
@@ -6293,7 +6293,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
               var leftScale=REALM_BG_LEFT_SCALE[realm]||0.60;
               var leftOffset=REALM_BG_LEFT_OFFSET[realm]||0;
               bgImgLeft.src=imgSrc;
-              bgImgLeft.style.transform='translateX(0px) translateY(-200px) scale('+leftScale+')';
+              bgImgLeft.style.transform='translateX(0px) translateY(-400px) scale('+leftScale+')';
               bgImgLeft.style.display='block';
             } else {
               bgImgLeft.style.display='none';
