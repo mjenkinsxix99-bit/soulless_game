@@ -656,12 +656,12 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   animation:pulse-red 1.2s ease-in-out infinite; }
 @keyframes pulse-red { 0%,100%{box-shadow:0 0 8px rgba(255,40,40,0.5);} 50%{box-shadow:0 0 18px rgba(255,40,40,0.9),0 0 34px rgba(255,40,40,0.4);} }
 
-/* New-floor bouncing red arrow — sits below minimap pointing up at next cell */
+/* New-floor bouncing red arrow — sits above minimap pointing down at next cell */
 #mm-new-arrow { display:none; position:absolute;
-  bottom:-26px; font-size:22px; color:#ff2222;
+  top:-28px; font-size:22px; color:#ff2222;
   text-shadow:0 0 10px rgba(255,40,40,0.9),0 0 22px rgba(255,40,40,0.5);
   animation:mm-rise 0.55s ease-in-out infinite alternate; pointer-events:none; z-index:10; transform:translateX(-50%); }
-@keyframes mm-rise { 0%{transform:translateX(-50%) translateY(6px)} 100%{transform:translateX(-50%) translateY(-4px)} }
+@keyframes mm-rise { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(4px)} }
 
 /* Minimap panel repositioned inside battlefield */
 #minimap-panel { flex-shrink:0; padding:2px 14px; background:transparent; position:relative; }
@@ -810,7 +810,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
             <button class="mm-nav" id="mm-next" title="Scroll right">&#9654;</button>
             <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
           </div>
-          <div id="mm-new-arrow">&#9650;</div>
+          <div id="mm-new-arrow">&#9660;</div>
         </div>
         <div id="click-hint">0 / 10</div>
       </div>
