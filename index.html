@@ -55,8 +55,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard-body { flex: 1; min-width: 0; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
-#realm-bg-img-left { display:none; position:absolute; bottom:-36px; left:0; pointer-events:none; z-index:0; width:auto; height:auto; transform-origin:bottom left; }
-#realm-bg-img { display:none; position:absolute; bottom:260px; left:50%; transform:translateX(-50%) scale(0.60); transform-origin:bottom center; pointer-events:none; z-index:-1; width:auto; height:auto; }
+#realm-bg-img-left { display:none; position:absolute; top:0; left:0; pointer-events:none; z-index:1; width:auto; height:auto; transform-origin:top left; }
+#realm-bg-img { display:none; position:absolute; top:0; left:0; transform-origin:top left; pointer-events:none; z-index:1; width:auto; height:auto; }
 #combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
   width:930px; height:930px; border-radius:50%;
   background:radial-gradient(circle at center,
@@ -67,7 +67,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     rgba(0,0,0,0.02) 74%,
     transparent 86%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
-#combat-wrap { position:absolute; left:50%; top:calc(36% + 175px); transform:translate(-50%,-50%); z-index:2; }
+#combat-wrap { position:absolute; left:50%; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
 #enemy-zone { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
 #enemy-zone .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -113,7 +113,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 #reform-btn:hover { background: rgba(102,85,170,0.15); }
 #realm-label { position: absolute; top: 12px; left: 14px; font-size: 18px; font-weight: bold; color: #eeddff; letter-spacing: 3px; text-transform: uppercase; z-index: 3; }
 /* Ascend (Rebirth) button */
-#ascend-btn { display: none; margin-top: 41px; padding: 9px 22px; background: #cc0000; border: 2px solid #d4a843; color: #2a0a4a; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
+#ascend-btn { display: none; position: absolute; top: 410px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #cc0000; border: 2px solid #d4a843; color: #2a0a4a; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
 #ascend-btn:hover { background: #ee0000; box-shadow: 0 0 14px rgba(212,168,67,0.6); }
 
 /* Tattered Souls display in topbar */
@@ -279,7 +279,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .path3-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
 .path3-card:hover { border-color: #4433aa; background: #111128; }
 .path3-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
-.path3-card .p3-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path3-card .p3-art { width: 80px; height: 80px; border-radius: 4px; margin: 0 auto 10px; }
 .path3-card .p3-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
 .path3-card .p3-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
 #path3-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
@@ -308,7 +308,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .path4-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
 .path4-card:hover { border-color: #4433aa; background: #111128; }
 .path4-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
-.path4-card .p4-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path4-card .p4-art { width: 80px; height: 80px; border-radius: 4px; margin: 0 auto 10px; }
 .path4-card .p4-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
 .path4-card .p4-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
 #path4-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
@@ -337,7 +337,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .path5-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
 .path5-card:hover { border-color: #4433aa; background: #111128; }
 .path5-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
-.path5-card .p5-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path5-card .p5-art { width: 80px; height: 80px; border-radius: 4px; margin: 0 auto 10px; }
 .path5-card .p5-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
 .path5-card .p5-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
 #path5-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
@@ -366,7 +366,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .path6-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
 .path6-card:hover { border-color: #4433aa; background: #111128; }
 .path6-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
-.path6-card .p6-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path6-card .p6-art { width: 80px; height: 80px; border-radius: 4px; margin: 0 auto 10px; }
 .path6-card .p6-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
 .path6-card .p6-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
 #path6-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
@@ -656,12 +656,12 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   animation:pulse-red 1.2s ease-in-out infinite; }
 @keyframes pulse-red { 0%,100%{box-shadow:0 0 8px rgba(255,40,40,0.5);} 50%{box-shadow:0 0 18px rgba(255,40,40,0.9),0 0 34px rgba(255,40,40,0.4);} }
 
-/* New-floor bouncing red arrow — sits below minimap pointing up at next cell */
+/* New-floor bouncing red arrow — sits above minimap pointing down at next cell */
 #mm-new-arrow { display:none; position:absolute;
-  bottom:-26px; font-size:22px; color:#ff2222;
+  top:-28px; font-size:22px; color:#ff2222;
   text-shadow:0 0 10px rgba(255,40,40,0.9),0 0 22px rgba(255,40,40,0.5);
   animation:mm-rise 0.55s ease-in-out infinite alternate; pointer-events:none; z-index:10; transform:translateX(-50%); }
-@keyframes mm-rise { 0%{transform:translateX(-50%) translateY(6px)} 100%{transform:translateX(-50%) translateY(-4px)} }
+@keyframes mm-rise { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(4px)} }
 
 /* Minimap panel repositioned inside battlefield */
 #minimap-panel { flex-shrink:0; padding:2px 14px; background:transparent; position:relative; }
@@ -704,15 +704,15 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ach-card.earned .acd { color:#6a5020; }
 
 /* ── LEFT PANEL TABS ─────────────────────────────────────────────────────── */
-#left-header { width:100%; text-align:center; padding-bottom:6px; }
-.left-tab-bar { display:flex; width:100%; border-bottom:1px solid #1e1845; margin-bottom:10px; }
+#left-header { width:100%; text-align:center; padding-bottom:6px; position:relative; z-index:2; background:#000; }
+.left-tab-bar { display:flex; width:100%; border-bottom:1px solid #1e1845; margin-bottom:10px; position:relative; z-index:2; background:#000; }
 .left-tab-btn { flex:1; background:transparent; border:none; border-bottom:2px solid transparent;
   color:#554477; font-family:Georgia,serif; font-size:11px; letter-spacing:2px; text-transform:uppercase;
   padding:7px 6px; cursor:pointer; transition:color 0.15s,border-color 0.15s; margin-bottom:-1px; }
 .left-tab-btn:hover:not(.locked) { color:#9980dd; }
 .left-tab-btn.active { color:#d4a843; border-bottom-color:#d4a843; }
 .left-tab-btn.locked { color:#2a2040; cursor:default; }
-#left-tab-content { width:100%; }
+#left-tab-content { width:100%; position:relative; }
 .left-tab-pane { display:none; width:100%; }
 .left-tab-pane.active { display:block; }
 
@@ -758,6 +758,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
   <div id="main">
     <div id="left">
+      <img id="realm-bg-img-left" src="" alt="" />
       <div id="left-header">
         <div id="entity-stage-label" class="cname entity-label">You are Ether.</div>
         <div id="stage-desc">Shapeless. Hungry.</div>
@@ -769,11 +770,10 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <div id="left-tab-content">
         <div id="ltab-entity" class="left-tab-pane active">
           <div id="left-entity">
-            <img id="realm-bg-img-left" src="" alt="" />
-            <div class="canvas-wrap" style="margin-top:6px;position:relative;z-index:1;">
+            <div class="canvas-wrap" style="position:absolute;top:42px;left:0;right:0;z-index:1;">
               <canvas id="entity-canvas" width="330" height="330"></canvas>
             </div>
-            <div class="hp-wrap" style="visibility:hidden">
+            <div class="hp-wrap" style="visibility:hidden;position:absolute;bottom:60px;left:0;right:0;display:flex;justify-content:center;">
               <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
               <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
             </div>
@@ -785,8 +785,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="battlefield">
       <canvas id="bg-canvas"></canvas>
+      <img id="realm-bg-img" src="" alt="" />
       <div id="combat-wrap">
-        <img id="realm-bg-img" src="" alt="" />
         <div id="enemy-zone">
         <div class="canvas-wrap" style="position:relative;">
           <canvas id="enemy-canvas" width="330" height="330"></canvas>
@@ -810,7 +810,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
             <button class="mm-nav" id="mm-next" title="Scroll right">&#9654;</button>
             <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
           </div>
-          <div id="mm-new-arrow">&#9650;</div>
+          <div id="mm-new-arrow">&#9660;</div>
         </div>
         <div id="click-hint">0 / 10</div>
       </div>
@@ -988,11 +988,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="form-confirm-area">
       <button id="form-confirm-btn">Confirm Choice</button>
-      <div id="form-certain">
-        <p>Are you Certain?</p>
-        <button id="form-yes">Yes. Begin.</button>
-        <button id="form-no">Choose Again</button>
-      </div>
+      <button id="form-no" style="display:none;">Choose Again</button>
     </div>
   </div>
 </div>
@@ -1001,9 +997,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="flesh-box">
     <div id="flesh-title">You have become Flesh.</div>
     <div id="flesh-body">
-      You have consumed enough souls to become Flesh. Your form bonus will increase by 50% and gain <span id="flesh-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls.<br><br>
-      You may choose to forsake your form and return to Ether, losing your bonus.<br><br>
-      Either path, you will keep your Tattered Souls, Achievements, and Tattered Shop upgrades.
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="flesh-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
+      Your form bonus will increase by 50%. You may also forsake your form and return to Ether, losing your bonus.<br><br>
+      Choose your path wisely.
     </div>
     <div id="flesh-choices">
       <button id="flesh-descend-btn">Descend</button>
@@ -1022,23 +1018,23 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="path3-box">
     <div id="path3-title">Choose Your Path</div>
     <div id="path3-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="path3-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       Many souls have been consumed in your quest to regain glory. Many more will fall before you succeed.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       Choose your path wisely. The way back is difficult.
     </div>
     <div id="path3-grid">
       <div class="path3-card" data-path="holy">
-        <div class="p3-art">art pending</div>
+        <div class="p3-art" style="background:url('artwork/sprites_asc_paths.webp') -80px 0/480px 80px no-repeat;"></div>
         <div class="p3-name">Holy</div>
         <div class="p3-bonus">+5% DPS</div>
       </div>
       <div class="path3-card" data-path="shadow">
-        <div class="p3-art">art pending</div>
+        <div class="p3-art" style="background:url('artwork/sprites_asc_paths.webp') 0px 0/480px 80px no-repeat;"></div>
         <div class="p3-name">Shadow</div>
         <div class="p3-bonus">+5% Tattered Souls</div>
       </div>
       <div class="path3-card" data-path="mystic">
-        <div class="p3-art">art pending</div>
+        <div class="p3-art" style="background:url('artwork/sprites_asc_paths.webp') -160px 0/480px 80px no-repeat;"></div>
         <div class="p3-name">Mystic</div>
         <div class="p3-bonus">+5% Souls gained</div>
       </div>
@@ -1060,23 +1056,23 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="path4-box">
     <div id="path4-title">Choose Your Path</div>
     <div id="path4-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="path4-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       To Rise again after destruction is the truest path to Glory. Every decision yields strength.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       Choose your path wisely. To forge a new path is tricky.
     </div>
     <div id="path4-grid">
       <div class="path4-card" data-path="holy">
-        <div class="p4-art">art pending</div>
+        <div class="p4-art" style="background:url('artwork/sprites_asc_paths.webp') -80px 0/480px 80px no-repeat;"></div>
         <div class="p4-name">Holy</div>
         <div class="p4-bonus">+5% Strike Damage</div>
       </div>
       <div class="path4-card" data-path="shadow">
-        <div class="p4-art">art pending</div>
+        <div class="p4-art" style="background:url('artwork/sprites_asc_paths.webp') 0px 0/480px 80px no-repeat;"></div>
         <div class="p4-name">Shadow</div>
         <div class="p4-bonus">+5% Mana Gain</div>
       </div>
       <div class="path4-card" data-path="mystic">
-        <div class="p4-art">art pending</div>
+        <div class="p4-art" style="background:url('artwork/sprites_asc_paths.webp') -160px 0/480px 80px no-repeat;"></div>
         <div class="p4-name">Mystic</div>
         <div class="p4-bonus">-5% Milestone Cost</div>
       </div>
@@ -1098,23 +1094,23 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="path5-box">
     <div id="path5-title">Choose Your Path</div>
     <div id="path5-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="path5-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       Fall and rise again, until every soul bends to your will. Let not fear deter your journey.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       Choose your path wisely. No need to add to your burden by trying to go backwards.
     </div>
     <div id="path5-grid">
       <div class="path5-card" data-path="holy">
-        <div class="p5-art">art pending</div>
+        <div class="p5-art" style="background:url('artwork/sprites_asc_paths.webp') -80px 0/480px 80px no-repeat;"></div>
         <div class="p5-name">Holy</div>
         <div class="p5-bonus">+5% Mana Gain</div>
       </div>
       <div class="path5-card" data-path="shadow">
-        <div class="p5-art">art pending</div>
+        <div class="p5-art" style="background:url('artwork/sprites_asc_paths.webp') 0px 0/480px 80px no-repeat;"></div>
         <div class="p5-name">Shadow</div>
         <div class="p5-bonus">+5% DPS</div>
       </div>
       <div class="path5-card" data-path="mystic">
-        <div class="p5-art">art pending</div>
+        <div class="p5-art" style="background:url('artwork/sprites_asc_paths.webp') -160px 0/480px 80px no-repeat;"></div>
         <div class="p5-name">Mystic</div>
         <div class="p5-bonus">+5% Strike Damage</div>
       </div>
@@ -1136,23 +1132,23 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="path6-box">
     <div id="path6-title">Choose Your Path</div>
     <div id="path6-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="path6-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       You have become strong indeed. Perhaps stronger than before. Soon you may take revenge and challenge the gods themselves.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       Choose your path wisely. You do not need courage when you have the strength required.
     </div>
     <div id="path6-grid">
       <div class="path6-card" data-path="steel">
-        <div class="p6-art">art pending</div>
+        <div class="p6-art" style="background:url('artwork/sprites_asc_paths.webp') -320px 0/480px 80px no-repeat;"></div>
         <div class="p6-name">Steel</div>
         <div class="p6-bonus">+10% DPS</div>
       </div>
       <div class="path6-card" data-path="leather">
-        <div class="p6-art">art pending</div>
+        <div class="p6-art" style="background:url('artwork/sprites_asc_paths.webp') -240px 0/480px 80px no-repeat;"></div>
         <div class="p6-name">Leather</div>
         <div class="p6-bonus">+10% Tattered Souls</div>
       </div>
       <div class="path6-card" data-path="knowledge">
-        <div class="p6-art">art pending</div>
+        <div class="p6-art" style="background:url('artwork/sprites_asc_paths.webp') -400px 0/480px 80px no-repeat;"></div>
         <div class="p6-name">Knowledge</div>
         <div class="p6-bonus">+10% Mana Generation</div>
       </div>
@@ -1174,8 +1170,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="final-box">
     <div id="final-title">You have achieved your Final Form.</div>
     <div id="final-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="final-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       You have become strength itself. There is nothing that can hold you back.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       You have achieved your final form. There are more conquests that await you.
     </div>
     <div id="final-choices">
@@ -1218,15 +1214,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     <div class="settings-row">
       <span class="settings-label">Show Tutorial</span>
       <button id="tutorial-toggle">On</button>
-    </div>
-    <div class="settings-row">
-      <span class="settings-label">Dev Mode</span>
-      <button id="dev-mode-btn">Unlock</button>
-    </div>
-    <div id="dev-mode-prompt" style="display:none;padding:10px 0 4px;">
-      <input id="dev-mode-pass" type="password" placeholder="Passcode" style="background:#0d0d1e;border:1px solid #4433aa;color:#c0b0ff;font-family:Georgia,serif;font-size:14px;padding:5px 10px;border-radius:4px;width:160px;letter-spacing:1px;">
-      <button id="dev-mode-submit" style="margin-left:8px;padding:5px 14px;background:transparent;border:1px solid #4433aa;color:#9988bb;font-family:Georgia,serif;font-size:13px;cursor:pointer;border-radius:4px;">Go</button>
-      <div id="dev-mode-err" style="color:#cc4444;font-size:12px;margin-top:4px;min-height:16px;"></div>
     </div>
     <div id="hard-reset-confirm">
       <p>This will wipe ALL progress. Are you certain?</p>
@@ -1406,25 +1393,22 @@ function drawEntityCanvas(t) {
   var useEquineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && !useFelineAscSheet && !useCanineAscSheet && rebirthForm === 'equine' && rebirthCount >= 1 && equineAscSheetLoaded;
   // Use generic form sprite sheet for other forms
   var useAscSheet = useMaleAscSheet || useFemaleAscSheet || useAndroAscSheet || useFelineAscSheet || useCanineAscSheet || useEquineAscSheet;
-  var useFormSheet = !useAscSheet && _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
   var isAttacking = (t - attackFlashTime < 400);
   var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
   var activeLoaded = isAttacking ? entityImgAttackLoaded : entityImgNormalLoaded;
-  if(!useAscSheet && !useFormSheet && _rebirthEntityOverride && FORM_IMAGES[_rebirthEntityOverride] && FORM_IMAGES[_rebirthEntityOverride].complete && FORM_IMAGES[_rebirthEntityOverride].naturalWidth>0){
-    activeImg = FORM_IMAGES[_rebirthEntityOverride]; activeLoaded = true;
-  }
-  if(!useAscSheet && !useFormSheet && !activeLoaded) return;
+if(rebirthCount >= 1 && !useAscSheet) return;
+if(!useAscSheet && !activeLoaded) return;
 
   var deathFade = 1;
 
-  var iw = useAscSheet ? MALE_ASC_CELL : (useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth);
-  var ih = useAscSheet ? MALE_ASC_CELL : (useFormSheet ? FORM_SPRITE_CELL_H : activeImg.naturalHeight);
+  var iw = useAscSheet ? MALE_ASC_CELL : activeImg.naturalWidth;
+  var ih = useAscSheet ? MALE_ASC_CELL : activeImg.naturalHeight;
   var drawH = Math.min(H * 0.9, H - 10);
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
 
-  // gentle float bob
-  var float = Math.sin(t * 0.0014) * 7;
+  // gentle float bob — only for pre-flesh forms (rebirthCount < 2)
+  var float = rebirthCount < 2 ? Math.sin(t * 0.0014) * 7 : 0;
   var dy = (H - drawH) / 2 + float;
 
   // squash/stretch on attack and hit
@@ -1443,6 +1427,22 @@ function drawEntityCanvas(t) {
   }
 
   var cx = W/2, cy = dy + drawH/2;
+
+  // Ground shadow — drawn before sprite so it sits behind
+  var shadowRx = drawW * 0.32;
+  var shadowRy = shadowRx * 0.18;
+  var shadowY = dy + drawH - shadowRy * 0.5;
+  ctx.save();
+  ctx.globalAlpha = 0.70;
+  var shadowGrad = ctx.createRadialGradient(cx, shadowY, 0, cx, shadowY, shadowRx);
+  shadowGrad.addColorStop(0, 'rgba(0,0,0,1)');
+  shadowGrad.addColorStop(0.6, 'rgba(0,0,0,0.6)');
+  shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = shadowGrad;
+  ctx.beginPath();
+  ctx.ellipse(cx, shadowY, shadowRx, shadowRy, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
 
   ctx.save();
   ctx.globalAlpha = deathFade;
@@ -1488,9 +1488,6 @@ function drawEntityCanvas(t) {
     var gcol = gpos % MALE_ASC_COLS;
     var grow = Math.floor(gpos / MALE_ASC_COLS);
     ctx.drawImage(equineAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
-  } else if(useFormSheet){
-    var fi=FORM_INDEX[_rebirthEntityOverride];
-    ctx.drawImage(formSpriteSheet,fi*FORM_SPRITE_CELL_W,0,FORM_SPRITE_CELL_W,FORM_SPRITE_CELL_H,dx,dy,drawW,drawH);
   } else {
     ctx.drawImage(activeImg, 0, 0, iw, ih, dx, dy, drawW, drawH);
   }
@@ -2164,7 +2161,6 @@ var ascension5Path=null;
 var ascension6Path=null;
 var rebirthForm=null;
 var soundMuted=false;
-var devModeEnabled=false;
 var eliteKillsTotal=0;
 var highestGlobalFloorEver=0;
 var achievementsEarned=[];
@@ -2928,94 +2924,94 @@ function hideMsTip(){
 
 function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
 var REP_UPGRADES=[
-  {id:'ss',name:'Spirit Slash',  cost:5,     costScale:1.0666, level:0, type:'click',  perLevel:1,
+  {id:'ss',name:'Spirit Slash',  icon:0,  cost:5,     costScale:1.0666, level:0, type:'click',  perLevel:1,
     desc:function(){return '+'+fmt(1)+' damage per click';},
     vis:function(){return true;}, milestones:mkMs()},
-  {id:'dh',name:'Deeper Hunger', cost:50,    costScale:1.06, level:0, type:'dps',    perLevel:5,
+  {id:'dh',name:'Deeper Hunger', icon:1,  cost:50,    costScale:1.06, level:0, type:'dps',    perLevel:5,
     desc:function(){return '+'+fmt(5)+' damage per second';},
     vis:function(){return REP_UPGRADES[0].level>=1;}, milestones:mkMs()},
-  {id:'sr',name:'Soul Resonance',cost:300,   costScale:1.09, level:0, type:'dps',    perLevel:20,
+  {id:'sr',name:'Soul Resonance',icon:2,  cost:300,   costScale:1.09, level:0, type:'dps',    perLevel:20,
     desc:function(){return '+'+fmt(20)+' damage per second';},
     vis:function(){return REP_UPGRADES[1].level>=1;}, milestones:mkMs()},
-  {id:'sl',name:'Spectral Lure', cost:1000,  costScale:1.07, level:0, type:'dps',    perLevel:75,
+  {id:'sl',name:'Spectral Lure', icon:3,  cost:1000,  costScale:1.07, level:0, type:'dps',    perLevel:75,
     desc:function(){return '+'+fmt(75)+' damage per second';},
     vis:function(){return REP_UPGRADES[2].level>=1;}, milestones:mkMs()},
-  {id:'dv',name:'Divine Hunger', cost:5000,  costScale:1.07, level:0, type:'drain',  perLevel:0.0003,
+  {id:'dv',name:'Divine Hunger', icon:4,  cost:5000,  costScale:1.07, level:0, type:'drain',  perLevel:0.0003,
     desc:function(){return '+0.03% enemy HP/s drain. Milestones unlock support bonuses.';},
     vis:function(){return REP_UPGRADES[3].level>=1;}, milestones:mkMs()},
-  {id:'vs',name:'Void Sense',    cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
+  {id:'vs',name:'Void Sense',    icon:5,  cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
     desc:function(){return '+'+fmt(900)+' damage per second';},
     vis:function(){return REP_UPGRADES[4].level>=1;}, milestones:mkMs()},
-  {id:'fm',name:'Feeding Mask',  cost:100000, costScale:1.06, level:0, type:'dps',   perLevel:3500,
+  {id:'fm',name:'Feeding Mask',  icon:6,  cost:100000, costScale:1.06, level:0, type:'dps',   perLevel:3500,
     desc:function(){return '+'+fmt(3500)+' damage per second';},
     vis:function(){return REP_UPGRADES[5].level>=1;}, milestones:mkMs()},
-  {id:'bb',name:'Bitter Bite',   cost:400000, costScale:1.07, level:0, type:'dps',   perLevel:10500,
+  {id:'bb',name:'Bitter Bite',   icon:7,  cost:400000, costScale:1.07, level:0, type:'dps',   perLevel:10500,
     desc:function(){return '+'+fmt(10500)+' damage per second';},
     vis:function(){return REP_UPGRADES[6].level>=1;}, milestones:mkMs()},
-  {id:'as',name:'Angelic Seduction', cost:2500000, costScale:1.06, level:0, type:'dps', perLevel:47500,
+  {id:'as',name:'Angelic Seduction', icon:8, cost:2500000, costScale:1.06, level:0, type:'dps', perLevel:47500,
     desc:function(){return '+'+fmt(47500)+' damage per second';},
     vis:function(){return REP_UPGRADES[7].level>=1;}, milestones:mkMs()},
-  {id:'ee',name:'Elemental Ecstasy', cost:15000000, costScale:1.06, level:0, type:'dps', perLevel:200000,
+  {id:'ee',name:'Elemental Ecstasy', icon:9, cost:15000000, costScale:1.06, level:0, type:'dps', perLevel:200000,
     desc:function(){return '+'+fmt(200000)+' damage per second';},
     vis:function(){return REP_UPGRADES[8].level>=1;}, milestones:mkMs()},
-  {id:'pf',name:'Piercing Fear',    cost:100000000, costScale:1.07, level:0, type:'dps', perLevel:950000,
+  {id:'pf',name:'Piercing Fear',    icon:10, cost:100000000, costScale:1.07, level:0, type:'dps', perLevel:950000,
     desc:function(){return '+'+fmt(950000)+' damage per second';},
     vis:function(){return REP_UPGRADES[9].level>=1;}, milestones:mkMs()},
-  {id:'cd',name:'Crushing Desire',  cost:800000000, costScale:1.08, level:0, type:'dps', perLevel:4000000,
+  {id:'cd',name:'Crushing Desire',  icon:11, cost:800000000, costScale:1.08, level:0, type:'dps', perLevel:4000000,
     desc:function(){return '+'+fmt(4000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[10].level>=1;}, milestones:mkMs()},
-  {id:'cs',name:'Chaotic Strike',   cost:6500000000, costScale:1.07, level:0, type:'dps', perLevel:20000000,
+  {id:'cs',name:'Chaotic Strike',   icon:12, cost:6500000000, costScale:1.07, level:0, type:'dps', perLevel:20000000,
     desc:function(){return '+'+fmt(20000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[11].level>=1;}, milestones:mkMs()},
-  {id:'md',name:'Mortal Deception', cost:50000000000, costScale:1.06, level:0, type:'dps', perLevel:70000000,
+  {id:'md',name:'Mortal Deception', icon:13, cost:50000000000, costScale:1.06, level:0, type:'dps', perLevel:70000000,
     desc:function(){return '+'+fmt(70000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[12].level>=1;}, milestones:mkMs()},
-  {id:'sg',name:'Sinful Gaze',      cost:425000000000, costScale:1.07, level:0, type:'dps', perLevel:450000000,
+  {id:'sg',name:'Sinful Gaze',      icon:14, cost:425000000000, costScale:1.07, level:0, type:'dps', perLevel:450000000,
     desc:function(){return '+'+fmt(450000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[13].level>=1;}, milestones:mkMs()},
-  {id:'ah',name:'Anima Harvest',    cost:3800000000000, costScale:1.08, level:0, type:'dps', perLevel:3000000000,
+  {id:'ah',name:'Anima Harvest',    icon:15, cost:3800000000000, costScale:1.08, level:0, type:'dps', perLevel:3000000000,
     desc:function(){return '+'+fmt(3000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[14].level>=1;}, milestones:mkMs()},
-  {id:'sk',name:'Searing Spark',    cost:35000000000000, costScale:1.07, level:0, type:'dps', perLevel:20000000000,
+  {id:'sk',name:'Searing Spark',    icon:16, cost:35000000000000, costScale:1.07, level:0, type:'dps', perLevel:20000000000,
     desc:function(){return '+'+fmt(20000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[15].level>=1;}, milestones:mkMs()},
-  {id:'cp',name:'Corrupt Psyche',   cost:330000000000000, costScale:1.06, level:0, type:'dps', perLevel:125000000000,
+  {id:'cp',name:'Corrupt Psyche',   icon:17, cost:330000000000000, costScale:1.06, level:0, type:'dps', perLevel:125000000000,
     desc:function(){return '+'+fmt(125000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[16].level>=1;}, milestones:mkMs()},
-  {id:'st',name:'Spirit Target',    cost:3e15, costScale:1.07, level:0, type:'dps', perLevel:800000000000,
+  {id:'st',name:'Spirit Target',    icon:18, cost:3e15, costScale:1.07, level:0, type:'dps', perLevel:800000000000,
     desc:function(){return '+'+fmt(800000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[17].level>=1;}, milestones:mkMs()},
-  {id:'sb',name:'Soul Blast',       cost:25e15, costScale:1.08, level:0, type:'dps', perLevel:5000000000000,
+  {id:'sb',name:'Soul Blast',       icon:19, cost:25e15, costScale:1.08, level:0, type:'dps', perLevel:5000000000000,
     desc:function(){return '+'+fmt(5000000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[18].level>=1;}, milestones:mkMs()},
-  {id:'dm',name:'Doom',             cost:300e15, costScale:1.07, level:0, type:'dps', perLevel:50000000000000,
+  {id:'dm',name:'Doom',             icon:20, cost:300e15, costScale:1.07, level:0, type:'dps', perLevel:50000000000000,
     desc:function(){return '+'+fmt(50000000000000)+' damage per second';},
     vis:function(){return REP_UPGRADES[19].level>=1;}, milestones:mkMs()},
-  {id:'nt',name:'Night Terror',     cost:10e18, costScale:1.06, level:0, type:'dps', perLevel:1e15,
+  {id:'nt',name:'Night Terror',     icon:21, cost:10e18, costScale:1.06, level:0, type:'dps', perLevel:1e15,
     desc:function(){return '+'+fmt(1e15)+' damage per second';},
     vis:function(){return REP_UPGRADES[20].level>=1;}, milestones:mkMs()},
-  {id:'ir',name:'Infernal Rage',    cost:325e18, costScale:1.07, level:0, type:'dps', perLevel:30e15,
+  {id:'ir',name:'Infernal Rage',    icon:22, cost:325e18, costScale:1.07, level:0, type:'dps', perLevel:30e15,
     desc:function(){return '+'+fmt(30e15)+' damage per second';},
     vis:function(){return REP_UPGRADES[21].level>=1;}, milestones:mkMs()},
-  {id:'td',name:'Tainted Dreams',   cost:15e21, costScale:1.08, level:0, type:'dps', perLevel:950e15,
+  {id:'td',name:'Tainted Dreams',   icon:23, cost:15e21, costScale:1.08, level:0, type:'dps', perLevel:950e15,
     desc:function(){return '+'+fmt(950e15)+' damage per second';},
     vis:function(){return REP_UPGRADES[22].level>=1;}, milestones:mkMs()},
-  {id:'mf',name:'Manifestation',    cost:4.75e24, costScale:1.07, level:0, type:'dps', perLevel:200e18,
+  {id:'mf',name:'Manifestation',    icon:24, cost:4.75e24, costScale:1.07, level:0, type:'dps', perLevel:200e18,
     desc:function(){return '+'+fmt(200e18)+' damage per second';},
     vis:function(){return REP_UPGRADES[23].level>=1;}, milestones:mkMs()},
-  {id:'bs',name:'Brimstone',        cost:2e27, costScale:1.06, level:0, type:'dps', perLevel:75e21,
+  {id:'bs',name:'Brimstone',        icon:25, cost:2e27, costScale:1.06, level:0, type:'dps', perLevel:75e21,
     desc:function(){return '+'+fmt(75e21)+' damage per second';},
     vis:function(){return REP_UPGRADES[24].level>=1;}, milestones:mkMs()},
-  {id:'ct',name:'Chaos Tide',       cost:325e27, costScale:1.07, level:0, type:'dps', perLevel:850e21,
+  {id:'ct',name:'Chaos Tide',       icon:26, cost:325e27, costScale:1.07, level:0, type:'dps', perLevel:850e21,
     desc:function(){return '+'+fmt(850e21)+' damage per second';},
     vis:function(){return REP_UPGRADES[25].level>=1;}, milestones:mkMs()},
-  {id:'rn',name:'Ragefire Nova',    cost:12e30, costScale:1.08, level:0, type:'dps', perLevel:32e24,
+  {id:'rn',name:'Ragefire Nova',    icon:27, cost:12e30, costScale:1.08, level:0, type:'dps', perLevel:32e24,
     desc:function(){return '+'+fmt(32e24)+' damage per second';},
     vis:function(){return REP_UPGRADES[26].level>=1;}, milestones:mkMs()},
-  {id:'ac',name:'Abyssal Call',     cost:780e30, costScale:1.07, level:0, type:'dps', perLevel:675e24,
+  {id:'ac',name:'Abyssal Call',     icon:28, cost:780e30, costScale:1.07, level:0, type:'dps', perLevel:675e24,
     desc:function(){return '+'+fmt(675e24)+' damage per second';},
     vis:function(){return REP_UPGRADES[27].level>=1;}, milestones:mkMs()},
-  {id:'bf',name:'Balefire',         cost:99e33, costScale:1.06, level:0, type:'dps', perLevel:50e27,
+  {id:'bf',name:'Balefire',         icon:29, cost:99e33, costScale:1.06, level:0, type:'dps', perLevel:50e27,
     desc:function(){return '+'+fmt(50e27)+' damage per second';},
     vis:function(){return REP_UPGRADES[28].level>=1;}, milestones:mkMs()},
 ];
@@ -3859,13 +3855,6 @@ function updateTatteredBtn(){
 
 // ── REBIRTH ───────────────────────────────────────────────────────────────────
 var FORM_NAMES=['masculine','feminine','androgynous','canine','feline','equine'];
-var FORM_SPRITE_CELL_W = 1056;
-var FORM_SPRITE_CELL_H = 1056;
-var formSpriteSheet = new Image();
-var formSpriteSheetLoaded = false;
-formSpriteSheet.onload = function(){ formSpriteSheetLoaded = true; };
-formSpriteSheet.src = "artwork/sprites_form.webp";
-var FORM_INDEX = {masculine:0,feminine:1,androgynous:2,canine:3,feline:4,equine:5};
 
 // ── FELINE ASCENSION SPRITE SHEET ────────────────────────────────────────────
 var felineAscSheet = new Image();
@@ -4001,15 +3990,7 @@ function getMaleAscGridPos(rc, p3, p4, p5, p6){
   var i6 = p6 ? (_MALE_P6[p6]||0) : 0;
   return            45 + i3*27 + i4*9 + i5*3 + i6;
 }
-var FORM_IMAGES={}; var _formImagesLoaded=false;
-function preloadFormImages(){
-  FORM_NAMES.forEach(function(f){
-    var img=new Image();
-    img.src='artwork/'+f+'.webp';
-    FORM_IMAGES[f]=img;
-  });
-  _formImagesLoaded=true;
-}
+function preloadFormImages(){}
 
 function calcTatteredSoulsGain(chosenForm){
   var base=Math.floor(totalUpgradePurchases/666);
@@ -4024,8 +4005,8 @@ function calcTatteredSoulsGain(chosenForm){
 function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
-  var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
-  var canAscend=doom&&doom.level>=1;
+  var doomUpgrade=REP_UPGRADES.find(function(u){return u.id==='dm';});
+  var canAscend=doomUpgrade&&doomUpgrade.level>=1;
   btn.style.display=canAscend?'block':'none';
   if(canAscend&&!_tutShown.ascension){ _tutShown.ascension=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You have grown strong enough to Ascend, if you choose. You will gain Tattered Souls which make you stronger that can be sacrificed to gain power. Own as many of each upgrade as you can. Every 666 purchases gives you 1 Tattered Soul.',document.getElementById('ascend-btn'),null); },400); } }
 }
@@ -4088,7 +4069,15 @@ function doRebirthReset(chosenForm){
   });
 
   // Apply rebirth
-  rebirthCount++;
+  if(chosenForm === null){
+    rebirthCount = 0;
+    ascension3Path = null;
+    ascension4Path = null;
+    ascension5Path = null;
+    ascension6Path = null;
+  } else {
+    rebirthCount++;
+  }
   rebirthForm=chosenForm;
   if(rebirthCount===1&&!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You may sacrifice Tattered Souls for the promise of more strength. Weigh your choices carefully. Visit the shop and claim Auto-Progress as a free gift.',document.getElementById('tattered-upgrades-btn'),null); },1500); } }
 
@@ -4115,7 +4104,27 @@ function doRebirthReset(chosenForm){
 var _rebirthEntityOverride=null;
 
 // ── SAVE / LOAD ───────────────────────────────────────────────────────────────
-var SAVE_KEY='formless_save_v1';
+var SAVE_KEY='formless_save_v2';
+var SETTINGS_KEY='formless_settings_v1';
+
+function saveSettings(){
+  try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify({
+    soundMuted:soundMuted,
+    showTutorial:showTutorial,
+    showIntro:showIntro
+  })); } catch(e){}
+}
+
+function loadSettings(){
+  try{
+    var raw=localStorage.getItem(SETTINGS_KEY);
+    if(!raw) return;
+    var d=JSON.parse(raw);
+    if(d.soundMuted!==undefined) soundMuted=d.soundMuted;
+    if(d.showTutorial!==undefined) showTutorial=d.showTutorial;
+    if(d.showIntro!==undefined) showIntro=d.showIntro;
+  } catch(e){}
+}
 var _lastAutoSave=0;
 
 function saveGame(){
@@ -4149,7 +4158,6 @@ function saveGame(){
     completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
-    devModeEnabled:devModeEnabled,
     showIntro:showIntro,
     showTutorial:showTutorial,
     tutShown:_tutShown,
@@ -4157,6 +4165,8 @@ function saveGame(){
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
+  // Keep offline timestamp current so closure time is accurate
+  try{ localStorage.setItem(OFFLINE_TS_KEY, String(Date.now())); } catch(e){}
 }
 
 function loadGame(){
@@ -4223,7 +4233,6 @@ function loadGame(){
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
-  devModeEnabled=data.devModeEnabled||false;
   showIntro=(data.showIntro!==undefined)?data.showIntro:true;
   showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
   if(data.tutShown) _tutShown=Object.assign(_tutShown,data.tutShown);
@@ -4241,15 +4250,25 @@ var OFFLINE_CAP_SECONDS = 6 * 3600; // 6 hours
 
 var OFFLINE_TS_KEY='soulless_offline_ts';
 
+var SESSION_KEY='soulless_session_active';
+
 function applyOfflineProgress(savedAt){
+  // Detect refresh vs true new session using sessionStorage.
+  // sessionStorage persists through F5/Ctrl+R but is cleared when the tab is closed.
+  var isRefresh = !!sessionStorage.getItem(SESSION_KEY);
+  sessionStorage.setItem(SESSION_KEY,'1');
+
   // Use the dedicated timestamp key if available — more reliable than the main save
   var storedTs=parseInt(localStorage.getItem(OFFLINE_TS_KEY)||'0',10);
   var ref=storedTs||savedAt||0;
-  // Write current time immediately so the next session has an accurate reference
+  // Update the stored timestamp so it's current (also updated in saveGame)
   try{ localStorage.setItem(OFFLINE_TS_KEY, String(Date.now())); } catch(e){}
+
+  // Skip offline progress on page refresh — only apply after a true session gap
+  if(isRefresh) return;
   if(!ref) return;
   var elapsed = Math.min((Date.now() - ref) / 1000, OFFLINE_CAP_SECONDS);
-  if(elapsed < 30) return; // ignore trivial reloads
+  if(elapsed < 30) return;
 
   // souls/sec = DPS / 5, matching kill-reward math (soulsPerKill = HP/5, timePerKill = HP/DPS)
   var soulMult = 1;
@@ -4454,7 +4473,9 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   var descHtml='<div class="ud">'+(bought?getUpgradeContribStr(u):u.desc())+'</div>';
   var buyPrefix=(actualN>1)?'<span class="ubuy">×'+actualN+'</span>':'';
   var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
-  d.innerHTML=nameHtml+descHtml+costHtml+msRowHtml;
+  var iconOffset = -(u.icon * 52);
+  var iconHtml = '<img class="ucard-icon" src="artwork/sprites_upgrades.webp" style="object-fit:none;object-position:'+iconOffset+'px 0;width:52px;height:52px;" alt="">';
+  d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+costHtml+'</div></div>'+msRowHtml;
 
   // Milestone box events — listeners live for the lifetime of the card element
   d.querySelectorAll('.ms-box').forEach(function(box){
@@ -4766,28 +4787,33 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
     document.getElementById('path3-confirm').classList.remove('show');
     document.getElementById('path3-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path3-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path3-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('path3-modal').classList.add('open');
     _selectedPath3=null;
   } else if(rebirthCount===3){
     document.getElementById('path4-confirm').classList.remove('show');
     document.getElementById('path4-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path4-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path4-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('path4-modal').classList.add('open');
     _selectedPath4=null;
   } else if(rebirthCount===4){
     document.getElementById('path5-confirm').classList.remove('show');
     document.getElementById('path5-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path5-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path5-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('path5-modal').classList.add('open');
     _selectedPath5=null;
   } else if(rebirthCount===5){
     document.getElementById('path6-confirm').classList.remove('show');
     document.getElementById('path6-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path6-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path6-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('path6-modal').classList.add('open');
     _selectedPath6=null;
   } else if(rebirthCount>=6){
     document.getElementById('final-confirm').classList.remove('show');
+    document.getElementById('final-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('final-modal').classList.add('open');
   } else {
     document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
@@ -4810,20 +4836,8 @@ document.querySelectorAll('.form-card').forEach(function(card){
 
 document.getElementById('form-confirm-btn').addEventListener('click',function(){
   if(!_selectedForm) return;
-  document.getElementById('form-certain').classList.add('show');
-});
-
-document.getElementById('form-yes').addEventListener('click',function(){
-  if(!_selectedForm) return;
   document.getElementById('form-modal').classList.remove('open');
   doRebirthReset(_selectedForm);
-  _selectedForm=null;
-});
-
-document.getElementById('form-no').addEventListener('click',function(){
-  document.getElementById('form-certain').classList.remove('show');
-  document.getElementById('form-confirm-btn').classList.remove('show');
-  document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
   _selectedForm=null;
 });
 
@@ -4837,11 +4851,9 @@ document.getElementById('flesh-descend-btn').addEventListener('click',function()
 });
 
 document.getElementById('flesh-ascend-btn').addEventListener('click',function(){
-  _pendingFleshChoice='ascend';
-  var newBonus=FORM_BONUS_ASCENDED[rebirthForm]||'an increased bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  document.getElementById('flesh-confirm-text').textContent='This will increase your bonus to '+newBonus+' and grant '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('flesh-confirm').classList.add('show');
+  document.getElementById('flesh-modal').classList.remove('open');
+  document.getElementById('flesh-confirm').classList.remove('show');
+  doFleshReset('ascend');
 });
 
 document.getElementById('flesh-confirm-yes').addEventListener('click',function(){
@@ -4856,6 +4868,7 @@ document.getElementById('flesh-confirm-no').addEventListener('click',function(){
   document.getElementById('flesh-confirm').classList.remove('show');
   _pendingFleshChoice=null;
 });
+
 
 document.getElementById('flesh-cancel-btn').addEventListener('click',function(){
   document.getElementById('flesh-confirm').classList.remove('show');
@@ -4899,11 +4912,10 @@ document.getElementById('path3-descend-btn').addEventListener('click',function()
 
 document.getElementById('path3-ascend-btn').addEventListener('click',function(){
   if(!_selectedPath3) return;
-  _pendingPath3Choice='ascend';
-  var bonus=ASCENSION3_BONUSES[_selectedPath3]||'a bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  document.getElementById('path3-confirm-text').textContent='You will walk the '+_selectedPath3.charAt(0).toUpperCase()+_selectedPath3.slice(1)+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('path3-confirm').classList.add('show');
+  document.getElementById('path3-modal').classList.remove('open');
+  document.getElementById('path3-confirm').classList.remove('show');
+  doPath3Reset('ascend',_selectedPath3);
+  _selectedPath3=null;
 });
 
 document.getElementById('path3-cancel-btn').addEventListener('click',function(){
@@ -4921,6 +4933,7 @@ document.getElementById('path3-confirm-yes').addEventListener('click',function()
   _pendingPath3Choice=null;
   _selectedPath3=null;
 });
+
 
 document.getElementById('path3-confirm-no').addEventListener('click',function(){
   document.getElementById('path3-confirm').classList.remove('show');
@@ -4964,12 +4977,10 @@ document.getElementById('path4-descend-btn').addEventListener('click',function()
 
 document.getElementById('path4-ascend-btn').addEventListener('click',function(){
   if(!_selectedPath4) return;
-  _pendingPath4Choice='ascend';
-  var bonus=ASCENSION4_BONUSES[_selectedPath4]||'a bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  var name=_selectedPath4.charAt(0).toUpperCase()+_selectedPath4.slice(1);
-  document.getElementById('path4-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('path4-confirm').classList.add('show');
+  document.getElementById('path4-modal').classList.remove('open');
+  document.getElementById('path4-confirm').classList.remove('show');
+  doPath4Reset('ascend',_selectedPath4);
+  _selectedPath4=null;
 });
 
 document.getElementById('path4-cancel-btn').addEventListener('click',function(){
@@ -5031,12 +5042,10 @@ document.getElementById('path5-descend-btn').addEventListener('click',function()
 
 document.getElementById('path5-ascend-btn').addEventListener('click',function(){
   if(!_selectedPath5) return;
-  _pendingPath5Choice='ascend';
-  var bonus=ASCENSION5_BONUSES[_selectedPath5]||'a bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  var name=_selectedPath5.charAt(0).toUpperCase()+_selectedPath5.slice(1);
-  document.getElementById('path5-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('path5-confirm').classList.add('show');
+  document.getElementById('path5-modal').classList.remove('open');
+  document.getElementById('path5-confirm').classList.remove('show');
+  doPath5Reset('ascend',_selectedPath5);
+  _selectedPath5=null;
 });
 
 document.getElementById('path5-cancel-btn').addEventListener('click',function(){
@@ -5099,12 +5108,10 @@ document.getElementById('path6-descend-btn').addEventListener('click',function()
 
 document.getElementById('path6-ascend-btn').addEventListener('click',function(){
   if(!_selectedPath6) return;
-  _pendingPath6Choice='ascend';
-  var bonus=ASCENSION6_BONUSES[_selectedPath6]||'a bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  var name=_selectedPath6.charAt(0).toUpperCase()+_selectedPath6.slice(1);
-  document.getElementById('path6-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('path6-confirm').classList.add('show');
+  document.getElementById('path6-modal').classList.remove('open');
+  document.getElementById('path6-confirm').classList.remove('show');
+  doPath6Reset('ascend',_selectedPath6);
+  _selectedPath6=null;
 });
 
 document.getElementById('path6-cancel-btn').addEventListener('click',function(){
@@ -5151,10 +5158,9 @@ document.getElementById('final-descend-btn').addEventListener('click',function()
 });
 
 document.getElementById('final-ascend-btn').addEventListener('click',function(){
-  _pendingFinalChoice='ascend';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  document.getElementById('final-confirm-text').textContent='You will gain '+tsGain+' Tattered Souls and begin again. Are you sure?';
-  document.getElementById('final-confirm').classList.add('show');
+  document.getElementById('final-modal').classList.remove('open');
+  document.getElementById('final-confirm').classList.remove('show');
+  doFinalReset('ascend');
 });
 
 document.getElementById('final-cancel-btn').addEventListener('click',function(){
@@ -5363,7 +5369,6 @@ document.getElementById('settings-btn').addEventListener('click',function(){
   document.getElementById('hard-reset-btn').style.display='';
   updateMuteToggle();
   syncIntroToggleUI();
-  syncDevModeUI();
   document.getElementById('settings-modal').classList.add('open');
 });
 
@@ -5378,7 +5383,7 @@ document.getElementById('settings-modal').addEventListener('click',function(e){
 document.getElementById('mute-toggle').addEventListener('click',function(){
   soundMuted=!soundMuted;
   updateMuteToggle();
-  saveGame();
+  saveGame(); saveSettings();
 });
 
 document.getElementById('hard-reset-btn').addEventListener('click',function(){
@@ -5645,19 +5650,20 @@ function syncIntroToggleUI(){
 document.getElementById('intro-toggle').addEventListener('click', function(){
   showIntro = !showIntro;
   syncIntroToggleUI();
-  saveGame();
+  saveGame(); saveSettings();
 });
 
 document.getElementById('tutorial-toggle').addEventListener('click', function(){
   showTutorial = !showTutorial;
   syncIntroToggleUI();
-  saveGame();
+  saveGame(); saveSettings();
 });
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
 initMist(28);
 preloadFormImages();
+loadSettings();
 var _hadSave = loadGame();
 updateHighestFloor();
 recalcStats();
@@ -6211,42 +6217,70 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       lastRealm=realm;
       resize();
       W=c.width; H=c.height;
+      var cw=document.getElementById('combat-wrap');
+      if(cw) cw.style.top=(realm===1||realm===9)?'calc(36% + 145px)':'calc(36% + 165px)';
 
       // Realm image backgrounds
       var REALM_BG_IMAGES={
-        1:'artwork/void_background.webp',
-        2:'artwork/underworld_background.webp',
-        3:'artwork/purgatory_background.webp',
-        4:'artwork/undead_background.webp',
-        5:'artwork/hades_background.webp',
-        6:'artwork/undersea_background.webp',
-        7:'artwork/swamp_background.webp',
-        8:'artwork/forest_background.webp',
-        9:'artwork/skyland_background.webp',
-        10:'artwork/heaven_background.webp'
+        1:'artwork/void_realm.webp',
+        2:'artwork/underworld_realm.webp',
+        3:'artwork/purgatory_realm.webp',
+        4:'artwork/undead_realm.webp',
+        5:'artwork/hades_realm.webp',
+        6:'artwork/undersea_realm.webp',
+        7:'artwork/swamp_realm.webp',
+        8:'artwork/forest_realm.webp',
+        9:'artwork/skyland_realm.webp',
+        10:'artwork/heaven_realm.webp'
       };
       var REALM_BG_SCALE={
         1:1.15,
-        3:0.50,
-        4:1.10,
-        5:1.25,
-        6:1.00,
-        7:1.00,
-        8:1.00,
-        9:0.85,
-        10:0.85
+        2:1.15,
+        3:1.15,
+        4:1.15,
+        5:1.15,
+        6:1.15,
+        7:1.15,
+        8:1.15,
+        9:1.15,
+        10:1.15
       };
       var REALM_BG_OFFSET={
-        1:100,
-        2:130,
-        3:-150,
-        4:-110,
-        5:35,
-        6:-105,
-        7:-110,
-        8:-140,
-        9:-120,
-        10:-205
+        1:0,
+        2:0,
+        3:0,
+        4:0,
+        5:0,
+        6:0,
+        7:0,
+        8:0,
+        9:0,
+        10:0
+      };
+      // Left panel background — scale and offset independent of the middle panel
+      var REALM_BG_LEFT_SCALE={
+        1:1.15,
+        2:1.15,
+        3:1.15,
+        4:1.15,
+        5:1.15,
+        6:1.15,
+        7:1.15,
+        8:1.15,
+        9:1.15,
+        10:1.15
+      };
+      var REALM_BG_LEFT_OFFSET={
+        1:0,
+        2:0,
+        3:0,
+        4:0,
+        5:0,
+        6:0,
+        7:0,
+        8:0,
+        9:0,
+        10:0
       };
       var bgImg=document.getElementById('realm-bg-img');
       if(bgImg){
@@ -6256,14 +6290,16 @@ document.getElementById('mm-auto').addEventListener('click',function(){
           var scale=REALM_BG_SCALE[realm]||0.60;
           var offset=REALM_BG_OFFSET[realm]||0;
           bgImg.src=imgSrc;
-          bgImg.style.transform='translateX(calc(-50% + '+offset+'px)) scale('+scale+')';
+          bgImg.style.transform='translateX(-370px) translateY(-400px) scale('+scale+')';
           bgImg.style.display='block';
           c.style.display='none';
-          // Left panel bg — all realms
+          // Left panel bg — all realms (independent scale/offset)
           if(bgImgLeft){
             if(imgSrc){
+              var leftScale=REALM_BG_LEFT_SCALE[realm]||0.60;
+              var leftOffset=REALM_BG_LEFT_OFFSET[realm]||0;
               bgImgLeft.src=imgSrc;
-              bgImgLeft.style.transform='scale('+scale+')';
+              bgImgLeft.style.transform='translateX(0px) translateY(-400px) scale('+leftScale+')';
               bgImgLeft.style.display='block';
             } else {
               bgImgLeft.style.display='none';
@@ -6306,85 +6342,6 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   });
 })();
 
-// ── dev mode ─────────────────────────────────────────────────────────────────
-var _devOv=null;
-
-function _showRealmSelect(){
-  document.getElementById('settings-modal').classList.remove('open');
-  if(!_devOv){
-    _devOv=document.createElement('div');
-    _devOv.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:Georgia,serif;';
-    var title=document.createElement('div');
-    title.textContent='Realm Select';
-    title.style.cssText='color:#d4a843;font-size:22px;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px;';
-    _devOv.appendChild(title);
-    var grid=document.createElement('div');
-    grid.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:10px;';
-    REALM_NAMES.forEach(function(name,i){
-      var btn=document.createElement('button');
-      btn.textContent=(i+1)+'. '+name;
-      btn.style.cssText='padding:10px 18px;background:#1a1535;border:1px solid #4433aa;color:#c0b0ff;font-family:Georgia,serif;font-size:14px;letter-spacing:1px;cursor:pointer;border-radius:4px;';
-      btn.onmouseenter=function(){this.style.background='#2a2545';};
-      btn.onmouseleave=function(){this.style.background='#1a1535';};
-      btn.onclick=function(){
-        var r=i+1;
-        curRealm=r; curLevel=1; curFloor=1; floorWins=0;
-        if(r>highestRealm){ highestRealm=r; highestLevel=1; highestFloor=1; }
-        enemyPool=[((r-1)%REALM_NAMES.length)*LEVELS_PER_REALM];
-        currentEnemyTypeIdx=enemyPool[0];
-        spawnEnemy(); updateProgressLabel(); updateEnemyPanel();
-        _devOv.style.display='none';
-      };
-      grid.appendChild(btn);
-    });
-    _devOv.appendChild(grid);
-    var close=document.createElement('button');
-    close.textContent='Close';
-    close.style.cssText='margin-top:12px;padding:8px 28px;background:transparent;border:1px solid #554466;color:#776699;font-family:Georgia,serif;font-size:13px;cursor:pointer;border-radius:4px;';
-    close.onclick=function(){ _devOv.style.display='none'; };
-    _devOv.appendChild(close);
-    document.body.appendChild(_devOv);
-  } else {
-    _devOv.style.display='flex';
-  }
-}
-
-document.getElementById('dev-mode-btn').addEventListener('click',function(){
-  if(devModeEnabled){ _showRealmSelect(); return; }
-  var p=document.getElementById('dev-mode-prompt');
-  p.style.display=p.style.display==='none'?'block':'none';
-  document.getElementById('dev-mode-pass').value='';
-  document.getElementById('dev-mode-err').textContent='';
-});
-
-document.getElementById('dev-mode-submit').addEventListener('click',function(){
-  document.getElementById('dev-mode-prompt').style.display='none';
-  document.getElementById('dev-mode-pass').value='';
-  document.getElementById('dev-mode-err').textContent='';
-  devModeEnabled=true;
-  syncDevModeUI();
-  saveGame();
-  checkRebirthButton();
-  _showRealmSelect();
-});
-
-function syncDevModeUI(){
-  var btn=document.getElementById('dev-mode-btn');
-  if(!btn) return;
-  if(devModeEnabled){
-    btn.textContent='Enabled';
-    btn.style.borderColor='#44aa66';
-    btn.style.color='#66cc88';
-  } else {
-    btn.textContent='Unlock';
-    btn.style.borderColor='';
-    btn.style.color='';
-  }
-}
-
-document.getElementById('dev-mode-pass').addEventListener('keydown',function(e){
-  if(e.key==='Enter') document.getElementById('dev-mode-submit').click();
-});
 
 })();
 
