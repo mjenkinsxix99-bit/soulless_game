@@ -704,15 +704,15 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ach-card.earned .acd { color:#6a5020; }
 
 /* ── LEFT PANEL TABS ─────────────────────────────────────────────────────── */
-#left-header { width:100%; text-align:center; padding-bottom:6px; }
-.left-tab-bar { display:flex; width:100%; border-bottom:1px solid #1e1845; margin-bottom:10px; }
+#left-header { width:100%; text-align:center; padding-bottom:6px; position:relative; z-index:2; }
+.left-tab-bar { display:flex; width:100%; border-bottom:1px solid #1e1845; margin-bottom:10px; position:relative; z-index:2; }
 .left-tab-btn { flex:1; background:transparent; border:none; border-bottom:2px solid transparent;
   color:#554477; font-family:Georgia,serif; font-size:11px; letter-spacing:2px; text-transform:uppercase;
   padding:7px 6px; cursor:pointer; transition:color 0.15s,border-color 0.15s; margin-bottom:-1px; }
 .left-tab-btn:hover:not(.locked) { color:#9980dd; }
 .left-tab-btn.active { color:#d4a843; border-bottom-color:#d4a843; }
 .left-tab-btn.locked { color:#2a2040; cursor:default; }
-#left-tab-content { width:100%; position:relative; overflow:hidden; }
+#left-tab-content { width:100%; position:relative; }
 .left-tab-pane { display:none; width:100%; }
 .left-tab-pane.active { display:block; }
 
