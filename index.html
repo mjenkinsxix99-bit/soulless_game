@@ -1420,8 +1420,8 @@ function drawEntityCanvas(t) {
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
 
-  // gentle float bob
-  var float = Math.sin(t * 0.0014) * 7;
+  // gentle float bob — only for pre-flesh forms (rebirthCount < 2)
+  var float = rebirthCount < 2 ? Math.sin(t * 0.0014) * 7 : 0;
   var dy = (H - drawH) / 2 + float;
 
   // squash/stretch on attack and hit
