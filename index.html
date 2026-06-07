@@ -4458,7 +4458,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
   var iconOffset = -(u.icon * 52);
   var iconHtml = '<img class="ucard-icon" src="artwork/sprites_upgrades.webp" style="object-fit:none;object-position:'+iconOffset+'px 0;width:52px;height:52px;" alt="">';
-  d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+costHtml+msRowHtml+'</div></div>';
+  d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+costHtml+'</div></div>'+msRowHtml;
 
   // Milestone box events — listeners live for the lifetime of the card element
   d.querySelectorAll('.ms-box').forEach(function(box){
