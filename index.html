@@ -1410,6 +1410,8 @@ function drawEntityCanvas(t) {
   var isAttacking = (t - attackFlashTime < 400);
   var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
   var activeLoaded = isAttacking ? entityImgAttackLoaded : entityImgNormalLoaded;
+  // If an asc sheet should be used but isn't loaded yet, bail — don't flash old artwork
+  if(rebirthCount >= 1 && !useAscSheet && !useFormSheet) return;
   if(!useAscSheet && !useFormSheet && !activeLoaded) return;
 
   var deathFade = 1;
