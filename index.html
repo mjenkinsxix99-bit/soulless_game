@@ -1406,16 +1406,15 @@ function drawEntityCanvas(t) {
   var useEquineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && !useFelineAscSheet && !useCanineAscSheet && rebirthForm === 'equine' && rebirthCount >= 1 && equineAscSheetLoaded;
   // Use generic form sprite sheet for other forms
   var useAscSheet = useMaleAscSheet || useFemaleAscSheet || useAndroAscSheet || useFelineAscSheet || useCanineAscSheet || useEquineAscSheet;
-  var useFormSheet = !useAscSheet && rebirthCount < 1 && _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
   var isAttacking = (t - attackFlashTime < 400);
   var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
   var activeLoaded = isAttacking ? entityImgAttackLoaded : entityImgNormalLoaded;
-if(!useAscSheet && !useFormSheet && !activeLoaded) return;
+if(!useAscSheet && !activeLoaded) return;
 
   var deathFade = 1;
 
-  var iw = useAscSheet ? MALE_ASC_CELL : (useFormSheet ? FORM_SPRITE_CELL_W : activeImg.naturalWidth);
-  var ih = useAscSheet ? MALE_ASC_CELL : (useFormSheet ? FORM_SPRITE_CELL_H : activeImg.naturalHeight);
+  var iw = useAscSheet ? MALE_ASC_CELL : activeImg.naturalWidth;
+  var ih = useAscSheet ? MALE_ASC_CELL : activeImg.naturalHeight;
   var drawH = Math.min(H * 0.9, H - 10);
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
@@ -1485,9 +1484,6 @@ if(!useAscSheet && !useFormSheet && !activeLoaded) return;
     var gcol = gpos % MALE_ASC_COLS;
     var grow = Math.floor(gpos / MALE_ASC_COLS);
     ctx.drawImage(equineAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
-  } else if(useFormSheet){
-    var fi=FORM_INDEX[_rebirthEntityOverride];
-    ctx.drawImage(formSpriteSheet,fi*FORM_SPRITE_CELL_W,0,FORM_SPRITE_CELL_W,FORM_SPRITE_CELL_H,dx,dy,drawW,drawH);
   } else {
     ctx.drawImage(activeImg, 0, 0, iw, ih, dx, dy, drawW, drawH);
   }
@@ -3856,13 +3852,6 @@ function updateTatteredBtn(){
 
 // ── REBIRTH ───────────────────────────────────────────────────────────────────
 var FORM_NAMES=['masculine','feminine','androgynous','canine','feline','equine'];
-var FORM_SPRITE_CELL_W = 1056;
-var FORM_SPRITE_CELL_H = 1056;
-var formSpriteSheet = new Image();
-var formSpriteSheetLoaded = false;
-formSpriteSheet.onload = function(){ formSpriteSheetLoaded = true; };
-formSpriteSheet.src = "artwork/sprites_form.webp";
-var FORM_INDEX = {masculine:0,feminine:1,androgynous:2,canine:3,feline:4,equine:5};
 
 // ── FELINE ASCENSION SPRITE SHEET ────────────────────────────────────────────
 var felineAscSheet = new Image();
