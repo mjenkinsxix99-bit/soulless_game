@@ -279,7 +279,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .path3-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
 .path3-card:hover { border-color: #4433aa; background: #111128; }
 .path3-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
-.path3-card .p3-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path3-card .p3-art { width: 80px; height: 80px; border-radius: 4px; margin: 0 auto 10px; }
 .path3-card .p3-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
 .path3-card .p3-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
 #path3-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
@@ -308,7 +308,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .path4-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
 .path4-card:hover { border-color: #4433aa; background: #111128; }
 .path4-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
-.path4-card .p4-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path4-card .p4-art { width: 80px; height: 80px; border-radius: 4px; margin: 0 auto 10px; }
 .path4-card .p4-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
 .path4-card .p4-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
 #path4-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
@@ -337,7 +337,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .path5-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
 .path5-card:hover { border-color: #4433aa; background: #111128; }
 .path5-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
-.path5-card .p5-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path5-card .p5-art { width: 80px; height: 80px; border-radius: 4px; margin: 0 auto 10px; }
 .path5-card .p5-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
 .path5-card .p5-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
 #path5-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
@@ -366,7 +366,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .path6-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 8px; padding: 16px 10px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
 .path6-card:hover { border-color: #4433aa; background: #111128; }
 .path6-card.picked { border-color: #d4a843; background: #1a1200; box-shadow: 0 0 12px rgba(212,168,67,0.35); }
-.path6-card .p6-art { width: 80px; height: 80px; background: #0a0a1a; border: 1px solid #1e1845; border-radius: 4px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: #332255; font-size: 11px; letter-spacing: 1px; }
+.path6-card .p6-art { width: 80px; height: 80px; border-radius: 4px; margin: 0 auto 10px; }
 .path6-card .p6-name { font-size: 15px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 1px; margin-bottom: 4px; }
 .path6-card .p6-bonus { font-size: 12px; color: #667744; letter-spacing: 0.5px; }
 #path6-choices { display: flex; gap: 12px; justify-content: center; margin-top: 4px; }
@@ -1028,17 +1028,17 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="path3-grid">
       <div class="path3-card" data-path="holy">
-        <div class="p3-art">art pending</div>
+        <div class="p3-art" style="background:url('artwork/sprites_asc_paths.webp') -80px 0/480px 80px no-repeat;"></div>
         <div class="p3-name">Holy</div>
         <div class="p3-bonus">+5% DPS</div>
       </div>
       <div class="path3-card" data-path="shadow">
-        <div class="p3-art">art pending</div>
+        <div class="p3-art" style="background:url('artwork/sprites_asc_paths.webp') 0px 0/480px 80px no-repeat;"></div>
         <div class="p3-name">Shadow</div>
         <div class="p3-bonus">+5% Tattered Souls</div>
       </div>
       <div class="path3-card" data-path="mystic">
-        <div class="p3-art">art pending</div>
+        <div class="p3-art" style="background:url('artwork/sprites_asc_paths.webp') -160px 0/480px 80px no-repeat;"></div>
         <div class="p3-name">Mystic</div>
         <div class="p3-bonus">+5% Souls gained</div>
       </div>
@@ -1066,17 +1066,17 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="path4-grid">
       <div class="path4-card" data-path="holy">
-        <div class="p4-art">art pending</div>
+        <div class="p4-art" style="background:url('artwork/sprites_asc_paths.webp') -80px 0/480px 80px no-repeat;"></div>
         <div class="p4-name">Holy</div>
         <div class="p4-bonus">+5% Strike Damage</div>
       </div>
       <div class="path4-card" data-path="shadow">
-        <div class="p4-art">art pending</div>
+        <div class="p4-art" style="background:url('artwork/sprites_asc_paths.webp') 0px 0/480px 80px no-repeat;"></div>
         <div class="p4-name">Shadow</div>
         <div class="p4-bonus">+5% Mana Gain</div>
       </div>
       <div class="path4-card" data-path="mystic">
-        <div class="p4-art">art pending</div>
+        <div class="p4-art" style="background:url('artwork/sprites_asc_paths.webp') -160px 0/480px 80px no-repeat;"></div>
         <div class="p4-name">Mystic</div>
         <div class="p4-bonus">-5% Milestone Cost</div>
       </div>
@@ -1104,17 +1104,17 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="path5-grid">
       <div class="path5-card" data-path="holy">
-        <div class="p5-art">art pending</div>
+        <div class="p5-art" style="background:url('artwork/sprites_asc_paths.webp') -80px 0/480px 80px no-repeat;"></div>
         <div class="p5-name">Holy</div>
         <div class="p5-bonus">+5% Mana Gain</div>
       </div>
       <div class="path5-card" data-path="shadow">
-        <div class="p5-art">art pending</div>
+        <div class="p5-art" style="background:url('artwork/sprites_asc_paths.webp') 0px 0/480px 80px no-repeat;"></div>
         <div class="p5-name">Shadow</div>
         <div class="p5-bonus">+5% DPS</div>
       </div>
       <div class="path5-card" data-path="mystic">
-        <div class="p5-art">art pending</div>
+        <div class="p5-art" style="background:url('artwork/sprites_asc_paths.webp') -160px 0/480px 80px no-repeat;"></div>
         <div class="p5-name">Mystic</div>
         <div class="p5-bonus">+5% Strike Damage</div>
       </div>
@@ -1142,17 +1142,17 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="path6-grid">
       <div class="path6-card" data-path="steel">
-        <div class="p6-art">art pending</div>
+        <div class="p6-art" style="background:url('artwork/sprites_asc_paths.webp') -320px 0/480px 80px no-repeat;"></div>
         <div class="p6-name">Steel</div>
         <div class="p6-bonus">+10% DPS</div>
       </div>
       <div class="path6-card" data-path="leather">
-        <div class="p6-art">art pending</div>
+        <div class="p6-art" style="background:url('artwork/sprites_asc_paths.webp') -240px 0/480px 80px no-repeat;"></div>
         <div class="p6-name">Leather</div>
         <div class="p6-bonus">+10% Tattered Souls</div>
       </div>
       <div class="path6-card" data-path="knowledge">
-        <div class="p6-art">art pending</div>
+        <div class="p6-art" style="background:url('artwork/sprites_asc_paths.webp') -400px 0/480px 80px no-repeat;"></div>
         <div class="p6-name">Knowledge</div>
         <div class="p6-bonus">+10% Mana Generation</div>
       </div>
