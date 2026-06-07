@@ -1403,8 +1403,9 @@ function drawEntityCanvas(t) {
   var useAndroAscSheet = !useFemaleAscSheet && !useMaleAscSheet && rebirthForm === 'androgynous' && rebirthCount >= 1 && androAscSheetLoaded;
   var useFelineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && rebirthForm === 'feline' && rebirthCount >= 1 && felineAscSheetLoaded;
   var useCanineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && !useFelineAscSheet && rebirthForm === 'canine' && rebirthCount >= 1 && canineAscSheetLoaded;
+  var useEquineAscSheet = !useFemaleAscSheet && !useMaleAscSheet && !useAndroAscSheet && !useFelineAscSheet && !useCanineAscSheet && rebirthForm === 'equine' && rebirthCount >= 1 && equineAscSheetLoaded;
   // Use generic form sprite sheet for other forms
-  var useAscSheet = useMaleAscSheet || useFemaleAscSheet || useAndroAscSheet || useFelineAscSheet || useCanineAscSheet;
+  var useAscSheet = useMaleAscSheet || useFemaleAscSheet || useAndroAscSheet || useFelineAscSheet || useCanineAscSheet || useEquineAscSheet;
   var useFormSheet = !useAscSheet && _rebirthEntityOverride && formSpriteSheetLoaded && FORM_INDEX[_rebirthEntityOverride] !== undefined;
   var isAttacking = (t - attackFlashTime < 400);
   var activeImg = isAttacking ? entityImgAttack : entityImgNormal;
@@ -1482,6 +1483,11 @@ function drawEntityCanvas(t) {
     var gcol = gpos % MALE_ASC_COLS;
     var grow = Math.floor(gpos / MALE_ASC_COLS);
     ctx.drawImage(canineAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
+  } else if(useEquineAscSheet){
+    var gpos = getEquineAscGridPos(rebirthCount, ascension3Path, ascension4Path, ascension5Path, ascension6Path);
+    var gcol = gpos % MALE_ASC_COLS;
+    var grow = Math.floor(gpos / MALE_ASC_COLS);
+    ctx.drawImage(equineAscSheet, gcol*MALE_ASC_CELL, grow*MALE_ASC_CELL, MALE_ASC_CELL, MALE_ASC_CELL, dx, dy, drawW, drawH);
   } else if(useFormSheet){
     var fi=FORM_INDEX[_rebirthEntityOverride];
     ctx.drawImage(formSpriteSheet,fi*FORM_SPRITE_CELL_W,0,FORM_SPRITE_CELL_W,FORM_SPRITE_CELL_H,dx,dy,drawW,drawH);
@@ -3880,6 +3886,28 @@ function getFelineAscGridPos(rc, p3, p4, p5, p6){
   var i5 = p5 ? (_FEL_P5[p5]||0) : 0;
   if(rc === 5) return 18 + i3*9  + i4*3 + i5;
   var i6 = p6 ? (_FEL_P6[p6]||0) : 0;
+  return            45 + i3*27 + i4*9 + i5*3 + i6;
+}
+
+// ── EQUINE ASCENSION SPRITE SHEET ────────────────────────────────────────────
+var equineAscSheet = new Image();
+var equineAscSheetLoaded = false;
+equineAscSheet.onload = function(){ equineAscSheetLoaded = true; };
+equineAscSheet.src = 'artwork/sprites_equine.webp';
+var _EQU_P3 = {shadow:0, holy:1, mystic:2};
+var _EQU_P4 = {shadow:0, holy:1, mystic:2};
+var _EQU_P5 = {shadow:0, holy:1, mystic:2};
+var _EQU_P6 = {leather:0, steel:1, knowledge:2};
+function getEquineAscGridPos(rc, p3, p4, p5, p6){
+  if(rc <= 1) return 0;
+  if(rc === 2) return 1;
+  var i3 = p3 ? (_EQU_P3[p3]||0) : 0;
+  if(rc === 3) return 2 + i3;
+  var i4 = p4 ? (_EQU_P4[p4]||0) : 0;
+  if(rc === 4) return 9  + i3*3  + i4;
+  var i5 = p5 ? (_EQU_P5[p5]||0) : 0;
+  if(rc === 5) return 18 + i3*9  + i4*3 + i5;
+  var i6 = p6 ? (_EQU_P6[p6]||0) : 0;
   return            45 + i3*27 + i4*9 + i5*3 + i6;
 }
 
