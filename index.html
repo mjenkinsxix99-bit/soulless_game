@@ -1491,6 +1491,22 @@ if(!useAscSheet && !activeLoaded) return;
   ctx.filter = 'none';
   ctx.restore();
 
+  // Ground shadow — ellipse scales with sprite width
+  var shadowRx = drawW * 0.48;
+  var shadowRy = shadowRx * 0.22;
+  var shadowY = dy + drawH - shadowRy * 0.5;
+  ctx.save();
+  ctx.globalAlpha = 0.90;
+  var shadowGrad = ctx.createRadialGradient(cx, shadowY, 0, cx, shadowY, shadowRx);
+  shadowGrad.addColorStop(0, 'rgba(0,0,0,1)');
+  shadowGrad.addColorStop(0.6, 'rgba(0,0,0,0.6)');
+  shadowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = shadowGrad;
+  ctx.beginPath();
+  ctx.ellipse(cx, shadowY, shadowRx, shadowRy, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+
   ctx.save();
   ctx.globalAlpha = deathFade;
 
