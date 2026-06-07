@@ -1431,7 +1431,8 @@ if(!useAscSheet && !activeLoaded) return;
   // Ground shadow — drawn before sprite so it sits behind
   var shadowRx = drawW * 0.32;
   var shadowRy = shadowRx * 0.18;
-  var shadowY = dy + drawH - shadowRy * 0.5;
+  // For floating forms, pin shadow to ground rather than following the float bob
+  var shadowY = rebirthCount < 2 ? (H - shadowRy - 2) : (dy + drawH - shadowRy * 0.5);
   ctx.save();
   ctx.globalAlpha = 0.70;
   var shadowGrad = ctx.createRadialGradient(cx, shadowY, 0, cx, shadowY, shadowRx);
