@@ -1215,15 +1215,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
       <span class="settings-label">Show Tutorial</span>
       <button id="tutorial-toggle">On</button>
     </div>
-    <div class="settings-row">
-      <span class="settings-label">Dev Mode</span>
-      <button id="dev-mode-btn">Unlock</button>
-    </div>
-    <div id="dev-mode-prompt" style="display:none;padding:10px 0 4px;">
-      <input id="dev-mode-pass" type="password" placeholder="Passcode" style="background:#0d0d1e;border:1px solid #4433aa;color:#c0b0ff;font-family:Georgia,serif;font-size:14px;padding:5px 10px;border-radius:4px;width:160px;letter-spacing:1px;">
-      <button id="dev-mode-submit" style="margin-left:8px;padding:5px 14px;background:transparent;border:1px solid #4433aa;color:#9988bb;font-family:Georgia,serif;font-size:13px;cursor:pointer;border-radius:4px;">Go</button>
-      <div id="dev-mode-err" style="color:#cc4444;font-size:12px;margin-top:4px;min-height:16px;"></div>
-    </div>
     <div id="hard-reset-confirm">
       <p>This will wipe ALL progress. Are you certain?</p>
       <button id="hard-reset-yes">Wipe Everything</button>
@@ -2170,7 +2161,6 @@ var ascension5Path=null;
 var ascension6Path=null;
 var rebirthForm=null;
 var soundMuted=false;
-var devModeEnabled=false;
 var eliteKillsTotal=0;
 var highestGlobalFloorEver=0;
 var achievementsEarned=[];
@@ -4015,7 +4005,8 @@ function calcTatteredSoulsGain(chosenForm){
 function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
-  var canAscend=true;
+  var doomUpgrade=REP_UPGRADES.find(function(u){return u.id==='dm';});
+  var canAscend=doomUpgrade&&doomUpgrade.level>=1;
   btn.style.display=canAscend?'block':'none';
   if(canAscend&&!_tutShown.ascension){ _tutShown.ascension=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You have grown strong enough to Ascend, if you choose. You will gain Tattered Souls which make you stronger that can be sacrificed to gain power. Own as many of each upgrade as you can. Every 666 purchases gives you 1 Tattered Soul.',document.getElementById('ascend-btn'),null); },400); } }
 }
@@ -4119,7 +4110,6 @@ var SETTINGS_KEY='formless_settings_v1';
 function saveSettings(){
   try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify({
     soundMuted:soundMuted,
-    devModeEnabled:devModeEnabled,
     showTutorial:showTutorial,
     showIntro:showIntro
   })); } catch(e){}
@@ -4131,7 +4121,6 @@ function loadSettings(){
     if(!raw) return;
     var d=JSON.parse(raw);
     if(d.soundMuted!==undefined) soundMuted=d.soundMuted;
-    if(d.devModeEnabled!==undefined) devModeEnabled=d.devModeEnabled;
     if(d.showTutorial!==undefined) showTutorial=d.showTutorial;
     if(d.showIntro!==undefined) showIntro=d.showIntro;
   } catch(e){}
@@ -4169,7 +4158,6 @@ function saveGame(){
     completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
     soundMuted:soundMuted,
-    devModeEnabled:devModeEnabled,
     showIntro:showIntro,
     showTutorial:showTutorial,
     tutShown:_tutShown,
@@ -4245,7 +4233,6 @@ function loadGame(){
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
   soundMuted=data.soundMuted||false;
-  devModeEnabled=data.devModeEnabled||false;
   showIntro=(data.showIntro!==undefined)?data.showIntro:true;
   showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
   if(data.tutShown) _tutShown=Object.assign(_tutShown,data.tutShown);
@@ -5382,7 +5369,6 @@ document.getElementById('settings-btn').addEventListener('click',function(){
   document.getElementById('hard-reset-btn').style.display='';
   updateMuteToggle();
   syncIntroToggleUI();
-  syncDevModeUI();
   document.getElementById('settings-modal').classList.add('open');
 });
 
@@ -6356,85 +6342,6 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   });
 })();
 
-// ── dev mode ─────────────────────────────────────────────────────────────────
-var _devOv=null;
-
-function _showRealmSelect(){
-  document.getElementById('settings-modal').classList.remove('open');
-  if(!_devOv){
-    _devOv=document.createElement('div');
-    _devOv.style.cssText='position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:Georgia,serif;';
-    var title=document.createElement('div');
-    title.textContent='Realm Select';
-    title.style.cssText='color:#d4a843;font-size:22px;letter-spacing:4px;text-transform:uppercase;margin-bottom:8px;';
-    _devOv.appendChild(title);
-    var grid=document.createElement('div');
-    grid.style.cssText='display:grid;grid-template-columns:repeat(5,1fr);gap:10px;';
-    REALM_NAMES.forEach(function(name,i){
-      var btn=document.createElement('button');
-      btn.textContent=(i+1)+'. '+name;
-      btn.style.cssText='padding:10px 18px;background:#1a1535;border:1px solid #4433aa;color:#c0b0ff;font-family:Georgia,serif;font-size:14px;letter-spacing:1px;cursor:pointer;border-radius:4px;';
-      btn.onmouseenter=function(){this.style.background='#2a2545';};
-      btn.onmouseleave=function(){this.style.background='#1a1535';};
-      btn.onclick=function(){
-        var r=i+1;
-        curRealm=r; curLevel=1; curFloor=1; floorWins=0;
-        if(r>highestRealm){ highestRealm=r; highestLevel=1; highestFloor=1; }
-        enemyPool=[((r-1)%REALM_NAMES.length)*LEVELS_PER_REALM];
-        currentEnemyTypeIdx=enemyPool[0];
-        spawnEnemy(); updateProgressLabel(); updateEnemyPanel();
-        _devOv.style.display='none';
-      };
-      grid.appendChild(btn);
-    });
-    _devOv.appendChild(grid);
-    var close=document.createElement('button');
-    close.textContent='Close';
-    close.style.cssText='margin-top:12px;padding:8px 28px;background:transparent;border:1px solid #554466;color:#776699;font-family:Georgia,serif;font-size:13px;cursor:pointer;border-radius:4px;';
-    close.onclick=function(){ _devOv.style.display='none'; };
-    _devOv.appendChild(close);
-    document.body.appendChild(_devOv);
-  } else {
-    _devOv.style.display='flex';
-  }
-}
-
-document.getElementById('dev-mode-btn').addEventListener('click',function(){
-  if(devModeEnabled){ _showRealmSelect(); return; }
-  var p=document.getElementById('dev-mode-prompt');
-  p.style.display=p.style.display==='none'?'block':'none';
-  document.getElementById('dev-mode-pass').value='';
-  document.getElementById('dev-mode-err').textContent='';
-});
-
-document.getElementById('dev-mode-submit').addEventListener('click',function(){
-  document.getElementById('dev-mode-prompt').style.display='none';
-  document.getElementById('dev-mode-pass').value='';
-  document.getElementById('dev-mode-err').textContent='';
-  devModeEnabled=true;
-  syncDevModeUI();
-  saveGame(); saveSettings();
-  checkRebirthButton();
-  _showRealmSelect();
-});
-
-function syncDevModeUI(){
-  var btn=document.getElementById('dev-mode-btn');
-  if(!btn) return;
-  if(devModeEnabled){
-    btn.textContent='Enabled';
-    btn.style.borderColor='#44aa66';
-    btn.style.color='#66cc88';
-  } else {
-    btn.textContent='Unlock';
-    btn.style.borderColor='';
-    btn.style.color='';
-  }
-}
-
-document.getElementById('dev-mode-pass').addEventListener('keydown',function(e){
-  if(e.key==='Enter') document.getElementById('dev-mode-submit').click();
-});
 
 })();
 
