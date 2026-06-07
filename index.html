@@ -6238,6 +6238,8 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       lastRealm=realm;
       resize();
       W=c.width; H=c.height;
+      var cw=document.getElementById('combat-wrap');
+      if(cw) cw.style.top=(realm===1||realm===9)?'calc(36% + 145px)':'calc(36% + 165px)';
 
       // Realm image backgrounds
       var REALM_BG_IMAGES={
