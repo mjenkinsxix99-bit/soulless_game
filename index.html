@@ -712,7 +712,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .left-tab-btn:hover:not(.locked) { color:#9980dd; }
 .left-tab-btn.active { color:#d4a843; border-bottom-color:#d4a843; }
 .left-tab-btn.locked { color:#2a2040; cursor:default; }
-#left-tab-content { width:100%; }
+#left-tab-content { width:100%; position:relative; overflow:hidden; }
 .left-tab-pane { display:none; width:100%; }
 .left-tab-pane.active { display:block; }
 
@@ -767,9 +767,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop">Tattered Shop</button>
       </div>
       <div id="left-tab-content">
+        <img id="realm-bg-img-left" src="" alt="" />
         <div id="ltab-entity" class="left-tab-pane active">
           <div id="left-entity">
-            <img id="realm-bg-img-left" src="" alt="" />
             <div class="canvas-wrap" style="position:absolute;top:62px;left:0;right:0;z-index:1;">
               <canvas id="entity-canvas" width="330" height="330"></canvas>
             </div>
