@@ -55,7 +55,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
 .ucard-body { flex: 1; min-width: 0; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
-#realm-bg-img-left { display:none; position:absolute; top:0; left:0; pointer-events:none; z-index:0; width:auto; height:auto; transform-origin:top left; }
+#realm-bg-img-left { display:none; position:absolute; top:0; left:0; pointer-events:none; z-index:1; width:auto; height:auto; transform-origin:top left; }
 #realm-bg-img { display:none; position:absolute; top:0; left:0; transform-origin:top left; pointer-events:none; z-index:1; width:auto; height:auto; }
 #combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
   width:930px; height:930px; border-radius:50%;
@@ -758,6 +758,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   </div>
   <div id="main">
     <div id="left">
+      <img id="realm-bg-img-left" src="" alt="" />
       <div id="left-header">
         <div id="entity-stage-label" class="cname entity-label">You are Ether.</div>
         <div id="stage-desc">Shapeless. Hungry.</div>
@@ -767,7 +768,6 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
         <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop">Tattered Shop</button>
       </div>
       <div id="left-tab-content">
-        <img id="realm-bg-img-left" src="" alt="" />
         <div id="ltab-entity" class="left-tab-pane active">
           <div id="left-entity">
             <div class="canvas-wrap" style="position:absolute;top:62px;left:0;right:0;z-index:1;">
