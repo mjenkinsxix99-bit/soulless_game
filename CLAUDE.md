@@ -8,6 +8,8 @@
 
 ## Left Panel Background
 
-- The left panel background transform is permanently locked at `translateX(-20px) translateY(-92px)`.
-- NEVER change these values for any reason.
-- If the user requests something that would alter the left panel background position, WARN them before making any change and get explicit confirmation.
+- The left panel background transform is permanently locked at `translateX(0px) translateY(-400px)` with `scale` driven by `REALM_BG_LEFT_SCALE` (all realms `1.15`).
+- The middle panel background transform is permanently locked at `translateX(-370px) translateY(-400px)` with `scale` driven by `REALM_BG_SCALE` (all realms `1.15`).
+- NEVER change these transform values for any reason.
+- NEVER change the anchor points (`top:0; left:0; transform-origin:top left`) on either background image.
+- If the user requests something that would alter either background position or anchor, WARN them before making any change and get explicit confirmation.
