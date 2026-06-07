@@ -4025,7 +4025,7 @@ function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
   if(!btn) return;
   var doom=REP_UPGRADES.filter(function(u){return u.id==='dm';})[0];
-  var canAscend=(doom&&doom.level>=1)||devModeEnabled;
+  var canAscend=doom&&doom.level>=1;
   btn.style.display=canAscend?'block':'none';
   if(canAscend&&!_tutShown.ascension){ _tutShown.ascension=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You have grown strong enough to Ascend, if you choose. You will gain Tattered Souls which make you stronger that can be sacrificed to gain power. Own as many of each upgrade as you can. Every 666 purchases gives you 1 Tattered Soul.',document.getElementById('ascend-btn'),null); },400); } }
 }
