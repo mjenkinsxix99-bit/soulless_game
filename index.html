@@ -988,11 +988,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     </div>
     <div id="form-confirm-area">
       <button id="form-confirm-btn">Confirm Choice</button>
-      <div id="form-certain">
-        <p>Are you Certain?</p>
-        <button id="form-yes">Yes. Begin.</button>
-        <button id="form-no">Choose Again</button>
-      </div>
+      <button id="form-no" style="display:none;">Choose Again</button>
     </div>
   </div>
 </div>
@@ -1001,9 +997,9 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="flesh-box">
     <div id="flesh-title">You have become Flesh.</div>
     <div id="flesh-body">
-      You have consumed enough souls to become Flesh. Your form bonus will increase by 50% and gain <span id="flesh-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls.<br><br>
-      You may choose to forsake your form and return to Ether, losing your bonus.<br><br>
-      Either path, you will keep your Tattered Souls, Achievements, and Tattered Shop upgrades.
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="flesh-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
+      Your form bonus will increase by 50%. You may also forsake your form and return to Ether, losing your bonus.<br><br>
+      Choose your path wisely.
     </div>
     <div id="flesh-choices">
       <button id="flesh-descend-btn">Descend</button>
@@ -1022,8 +1018,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="path3-box">
     <div id="path3-title">Choose Your Path</div>
     <div id="path3-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="path3-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       Many souls have been consumed in your quest to regain glory. Many more will fall before you succeed.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       Choose your path wisely. The way back is difficult.
     </div>
     <div id="path3-grid">
@@ -1060,8 +1056,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="path4-box">
     <div id="path4-title">Choose Your Path</div>
     <div id="path4-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="path4-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       To Rise again after destruction is the truest path to Glory. Every decision yields strength.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       Choose your path wisely. To forge a new path is tricky.
     </div>
     <div id="path4-grid">
@@ -1098,8 +1094,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="path5-box">
     <div id="path5-title">Choose Your Path</div>
     <div id="path5-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="path5-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       Fall and rise again, until every soul bends to your will. Let not fear deter your journey.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       Choose your path wisely. No need to add to your burden by trying to go backwards.
     </div>
     <div id="path5-grid">
@@ -1136,8 +1132,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="path6-box">
     <div id="path6-title">Choose Your Path</div>
     <div id="path6-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="path6-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       You have become strong indeed. Perhaps stronger than before. Soon you may take revenge and challenge the gods themselves.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       Choose your path wisely. You do not need courage when you have the strength required.
     </div>
     <div id="path6-grid">
@@ -1174,8 +1170,8 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
   <div id="final-box">
     <div id="final-title">You have achieved your Final Form.</div>
     <div id="final-body">
+      You will keep Tattered Souls, Honors, and Tattered Shop upgrades and gain <span id="final-ts-gain" style="color:#c47c2a;font-weight:bold">0</span> Tattered Souls. Everything else will be reset.<br><br>
       You have become strength itself. There is nothing that can hold you back.<br><br>
-      You will keep Tattered Souls, Honors, and Tattered Shop purchases.<br><br>
       You have achieved your final form. There are more conquests that await you.
     </div>
     <div id="final-choices">
@@ -4792,28 +4788,33 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
     document.getElementById('path3-confirm').classList.remove('show');
     document.getElementById('path3-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path3-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path3-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('path3-modal').classList.add('open');
     _selectedPath3=null;
   } else if(rebirthCount===3){
     document.getElementById('path4-confirm').classList.remove('show');
     document.getElementById('path4-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path4-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path4-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('path4-modal').classList.add('open');
     _selectedPath4=null;
   } else if(rebirthCount===4){
     document.getElementById('path5-confirm').classList.remove('show');
     document.getElementById('path5-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path5-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path5-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('path5-modal').classList.add('open');
     _selectedPath5=null;
   } else if(rebirthCount===5){
     document.getElementById('path6-confirm').classList.remove('show');
     document.getElementById('path6-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path6-card').forEach(function(c){c.classList.remove('picked');});
+    document.getElementById('path6-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('path6-modal').classList.add('open');
     _selectedPath6=null;
   } else if(rebirthCount>=6){
     document.getElementById('final-confirm').classList.remove('show');
+    document.getElementById('final-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('final-modal').classList.add('open');
   } else {
     document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
@@ -4836,20 +4837,8 @@ document.querySelectorAll('.form-card').forEach(function(card){
 
 document.getElementById('form-confirm-btn').addEventListener('click',function(){
   if(!_selectedForm) return;
-  document.getElementById('form-certain').classList.add('show');
-});
-
-document.getElementById('form-yes').addEventListener('click',function(){
-  if(!_selectedForm) return;
   document.getElementById('form-modal').classList.remove('open');
   doRebirthReset(_selectedForm);
-  _selectedForm=null;
-});
-
-document.getElementById('form-no').addEventListener('click',function(){
-  document.getElementById('form-certain').classList.remove('show');
-  document.getElementById('form-confirm-btn').classList.remove('show');
-  document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
   _selectedForm=null;
 });
 
@@ -4863,11 +4852,9 @@ document.getElementById('flesh-descend-btn').addEventListener('click',function()
 });
 
 document.getElementById('flesh-ascend-btn').addEventListener('click',function(){
-  _pendingFleshChoice='ascend';
-  var newBonus=FORM_BONUS_ASCENDED[rebirthForm]||'an increased bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  document.getElementById('flesh-confirm-text').textContent='This will increase your bonus to '+newBonus+' and grant '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('flesh-confirm').classList.add('show');
+  document.getElementById('flesh-modal').classList.remove('open');
+  document.getElementById('flesh-confirm').classList.remove('show');
+  doFleshReset('ascend');
 });
 
 document.getElementById('flesh-confirm-yes').addEventListener('click',function(){
@@ -4882,6 +4869,7 @@ document.getElementById('flesh-confirm-no').addEventListener('click',function(){
   document.getElementById('flesh-confirm').classList.remove('show');
   _pendingFleshChoice=null;
 });
+
 
 document.getElementById('flesh-cancel-btn').addEventListener('click',function(){
   document.getElementById('flesh-confirm').classList.remove('show');
@@ -4925,11 +4913,10 @@ document.getElementById('path3-descend-btn').addEventListener('click',function()
 
 document.getElementById('path3-ascend-btn').addEventListener('click',function(){
   if(!_selectedPath3) return;
-  _pendingPath3Choice='ascend';
-  var bonus=ASCENSION3_BONUSES[_selectedPath3]||'a bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  document.getElementById('path3-confirm-text').textContent='You will walk the '+_selectedPath3.charAt(0).toUpperCase()+_selectedPath3.slice(1)+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('path3-confirm').classList.add('show');
+  document.getElementById('path3-modal').classList.remove('open');
+  document.getElementById('path3-confirm').classList.remove('show');
+  doPath3Reset('ascend',_selectedPath3);
+  _selectedPath3=null;
 });
 
 document.getElementById('path3-cancel-btn').addEventListener('click',function(){
@@ -4947,6 +4934,7 @@ document.getElementById('path3-confirm-yes').addEventListener('click',function()
   _pendingPath3Choice=null;
   _selectedPath3=null;
 });
+
 
 document.getElementById('path3-confirm-no').addEventListener('click',function(){
   document.getElementById('path3-confirm').classList.remove('show');
@@ -4990,12 +4978,10 @@ document.getElementById('path4-descend-btn').addEventListener('click',function()
 
 document.getElementById('path4-ascend-btn').addEventListener('click',function(){
   if(!_selectedPath4) return;
-  _pendingPath4Choice='ascend';
-  var bonus=ASCENSION4_BONUSES[_selectedPath4]||'a bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  var name=_selectedPath4.charAt(0).toUpperCase()+_selectedPath4.slice(1);
-  document.getElementById('path4-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('path4-confirm').classList.add('show');
+  document.getElementById('path4-modal').classList.remove('open');
+  document.getElementById('path4-confirm').classList.remove('show');
+  doPath4Reset('ascend',_selectedPath4);
+  _selectedPath4=null;
 });
 
 document.getElementById('path4-cancel-btn').addEventListener('click',function(){
@@ -5057,12 +5043,10 @@ document.getElementById('path5-descend-btn').addEventListener('click',function()
 
 document.getElementById('path5-ascend-btn').addEventListener('click',function(){
   if(!_selectedPath5) return;
-  _pendingPath5Choice='ascend';
-  var bonus=ASCENSION5_BONUSES[_selectedPath5]||'a bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  var name=_selectedPath5.charAt(0).toUpperCase()+_selectedPath5.slice(1);
-  document.getElementById('path5-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('path5-confirm').classList.add('show');
+  document.getElementById('path5-modal').classList.remove('open');
+  document.getElementById('path5-confirm').classList.remove('show');
+  doPath5Reset('ascend',_selectedPath5);
+  _selectedPath5=null;
 });
 
 document.getElementById('path5-cancel-btn').addEventListener('click',function(){
@@ -5125,12 +5109,10 @@ document.getElementById('path6-descend-btn').addEventListener('click',function()
 
 document.getElementById('path6-ascend-btn').addEventListener('click',function(){
   if(!_selectedPath6) return;
-  _pendingPath6Choice='ascend';
-  var bonus=ASCENSION6_BONUSES[_selectedPath6]||'a bonus';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  var name=_selectedPath6.charAt(0).toUpperCase()+_selectedPath6.slice(1);
-  document.getElementById('path6-confirm-text').textContent='You will walk the '+name+' path, gaining '+bonus+' and '+tsGain+' Tattered Souls. Are you sure?';
-  document.getElementById('path6-confirm').classList.add('show');
+  document.getElementById('path6-modal').classList.remove('open');
+  document.getElementById('path6-confirm').classList.remove('show');
+  doPath6Reset('ascend',_selectedPath6);
+  _selectedPath6=null;
 });
 
 document.getElementById('path6-cancel-btn').addEventListener('click',function(){
@@ -5177,10 +5159,9 @@ document.getElementById('final-descend-btn').addEventListener('click',function()
 });
 
 document.getElementById('final-ascend-btn').addEventListener('click',function(){
-  _pendingFinalChoice='ascend';
-  var tsGain=calcTatteredSoulsGain(rebirthForm).toLocaleString();
-  document.getElementById('final-confirm-text').textContent='You will gain '+tsGain+' Tattered Souls and begin again. Are you sure?';
-  document.getElementById('final-confirm').classList.add('show');
+  document.getElementById('final-modal').classList.remove('open');
+  document.getElementById('final-confirm').classList.remove('show');
+  doFinalReset('ascend');
 });
 
 document.getElementById('final-cancel-btn').addEventListener('click',function(){
