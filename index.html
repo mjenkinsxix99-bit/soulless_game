@@ -4250,33 +4250,33 @@ function deleteSave(){
 // ── OFFLINE PROGRESS ──────────────────────────────────────────────────────────
 var OFFLINE_CAP_SECONDS = 6 * 3600; // 6 hours
 
-var OFFLINE_TS_KEY='soulless_offline_ts';
+var OFFLINE_EFFICIENCY = 0.5; // 50% of active rate while offline — upgradeable later
 
-var SESSION_KEY='soulless_session_active';
+var OFFLINE_TS_KEY='soulless_offline_ts';
+var OFFLINE_APPLIED_KEY='soulless_offline_applied'; // timestamp of last offline-progress application
 
 function applyOfflineProgress(savedAt){
-  // Detect refresh vs true new session using sessionStorage.
-  // sessionStorage persists through F5/Ctrl+R but is cleared when the tab is closed.
-  var isRefresh = !!sessionStorage.getItem(SESSION_KEY);
-  sessionStorage.setItem(SESSION_KEY,'1');
-
   // Use the dedicated timestamp key if available — more reliable than the main save
   var storedTs=parseInt(localStorage.getItem(OFFLINE_TS_KEY)||'0',10);
   var ref=storedTs||savedAt||0;
+
+  // Reliable refresh detection: if offline progress was applied within the last 60 seconds,
+  // this is a refresh or rapid reload — skip to prevent double-awarding.
+  var lastApplied=parseInt(localStorage.getItem(OFFLINE_APPLIED_KEY)||'0',10);
+  if(lastApplied && (Date.now()-lastApplied)<60000) return;
+
   // Update the stored timestamp so it's current (also updated in saveGame)
   try{ localStorage.setItem(OFFLINE_TS_KEY, String(Date.now())); } catch(e){}
 
-  // Skip offline progress on page refresh — only apply after a true session gap
-  if(isRefresh) return;
   if(!ref) return;
   var elapsed = Math.min((Date.now() - ref) / 1000, OFFLINE_CAP_SECONDS);
   if(elapsed < 30) return;
 
-  // souls/sec = DPS / 5, matching kill-reward math (soulsPerKill = HP/5, timePerKill = HP/DPS)
+  // souls/sec = DPS / 5 * OFFLINE_EFFICIENCY, matching kill-reward math at reduced offline rate
   var soulMult = 1;
   if(rebirthForm==='androgynous') soulMult *= (1 + 0.10 * formBonusMult);
   if(ascension3Path==='mystic')   soulMult *= 1.05;
-  var soulsPerSecond = totalDps.div(5).mul(soulMult);
+  var soulsPerSecond = totalDps.div(5).mul(soulMult).mul(OFFLINE_EFFICIENCY);
   var gained = soulsPerSecond.mul(elapsed).floor();
   if(gained.lte(0)) return;
 
@@ -4296,6 +4296,7 @@ function applyOfflineProgress(savedAt){
   soulsEl.textContent = '';
   modal.classList.add('open');
 
+  try{ localStorage.setItem(OFFLINE_APPLIED_KEY, String(Date.now())); } catch(e){}
   saveGame();
 
   // Count-up animation over 1.6 seconds then auto-close
@@ -6397,5 +6398,6 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
 </script>
 <div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-cost" style="display:none"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
