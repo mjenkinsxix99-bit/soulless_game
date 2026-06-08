@@ -68,7 +68,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     rgba(0,0,0,0.02) 74%,
     transparent 86%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
-#combat-wrap { position:absolute; left:50%; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
+#combat-wrap { position:absolute; left:50%; top:54%; transform:translate(-50%,-50%); z-index:2; }
 #enemy-zone { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
 #enemy-zone .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -6220,7 +6220,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       resize();
       W=c.width; H=c.height;
       var cw=document.getElementById('combat-wrap');
-      if(cw) cw.style.top=(realm===1||realm===9)?'calc(36% + 145px)':'calc(36% + 165px)';
+      if(cw) cw.style.top=(realm===1||realm===9)?'52%':'54%';
 
       // Realm image backgrounds
       var REALM_BG_IMAGES={
