@@ -68,7 +68,7 @@ html, body { height: 100%; background: #07070f; color: #e0d8ff; font-family: Geo
     rgba(0,0,0,0.02) 74%,
     transparent 86%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
-#combat-wrap { position:absolute; left:50%; top:calc(54vh - 54px); transform:translate(-50%,-50%); z-index:2; }
+#combat-wrap { position:absolute; left:50%; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
 #enemy-zone { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
 #enemy-zone .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -6220,7 +6220,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       resize();
       W=c.width; H=c.height;
       var cw=document.getElementById('combat-wrap');
-      if(cw) cw.style.top=(realm===1||realm===9)?'calc(52vh - 54px)':'calc(54vh - 54px)';
+      if(cw) cw.style.top=(realm===1||realm===9)?'calc(36% + 145px)':'calc(36% + 165px)';
 
       // Realm image backgrounds
       var REALM_BG_IMAGES={
@@ -6345,6 +6345,21 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 })();
 
 
+})();
+
+// Lock the game to its initial layout size and counter-scale on browser zoom.
+// All internal coordinates (%, px, canvas draws) are evaluated at the initial
+// viewport dimensions, so nothing drifts regardless of zoom level.
+(function() {
+  var g = document.getElementById('game');
+  var _iw = window.innerWidth, _ih = window.innerHeight;
+  g.style.width  = _iw + 'px';
+  g.style.height = _ih + 'px';
+  g.style.transformOrigin = 'top left';
+  window.addEventListener('resize', function() {
+    var s = Math.min(window.innerWidth / _iw, window.innerHeight / _ih);
+    g.style.transform = (s === 1) ? '' : 'scale(' + s + ')';
+  });
 })();
 
 </script>
