@@ -5468,30 +5468,49 @@ function _showTutTipNow(text, targetEl, onDone) {
   textEl.textContent = text;
 
   function positionTip() {
-    var rect = targetEl ? targetEl.getBoundingClientRect() : null;
-    if (!rect || (rect.width === 0 && rect.height === 0)) {
-      tip.style.left = (window.innerWidth / 2 - 140) + 'px';
-      tip.style.top  = (window.innerHeight / 2 - 60) + 'px';
-      arrow.style.display = 'none';
-      return;
-    }
-    arrow.style.display = '';
     var tipW = 280;
-    var tipH = tip.offsetHeight || 110;
+    var tipH = tip.offsetHeight || 120;
     var margin = 20;
-    var targetCX = rect.left + rect.width / 2;
-    var left = targetCX - tipW / 2;
-    left = Math.max(8, Math.min(left, window.innerWidth - tipW - 8));
-    var arrowOffset = (targetCX - left) - 13;
-    arrowOffset = Math.max(10, Math.min(arrowOffset, tipW - 26));
-    var top = rect.top - tipH - margin - 17;
-    if (top < 8) {
-      top = rect.bottom + margin + 17;
-      arrow.className = 'tut-arrow-up';
+    var vw = window.innerWidth, vh = window.innerHeight;
+
+    // Always aim the tip toward the center of the game (enemy area).
+    var centerX = vw / 2;
+    var centerY = vh / 2;
+
+    // Horizontal: center the tip on the screen center, clamped to viewport.
+    var left = centerX - tipW / 2;
+    left = Math.max(8, Math.min(left, vw - tipW - 8));
+
+    var rect = targetEl ? targetEl.getBoundingClientRect() : null;
+    var targetCY = (rect && rect.width > 0) ? (rect.top + rect.height / 2) : centerY;
+
+    // Place tip on whichever side of the target pushes it toward screen center.
+    var top, arrowClass;
+    if (targetCY > centerY) {
+      // Target is below center — tip goes above the target, pointing down.
+      top = (rect ? rect.top : centerY) - tipH - margin - 17;
+      arrowClass = 'tut-arrow-down';
     } else {
-      arrow.className = 'tut-arrow-down';
+      // Target is above center (or at center) — tip goes below, pointing up.
+      top = (rect ? rect.bottom : centerY) + margin + 17;
+      arrowClass = 'tut-arrow-up';
     }
-    arrow.style.left = arrowOffset + 'px';
+
+    // Final clamp so tip never leaves the viewport.
+    top = Math.max(8, Math.min(top, vh - tipH - 8));
+    left = Math.max(8, Math.min(left, vw - tipW - 8));
+
+    if (rect && rect.width > 0) {
+      arrow.style.display = '';
+      arrow.className = arrowClass;
+      var targetCX = rect.left + rect.width / 2;
+      var arrowOffset = (targetCX - left) - 13;
+      arrowOffset = Math.max(10, Math.min(arrowOffset, tipW - 26));
+      arrow.style.left = arrowOffset + 'px';
+    } else {
+      arrow.style.display = 'none';
+    }
+
     tip.style.left = left + 'px';
     tip.style.top  = top + 'px';
   }
@@ -5499,15 +5518,29 @@ function _showTutTipNow(text, targetEl, onDone) {
   overlay.classList.add('open');
   requestAnimationFrame(positionTip);
 
-  okBtn.onclick = function() {
+  function dismissTip() {
+    if (!_tutActive) return;
     overlay.classList.remove('open');
     _tutActive = false;
+    overlay.removeEventListener('pointerdown', dismissTip);
+    document.removeEventListener('keydown', onTutKey);
     if (onDone) onDone();
     if (_tutQueue.length > 0) {
       var next = _tutQueue.shift();
       setTimeout(function() { _showTutTipNow(next.text, next.targetEl, next.onDone); }, 300);
     }
-  };
+  }
+
+  function onTutKey(e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+      e.preventDefault();
+      dismissTip();
+    }
+  }
+
+  okBtn.onclick = dismissTip;
+  overlay.addEventListener('pointerdown', dismissTip);
+  document.addEventListener('keydown', onTutKey);
 }
 
 // ── INTRO SEQUENCE ────────────────────────────────────────────────────────────
@@ -6345,6 +6378,21 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 })();
 
 
+})();
+
+// Lock the game to its initial layout size and counter-scale on browser zoom.
+// All internal coordinates (%, px, canvas draws) are evaluated at the initial
+// viewport dimensions, so nothing drifts regardless of zoom level.
+(function() {
+  var g = document.getElementById('game');
+  var _iw = window.innerWidth, _ih = window.innerHeight;
+  g.style.width  = _iw + 'px';
+  g.style.height = _ih + 'px';
+  g.style.transformOrigin = 'top left';
+  window.addEventListener('resize', function() {
+    var s = Math.min(window.innerWidth / _iw, window.innerHeight / _ih);
+    g.style.transform = (s === 1) ? '' : 'scale(' + s + ')';
+  });
 })();
 
 </script>
