@@ -30,8 +30,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 	.ucard.can.bought:hover { border-color: #e0b820; background: #fffde0; }
 .ucard .un-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
 .ucard .un { font-size: 17px; font-weight: bold; color: #1a1a1a; }
-.ucard .uowned { font-size: 15px; font-weight: bold; color: #7a6010; margin-left: auto; padding-left: 10px; white-space: nowrap; }
+.ucard .uowned { font-size: 15px; font-weight: bold; color: #7a6010; white-space: nowrap; }
 .ucard .ud { font-size: 15px; font-weight: 600; color: #333333; font-style: italic; line-height: 1.4; }
+.ucard .uowned-block { display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; padding-left: 10px; }
+.ucard .ucontrib { font-size: 12px; font-weight: bold; color: #2a6a2a; white-space: nowrap; }
 .ucard .uc { font-size: 15px; font-weight: bold; color: #7a6010; margin-top: 4px; }
 .ucard .ms-row { display:flex; gap:3px; margin-top:8px; padding-top:7px; border-top:1px solid #c8b870; }
 .ms-box { flex:0 0 32px; width:32px; height:32px; border-radius:3px; border:1px solid #2a2010; background:rgba(30,20,10,0.35); cursor:not-allowed; position:relative; transition:background 0.2s,border-color 0.2s,box-shadow 0.2s; overflow:hidden; }
@@ -50,6 +52,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #ms-tooltip .mst-cost { font-size:12px; margin-top:3px; font-weight:bold; }
 #ms-tooltip .mst-status { color:#554488; font-size:12px; margin-top:3px; font-style:italic; }
 #ms-tooltip .mst-dmg { color:#88ddaa; font-size:13px; margin-top:4px; font-weight:bold; }
+#upgrade-tooltip { display:none; position:fixed; z-index:199; background:#0d0d1e; border:1px solid #335533; border-radius:6px; padding:7px 11px; font-family:Georgia,serif; font-size:13px; color:#b0ccb0; pointer-events:none; max-width:240px; box-shadow:0 0 14px rgba(40,120,60,0.4); line-height:1.6; }
+#upgrade-tooltip .utt-dps { color:#88ddaa; font-weight:bold; }
+#upgrade-tooltip .utt-mult { color:#d4a843; font-size:12px; margin-top:2px; }
 /* Flex layout: icon left, content right */
 .ucard-flex { display: flex; gap: 10px; align-items: flex-start; }
 .ucard-icon { width: 52px; height: 52px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; }
@@ -2802,7 +2807,7 @@ function recalcStats(){
     if(u.level===0) return;
     // DV milestones have unique effects — don't apply generic multiplier to drain
     // getPurchMult also excluded from drain: % drain scales naturally with HP, no boost needed
-    var mm=(u.id==='dv')?1:getMileMult(u);
+    var mm=getMileMult(u);
     var pm=getPurchMult(u.level);
     if(u.type==='drain'){
       enemyHpDrainPct+=u.level*u.perLevel*mm;
@@ -2924,6 +2929,48 @@ function hideMsTip(){
   var tip=document.getElementById('ms-tooltip'); if(tip) tip.style.display='none';
 }
 
+function getNextPurchThreshInfo(level){
+  var next=level<200?200:(Math.floor(level/100)+1)*100;
+  return {thresh:next,mult:getPurchMult(next)};
+}
+function showUpgradeTip(evt,u){
+  var tip=document.getElementById('upgrade-tooltip');
+  if(!tip) return;
+  var n=(buyQty==='max')?maxAffordableN(u):buyQty;
+  if(n<1) n=1;
+  var newLevel=u.level+n;
+  var mm=getMileMult(u);
+  var dpsLine;
+  if(u.type==='drain'){
+    var drainMm=(u.id==='dv')?1:mm;
+    var delta=n*u.perLevel*drainMm*100;
+    dpsLine='+'+n+': +'+(+(delta.toFixed(4)))+'% HP/s drain';
+  } else {
+    var currEff=u.level>0?D(u.level).mul(u.perLevel).mul(mm).mul(getPurchMult(u.level)):D(0);
+    var newEff=D(newLevel).mul(u.perLevel).mul(mm).mul(getPurchMult(newLevel));
+    var delta=newEff.sub(currEff);
+    var label=u.type==='click'?' strike damage':' DPS';
+    dpsLine='+'+n+': +'+fmt(delta)+label;
+  }
+  var info=getNextPurchThreshInfo(u.level);
+  tip.querySelector('.utt-dps').textContent=dpsLine;
+  tip.querySelector('.utt-mult').textContent=info.thresh+': \xd7'+fmt(info.mult);
+  tip.style.display='block';
+  positionUpgradeTip(evt);
+}
+function positionUpgradeTip(evt){
+  var tip=document.getElementById('upgrade-tooltip'); if(!tip) return;
+  var x=evt.clientX+14, y=evt.clientY-50;
+  var tw=tip.offsetWidth||200;
+  if(x+tw>window.innerWidth-8) x=evt.clientX-tw-14;
+  if(x<4) x=4;
+  if(y<4) y=4;
+  tip.style.left=x+'px'; tip.style.top=y+'px';
+}
+function hideUpgradeTip(){
+  var tip=document.getElementById('upgrade-tooltip'); if(tip) tip.style.display='none';
+}
+
 function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
 var REP_UPGRADES=[
   {id:'ss',name:'Spirit Slash',  icon:0,  cost:5,     costScale:1.0666, level:0, type:'click',  perLevel:1,
@@ -2938,8 +2985,8 @@ var REP_UPGRADES=[
   {id:'sl',name:'Spectral Lure', icon:3,  cost:1000,  costScale:1.07, level:0, type:'dps',    perLevel:75,
     desc:function(){return '+'+fmt(75)+' damage per second';},
     vis:function(){return REP_UPGRADES[2].level>=1;}, milestones:mkMs()},
-  {id:'dv',name:'Divine Hunger', icon:4,  cost:5000,  costScale:1.07, level:0, type:'drain',  perLevel:0.0003,
-    desc:function(){return '+0.03% enemy HP/s drain. Milestones unlock support bonuses.';},
+  {id:'dv',name:'Divine Hunger', icon:4,  cost:5000,  costScale:1.07, level:0, type:'dps',    perLevel:333,
+    desc:function(){return '+'+fmt(333)+' damage per second';},
     vis:function(){return REP_UPGRADES[3].level>=1;}, milestones:mkMs()},
   {id:'vs',name:'Void Sense',    icon:5,  cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
     desc:function(){return '+'+fmt(900)+' damage per second';},
@@ -3021,20 +3068,19 @@ var REP_UPGRADES=[
 // Convert all upgrade costs to Decimal after definition
 REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
 
-// Each milestone cost = previous milestone cost × chain factor (compounding)
-var MS_CHAIN_FACTORS=[3.33, 3.33, 6.66, 6.66, 9.99, 9.99, 9.99, 6.66, 3.33];
 // DV DPS→Click milestone indices and their step multipliers from the previous DPS→Click milestone
 var DV_DPS_MS_IDX=[0,1,3,4,6,7,9];
 var DV_DPS_MS_STEP=[12,100,1000,10000,100000,1000000];
+// Milestone cost = cost to buy 10 more of that upgrade starting at the milestone's threshold level.
+// This ties each milestone price to the upgrade economy at the moment it becomes available.
 function calcMilestoneCosts(u){
-  var c=u._baseCost, base=D(0);
-  for(var i=0;i<10;i++){ base=base.add(c); c=c.mul(u.costScale).ceil(); }
-  var costs=[base.floor()];
-  for(var i=0;i<9;i++){ costs.push(costs[i].mul(MS_CHAIN_FACTORS[i]).floor()); }
-  if(u.id==='dv'){
-    var dpsCosts=[base.floor()];
-    for(var i=0;i<DV_DPS_MS_STEP.length;i++) dpsCosts.push(dpsCosts[i].mul(DV_DPS_MS_STEP[i]));
-    DV_DPS_MS_IDX.forEach(function(mi,j){ costs[mi]=dpsCosts[j]; });
+  var costs=[];
+  for(var i=0;i<10;i++){
+    var thresh=MS_THRESH[i];
+    var c=u._baseCost.mul(D(u.costScale).pow(thresh));
+    var total=D(0);
+    for(var j=0;j<10;j++){ total=total.add(c); c=c.mul(u.costScale).ceil(); }
+    costs.push(total.floor());
   }
   u.milestoneCosts=costs;
 }
@@ -4471,9 +4517,9 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   }
   msRowHtml+='</div>';
 
-  var ownedHtml=bought?'<span class="uowned">'+u.level+' owned</span>':'';
+  var ownedHtml=bought?'<div class="uowned-block"><span class="uowned">'+u.level+' owned</span><span class="ucontrib">'+getUpgradeContribStr(u)+'</span></div>':'';
   var nameHtml='<div class="un-row"><span class="un">'+u.name+'</span>'+ownedHtml+'</div>';
-  var descHtml='<div class="ud">'+(bought?getUpgradeContribStr(u):u.desc())+'</div>';
+  var descHtml='<div class="ud">'+u.desc()+'</div>';
   var buyPrefix=(actualN>1)?'<span class="ubuy">×'+actualN+'</span>':'';
   var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
   var iconOffset = -(u.icon * 52);
@@ -4504,6 +4550,11 @@ function createUpgradeCard(u, can, bought, actualN, cost){
     box.addEventListener('mousemove',positionMsTip);
     box.addEventListener('mouseleave',hideMsTip);
   });
+
+  // Upgrade tooltip
+  d.addEventListener('mouseenter',function(e){ showUpgradeTip(e,u); });
+  d.addEventListener('mousemove',positionUpgradeTip);
+  d.addEventListener('mouseleave',hideUpgradeTip);
 
   // Card buy click — always attached; affordability checked at call time
   d.addEventListener('click',function(e){
@@ -4591,20 +4642,22 @@ function buildUpgrades(){
     if(card){
       // Patch the existing card — no DOM destruction
       card.className='ucard'+(can?' can':'')+(bought?' bought':'');
-      var ownedEl=card.querySelector('.uowned');
+      var unRow=card.querySelector('.un-row');
+      var ownedBlock=card.querySelector('.uowned-block');
       if(bought){
-        if(!ownedEl){
-          ownedEl=document.createElement('span');
-          ownedEl.className='uowned';
-          var unRow=card.querySelector('.un-row');
-          if(unRow) unRow.appendChild(ownedEl);
+        if(!ownedBlock){
+          ownedBlock=document.createElement('div');
+          ownedBlock.className='uowned-block';
+          ownedBlock.innerHTML='<span class="uowned"></span><span class="ucontrib"></span>';
+          if(unRow) unRow.appendChild(ownedBlock);
         }
-        ownedEl.textContent=u.level+' owned';
-      } else if(ownedEl){
-        ownedEl.parentNode.removeChild(ownedEl);
+        ownedBlock.querySelector('.uowned').textContent=u.level+' owned';
+        ownedBlock.querySelector('.ucontrib').textContent=getUpgradeContribStr(u);
+      } else if(ownedBlock){
+        ownedBlock.parentNode.removeChild(ownedBlock);
       }
       var udEl=card.querySelector('.ud');
-      if(udEl) udEl.textContent=bought?getUpgradeContribStr(u):u.desc();
+      if(udEl) udEl.textContent=u.desc();
       var ucEl=card.querySelector('.uc');
       if(ucEl) ucEl.innerHTML=(actualN>1?'<span class="ubuy">×'+actualN+'</span>':'')+fmt(cost)+' souls';
       patchMilestoneRow(card, u);
@@ -6398,6 +6451,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
 </script>
 <div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-cost" style="display:none"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
+<div id="upgrade-tooltip"><div class="utt-dps"></div><div class="utt-mult"></div></div>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
