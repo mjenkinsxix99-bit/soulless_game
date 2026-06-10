@@ -2183,6 +2183,30 @@ var ascension5Path=null;
 var ascension6Path=null;
 var rebirthForm=null;
 var soundVolume=0.7; // 0.0–1.0; 0 = muted
+
+// ── MUSIC ─────────────────────────────────────────────────────────────────────
+var REALM_TRACKS=['music/void.mp3','music/underworld.mp3','music/purgatory.mp3',
+                  'music/undead.mp3','music/hades.mp3',null,null,null,null,null];
+var _bgmAudio=null;
+var _bgmRealm=-1;
+function bgmSetVolume(){
+  if(_bgmAudio) _bgmAudio.volume=soundVolume;
+}
+function bgmPlay(realm){
+  var track=REALM_TRACKS[realm-1]||null;
+  if(realm===_bgmRealm) return; // already playing this realm
+  _bgmRealm=realm;
+  if(_bgmAudio){ _bgmAudio.pause(); _bgmAudio=null; }
+  if(!track||soundVolume<=0) return;
+  var a=new Audio(track);
+  a.loop=true; a.volume=soundVolume;
+  a.play().catch(function(){}); // silently swallow autoplay block
+  _bgmAudio=a;
+}
+function bgmStop(){
+  if(_bgmAudio){ _bgmAudio.pause(); _bgmAudio=null; }
+  _bgmRealm=-1;
+}
 var eliteKillsTotal=0;
 var highestGlobalFloorEver=0;
 var achievementsEarned=[];
@@ -2476,6 +2500,7 @@ function navigateTo(level, floor, realm){
   var beyondFrontier=(realm>highestRealm)||(realm===highestRealm&&(level>highestLevel||(level===highestLevel&&floor>highestFloor)));
   curRealm=realm; curLevel=level; curFloor=floor;
   floorWins=atFrontier?_frontierWins:(beyondFrontier?0:WINS_PER_FLOOR);
+  bgmPlay(curRealm);
   setTimeout(spawnEnemy,400);
   buildMinimap();
   updateProgressLabel();
@@ -5465,6 +5490,9 @@ document.getElementById('settings-modal').addEventListener('click',function(e){
 document.getElementById('volume-slider').addEventListener('input',function(){
   soundVolume=parseInt(this.value,10)/100;
   updateVolumeSlider();
+  bgmSetVolume();
+  if(soundVolume>0 && _bgmRealm===curRealm && !_bgmAudio) bgmPlay(curRealm);
+  if(soundVolume<=0) bgmStop();
   saveGame(); saveSettings();
 });
 
@@ -5793,6 +5821,12 @@ updateTatteredBtn();
 updateManaBar();
 renderSpellPanel();
 updateVolumeSlider();
+// Start BGM on first user interaction (autoplay policy requires a gesture)
+(function(){
+  function _startBgm(){ bgmPlay(curRealm); document.removeEventListener('click',_startBgm); document.removeEventListener('keydown',_startBgm); }
+  document.addEventListener('click',_startBgm);
+  document.addEventListener('keydown',_startBgm);
+})();
 syncIntroToggleUI();
 if(!_hadSave && showIntro){
   showIntroSequence(function(){
