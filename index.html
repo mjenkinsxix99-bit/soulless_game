@@ -2043,7 +2043,7 @@ var ENEMY_TYPES = [
 //
 // Scaling: continuous floor index across entire realm
 //   floorHp(f)    = ceil(10 * 1.6^(f-1))   f = 1-based absolute floor number
-//   floorSouls(f) = ceil(floorHp / 5)
+//   floorSouls(f) = ceil(1 * 1.666^(gf-1))  [gf<=130], then continues at 1.1666x/floor
 //   Elite hp      = ceil(last floor hp of that level * 2.5)
 //
 // Navigation:
@@ -2112,8 +2112,17 @@ function computeEnemyHp(gf){
 function floorHp(level, floor){
   return computeEnemyHp(absGlobalFloor(curRealm, level, floor)).ceil();
 }
+function computeFloorSoulsBase(gf){
+  // Floor 1 = 1 soul; ×1.666/floor up to gf 130, then ×1.1666/floor after
+  if(gf<=130){
+    return D(1).mul(D(1.666).pow(gf-1));
+  }
+  var s130=D(1).mul(D(1.666).pow(129));
+  return s130.mul(D(1.1666).pow(gf-130));
+}
 function floorSouls(level, floor){
-  return floorHp(level, floor).div(5).ceil();
+  var gf=absGlobalFloor(curRealm, level, floor);
+  return computeFloorSoulsBase(gf).ceil();
 }
 function eliteHp(level){
   var gf=absGlobalFloor(curRealm, level, FLOORS_PER_LEVEL+1);
@@ -2121,7 +2130,8 @@ function eliteHp(level){
   return computeEnemyHp(gf).mul(mult).ceil();
 }
 function eliteSouls(level){
-  return eliteHp(level).div(5).ceil();
+  var gf=absGlobalFloor(curRealm, level, FLOORS_PER_LEVEL+1);
+  return computeFloorSoulsBase(gf).mul(9.99).ceil();
 }
 function floorDmgMin(hp){ return Decimal.max(D(1), hp.mul(0.08).round()); }
 function floorDmgMax(hp){ return Decimal.max(D(1), hp.mul(0.14).round()); }
