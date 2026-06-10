@@ -3080,13 +3080,6 @@ function calcMilestoneCosts(u){
     for(var j=0;j<10;j++){ total=total.add(c); c=c.mul(u.costScale).ceil(); }
     costs.push(total.floor());
   }
-  if(u.id==='dv'){
-    // DV keeps its own bespoke cost ladder
-    var dvBase=costs[0];
-    var dpsCosts=[dvBase];
-    for(var i=0;i<DV_DPS_MS_STEP.length;i++) dpsCosts.push(dpsCosts[i].mul(DV_DPS_MS_STEP[i]));
-    DV_DPS_MS_IDX.forEach(function(mi,j){ costs[mi]=dpsCosts[j]; });
-  }
   u.milestoneCosts=costs;
 }
 REP_UPGRADES.forEach(calcMilestoneCosts);
