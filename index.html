@@ -2805,7 +2805,7 @@ function recalcStats(){
     if(u.level===0) return;
     // DV milestones have unique effects — don't apply generic multiplier to drain
     // getPurchMult also excluded from drain: % drain scales naturally with HP, no boost needed
-    var mm=(u.id==='dv')?1:getMileMult(u);
+    var mm=getMileMult(u);
     var pm=getPurchMult(u.level);
     if(u.type==='drain'){
       enemyHpDrainPct+=u.level*u.perLevel*mm;
@@ -2983,8 +2983,8 @@ var REP_UPGRADES=[
   {id:'sl',name:'Spectral Lure', icon:3,  cost:1000,  costScale:1.07, level:0, type:'dps',    perLevel:75,
     desc:function(){return '+'+fmt(75)+' damage per second';},
     vis:function(){return REP_UPGRADES[2].level>=1;}, milestones:mkMs()},
-  {id:'dv',name:'Divine Hunger', icon:4,  cost:5000,  costScale:1.07, level:0, type:'drain',  perLevel:0.0003,
-    desc:function(){return '+0.03% enemy HP/s drain. Milestones unlock support bonuses.';},
+  {id:'dv',name:'Divine Hunger', icon:4,  cost:5000,  costScale:1.07, level:0, type:'dps',    perLevel:333,
+    desc:function(){return '+'+fmt(333)+' damage per second';},
     vis:function(){return REP_UPGRADES[3].level>=1;}, milestones:mkMs()},
   {id:'vs',name:'Void Sense',    icon:5,  cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
     desc:function(){return '+'+fmt(900)+' damage per second';},
