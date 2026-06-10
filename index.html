@@ -437,9 +437,13 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1540; }
 .settings-row:last-of-type { border-bottom: none; }
 .settings-label { font-size: 15px; color: #9988bb; letter-spacing: 1px; }
-#mute-toggle, #intro-toggle, #tutorial-toggle { padding: 6px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
-#mute-toggle:hover, #intro-toggle:hover, #tutorial-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
-#mute-toggle.muted, #intro-toggle.muted, #tutorial-toggle.muted { border-color: #554477; color: #554477; }
+#intro-toggle, #tutorial-toggle { padding: 6px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
+#intro-toggle:hover, #tutorial-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
+#intro-toggle.muted, #tutorial-toggle.muted { border-color: #554477; color: #554477; }
+#volume-slider { -webkit-appearance:none; appearance:none; width:130px; height:4px; border-radius:2px; background:linear-gradient(to right,#7755cc 0%,#7755cc var(--vp,70%),#2a1f44 var(--vp,70%),#2a1f44 100%); outline:none; cursor:pointer; vertical-align:middle; }
+#volume-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:14px; height:14px; border-radius:50%; background:#9977ee; border:2px solid #c0a8ff; cursor:pointer; }
+#volume-slider::-moz-range-thumb { width:14px; height:14px; border-radius:50%; background:#9977ee; border:2px solid #c0a8ff; cursor:pointer; }
+#volume-label { font-size:13px; color:#9988bb; min-width:36px; text-align:right; display:inline-block; vertical-align:middle; margin-left:8px; }
 #hard-reset-btn { margin-top: 22px; padding: 10px 24px; background: transparent; border: 1px solid #882222; color: #994444; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; width: 100%; transition: background 0.2s, color 0.2s; }
 #hard-reset-btn:hover { background: rgba(140,30,30,0.15); color: #cc5555; }
 #hard-reset-confirm { display: none; margin-top: 14px; }
@@ -1211,7 +1215,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <div id="settings-title">⚙ Settings</div>
     <div class="settings-row">
       <span class="settings-label">Sound</span>
-      <button id="mute-toggle">On</button>
+      <input type="range" id="volume-slider" min="0" max="100" step="1" value="70">
+      <span id="volume-label">70%</span>
     </div>
     <div class="settings-row">
       <span class="settings-label">Show Intro</span>
@@ -2177,7 +2182,7 @@ var ascension4Path=null;
 var ascension5Path=null;
 var ascension6Path=null;
 var rebirthForm=null;
-var soundMuted=false;
+var soundVolume=0.7; // 0.0–1.0; 0 = muted
 var eliteKillsTotal=0;
 var highestGlobalFloorEver=0;
 var achievementsEarned=[];
@@ -3250,12 +3255,13 @@ function showAchievementBanner(a){
   banner.classList.add('show');
 }
 function playChurchBell(){
+  if(soundVolume<=0) return;
   try{
     var AC=window.AudioContext||window.webkitAudioContext;
     if(!AC) return;
     var ctx=new AC();
     var master=ctx.createGain();
-    master.gain.value=0.55;
+    master.gain.value=0.55*soundVolume;
     master.connect(ctx.destination);
     [{freq:174,gain:0.70,decay:5.0},{freq:261,gain:0.40,decay:4.0},
      {freq:349,gain:0.28,decay:3.0},{freq:523,gain:0.18,decay:2.0},
@@ -4168,7 +4174,7 @@ var SETTINGS_KEY='formless_settings_v1';
 
 function saveSettings(){
   try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify({
-    soundMuted:soundMuted,
+    soundVolume:soundVolume,
     showTutorial:showTutorial,
     showIntro:showIntro
   })); } catch(e){}
@@ -4179,7 +4185,8 @@ function loadSettings(){
     var raw=localStorage.getItem(SETTINGS_KEY);
     if(!raw) return;
     var d=JSON.parse(raw);
-    if(d.soundMuted!==undefined) soundMuted=d.soundMuted;
+    if(d.soundVolume!==undefined) soundVolume=d.soundVolume;
+    else if(d.soundMuted!==undefined) soundVolume=d.soundMuted?0:0.7; // migrate old saves
     if(d.showTutorial!==undefined) showTutorial=d.showTutorial;
     if(d.showIntro!==undefined) showIntro=d.showIntro;
   } catch(e){}
@@ -4216,7 +4223,7 @@ function saveGame(){
     invokePowerStacks:invokePowerStacks,
     completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
-    soundMuted:soundMuted,
+    soundVolume:soundVolume,
     showIntro:showIntro,
     showTutorial:showTutorial,
     tutShown:_tutShown,
@@ -4291,7 +4298,8 @@ function loadGame(){
   if(data.completedFloorsThisAscension) completedFloorsThisAscension=data.completedFloorsThisAscension;
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
-  soundMuted=data.soundMuted||false;
+  if(data.soundVolume!==undefined) soundVolume=data.soundVolume;
+  else if(data.soundMuted!==undefined) soundVolume=data.soundMuted?0:0.7;
   showIntro=(data.showIntro!==undefined)?data.showIntro:true;
   showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
   if(data.tutShown) _tutShown=Object.assign(_tutShown,data.tutShown);
@@ -5428,16 +5436,20 @@ function gameLoop(){
 }
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
-function updateMuteToggle(){
-  var btn=document.getElementById('mute-toggle');
-  if(soundMuted){ btn.textContent='Off'; btn.classList.add('muted'); }
-  else { btn.textContent='On'; btn.classList.remove('muted'); }
+function updateVolumeSlider(){
+  var sl=document.getElementById('volume-slider');
+  var lb=document.getElementById('volume-label');
+  if(!sl||!lb) return;
+  var pct=Math.round(soundVolume*100);
+  sl.value=pct;
+  sl.style.setProperty('--vp', pct+'%');
+  lb.textContent=pct===0?'Mute':pct+'%';
 }
 
 document.getElementById('settings-btn').addEventListener('click',function(){
   document.getElementById('hard-reset-confirm').style.display='none';
   document.getElementById('hard-reset-btn').style.display='';
-  updateMuteToggle();
+  updateVolumeSlider();
   syncIntroToggleUI();
   document.getElementById('settings-modal').classList.add('open');
 });
@@ -5450,9 +5462,9 @@ document.getElementById('settings-modal').addEventListener('click',function(e){
   if(e.target===this) this.classList.remove('open');
 });
 
-document.getElementById('mute-toggle').addEventListener('click',function(){
-  soundMuted=!soundMuted;
-  updateMuteToggle();
+document.getElementById('volume-slider').addEventListener('input',function(){
+  soundVolume=parseInt(this.value,10)/100;
+  updateVolumeSlider();
   saveGame(); saveSettings();
 });
 
@@ -5780,7 +5792,7 @@ updateTatteredDisplay();
 updateTatteredBtn();
 updateManaBar();
 renderSpellPanel();
-updateMuteToggle();
+updateVolumeSlider();
 syncIntroToggleUI();
 if(!_hadSave && showIntro){
   showIntroSequence(function(){
