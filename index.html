@@ -50,6 +50,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #ms-tooltip .mst-cost { font-size:12px; margin-top:3px; font-weight:bold; }
 #ms-tooltip .mst-status { color:#554488; font-size:12px; margin-top:3px; font-style:italic; }
 #ms-tooltip .mst-dmg { color:#88ddaa; font-size:13px; margin-top:4px; font-weight:bold; }
+#upgrade-tooltip { display:none; position:fixed; z-index:199; background:#0d0d1e; border:1px solid #335533; border-radius:6px; padding:7px 11px; font-family:Georgia,serif; font-size:13px; color:#b0ccb0; pointer-events:none; max-width:240px; box-shadow:0 0 14px rgba(40,120,60,0.4); line-height:1.6; }
+#upgrade-tooltip .utt-dps { color:#88ddaa; font-weight:bold; }
+#upgrade-tooltip .utt-mult { color:#d4a843; font-size:12px; margin-top:2px; }
 /* Flex layout: icon left, content right */
 .ucard-flex { display: flex; gap: 10px; align-items: flex-start; }
 .ucard-icon { width: 52px; height: 52px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; }
@@ -2924,6 +2927,48 @@ function hideMsTip(){
   var tip=document.getElementById('ms-tooltip'); if(tip) tip.style.display='none';
 }
 
+function getNextPurchThreshInfo(level){
+  var next=level<200?200:(Math.floor(level/100)+1)*100;
+  return {thresh:next,mult:getPurchMult(next)};
+}
+function showUpgradeTip(evt,u){
+  var tip=document.getElementById('upgrade-tooltip');
+  if(!tip) return;
+  var n=(buyQty==='max')?maxAffordableN(u):buyQty;
+  if(n<1) n=1;
+  var newLevel=u.level+n;
+  var mm=getMileMult(u);
+  var dpsLine;
+  if(u.type==='drain'){
+    var drainMm=(u.id==='dv')?1:mm;
+    var delta=n*u.perLevel*drainMm*100;
+    dpsLine='+'+n+': +'+(+(delta.toFixed(4)))+'% HP/s drain';
+  } else {
+    var currEff=u.level>0?D(u.level).mul(u.perLevel).mul(mm).mul(getPurchMult(u.level)):D(0);
+    var newEff=D(newLevel).mul(u.perLevel).mul(mm).mul(getPurchMult(newLevel));
+    var delta=newEff.sub(currEff);
+    var label=u.type==='click'?' strike damage':' DPS';
+    dpsLine='+'+n+': +'+fmt(delta)+label;
+  }
+  var info=getNextPurchThreshInfo(u.level);
+  tip.querySelector('.utt-dps').textContent=dpsLine;
+  tip.querySelector('.utt-mult').textContent=info.thresh+': \xd7'+fmt(info.mult);
+  tip.style.display='block';
+  positionUpgradeTip(evt);
+}
+function positionUpgradeTip(evt){
+  var tip=document.getElementById('upgrade-tooltip'); if(!tip) return;
+  var x=evt.clientX+14, y=evt.clientY-50;
+  var tw=tip.offsetWidth||200;
+  if(x+tw>window.innerWidth-8) x=evt.clientX-tw-14;
+  if(x<4) x=4;
+  if(y<4) y=4;
+  tip.style.left=x+'px'; tip.style.top=y+'px';
+}
+function hideUpgradeTip(){
+  var tip=document.getElementById('upgrade-tooltip'); if(tip) tip.style.display='none';
+}
+
 function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
 var REP_UPGRADES=[
   {id:'ss',name:'Spirit Slash',  icon:0,  cost:5,     costScale:1.0666, level:0, type:'click',  perLevel:1,
@@ -4504,6 +4549,11 @@ function createUpgradeCard(u, can, bought, actualN, cost){
     box.addEventListener('mousemove',positionMsTip);
     box.addEventListener('mouseleave',hideMsTip);
   });
+
+  // Upgrade tooltip
+  d.addEventListener('mouseenter',function(e){ showUpgradeTip(e,u); });
+  d.addEventListener('mousemove',positionUpgradeTip);
+  d.addEventListener('mouseleave',hideUpgradeTip);
 
   // Card buy click — always attached; affordability checked at call time
   d.addEventListener('click',function(e){
@@ -6398,6 +6448,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
 </script>
 <div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-cost" style="display:none"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
+<div id="upgrade-tooltip"><div class="utt-dps"></div><div class="utt-mult"></div></div>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
