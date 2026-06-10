@@ -2931,7 +2931,8 @@ function hideMsTip(){
 
 function getNextPurchThreshInfo(level){
   var next=level<200?200:(Math.floor(level/100)+1)*100;
-  return {thresh:next,mult:getPurchMult(next)};
+  var marginal=(next%1000===0)?D(999):D(13);
+  return {thresh:next,mult:marginal};
 }
 function showUpgradeTip(evt,u){
   var tip=document.getElementById('upgrade-tooltip');
@@ -4551,10 +4552,13 @@ function createUpgradeCard(u, can, bought, actualN, cost){
     box.addEventListener('mouseleave',hideMsTip);
   });
 
-  // Upgrade tooltip
-  d.addEventListener('mouseenter',function(e){ showUpgradeTip(e,u); });
-  d.addEventListener('mousemove',positionUpgradeTip);
-  d.addEventListener('mouseleave',hideUpgradeTip);
+  // Upgrade tooltip — icon only
+  var iconEl=d.querySelector('.ucard-icon');
+  if(iconEl){
+    iconEl.addEventListener('mouseenter',function(e){ showUpgradeTip(e,u); });
+    iconEl.addEventListener('mousemove',positionUpgradeTip);
+    iconEl.addEventListener('mouseleave',hideUpgradeTip);
+  }
 
   // Card buy click — always attached; affordability checked at call time
   d.addEventListener('click',function(e){
