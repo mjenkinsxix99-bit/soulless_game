@@ -30,9 +30,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 	.ucard.can.bought:hover { border-color: #e0b820; background: #fffde0; }
 .ucard .un-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
 .ucard .un { font-size: 17px; font-weight: bold; color: #1a1a1a; }
-.ucard .uowned { font-size: 15px; font-weight: bold; color: #7a6010; margin-left: auto; padding-left: 10px; white-space: nowrap; }
+.ucard .uowned { font-size: 15px; font-weight: bold; color: #7a6010; white-space: nowrap; }
 .ucard .ud { font-size: 15px; font-weight: 600; color: #333333; font-style: italic; line-height: 1.4; }
-.ucard .ucontrib { font-size: 13px; font-weight: bold; color: #2a6a2a; margin-top: 2px; }
+.ucard .uowned-block { display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; padding-left: 10px; }
+.ucard .ucontrib { font-size: 12px; font-weight: bold; color: #2a6a2a; white-space: nowrap; }
 .ucard .uc { font-size: 15px; font-weight: bold; color: #7a6010; margin-top: 4px; }
 .ucard .ms-row { display:flex; gap:3px; margin-top:8px; padding-top:7px; border-top:1px solid #c8b870; }
 .ms-box { flex:0 0 32px; width:32px; height:32px; border-radius:3px; border:1px solid #2a2010; background:rgba(30,20,10,0.35); cursor:not-allowed; position:relative; transition:background 0.2s,border-color 0.2s,box-shadow 0.2s; overflow:hidden; }
@@ -4516,15 +4517,14 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   }
   msRowHtml+='</div>';
 
-  var ownedHtml=bought?'<span class="uowned">'+u.level+' owned</span>':'';
+  var ownedHtml=bought?'<div class="uowned-block"><span class="uowned">'+u.level+' owned</span><span class="ucontrib">'+getUpgradeContribStr(u)+'</span></div>':'';
   var nameHtml='<div class="un-row"><span class="un">'+u.name+'</span>'+ownedHtml+'</div>';
   var descHtml='<div class="ud">'+u.desc()+'</div>';
-  var contribHtml=bought?'<div class="ucontrib">'+getUpgradeContribStr(u)+'</div>':'';
   var buyPrefix=(actualN>1)?'<span class="ubuy">×'+actualN+'</span>':'';
   var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
   var iconOffset = -(u.icon * 52);
   var iconHtml = '<img class="ucard-icon" src="artwork/sprites_upgrades.webp" style="object-fit:none;object-position:'+iconOffset+'px 0;width:52px;height:52px;" alt="">';
-  d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+contribHtml+costHtml+'</div></div>'+msRowHtml;
+  d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+costHtml+'</div></div>'+msRowHtml;
 
   // Milestone box events — listeners live for the lifetime of the card element
   d.querySelectorAll('.ms-box').forEach(function(box){
@@ -4642,32 +4642,22 @@ function buildUpgrades(){
     if(card){
       // Patch the existing card — no DOM destruction
       card.className='ucard'+(can?' can':'')+(bought?' bought':'');
-      var ownedEl=card.querySelector('.uowned');
+      var unRow=card.querySelector('.un-row');
+      var ownedBlock=card.querySelector('.uowned-block');
       if(bought){
-        if(!ownedEl){
-          ownedEl=document.createElement('span');
-          ownedEl.className='uowned';
-          var unRow=card.querySelector('.un-row');
-          if(unRow) unRow.appendChild(ownedEl);
+        if(!ownedBlock){
+          ownedBlock=document.createElement('div');
+          ownedBlock.className='uowned-block';
+          ownedBlock.innerHTML='<span class="uowned"></span><span class="ucontrib"></span>';
+          if(unRow) unRow.appendChild(ownedBlock);
         }
-        ownedEl.textContent=u.level+' owned';
-      } else if(ownedEl){
-        ownedEl.parentNode.removeChild(ownedEl);
+        ownedBlock.querySelector('.uowned').textContent=u.level+' owned';
+        ownedBlock.querySelector('.ucontrib').textContent=getUpgradeContribStr(u);
+      } else if(ownedBlock){
+        ownedBlock.parentNode.removeChild(ownedBlock);
       }
       var udEl=card.querySelector('.ud');
       if(udEl) udEl.textContent=u.desc();
-      var contribEl=card.querySelector('.ucontrib');
-      if(bought){
-        if(!contribEl){
-          contribEl=document.createElement('div');
-          contribEl.className='ucontrib';
-          var ucElRef=card.querySelector('.uc');
-          if(ucElRef) card.querySelector('.ucard-body').insertBefore(contribEl,ucElRef);
-        }
-        contribEl.textContent=getUpgradeContribStr(u);
-      } else if(contribEl){
-        contribEl.parentNode.removeChild(contribEl);
-      }
       var ucEl=card.querySelector('.uc');
       if(ucEl) ucEl.innerHTML=(actualN>1?'<span class="ubuy">×'+actualN+'</span>':'')+fmt(cost)+' souls';
       patchMilestoneRow(card, u);
