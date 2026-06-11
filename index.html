@@ -5949,23 +5949,17 @@ function buyAllAffordable(){
   var keepGoing=true;
   while(keepGoing){
     keepGoing=false;
-    var candidates=REP_UPGRADES.filter(function(u){return u.vis();});
-    candidates.sort(function(a,b){return a.cost.lt(b.cost)?-1:a.cost.gt(b.cost)?1:0;});
-    for(var i=0;i<candidates.length;i++){
-      var u=candidates[i];
-      var n=maxAffordableN(u);
-      if(n>=1){
-        var total=calcCostN(u,n);
-        souls=souls.sub(total);
-        var c=u.cost;
-        for(var j=0;j<n;j++){c=c.mul(u.costScale).ceil();}
-        u.cost=c;
-        u.level+=n;
-        totalUpgradePurchases+=n;
-        changed=true;
-        keepGoing=true;
-        buyFreeMilestones();
-      }
+    var candidates=REP_UPGRADES.filter(function(u){return u.vis()&&souls.gte(u.cost);});
+    if(candidates.length>0){
+      candidates.sort(function(a,b){return a.cost.lt(b.cost)?-1:a.cost.gt(b.cost)?1:0;});
+      var u=candidates[0];
+      souls=souls.sub(u.cost);
+      u.cost=u.cost.mul(u.costScale).ceil();
+      u.level+=1;
+      totalUpgradePurchases+=1;
+      changed=true;
+      keepGoing=true;
+      buyFreeMilestones();
     }
   }
 
