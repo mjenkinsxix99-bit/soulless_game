@@ -4925,7 +4925,6 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
   } else {
     document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
     document.getElementById('form-confirm-btn').classList.remove('show');
-    document.getElementById('form-certain').classList.remove('show');
     document.getElementById('form-modal').classList.add('open');
   }
 });
@@ -4937,7 +4936,6 @@ document.querySelectorAll('.form-card').forEach(function(card){
     card.classList.add('picked');
     _selectedForm=card.getAttribute('data-form');
     document.getElementById('form-confirm-btn').classList.add('show');
-    document.getElementById('form-certain').classList.remove('show');
   });
 });
 
