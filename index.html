@@ -2118,11 +2118,11 @@ function floorHp(level, floor){
   return computeEnemyHp(absGlobalFloor(curRealm, level, floor)).ceil();
 }
 function computeFloorSoulsBase(gf){
-  // Floor 1 = 1 soul; ×1.333/floor up to gf 139, then ×1.1666/floor after
+  // Floor 1 = 1 soul; ×1.339/floor up to gf 139, then ×1.1666/floor after
   if(gf<=139){
-    return D(1).mul(D(1.333).pow(gf-1));
+    return D(1).mul(D(1.339).pow(gf-1));
   }
-  var s139=D(1).mul(D(1.333).pow(138));
+  var s139=D(1).mul(D(1.339).pow(138));
   return s139.mul(D(1.1666).pow(gf-139));
 }
 function floorSouls(level, floor){
