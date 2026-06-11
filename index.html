@@ -2185,8 +2185,14 @@ var rebirthForm=null;
 var soundVolume=0.7; // 0.0–1.0; 0 = muted
 
 // ── MUSIC ─────────────────────────────────────────────────────────────────────
-var REALM_TRACKS=['music/void.mp3','music/underworld.mp3','music/purgatory.mp3',
-                  'music/undead.mp3','music/hades.mp3',null,null,null,null,null];
+var REALM_TRACKS=[
+  'https://raw.githubusercontent.com/mjenkinsxix99-bit/soulless_game/master/music/void.mp3',
+  'https://raw.githubusercontent.com/mjenkinsxix99-bit/soulless_game/master/music/underworld.mp3',
+  'https://raw.githubusercontent.com/mjenkinsxix99-bit/soulless_game/master/music/purgatory.mp3',
+  'https://raw.githubusercontent.com/mjenkinsxix99-bit/soulless_game/master/music/undead.mp3',
+  'https://raw.githubusercontent.com/mjenkinsxix99-bit/soulless_game/master/music/hades.mp3',
+  null,null,null,null,null
+];
 var _bgmAudio=null;
 var _bgmRealm=-1;
 function bgmSetVolume(){
