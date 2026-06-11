@@ -844,7 +844,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <button class="buy-btn" data-qty="50">50</button>
       <button class="buy-btn" data-qty="100">100</button>
       <button class="buy-btn" data-qty="max">MAX</button>
-      <button class="buy-btn" data-qty="all">ALL</button>
+      <button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;">All Augments</button>
       <div id="spell-panel">
         <div class="spell-divider"></div>
         <div id="mana-label">mana</div>
@@ -2118,11 +2118,11 @@ function floorHp(level, floor){
   return computeEnemyHp(absGlobalFloor(curRealm, level, floor)).ceil();
 }
 function computeFloorSoulsBase(gf){
-  // Floor 1 = 1 soul; ×1.339/floor up to gf 139, then ×1.1666/floor after
+  // Floor 1 = 1 soul; ×1.363/floor up to gf 139, then ×1.1666/floor after
   if(gf<=139){
-    return D(1).mul(D(1.339).pow(gf-1));
+    return D(1).mul(D(1.363).pow(gf-1));
   }
-  var s139=D(1).mul(D(1.339).pow(138));
+  var s139=D(1).mul(D(1.363).pow(138));
   return s139.mul(D(1.1666).pow(gf-139));
 }
 function floorSouls(level, floor){
@@ -2811,7 +2811,7 @@ function getMsThresh(i){
 }
 var MS_MULT=[1.777,1.777,1.666,1.777,1.777,1.777,1.666,1.777,1.777,1.999];
 var MS_MULT_LABELS=['+77.7%','+77.7%','+66.6%','+77.7%','+77.7%','+77.7%','+66.6%','+77.7%','+77.7%','+99.9%'];
-var MS_LABELS=['I','II','III','IV','V','VI','VII','VIII','IX','X'];
+var MS_LABELS=['Augment I','Augment II','Augment III','Augment IV','Augment V','Augment VI','Augment VII','Augment VIII','Augment IX','Augment X'];
 var MS_COLORS=['#ffffff','#f8f0e0','#f5e6c0','#f0d888','#e8cc55','#e0bb30','#d8aa18','#cf9a08','#c88a00','#d4a843'];
 var MS_LIT_BG=['rgba(255,255,255,0.35)','rgba(248,240,224,0.35)','rgba(245,230,192,0.35)','rgba(240,216,136,0.35)','rgba(232,204,85,0.35)','rgba(224,187,48,0.35)','rgba(216,170,24,0.35)','rgba(207,154,8,0.35)','rgba(200,138,0,0.35)','rgba(212,168,67,0.38)'];
 var MS_GLOW=['rgba(255,255,255,0.8)','rgba(248,240,224,0.8)','rgba(245,230,192,0.8)','rgba(240,216,136,0.8)','rgba(232,204,85,0.8)','rgba(224,187,48,0.8)','rgba(216,170,24,0.8)','rgba(207,154,8,0.8)','rgba(200,138,0,0.8)','rgba(255,215,0,0.95)'];
@@ -2914,7 +2914,7 @@ function showMsTip(evt,u,i){
   var tip=document.getElementById('ms-tooltip');
   if(!tip) return;
   var lit=u.milestones[i], avail=u.level>=getMsThresh(i);
-  tip.querySelector('.mst-title').textContent='Milestone '+MS_LABELS[i];
+  tip.querySelector('.mst-title').textContent=MS_LABELS[i];
   tip.querySelector('.mst-req').textContent='Requires '+getMsThresh(i)+' purchases';
   if(u.id==='dv'){
     tip.querySelector('.mst-eff').textContent=DV_MS_EFFECTS[i];
@@ -5932,42 +5932,26 @@ document.getElementById('tattered-modal').addEventListener('click',function(e){
 function buyAllAffordable(){
   var changed=false;
 
-  function buyFreeMilestones(){
-    REP_UPGRADES.forEach(function(u){
-      for(var mi=0;mi<10;mi++){
-        if(!u.milestones[mi]&&u.level>=getMsThresh(mi)){
-          u.milestones[mi]=true;
-          totalMilestonePurchases++;
-          changed=true;
-        }
-      }
-    });
-  }
-
-  buyFreeMilestones();
-
-  var keepGoing=true;
-  while(keepGoing){
-    keepGoing=false;
-    var candidates=REP_UPGRADES.filter(function(u){return u.vis();});
-    candidates.sort(function(a,b){return a.cost.lt(b.cost)?-1:a.cost.gt(b.cost)?1:0;});
-    for(var i=0;i<candidates.length;i++){
-      var u=candidates[i];
-      var n=maxAffordableN(u);
-      if(n>=1){
-        var total=calcCostN(u,n);
-        souls=souls.sub(total);
-        var c=u.cost;
-        for(var j=0;j<n;j++){c=c.mul(u.costScale).ceil();}
-        u.cost=c;
-        u.level+=n;
-        totalUpgradePurchases+=n;
-        changed=true;
-        keepGoing=true;
-        buyFreeMilestones();
+  // Build a flat list of all purchasable augments (threshold met, not yet bought, can afford)
+  var augments=[];
+  REP_UPGRADES.forEach(function(u){
+    for(var mi=0;mi<10;mi++){
+      if(!u.milestones[mi]&&u.level>=getMsThresh(mi)){
+        augments.push({u:u,mi:mi,cost:u.milestoneCosts[mi]});
       }
     }
-  }
+  });
+
+  // Sort cheapest first, then buy each one that is affordable
+  augments.sort(function(a,b){return a.cost.lt(b.cost)?-1:a.cost.gt(b.cost)?1:0;});
+  augments.forEach(function(item){
+    if(souls.gte(item.cost)){
+      souls=souls.sub(item.cost);
+      item.u.milestones[item.mi]=true;
+      totalMilestonePurchases++;
+      changed=true;
+    }
+  });
 
   if(changed){
     recalcStats();
