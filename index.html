@@ -2265,7 +2265,8 @@ function spawnSoulCoins(){
   if(_floorsComp>0){
     var _mg=3*0.00001*_floorsComp;
     if(isSpellActive('manaHungry')) _mg*=1.333;
-    if(rebirthForm==='feline') _mg*=(1+0.10*formBonusMult);
+    if(rebirthForm==='feline') _mg*=(1+0.10*getFormMult());
+    else if(achievementsEarned.indexOf('form-ult-feline')>=0) _mg*=1.10;
     if(ascension4Path==='shadow') _mg*=1.05;
     if(ascension5Path==='holy') _mg*=1.05;
     if(ascension6Path==='knowledge') _mg*=1.10;
@@ -2644,7 +2645,8 @@ function onEnemyDeath(){
   spawnSoulCoins();
   document.getElementById('elite-timer-wrap').style.visibility='hidden';
   var soulMult=1;
-  if(rebirthForm==='androgynous') soulMult*=(1+0.10*formBonusMult);
+  if(rebirthForm==='androgynous') soulMult*=(1+0.10*getFormMult());
+  else if(achievementsEarned.indexOf('form-ult-androgynous')>=0) soulMult*=1.10;
   if(ascension3Path==='mystic') soulMult*=1.05;
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
   // Spell: Twin Souls — ×2 souls gained
@@ -2805,7 +2807,8 @@ var DV_MS_EFFECTS=[
 var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
 function getMsThresh(i){
   var t=MS_THRESH[i];
-  if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*(1-0.10*formBonusMult)));
+  if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*(1-0.10*getFormMult())));
+  else if(achievementsEarned.indexOf('form-ult-equine')>=0) t=Math.max(1,Math.floor(t*0.90));
   if(ascension4Path==='mystic') t=Math.max(1,Math.floor(t*0.95));
   return t;
 }
@@ -2858,8 +2861,10 @@ function recalcStats(){
     }
   });
   // Apply form bonuses
-  if(rebirthForm==='masculine') totalDps=totalDps.mul(1+0.10*formBonusMult);
-  if(rebirthForm==='canine') clickDmgBonus=clickDmgBonus.mul(1+0.10*formBonusMult);
+  if(rebirthForm==='masculine') totalDps=totalDps.mul(1+0.10*getFormMult());
+  else if(achievementsEarned.indexOf('form-ult-masculine')>=0) totalDps=totalDps.mul(1.10);
+  if(rebirthForm==='canine') clickDmgBonus=clickDmgBonus.mul(1+0.10*getFormMult());
+  else if(achievementsEarned.indexOf('form-ult-canine')>=0) clickDmgBonus=clickDmgBonus.mul(1.10);
   if(ascension3Path==='holy') totalDps=totalDps.mul(1.05);
   if(ascension4Path==='holy') clickDmgBonus=clickDmgBonus.mul(1.05);
   if(ascension5Path==='shadow') totalDps=totalDps.mul(1.05);
@@ -3173,30 +3178,25 @@ var ACHIEVEMENTS=[
   {id:'mile-1k',       cat:'Milestone Seeker',name:'Thousand Milestones',     desc:'Activate 1,000 milestones',                   check:function(){return totalMilestonePurchases>=1000;}},
   {id:'mile-2k',       cat:'Milestone Seeker',name:'Beyond Reckoning',        desc:'Activate 2,000 milestones',                   check:function(){return totalMilestonePurchases>=2000;}},
   {id:'mile-3k',       cat:'Milestone Seeker',name:'The Unyielding Path',     desc:'Activate 3,000 milestones',                   check:function(){return totalMilestonePurchases>=3000;}},
-  // Floors
-  {id:'floor-10',      cat:'Realm Walker',    name:'First Door Opened',       desc:'Reach floor 10',                              check:function(){return highestGlobalFloorEver>=10;}},
-  {id:'floor-25',      cat:'Realm Walker',    name:'Deep Wanderer',           desc:'Reach floor 25',                              check:function(){return highestGlobalFloorEver>=25;}},
-  {id:'floor-50',      cat:'Realm Walker',    name:'The Fifty Chambers',      desc:'Reach floor 50',                              check:function(){return highestGlobalFloorEver>=50;}},
-  {id:'floor-100',     cat:'Realm Walker',    name:'Centuriate',              desc:'Reach floor 100',                             check:function(){return highestGlobalFloorEver>=100;}},
-  {id:'floor-150',     cat:'Realm Walker',    name:'Depths Uncharted',        desc:'Reach floor 150',                             check:function(){return highestGlobalFloorEver>=150;}},
-  {id:'floor-250',     cat:'Realm Walker',    name:'The Long Descent',        desc:'Reach floor 250',                             check:function(){return highestGlobalFloorEver>=250;}},
-  {id:'floor-500',     cat:'Realm Walker',    name:'Five Hundred Voids',      desc:'Reach floor 500',                             check:function(){return highestGlobalFloorEver>=500;}},
-  {id:'floor-1k',      cat:'Realm Walker',    name:'Thousand Rooms',          desc:'Reach floor 1,000',                           check:function(){return highestGlobalFloorEver>=1000;}},
-  {id:'floor-1250',    cat:'Realm Walker',    name:'The Unending Hall',       desc:'Reach floor 1,250',                           check:function(){return highestGlobalFloorEver>=1250;}},
-  {id:'floor-1500',    cat:'Realm Walker',    name:'Where Light Fears',       desc:'Reach floor 1,500',                           check:function(){return highestGlobalFloorEver>=1500;}},
-  {id:'floor-1750',    cat:'Realm Walker',    name:'The Bottomless Dark',     desc:'Reach floor 1,750',                           check:function(){return highestGlobalFloorEver>=1750;}},
-  {id:'floor-2k',      cat:'Realm Walker',    name:'Two Thousand Floors',     desc:'Reach floor 2,000',                           check:function(){return highestGlobalFloorEver>=2000;}},
-  {id:'floor-2150',    cat:'Realm Walker',    name:'Past the Point of Return',desc:'Reach floor 2,150',                           check:function(){return highestGlobalFloorEver>=2150;}},
-  {id:'floor-2300',    cat:'Realm Walker',    name:'The Final Depths',        desc:'Reach floor 2,300',                           check:function(){return highestGlobalFloorEver>=2300;}},
-  {id:'floor-2500',    cat:'Realm Walker',    name:'The Last Floor',          desc:'Reach floor 2,500',                           check:function(){return highestGlobalFloorEver>=2500;}},
+  // Realm Walker — one per realm cleared
+  {id:'realm-void',        cat:'Realm Walker',name:'Beyond the Void',         desc:'Clear the Void realm',                        check:function(){return highestRealm>=2;}},
+  {id:'realm-underworld',  cat:'Realm Walker',name:'Out of the Underworld',   desc:'Clear the Underworld realm',                  check:function(){return highestRealm>=3;}},
+  {id:'realm-purgatory',   cat:'Realm Walker',name:'Purgatory Survived',      desc:'Clear the Purgatory realm',                   check:function(){return highestRealm>=4;}},
+  {id:'realm-undead',      cat:'Realm Walker',name:'Death Denied',            desc:'Clear the Undead realm',                      check:function(){return highestRealm>=5;}},
+  {id:'realm-hades',       cat:'Realm Walker',name:'Hades Forsaken',          desc:'Clear the Hades realm',                       check:function(){return highestRealm>=6;}},
+  {id:'realm-undersea',    cat:'Realm Walker',name:'The Deep Crossed',        desc:'Clear the Undersea realm',                    check:function(){return highestRealm>=7;}},
+  {id:'realm-swamp',       cat:'Realm Walker',name:'The Mire Behind',         desc:'Clear the Swamp realm',                       check:function(){return highestRealm>=8;}},
+  {id:'realm-forest',      cat:'Realm Walker',name:'The Forest Falls',        desc:'Clear the Forest realm',                      check:function(){return highestRealm>=9;}},
+  {id:'realm-skyland',     cat:'Realm Walker',name:'Above the Clouds',        desc:'Clear the Skyland realm',                     check:function(){return highestRealm>=10;}},
+  {id:'realm-heaven',      cat:'Realm Walker',name:'Heaven Unmade',           desc:'Clear the Heaven realm',                      check:function(){return highestRealm>=11;}},
   // Ascension
-  {id:'asc-1',         cat:'Transcendence',   name:'First Transformation',    desc:'Ascend once',                                 check:function(){return ascendCount>=1;}},
-  {id:'asc-5',         cat:'Transcendence',   name:'Five Evolutions',         desc:'Ascend 5 times',                              check:function(){return ascendCount>=5;}},
-  {id:'asc-10',        cat:'Transcendence',   name:'Veteran of Change',       desc:'Ascend 10 times',                             check:function(){return ascendCount>=10;}},
-  {id:'asc-25',        cat:'Transcendence',   name:'The Endless Cycle',       desc:'Ascend 25 times',                             check:function(){return ascendCount>=25;}},
-  {id:'asc-50',        cat:'Transcendence',   name:'Perpetual Becoming',      desc:'Ascend 50 times',                             check:function(){return ascendCount>=50;}},
-  {id:'asc-100',       cat:'Transcendence',   name:'One Hundred Lives',       desc:'Ascend 100 times',                            check:function(){return ascendCount>=100;}},
-  {id:'asc-250',       cat:'Transcendence',   name:'Eternal Rebirth',         desc:'Ascend 250 times',                            check:function(){return ascendCount>=250;}},
+  {id:'asc-1',         cat:'Ascendant',      name:'First Transformation',     desc:'Ascend once',                                 check:function(){return ascendCount>=1;}},
+  {id:'asc-5',         cat:'Ascendant',      name:'Five Evolutions',          desc:'Ascend 5 times',                              check:function(){return ascendCount>=5;}},
+  {id:'asc-10',        cat:'Ascendant',      name:'Veteran of Change',        desc:'Ascend 10 times',                             check:function(){return ascendCount>=10;}},
+  {id:'asc-25',        cat:'Ascendant',      name:'The Endless Cycle',        desc:'Ascend 25 times',                             check:function(){return ascendCount>=25;}},
+  {id:'asc-50',        cat:'Ascendant',      name:'Perpetual Becoming',       desc:'Ascend 50 times',                             check:function(){return ascendCount>=50;}},
+  {id:'asc-100',       cat:'Ascendant',      name:'One Hundred Lives',        desc:'Ascend 100 times',                            check:function(){return ascendCount>=100;}},
+  {id:'asc-250',       cat:'Ascendant',      name:'Eternal Rebirth',          desc:'Ascend 250 times',                            check:function(){return ascendCount>=250;}},
   // Kill count in 1 ascension
   {id:'asc-kill-100',  cat:'Void Hunter',     name:'Bloody Hands',            desc:'Kill 100 enemies in one ascension',           check:function(){return currentAscensionKills>=100;}},
   {id:'asc-kill-1k',   cat:'Void Hunter',     name:'Mass Slaughter',          desc:'Kill 1,000 enemies in one ascension',         check:function(){return currentAscensionKills>=1000;}},
@@ -3212,17 +3212,6 @@ var ACHIEVEMENTS=[
   {id:'elite-10k',     cat:'Elite Slayer',    name:'Elite Annihilator',       desc:'Slay 10,000 elite enemies',                   check:function(){return eliteKillsTotal>=10000;}},
   {id:'elite-100k',    cat:'Elite Slayer',    name:'The Apex Slayer',         desc:'Slay 100,000 elite enemies',                  check:function(){return eliteKillsTotal>=100000;}},
   {id:'elite-1m',      cat:'Elite Slayer',    name:'Million Elites',          desc:'Slay 1,000,000 elite enemies',                check:function(){return eliteKillsTotal>=1000000;}},
-  // Named elite first kills
-  {id:'elite-first-wisp',   cat:'Named Prey', name:'Wisp Bane',              desc:'Defeat the Wisper elite for the first time',          check:function(){return namedEliteFirstKills.indexOf(0)>=0;}},
-  {id:'elite-first-shade',  cat:'Named Prey', name:'Shade Crusher',          desc:'Defeat the Hollo elite for the first time',       check:function(){return namedEliteFirstKills.indexOf(1)>=0;}},
-  {id:'elite-first-specter',cat:'Named Prey', name:'Specter Felled',         desc:'Defeat the Booki elite for the first time',    check:function(){return namedEliteFirstKills.indexOf(2)>=0;}},
-  {id:'elite-first-haunt',  cat:'Named Prey', name:'Haunt Silenced',         desc:'Defeat the Haaate elite for the first time',      check:function(){return namedEliteFirstKills.indexOf(3)>=0;}},
-  {id:'elite-first-wraith', cat:'Named Prey', name:'Wraith Unraveled',       desc:'Defeat the Ms. Wale elite for the first time',     check:function(){return namedEliteFirstKills.indexOf(4)>=0;}},
-  {id:'elite-first-shiver', cat:'Named Prey', name:'Shiver Broken',          desc:'Defeat the Shiver elite for the first time',    check:function(){return namedEliteFirstKills.indexOf(5)>=0;}},
-  {id:'elite-first-ghoul',  cat:'Named Prey', name:'Ghoul Laid Low',         desc:'Defeat the Mr. Glair elite for the first time',      check:function(){return namedEliteFirstKills.indexOf(6)>=0;}},
-  {id:'elite-first-phlegm', cat:'Named Prey', name:'Phantom Purged',         desc:'Defeat the Phlegm elite for the first time',     check:function(){return namedEliteFirstKills.indexOf(7)>=0;}},
-  {id:'elite-first-banshee',cat:'Named Prey', name:'Banshee Quieted',        desc:'Defeat the Banshee elite for the first time',     check:function(){return namedEliteFirstKills.indexOf(8)>=0;}},
-  {id:'elite-first-demon',  cat:'Named Prey', name:'Demon Unmade',           desc:'Defeat the Queen Shayd elite for the first time',   check:function(){return namedEliteFirstKills.indexOf(9)>=0;}},
   // Identity / Form
   {id:'form-male',     cat:'Identity',        name:'The Masculine Form',      desc:'Choose a masculine essence',                  check:function(){return traitChoicesEver.indexOf('male')>=0;}},
   {id:'form-female',   cat:'Identity',        name:'The Feminine Form',       desc:'Choose a feminine essence',                   check:function(){return traitChoicesEver.indexOf('female')>=0;}},
@@ -3236,9 +3225,38 @@ var ACHIEVEMENTS=[
   {id:'form-halo',     cat:'Identity',        name:'The Fallen Halo',         desc:'Light that no longer protects',               check:function(){return traitChoicesEver.indexOf('halo')>=0;}},
   {id:'form-tail',     cat:'Identity',        name:'A New Appendage',         desc:'Something follows you now',                   check:function(){return traitChoicesEver.indexOf('tail')>=0;}},
   {id:'form-weapon',   cat:'Identity',        name:'Armed',                   desc:'A tool of ending',                            check:function(){return traitChoicesEver.indexOf('weapon')>=0;}},
-  {id:'form-ultimate', cat:'Identity',        name:'Ascendant',               desc:'Reach the ultimate form',                     check:function(){return stage>=3;}},
-  {id:'final-form',    cat:'Transcendence',   name:'Final Form',              desc:'Complete all seven ascensions',               check:function(){return rebirthCount>=7;}},
+  {id:'form-ultimate',        cat:'Identity',  name:'Ascendant',               desc:'Reach the ultimate form',                                                          check:function(){return stage>=3;}},
+  // Form ultimate completions — each rewards the first-ascension form bonus permanently
+  {id:'form-ult-masculine',  cat:'Identity',  name:'Pinnacle of Strength',    desc:'Complete the Masculine form\'s final ascension. Grants +10% DPS permanently.',     check:function(){return rebirthForm==='masculine'&&rebirthCount>=7;}},
+  {id:'form-ult-feminine',   cat:'Identity',  name:'Pinnacle of Grace',       desc:'Complete the Feminine form\'s final ascension. Grants +10% Tattered Souls permanently.', check:function(){return rebirthForm==='feminine'&&rebirthCount>=7;}},
+  {id:'form-ult-androgynous',cat:'Identity',  name:'Pinnacle of Balance',     desc:'Complete the Unbound form\'s final ascension. Grants +10% Soul income permanently.',check:function(){return rebirthForm==='androgynous'&&rebirthCount>=7;}},
+  {id:'form-ult-feline',     cat:'Identity',  name:'Pinnacle of Cunning',     desc:'Complete the Feline form\'s final ascension. Grants +10% Mana regen permanently.', check:function(){return rebirthForm==='feline'&&rebirthCount>=7;}},
+  {id:'form-ult-canine',     cat:'Identity',  name:'Pinnacle of the Hunt',    desc:'Complete the Canine form\'s final ascension. Grants +10% Click damage permanently.',check:function(){return rebirthForm==='canine'&&rebirthCount>=7;}},
+  {id:'form-ult-equine',     cat:'Identity',  name:'Pinnacle of Freedom',     desc:'Complete the Equine form\'s final ascension. Grants -10% Milestone cost permanently.',check:function(){return rebirthForm==='equine'&&rebirthCount>=7;}},
+  // All six form ultimates — doubles the chosen form\'s bonus for each run
+  {id:'form-ult-all',        cat:'Identity',  name:'The Complete Self',       desc:'Complete the final form of all six essences. Your chosen form\'s bonus is doubled each run.', check:function(){return['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine'].every(function(id){return achievementsEarned.indexOf(id)>=0;});}},
+  {id:'final-form',          cat:'Ascendant', name:'Final Form',              desc:'Complete all seven ascensions',                                                    check:function(){return rebirthCount>=7;}},
+  // Elite Prey — first kill of each named elite
+  {id:'elite-first-wisp',   cat:'Elite Prey', name:'Wisp Bane',              desc:'Defeat the Wisper elite for the first time',        check:function(){return namedEliteFirstKills.indexOf(0)>=0;}},
+  {id:'elite-first-shade',  cat:'Elite Prey', name:'Shade Crusher',          desc:'Defeat the Hollo elite for the first time',         check:function(){return namedEliteFirstKills.indexOf(1)>=0;}},
+  {id:'elite-first-specter',cat:'Elite Prey', name:'Specter Felled',         desc:'Defeat the Booki elite for the first time',         check:function(){return namedEliteFirstKills.indexOf(2)>=0;}},
+  {id:'elite-first-haunt',  cat:'Elite Prey', name:'Haunt Silenced',         desc:'Defeat the Haaate elite for the first time',        check:function(){return namedEliteFirstKills.indexOf(3)>=0;}},
+  {id:'elite-first-wraith', cat:'Elite Prey', name:'Wraith Unraveled',       desc:'Defeat the Ms. Wale elite for the first time',      check:function(){return namedEliteFirstKills.indexOf(4)>=0;}},
+  {id:'elite-first-shiver', cat:'Elite Prey', name:'Shiver Broken',          desc:'Defeat the Shiver elite for the first time',        check:function(){return namedEliteFirstKills.indexOf(5)>=0;}},
+  {id:'elite-first-ghoul',  cat:'Elite Prey', name:'Ghoul Laid Low',         desc:'Defeat the Mr. Glair elite for the first time',     check:function(){return namedEliteFirstKills.indexOf(6)>=0;}},
+  {id:'elite-first-phlegm', cat:'Elite Prey', name:'Phantom Purged',         desc:'Defeat the Phlegm elite for the first time',        check:function(){return namedEliteFirstKills.indexOf(7)>=0;}},
+  {id:'elite-first-banshee',cat:'Elite Prey', name:'Banshee Quieted',        desc:'Defeat the Banshee elite for the first time',       check:function(){return namedEliteFirstKills.indexOf(8)>=0;}},
+  {id:'elite-first-demon',  cat:'Elite Prey', name:'Demon Unmade',           desc:'Defeat the Queen Shayd elite for the first time',   check:function(){return namedEliteFirstKills.indexOf(9)>=0;}},
 ];
+
+function allSixFormsComplete(){
+  return ['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine'].every(function(id){return achievementsEarned.indexOf(id)>=0;});
+}
+function getFormMult(){
+  var m=formBonusMult;
+  if(rebirthForm!==null&&allSixFormsComplete()) m*=2;
+  return m;
+}
 
 function checkAchievements(silent){
   ACHIEVEMENTS.forEach(function(a){
@@ -4086,7 +4104,8 @@ function calcTatteredSoulsGain(chosenForm){
   var base=Math.floor(totalUpgradePurchases/666);
   // Feminine bonus applies to the NEWLY CHOSEN form (not the current one, since this is the gain for this rebirth)
   var form=chosenForm!==undefined?chosenForm:rebirthForm;
-  if(form==='feminine') base=Math.floor(base*(1+0.10*formBonusMult));
+  if(form==='feminine') base=Math.floor(base*(1+0.10*getFormMult()));
+  else if(achievementsEarned.indexOf('form-ult-feminine')>=0) base=Math.floor(base*1.10);
   if(ascension3Path==='shadow') base=Math.floor(base*1.05);
   if(ascension6Path==='leather') base=Math.floor(base*1.10);
   return Math.max(0,base);
