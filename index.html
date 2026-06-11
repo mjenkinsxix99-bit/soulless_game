@@ -2691,7 +2691,7 @@ function onEnemyDeath(){
       }
     }
 
-    if(curLevel>=LEVELS_PER_REALM&&curRealm===highestRealm&&rebirthCount>0){
+    if(curLevel>=LEVELS_PER_REALM&&curRealm===highestRealm){
       updateHighestFloor(); checkAchievements();
       document.getElementById('click-hint').textContent='Realm '+curRealm+' complete! Advancing to Realm '+(curRealm+1)+'…';
       setTimeout(function(){
