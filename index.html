@@ -993,7 +993,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <div class="form-card" data-form="equine">
         <img src="artwork/equine.webp" alt="Equine">
         <div class="fc-name">Equine</div>
-        <div class="fc-bonus">-10% Milestone requirement</div>
+        <div class="fc-bonus">-10% Augment requirement</div>
       </div>
     </div>
     <div id="form-confirm-area">
@@ -1084,7 +1084,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <div class="path4-card" data-path="mystic">
         <div class="p4-art" style="background:url('artwork/sprites_asc_paths.webp') -160px 0/480px 80px no-repeat;"></div>
         <div class="p4-name">Mystic</div>
-        <div class="p4-bonus">-5% Milestone Cost</div>
+        <div class="p4-bonus">-5% Augment Cost</div>
       </div>
     </div>
     <div id="path4-choices">
@@ -3169,15 +3169,15 @@ var ACHIEVEMENTS=[
   {id:'souls-10m',     cat:'Soul Drinker',    name:'The Devourer',            desc:'Collect 10,000,000 souls',                    check:function(){return totalSouls.gte(D('1e7'));}},
   {id:'souls-1b',      cat:'Soul Drinker',    name:'Billion Soul March',      desc:'Collect 1,000,000,000 souls',                 check:function(){return totalSouls.gte(D('1e9'));}},
   {id:'souls-1t',      cat:'Soul Drinker',    name:'Unfathomable Greed',      desc:'Collect 1,000,000,000,000 souls',             check:function(){return totalSouls.gte(D('1e12'));}},
-  // Milestones
-  {id:'mile-25',       cat:'Milestone Seeker',name:'Milestone Seeker',        desc:'Activate 25 milestones',                      check:function(){return totalMilestonePurchases>=25;}},
-  {id:'mile-50',       cat:'Milestone Seeker',name:'Power Hungry',            desc:'Activate 50 milestones',                      check:function(){return totalMilestonePurchases>=50;}},
-  {id:'mile-100',      cat:'Milestone Seeker',name:'Centenary of Might',      desc:'Activate 100 milestones',                     check:function(){return totalMilestonePurchases>=100;}},
-  {id:'mile-250',      cat:'Milestone Seeker',name:'Quarter Thousand Stars',  desc:'Activate 250 milestones',                     check:function(){return totalMilestonePurchases>=250;}},
-  {id:'mile-500',      cat:'Milestone Seeker',name:'Five Hundred Lights',     desc:'Activate 500 milestones',                     check:function(){return totalMilestonePurchases>=500;}},
-  {id:'mile-1k',       cat:'Milestone Seeker',name:'Thousand Milestones',     desc:'Activate 1,000 milestones',                   check:function(){return totalMilestonePurchases>=1000;}},
-  {id:'mile-2k',       cat:'Milestone Seeker',name:'Beyond Reckoning',        desc:'Activate 2,000 milestones',                   check:function(){return totalMilestonePurchases>=2000;}},
-  {id:'mile-3k',       cat:'Milestone Seeker',name:'The Unyielding Path',     desc:'Activate 3,000 milestones',                   check:function(){return totalMilestonePurchases>=3000;}},
+  // Augments
+  {id:'mile-25',       cat:'Augment Seeker',name:'Augment Seeker',            desc:'Activate 25 augments',                        check:function(){return totalMilestonePurchases>=25;}},
+  {id:'mile-50',       cat:'Augment Seeker',name:'Power Hungry',              desc:'Activate 50 augments',                        check:function(){return totalMilestonePurchases>=50;}},
+  {id:'mile-100',      cat:'Augment Seeker',name:'Centenary of Might',        desc:'Activate 100 augments',                       check:function(){return totalMilestonePurchases>=100;}},
+  {id:'mile-250',      cat:'Augment Seeker',name:'Quarter Thousand Stars',    desc:'Activate 250 augments',                       check:function(){return totalMilestonePurchases>=250;}},
+  {id:'mile-500',      cat:'Augment Seeker',name:'Five Hundred Lights',       desc:'Activate 500 augments',                       check:function(){return totalMilestonePurchases>=500;}},
+  {id:'mile-1k',       cat:'Augment Seeker',name:'Thousand Augments',         desc:'Activate 1,000 augments',                     check:function(){return totalMilestonePurchases>=1000;}},
+  {id:'mile-2k',       cat:'Augment Seeker',name:'Beyond Reckoning',          desc:'Activate 2,000 augments',                     check:function(){return totalMilestonePurchases>=2000;}},
+  {id:'mile-3k',       cat:'Augment Seeker',name:'The Unyielding Path',       desc:'Activate 3,000 augments',                     check:function(){return totalMilestonePurchases>=3000;}},
   // Realm Walker — one per realm cleared
   {id:'realm-void',        cat:'Realm Walker',name:'Beyond the Void',         desc:'Clear the Void realm',                        check:function(){return highestRealm>=2;}},
   {id:'realm-underworld',  cat:'Realm Walker',name:'Out of the Underworld',   desc:'Clear the Underworld realm',                  check:function(){return highestRealm>=3;}},
@@ -3232,7 +3232,7 @@ var ACHIEVEMENTS=[
   {id:'form-ult-androgynous',cat:'Identity',  name:'Pinnacle of Balance',     desc:'Complete the Unbound form\'s final ascension. Grants +10% Soul income permanently.',check:function(){return rebirthForm==='androgynous'&&rebirthCount>=7;}},
   {id:'form-ult-feline',     cat:'Identity',  name:'Pinnacle of Cunning',     desc:'Complete the Feline form\'s final ascension. Grants +10% Mana regen permanently.', check:function(){return rebirthForm==='feline'&&rebirthCount>=7;}},
   {id:'form-ult-canine',     cat:'Identity',  name:'Pinnacle of the Hunt',    desc:'Complete the Canine form\'s final ascension. Grants +10% Click damage permanently.',check:function(){return rebirthForm==='canine'&&rebirthCount>=7;}},
-  {id:'form-ult-equine',     cat:'Identity',  name:'Pinnacle of Freedom',     desc:'Complete the Equine form\'s final ascension. Grants -10% Milestone cost permanently.',check:function(){return rebirthForm==='equine'&&rebirthCount>=7;}},
+  {id:'form-ult-equine',     cat:'Identity',  name:'Pinnacle of Freedom',     desc:'Complete the Equine form\'s final ascension. Grants -10% Augment cost permanently.',check:function(){return rebirthForm==='equine'&&rebirthCount>=7;}},
   // All six form ultimates — doubles the chosen form\'s bonus for each run
   {id:'form-ult-all',        cat:'Identity',  name:'The Complete Self',       desc:'Complete the final form of all six essences. Your chosen form\'s bonus is doubled each run.', check:function(){return['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine'].every(function(id){return achievementsEarned.indexOf(id)>=0;});}},
   {id:'final-form',          cat:'Ascendant', name:'Final Form',              desc:'Complete all seven ascensions',                                                    check:function(){return rebirthCount>=7;}},
@@ -4743,7 +4743,7 @@ var FORM_BONUSES={
   androgynous: '+10% Souls gained',
   canine:      '+10% Strike Damage',
   feline:      '+10% Mana Gain',
-  equine:      '-10% Milestone requirement'
+  equine:      '-10% Augment requirement'
 };
 
 var FORM_BONUS_ASCENDED={
@@ -4752,7 +4752,7 @@ var FORM_BONUS_ASCENDED={
   androgynous: '+15% Souls gained',
   canine:      '+15% Strike Damage',
   feline:      '+15% Mana Gain',
-  equine:      '-15% Milestone requirement'
+  equine:      '-15% Augment requirement'
 };
 
 function doFleshReset(choice){
@@ -5065,7 +5065,7 @@ document.getElementById('path3-confirm-no').addEventListener('click',function(){
 });
 
 // ── PATH4 MODAL (Ascension 4) ─────────────────────────────────────────────────
-var ASCENSION4_BONUSES={holy:'+5% Strike Damage',shadow:'+5% Mana Gain',mystic:'-5% Milestone Cost'};
+var ASCENSION4_BONUSES={holy:'+5% Strike Damage',shadow:'+5% Mana Gain',mystic:'-5% Augment Cost'};
 
 function doPath4Reset(choice,path){
   if(choice==='ascend'){
