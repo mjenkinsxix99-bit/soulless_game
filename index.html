@@ -4662,10 +4662,15 @@ function createUpgradeCard(u, can, bought, actualN, cost){
 function patchMilestoneRow(card, u){
   var boxes=card.querySelectorAll('.ms-box');
   boxes.forEach(function(box){
-    // Lit milestone animations are immortal — never touch them again
-    if(box.classList.contains('lit')) return;
     var i=parseInt(box.getAttribute('data-mi'),10);
     var lit=u.milestones[i];
+    // Lit animations are immortal only while still purchased; reset if data says unlit
+    if(box.classList.contains('lit') && lit) return;
+    if(box.classList.contains('lit') && !lit){
+      box.classList.remove('lit');
+      box.style.cssText='';
+      box.innerHTML='';
+    }
     var prevLit=i===0||u.milestones[i-1];
     var threshMet=u.level>=getMsThresh(i);
     var visible=lit||(i===0&&threshMet)||prevLit;
