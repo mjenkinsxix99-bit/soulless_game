@@ -117,14 +117,14 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .rm-sub { font-size: 16px; color: #443366; font-style: italic; }
 #reform-btn { padding: 8px 24px; border: 1px solid #6655aa; color: #b0a0e8; background: transparent; font-family: Georgia,serif; font-size: 18px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; }
 #reform-btn:hover { background: rgba(102,85,170,0.15); }
-#realm-label { position: absolute; top: 12px; left: 14px; font-size: 18px; font-weight: bold; color: #eeddff; letter-spacing: 3px; text-transform: uppercase; z-index: 3; }
+#realm-label { position: absolute; top: 58px; left: 14px; font-size: 18px; font-weight: bold; color: #eeddff; letter-spacing: 3px; text-transform: uppercase; z-index: 3; }
 /* Ascend (Rebirth) button */
 #ascend-btn { display: none; position: absolute; top: 410px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #cc0000; border: 2px solid #d4a843; color: #2a0a4a; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
 #ascend-btn:hover { background: #ee0000; box-shadow: 0 0 14px rgba(212,168,67,0.6); }
 
-/* Tattered Souls display in topbar */
-#tattered-display { display: none; text-align: center; }
-#tattered-display .num { font-size: 22px; color: #ff8800; font-weight: bold; text-shadow: 0 0 5px rgba(255,180,0,1), 0 0 12px rgba(255,120,0,1), 0 0 24px rgba(255,80,0,0.8), 0 0 48px rgba(255,60,0,0.4); animation: tatteredPulse 2s ease-in-out infinite; }
+/* Tattered Souls display — above realm label in left panel */
+#tattered-display { display: none; position: absolute; top: 10px; left: 14px; text-align: left; z-index: 3; }
+#tattered-display .num { font-size: 22px; color: #ff8800; font-weight: bold; text-shadow: 0 0 5px rgba(255,180,0,1), 0 0 12px rgba(255,120,0,1), 0 0 24px rgba(255,80,0,0.8), 0 0 48px rgba(255,60,0,0.4); animation: tatteredPulse 2s ease-in-out infinite; line-height: 1.1; }
 #tattered-display .lbl { font-size: 11px; color: #ff9900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,140,0,0.9), 0 0 18px rgba(255,80,0,0.5); }
 
 /* Tutorial tooltip */
@@ -756,10 +756,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <div class="num" id="soul-count">0</div>
       <div class="lbl">souls collected</div>
     </div>
-    <div id="tattered-display">
-      <div class="num" id="tattered-count">0</div>
-      <div class="lbl">tattered souls</div>
-    </div>
     <div id="ach-banner">
       <div class="ach-label">Achievement Unlocked</div>
       <div class="ach-name"></div>
@@ -827,6 +823,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       </div><!-- /combat-wrap -->
       <div id="combat-oval"></div>
       <div id="ss-global-arrow">⮞</div>
+      <div id="tattered-display">
+        <div class="num" id="tattered-count">0</div>
+        <div class="lbl">tattered souls</div>
+      </div>
       <div id="realm-label">Realm: Void</div>
 
       <div id="reform-msg">
