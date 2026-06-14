@@ -127,6 +127,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #tattered-display { display: none; text-align: center; }
 #tattered-display .num { font-size: 22px; color: #ff8800; font-weight: bold; text-shadow: 0 0 5px rgba(255,180,0,1), 0 0 12px rgba(255,120,0,1), 0 0 24px rgba(255,80,0,0.8), 0 0 48px rgba(255,60,0,0.4); animation: tatteredPulse 2s ease-in-out infinite; }
 #tattered-display .lbl { font-size: 11px; color: #ff9900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,140,0,0.9), 0 0 18px rgba(255,80,0,0.5); }
+#tattered-display .ts-preview { font-size: 10px; color: #cc7700; letter-spacing: 1px; margin-top: 2px; }
 
 /* Tutorial tooltip */
 #tutorial-overlay { display: none; position: fixed; inset: 0; z-index: 20000; }
@@ -760,6 +761,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <div id="tattered-display">
       <div class="num" id="tattered-count">0</div>
       <div class="lbl">tattered souls</div>
+      <div class="ts-preview" id="ts-ascend-preview"></div>
     </div>
     <div id="ach-banner">
       <div class="ach-label">Achievement Unlocked</div>
@@ -4126,6 +4128,8 @@ function updateTatteredDisplay(){
   if(el) el.textContent=tatteredSouls.toLocaleString();
   var disp=document.getElementById('tattered-display');
   if(disp) disp.style.display=rebirthCount>0?'block':'none';
+  var preview=document.getElementById('ts-ascend-preview');
+  if(preview) preview.textContent='Ascend for '+calcTatteredSoulsGain(null).toLocaleString()+' TS';
   updateTatteredBtn();
 }
 
