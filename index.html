@@ -5542,7 +5542,7 @@ document.getElementById('volume-slider').addEventListener('input',function(){
   soundVolume=parseInt(this.value,10)/100;
   updateVolumeSlider();
   bgmSetVolume();
-  if(soundVolume>0 && _bgmRealm===curRealm && !_bgmAudio) bgmPlay(curRealm);
+  if(soundVolume>0 && !_bgmAudio) bgmPlay(curRealm);
   if(soundVolume<=0) bgmStop();
   saveGame(); saveSettings();
 });
