@@ -10,9 +10,10 @@ html { zoom: 1; }
 html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e0d8ff; font-family: Georgia, serif; overflow: hidden; }
 #game, #game * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M4,2 L18,5 L13,8 L26,13 L16,14 L15,24 L10,11 L7,16 Z' fill='%23d4a843' stroke='%23000' stroke-width='0.8' stroke-linejoin='round'/%3E%3C/svg%3E") 4 2, crosshair !important; }
 #game { display: flex; flex-direction: column; height: 100vh; min-width: 900px; }
-#topbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; position: relative; }
+#topbar { display: flex; align-items: center; gap: 20px; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; position: relative; }
 .title { font-size: 27px; letter-spacing: 4px; color: #d0c4ff; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
-#souls-display { text-align: center; }
+#souls-display { text-align: left; }
+#tattered-display { margin-left: auto; }
 #souls-display .num { font-size: 33px; color: #ffffff; font-weight: bold; text-shadow: 0 0 8px rgba(200,180,255,0.9), 0 0 18px rgba(160,120,255,0.5); }
 #souls-display .lbl { font-size: 14px; color: #c0b0f0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 6px rgba(150,120,240,0.4); }
 #stage-desc { font-size: 13px; color: #7766aa; font-style: italic; text-align: center; }
@@ -126,6 +127,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #tattered-display { display: none; text-align: center; }
 #tattered-display .num { font-size: 22px; color: #ff8800; font-weight: bold; text-shadow: 0 0 5px rgba(255,180,0,1), 0 0 12px rgba(255,120,0,1), 0 0 24px rgba(255,80,0,0.8), 0 0 48px rgba(255,60,0,0.4); animation: tatteredPulse 2s ease-in-out infinite; }
 #tattered-display .lbl { font-size: 11px; color: #ff9900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,140,0,0.9), 0 0 18px rgba(255,80,0,0.5); }
+#tattered-display .ts-preview { font-size: 10px; color: #cc7700; letter-spacing: 1px; margin-top: 2px; }
 
 /* Tutorial tooltip */
 #tutorial-overlay { display: none; position: fixed; inset: 0; z-index: 20000; }
@@ -759,6 +761,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <div id="tattered-display">
       <div class="num" id="tattered-count">0</div>
       <div class="lbl">tattered souls</div>
+      <div class="ts-preview" id="ts-ascend-preview"></div>
     </div>
     <div id="ach-banner">
       <div class="ach-label">Achievement Unlocked</div>
@@ -879,6 +882,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
         <div class="stat-row" id="es-critm-row" style="display:none"><span>Crit multiplier</span><span class="sv good" id="es-critm">—</span></div>
         <div class="stat-row" id="es-soul-row" style="display:none"><span>Soul absorb</span><span class="sv good" id="es-soul">—</span></div>
         <div class="stat-row"><span>Total strikes</span><span class="sv" id="es-clicks">0</span></div>
+        <div class="stat-row"><span>Upgrades purchased</span><span class="sv" id="es-upgrades">0</span></div>
         <div class="stat-row" id="es-tattered-row" style="display:none"><span>Tattered Souls</span><span class="sv good" id="es-tattered">—</span></div>
         <div class="stat-row" id="es-ascensions-row" style="display:none"><span>Ascensions</span><span class="sv" id="es-ascensions">0</span></div>
         <div class="ph gap">Enemy Defeats</div>
@@ -951,6 +955,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   <div id="rebirth-box">
     <div id="rebirth-lore">You have grown strong enough to Ascend this world.<br>You will restart your journey, but stronger.<br>Are you ready to begin again?</div>
     <div class="rebirth-info">You will gain <span class="rval" id="rebirth-ts-gain">0</span> Tattered Souls</div>
+    <div class="rebirth-info" style="font-size:13px;color:#665577;" id="rebirth-ts-breakdown"></div>
     <div class="rebirth-info"><span class="rloss">You will lose all progress, souls, and Upgrades.</span></div>
     <div class="rebirth-info" id="rebirth-keep-line" style="display:none"><span class="rkeep">You will keep any Evolutions or Tattered Soul upgrades.</span></div>
     <div class="rebirth-info"><span class="rspecial" id="rebirth-special-text"></span></div>
@@ -993,7 +998,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <div class="form-card" data-form="equine">
         <img src="artwork/equine.webp" alt="Equine">
         <div class="fc-name">Equine</div>
-        <div class="fc-bonus">-10% Milestone requirement</div>
+        <div class="fc-bonus">-10% Augment requirement</div>
       </div>
     </div>
     <div id="form-confirm-area">
@@ -1084,7 +1089,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <div class="path4-card" data-path="mystic">
         <div class="p4-art" style="background:url('artwork/sprites_asc_paths.webp') -160px 0/480px 80px no-repeat;"></div>
         <div class="p4-name">Mystic</div>
-        <div class="p4-bonus">-5% Milestone Cost</div>
+        <div class="p4-bonus">-5% Augment Cost</div>
       </div>
     </div>
     <div id="path4-choices">
@@ -2172,6 +2177,7 @@ var totalUpgradePurchases=0;
 var totalMilestonePurchases=0;
 var ascendCount=0;
 var currentAscensionKills=0;
+var eliteBountyTSEarned=0;
 var tatteredSouls=0;
 var rebirthCount=0;
 var _offlineSavedAt=0;
@@ -2185,7 +2191,7 @@ var rebirthForm=null;
 var soundVolume=0.5; // 0.0–1.0; 0 = muted
 
 // ── MUSIC ─────────────────────────────────────────────────────────────────────
-var REALM_TRACKS=['music/void_music_1.2.mp3','music/underworld_music_1.2.mp3','music/purgatory_music_1.2.mp3',
+var REALM_TRACKS=['music/void_music_1.3.mp3','music/underworld_music_1.2.mp3','music/purgatory_music_1.2.mp3',
                   'music/undead_music_1.2.mp3','music/hades_music_1.2.mp3','music/undersea_music.mp3','music/swamp_music.mp3','music/forest_music.mp3','music/skyland_music.mp3','music/heaven_music.mp3'];
 var _bgmAudio=null;
 var _bgmRealm=-1;
@@ -2678,6 +2684,8 @@ function onEnemyDeath(){
     if(namedEliteFirstKills.indexOf(typeIdx2)<0) namedEliteFirstKills.push(typeIdx2);
     if(defeatedElites.indexOf(typeIdx2)<0){
       defeatedElites.push(typeIdx2);
+      var _eliteGF=absGlobalFloor(curRealm,curLevel,FLOORS_PER_LEVEL+1);
+      if(_eliteGF>=150) eliteBountyTSEarned+=Math.floor(_eliteGF/100);
       if(curRealm===highestRealm){
         // add next type to pool if not already there
         var nextType=typeIdx2+1;
@@ -3169,15 +3177,15 @@ var ACHIEVEMENTS=[
   {id:'souls-10m',     cat:'Soul Drinker',    name:'The Devourer',            desc:'Collect 10,000,000 souls',                    check:function(){return totalSouls.gte(D('1e7'));}},
   {id:'souls-1b',      cat:'Soul Drinker',    name:'Billion Soul March',      desc:'Collect 1,000,000,000 souls',                 check:function(){return totalSouls.gte(D('1e9'));}},
   {id:'souls-1t',      cat:'Soul Drinker',    name:'Unfathomable Greed',      desc:'Collect 1,000,000,000,000 souls',             check:function(){return totalSouls.gte(D('1e12'));}},
-  // Milestones
-  {id:'mile-25',       cat:'Milestone Seeker',name:'Milestone Seeker',        desc:'Activate 25 milestones',                      check:function(){return totalMilestonePurchases>=25;}},
-  {id:'mile-50',       cat:'Milestone Seeker',name:'Power Hungry',            desc:'Activate 50 milestones',                      check:function(){return totalMilestonePurchases>=50;}},
-  {id:'mile-100',      cat:'Milestone Seeker',name:'Centenary of Might',      desc:'Activate 100 milestones',                     check:function(){return totalMilestonePurchases>=100;}},
-  {id:'mile-250',      cat:'Milestone Seeker',name:'Quarter Thousand Stars',  desc:'Activate 250 milestones',                     check:function(){return totalMilestonePurchases>=250;}},
-  {id:'mile-500',      cat:'Milestone Seeker',name:'Five Hundred Lights',     desc:'Activate 500 milestones',                     check:function(){return totalMilestonePurchases>=500;}},
-  {id:'mile-1k',       cat:'Milestone Seeker',name:'Thousand Milestones',     desc:'Activate 1,000 milestones',                   check:function(){return totalMilestonePurchases>=1000;}},
-  {id:'mile-2k',       cat:'Milestone Seeker',name:'Beyond Reckoning',        desc:'Activate 2,000 milestones',                   check:function(){return totalMilestonePurchases>=2000;}},
-  {id:'mile-3k',       cat:'Milestone Seeker',name:'The Unyielding Path',     desc:'Activate 3,000 milestones',                   check:function(){return totalMilestonePurchases>=3000;}},
+  // Augments
+  {id:'mile-25',       cat:'Augment Seeker',name:'Augment Seeker',            desc:'Activate 25 augments',                        check:function(){return totalMilestonePurchases>=25;}},
+  {id:'mile-50',       cat:'Augment Seeker',name:'Power Hungry',              desc:'Activate 50 augments',                        check:function(){return totalMilestonePurchases>=50;}},
+  {id:'mile-100',      cat:'Augment Seeker',name:'Centenary of Might',        desc:'Activate 100 augments',                       check:function(){return totalMilestonePurchases>=100;}},
+  {id:'mile-250',      cat:'Augment Seeker',name:'Quarter Thousand Stars',    desc:'Activate 250 augments',                       check:function(){return totalMilestonePurchases>=250;}},
+  {id:'mile-500',      cat:'Augment Seeker',name:'Five Hundred Lights',       desc:'Activate 500 augments',                       check:function(){return totalMilestonePurchases>=500;}},
+  {id:'mile-1k',       cat:'Augment Seeker',name:'Thousand Augments',         desc:'Activate 1,000 augments',                     check:function(){return totalMilestonePurchases>=1000;}},
+  {id:'mile-2k',       cat:'Augment Seeker',name:'Beyond Reckoning',          desc:'Activate 2,000 augments',                     check:function(){return totalMilestonePurchases>=2000;}},
+  {id:'mile-3k',       cat:'Augment Seeker',name:'The Unyielding Path',       desc:'Activate 3,000 augments',                     check:function(){return totalMilestonePurchases>=3000;}},
   // Realm Walker — one per realm cleared
   {id:'realm-void',        cat:'Realm Walker',name:'Beyond the Void',         desc:'Clear the Void realm',                        check:function(){return highestRealm>=2;}},
   {id:'realm-underworld',  cat:'Realm Walker',name:'Out of the Underworld',   desc:'Clear the Underworld realm',                  check:function(){return highestRealm>=3;}},
@@ -3232,7 +3240,7 @@ var ACHIEVEMENTS=[
   {id:'form-ult-androgynous',cat:'Identity',  name:'Pinnacle of Balance',     desc:'Complete the Unbound form\'s final ascension. Grants +10% Soul income permanently.',check:function(){return rebirthForm==='androgynous'&&rebirthCount>=7;}},
   {id:'form-ult-feline',     cat:'Identity',  name:'Pinnacle of Cunning',     desc:'Complete the Feline form\'s final ascension. Grants +10% Mana regen permanently.', check:function(){return rebirthForm==='feline'&&rebirthCount>=7;}},
   {id:'form-ult-canine',     cat:'Identity',  name:'Pinnacle of the Hunt',    desc:'Complete the Canine form\'s final ascension. Grants +10% Click damage permanently.',check:function(){return rebirthForm==='canine'&&rebirthCount>=7;}},
-  {id:'form-ult-equine',     cat:'Identity',  name:'Pinnacle of Freedom',     desc:'Complete the Equine form\'s final ascension. Grants -10% Milestone cost permanently.',check:function(){return rebirthForm==='equine'&&rebirthCount>=7;}},
+  {id:'form-ult-equine',     cat:'Identity',  name:'Pinnacle of Freedom',     desc:'Complete the Equine form\'s final ascension. Grants -10% Augment cost permanently.',check:function(){return rebirthForm==='equine'&&rebirthCount>=7;}},
   // All six form ultimates — doubles the chosen form\'s bonus for each run
   {id:'form-ult-all',        cat:'Identity',  name:'The Complete Self',       desc:'Complete the final form of all six essences. Your chosen form\'s bonus is doubled each run.', check:function(){return['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine'].every(function(id){return achievementsEarned.indexOf(id)>=0;});}},
   {id:'final-form',          cat:'Ascendant', name:'Final Form',              desc:'Complete all seven ascensions',                                                    check:function(){return rebirthCount>=7;}},
@@ -4100,15 +4108,17 @@ function getMaleAscGridPos(rc, p3, p4, p5, p6){
 }
 function preloadFormImages(){}
 
-function calcTatteredSoulsGain(chosenForm){
+function calcUpgradeTSGain(chosenForm){
   var base=Math.floor(totalUpgradePurchases/666);
-  // Feminine bonus applies to the NEWLY CHOSEN form (not the current one, since this is the gain for this rebirth)
   var form=chosenForm!==undefined?chosenForm:rebirthForm;
   if(form==='feminine') base=Math.floor(base*(1+0.10*getFormMult()));
   else if(achievementsEarned.indexOf('form-ult-feminine')>=0) base=Math.floor(base*1.10);
   if(ascension3Path==='shadow') base=Math.floor(base*1.05);
   if(ascension6Path==='leather') base=Math.floor(base*1.10);
   return Math.max(0,base);
+}
+function calcTatteredSoulsGain(chosenForm){
+  return calcUpgradeTSGain(chosenForm)+eliteBountyTSEarned;
 }
 
 function checkRebirthButton(){
@@ -4125,6 +4135,8 @@ function updateTatteredDisplay(){
   if(el) el.textContent=tatteredSouls.toLocaleString();
   var disp=document.getElementById('tattered-display');
   if(disp) disp.style.display=rebirthCount>0?'block':'none';
+  var preview=document.getElementById('ts-ascend-preview');
+  if(preview) preview.textContent='Ascend for '+calcTatteredSoulsGain(null).toLocaleString()+' TS';
   updateTatteredBtn();
 }
 
@@ -4140,7 +4152,17 @@ var ASCENSION_SPECIAL=[
 
 function openRebirthModal(){
   var gain=calcTatteredSoulsGain(null);
+  var upgradeGain=calcUpgradeTSGain(null);
+  var bountyGain=eliteBountyTSEarned;
   document.getElementById('rebirth-ts-gain').textContent=gain.toLocaleString();
+  var bdEl=document.getElementById('rebirth-ts-breakdown');
+  if(bdEl){
+    if(bountyGain>0){
+      bdEl.textContent='('+upgradeGain.toLocaleString()+' for '+totalUpgradePurchases.toLocaleString()+' upgrades + '+bountyGain.toLocaleString()+' for Elite Bounties)';
+    } else {
+      bdEl.textContent='('+upgradeGain.toLocaleString()+' for '+totalUpgradePurchases.toLocaleString()+' upgrades)';
+    }
+  }
   var keepLine=document.getElementById('rebirth-keep-line');
   keepLine.style.display=rebirthCount>=1?'':'none';
   var specIdx=rebirthCount; // 0-based: 0 = first ascension
@@ -4163,7 +4185,7 @@ function doRebirthReset(chosenForm){
   enemyPool=[0]; currentEnemyTypeIdx=0;
   stage=0; traits={sex:null,adds:[],aff:null,outfit:null};
   totalUpgradePurchases=0; totalMilestonePurchases=0;
-  currentAscensionKills=0;
+  currentAscensionKills=0; eliteBountyTSEarned=0;
 
   // Reset mana & spell state
   mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0;
@@ -4248,7 +4270,7 @@ function saveGame(){
     upgrades:REP_UPGRADES.map(function(u){return{id:u.id,level:u.level,cost:u.cost.toString(),milestones:u.milestones.slice()};}),
     totalClicks:totalClicks, totalUpgradePurchases:totalUpgradePurchases,
     totalMilestonePurchases:totalMilestonePurchases, ascendCount:ascendCount,
-    currentAscensionKills:currentAscensionKills, eliteKillsTotal:eliteKillsTotal,
+    currentAscensionKills:currentAscensionKills, eliteKillsTotal:eliteKillsTotal, eliteBountyTSEarned:eliteBountyTSEarned,
     highestGlobalFloorEver:highestGlobalFloorEver,
     achievementsEarned:achievementsEarned.slice(),
     traitChoicesEver:traitChoicesEver.slice(),
@@ -4322,6 +4344,7 @@ function loadGame(){
   totalMilestonePurchases=data.totalMilestonePurchases||0;
   ascendCount=data.ascendCount||0;
   currentAscensionKills=data.currentAscensionKills||0;
+  eliteBountyTSEarned=data.eliteBountyTSEarned||0;
   eliteKillsTotal=data.eliteKillsTotal||0;
   highestGlobalFloorEver=data.highestGlobalFloorEver||0;
   achievementsEarned=data.achievementsEarned||[];
@@ -4657,10 +4680,15 @@ function createUpgradeCard(u, can, bought, actualN, cost){
 function patchMilestoneRow(card, u){
   var boxes=card.querySelectorAll('.ms-box');
   boxes.forEach(function(box){
-    // Lit milestone animations are immortal — never touch them again
-    if(box.classList.contains('lit')) return;
     var i=parseInt(box.getAttribute('data-mi'),10);
     var lit=u.milestones[i];
+    // Lit animations are immortal only while still purchased; reset if data says unlit
+    if(box.classList.contains('lit') && lit) return;
+    if(box.classList.contains('lit') && !lit){
+      box.classList.remove('lit');
+      box.style.cssText='';
+      box.innerHTML='';
+    }
     var prevLit=i===0||u.milestones[i-1];
     var threshMet=u.level>=getMsThresh(i);
     var visible=lit||(i===0&&threshMet)||prevLit;
@@ -4743,7 +4771,7 @@ var FORM_BONUSES={
   androgynous: '+10% Souls gained',
   canine:      '+10% Strike Damage',
   feline:      '+10% Mana Gain',
-  equine:      '-10% Milestone requirement'
+  equine:      '-10% Augment requirement'
 };
 
 var FORM_BONUS_ASCENDED={
@@ -4752,7 +4780,7 @@ var FORM_BONUS_ASCENDED={
   androgynous: '+15% Souls gained',
   canine:      '+15% Strike Damage',
   feline:      '+15% Mana Gain',
-  equine:      '-15% Milestone requirement'
+  equine:      '-15% Augment requirement'
 };
 
 function doFleshReset(choice){
@@ -4792,6 +4820,7 @@ function updateEntityStatsPanel(){
   if(critClickMult>0) document.getElementById('es-critm').textContent=(2+critClickMult).toFixed(2)+'×';
   if(soulAbsorbBonus>0) document.getElementById('es-soul').textContent='+'+(soulAbsorbBonus*100).toFixed(1)+'%';
   var _escl=document.getElementById('es-clicks'); if(_escl) _escl.textContent=totalClicks.toLocaleString();
+  var _esup=document.getElementById('es-upgrades'); if(_esup) _esup.textContent=totalUpgradePurchases.toLocaleString();
   // Tattered Souls stat row
   var tatteredRow=document.getElementById('es-tattered-row');
   var tatteredEl=document.getElementById('es-tattered');
@@ -5065,7 +5094,7 @@ document.getElementById('path3-confirm-no').addEventListener('click',function(){
 });
 
 // ── PATH4 MODAL (Ascension 4) ─────────────────────────────────────────────────
-var ASCENSION4_BONUSES={holy:'+5% Strike Damage',shadow:'+5% Mana Gain',mystic:'-5% Milestone Cost'};
+var ASCENSION4_BONUSES={holy:'+5% Strike Damage',shadow:'+5% Mana Gain',mystic:'-5% Augment Cost'};
 
 function doPath4Reset(choice,path){
   if(choice==='ascend'){
