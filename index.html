@@ -882,6 +882,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
         <div class="stat-row" id="es-critm-row" style="display:none"><span>Crit multiplier</span><span class="sv good" id="es-critm">—</span></div>
         <div class="stat-row" id="es-soul-row" style="display:none"><span>Soul absorb</span><span class="sv good" id="es-soul">—</span></div>
         <div class="stat-row"><span>Total strikes</span><span class="sv" id="es-clicks">0</span></div>
+        <div class="stat-row"><span>Upgrades purchased</span><span class="sv" id="es-upgrades">0</span></div>
         <div class="stat-row" id="es-tattered-row" style="display:none"><span>Tattered Souls</span><span class="sv good" id="es-tattered">—</span></div>
         <div class="stat-row" id="es-ascensions-row" style="display:none"><span>Ascensions</span><span class="sv" id="es-ascensions">0</span></div>
         <div class="ph gap">Enemy Defeats</div>
@@ -954,6 +955,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   <div id="rebirth-box">
     <div id="rebirth-lore">You have grown strong enough to Ascend this world.<br>You will restart your journey, but stronger.<br>Are you ready to begin again?</div>
     <div class="rebirth-info">You will gain <span class="rval" id="rebirth-ts-gain">0</span> Tattered Souls</div>
+    <div class="rebirth-info" style="font-size:13px;color:#665577;" id="rebirth-ts-breakdown"></div>
     <div class="rebirth-info"><span class="rloss">You will lose all progress, souls, and Upgrades.</span></div>
     <div class="rebirth-info" id="rebirth-keep-line" style="display:none"><span class="rkeep">You will keep any Evolutions or Tattered Soul upgrades.</span></div>
     <div class="rebirth-info"><span class="rspecial" id="rebirth-special-text"></span></div>
@@ -2175,6 +2177,7 @@ var totalUpgradePurchases=0;
 var totalMilestonePurchases=0;
 var ascendCount=0;
 var currentAscensionKills=0;
+var eliteBountyTSEarned=0;
 var tatteredSouls=0;
 var rebirthCount=0;
 var _offlineSavedAt=0;
@@ -2681,6 +2684,8 @@ function onEnemyDeath(){
     if(namedEliteFirstKills.indexOf(typeIdx2)<0) namedEliteFirstKills.push(typeIdx2);
     if(defeatedElites.indexOf(typeIdx2)<0){
       defeatedElites.push(typeIdx2);
+      var _eliteGF=absGlobalFloor(curRealm,curLevel,FLOORS_PER_LEVEL+1);
+      if(_eliteGF>=150) eliteBountyTSEarned+=Math.floor(_eliteGF/100);
       if(curRealm===highestRealm){
         // add next type to pool if not already there
         var nextType=typeIdx2+1;
@@ -4103,15 +4108,17 @@ function getMaleAscGridPos(rc, p3, p4, p5, p6){
 }
 function preloadFormImages(){}
 
-function calcTatteredSoulsGain(chosenForm){
+function calcUpgradeTSGain(chosenForm){
   var base=Math.floor(totalUpgradePurchases/666);
-  // Feminine bonus applies to the NEWLY CHOSEN form (not the current one, since this is the gain for this rebirth)
   var form=chosenForm!==undefined?chosenForm:rebirthForm;
   if(form==='feminine') base=Math.floor(base*(1+0.10*getFormMult()));
   else if(achievementsEarned.indexOf('form-ult-feminine')>=0) base=Math.floor(base*1.10);
   if(ascension3Path==='shadow') base=Math.floor(base*1.05);
   if(ascension6Path==='leather') base=Math.floor(base*1.10);
   return Math.max(0,base);
+}
+function calcTatteredSoulsGain(chosenForm){
+  return calcUpgradeTSGain(chosenForm)+eliteBountyTSEarned;
 }
 
 function checkRebirthButton(){
@@ -4145,7 +4152,17 @@ var ASCENSION_SPECIAL=[
 
 function openRebirthModal(){
   var gain=calcTatteredSoulsGain(null);
+  var upgradeGain=calcUpgradeTSGain(null);
+  var bountyGain=eliteBountyTSEarned;
   document.getElementById('rebirth-ts-gain').textContent=gain.toLocaleString();
+  var bdEl=document.getElementById('rebirth-ts-breakdown');
+  if(bdEl){
+    if(bountyGain>0){
+      bdEl.textContent='('+upgradeGain.toLocaleString()+' for '+totalUpgradePurchases.toLocaleString()+' upgrades + '+bountyGain.toLocaleString()+' for Elite Bounties)';
+    } else {
+      bdEl.textContent='('+upgradeGain.toLocaleString()+' for '+totalUpgradePurchases.toLocaleString()+' upgrades)';
+    }
+  }
   var keepLine=document.getElementById('rebirth-keep-line');
   keepLine.style.display=rebirthCount>=1?'':'none';
   var specIdx=rebirthCount; // 0-based: 0 = first ascension
@@ -4168,7 +4185,7 @@ function doRebirthReset(chosenForm){
   enemyPool=[0]; currentEnemyTypeIdx=0;
   stage=0; traits={sex:null,adds:[],aff:null,outfit:null};
   totalUpgradePurchases=0; totalMilestonePurchases=0;
-  currentAscensionKills=0;
+  currentAscensionKills=0; eliteBountyTSEarned=0;
 
   // Reset mana & spell state
   mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0;
@@ -4253,7 +4270,7 @@ function saveGame(){
     upgrades:REP_UPGRADES.map(function(u){return{id:u.id,level:u.level,cost:u.cost.toString(),milestones:u.milestones.slice()};}),
     totalClicks:totalClicks, totalUpgradePurchases:totalUpgradePurchases,
     totalMilestonePurchases:totalMilestonePurchases, ascendCount:ascendCount,
-    currentAscensionKills:currentAscensionKills, eliteKillsTotal:eliteKillsTotal,
+    currentAscensionKills:currentAscensionKills, eliteKillsTotal:eliteKillsTotal, eliteBountyTSEarned:eliteBountyTSEarned,
     highestGlobalFloorEver:highestGlobalFloorEver,
     achievementsEarned:achievementsEarned.slice(),
     traitChoicesEver:traitChoicesEver.slice(),
@@ -4327,6 +4344,7 @@ function loadGame(){
   totalMilestonePurchases=data.totalMilestonePurchases||0;
   ascendCount=data.ascendCount||0;
   currentAscensionKills=data.currentAscensionKills||0;
+  eliteBountyTSEarned=data.eliteBountyTSEarned||0;
   eliteKillsTotal=data.eliteKillsTotal||0;
   highestGlobalFloorEver=data.highestGlobalFloorEver||0;
   achievementsEarned=data.achievementsEarned||[];
@@ -4802,6 +4820,7 @@ function updateEntityStatsPanel(){
   if(critClickMult>0) document.getElementById('es-critm').textContent=(2+critClickMult).toFixed(2)+'×';
   if(soulAbsorbBonus>0) document.getElementById('es-soul').textContent='+'+(soulAbsorbBonus*100).toFixed(1)+'%';
   var _escl=document.getElementById('es-clicks'); if(_escl) _escl.textContent=totalClicks.toLocaleString();
+  var _esup=document.getElementById('es-upgrades'); if(_esup) _esup.textContent=totalUpgradePurchases.toLocaleString();
   // Tattered Souls stat row
   var tatteredRow=document.getElementById('es-tattered-row');
   var tatteredEl=document.getElementById('es-tattered');
