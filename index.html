@@ -4137,7 +4137,7 @@ function updateTatteredDisplay(){
   var disp=document.getElementById('tattered-display');
   if(disp) disp.style.display=rebirthCount>0?'block':'none';
   var preview=document.getElementById('ts-ascend-preview');
-  if(preview) preview.textContent='Ascend for '+calcTatteredSoulsGain(null).toLocaleString()+' TS';
+  if(preview) preview.textContent='Ascend for '+calcTatteredSoulsGain(rebirthForm).toLocaleString()+' TS';
   updateTatteredBtn();
 }
 
@@ -4152,8 +4152,8 @@ var ASCENSION_SPECIAL=[
 ];
 
 function openRebirthModal(){
-  var gain=calcTatteredSoulsGain(null);
-  var upgradeGain=calcUpgradeTSGain(null);
+  var gain=calcTatteredSoulsGain(rebirthForm);
+  var upgradeGain=calcUpgradeTSGain(rebirthForm);
   var bountyGain=eliteBountyTSEarned;
   document.getElementById('rebirth-ts-gain').textContent=gain.toLocaleString();
   var bdEl=document.getElementById('rebirth-ts-breakdown');
@@ -5542,7 +5542,7 @@ document.getElementById('volume-slider').addEventListener('input',function(){
   soundVolume=parseInt(this.value,10)/100;
   updateVolumeSlider();
   bgmSetVolume();
-  if(soundVolume>0 && _bgmRealm===curRealm && !_bgmAudio) bgmPlay(curRealm);
+  if(soundVolume>0 && !_bgmAudio) bgmPlay(curRealm);
   if(soundVolume<=0) bgmStop();
   saveGame(); saveSettings();
 });
@@ -5823,6 +5823,7 @@ function showIntroSequence(onDone) {
         panel.style.transition = '';
         panel.style.opacity = '';
         clearLines();
+        bgmPlay(curRealm);
         if(onDone) onDone();
       }, 720);
     }
@@ -5872,9 +5873,15 @@ updateTatteredBtn();
 updateManaBar();
 renderSpellPanel();
 updateVolumeSlider();
-// Start BGM on first user interaction (autoplay policy requires a gesture)
+// Start BGM on first user interaction (autoplay policy requires a gesture).
+// Skip if the intro overlay is still open — BGM is started explicitly when it closes.
 (function(){
-  function _startBgm(){ bgmPlay(curRealm); document.removeEventListener('click',_startBgm); document.removeEventListener('keydown',_startBgm); }
+  function _startBgm(){
+    if(document.getElementById('intro-overlay').classList.contains('open')) return;
+    bgmPlay(curRealm);
+    document.removeEventListener('click',_startBgm);
+    document.removeEventListener('keydown',_startBgm);
+  }
   document.addEventListener('click',_startBgm);
   document.addEventListener('keydown',_startBgm);
 })();
