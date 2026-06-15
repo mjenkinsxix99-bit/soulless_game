@@ -4667,6 +4667,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
       recalcStats();
       buildUpgrades(); lastRebuildU=Date.now(); dirtyU=false;
       updateEntityStatsPanel();
+      updateTatteredDisplay();
       document.getElementById('soul-count').textContent=fmt(souls);
       setHint();
       checkAchievements();
@@ -6013,6 +6014,7 @@ function buyAllAffordable(){
     recalcStats();
     dirtyU=true;
     updateEntityStatsPanel();
+    updateTatteredDisplay();
     document.getElementById('soul-count').textContent=fmt(souls);
     setHint();
     checkAchievements();
