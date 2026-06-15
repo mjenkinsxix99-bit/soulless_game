@@ -5823,6 +5823,7 @@ function showIntroSequence(onDone) {
         panel.style.transition = '';
         panel.style.opacity = '';
         clearLines();
+        bgmPlay(curRealm);
         if(onDone) onDone();
       }, 720);
     }
@@ -5872,9 +5873,15 @@ updateTatteredBtn();
 updateManaBar();
 renderSpellPanel();
 updateVolumeSlider();
-// Start BGM on first user interaction (autoplay policy requires a gesture)
+// Start BGM on first user interaction (autoplay policy requires a gesture).
+// Skip if the intro overlay is still open — BGM is started explicitly when it closes.
 (function(){
-  function _startBgm(){ bgmPlay(curRealm); document.removeEventListener('click',_startBgm); document.removeEventListener('keydown',_startBgm); }
+  function _startBgm(){
+    if(document.getElementById('intro-overlay').classList.contains('open')) return;
+    bgmPlay(curRealm);
+    document.removeEventListener('click',_startBgm);
+    document.removeEventListener('keydown',_startBgm);
+  }
   document.addEventListener('click',_startBgm);
   document.addEventListener('keydown',_startBgm);
 })();
