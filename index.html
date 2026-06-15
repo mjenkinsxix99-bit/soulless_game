@@ -2569,11 +2569,8 @@ function spawnEnemy(){
   updateEnemyPanel();
   updateProgressLabel();
   updateHpBars();
-  setHint();
   buildMinimap();
 }
-
-function setHint(){}
 
 function updateProgressLabel(){
   var elite=isEliteFight();
@@ -4107,8 +4104,6 @@ function getMaleAscGridPos(rc, p3, p4, p5, p6){
   var i6 = p6 ? (_MALE_P6[p6]||0) : 0;
   return            45 + i3*27 + i4*9 + i5*3 + i6;
 }
-function preloadFormImages(){}
-
 function calcUpgradeTSGain(chosenForm){
   var base=Math.floor(totalUpgradePurchases/666);
   var form=chosenForm!==undefined?chosenForm:rebirthForm;
@@ -4669,7 +4664,6 @@ function createUpgradeCard(u, can, bought, actualN, cost){
       updateEntityStatsPanel();
       updateTatteredDisplay();
       document.getElementById('soul-count').textContent=fmt(souls);
-      setHint();
       checkAchievements();
       checkRebirthButton();
       saveGame();
@@ -5858,7 +5852,6 @@ document.getElementById('tutorial-toggle').addEventListener('click', function(){
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
 initMist(28);
-preloadFormImages();
 loadSettings();
 var _hadSave = loadGame();
 updateHighestFloor();
@@ -6016,7 +6009,6 @@ function buyAllAffordable(){
     updateEntityStatsPanel();
     updateTatteredDisplay();
     document.getElementById('soul-count').textContent=fmt(souls);
-    setHint();
     checkAchievements();
     checkRebirthButton();
     saveGame();
