@@ -1616,8 +1616,9 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
   var float = (dead || !floatSpeed) ? 0 : Math.sin(t * floatSpeed) * 6;
-  // Elite: bias sprite toward bottom of canvas (0.75 of remaining space above)
-  var dy = elite ? (H - drawH) * 0.75 + float : (H - drawH) / 2 + float;
+  // All enemies share the same bottom anchor so elite appears larger (not lower)
+  var bottomAnchor = H * 0.75;
+  var dy = (bottomAnchor - drawH) + float;
   var cx = W / 2, cy = dy + drawH / 2;
 
   // Hit squish: stretch wide, squish tall
