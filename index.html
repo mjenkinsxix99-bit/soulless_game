@@ -4137,7 +4137,7 @@ function updateTatteredDisplay(){
   var disp=document.getElementById('tattered-display');
   if(disp) disp.style.display=rebirthCount>0?'block':'none';
   var preview=document.getElementById('ts-ascend-preview');
-  if(preview) preview.textContent='Ascend for '+calcTatteredSoulsGain(null).toLocaleString()+' TS';
+  if(preview) preview.textContent='Ascend for '+calcTatteredSoulsGain(rebirthForm).toLocaleString()+' TS';
   updateTatteredBtn();
 }
 
@@ -4152,8 +4152,8 @@ var ASCENSION_SPECIAL=[
 ];
 
 function openRebirthModal(){
-  var gain=calcTatteredSoulsGain(null);
-  var upgradeGain=calcUpgradeTSGain(null);
+  var gain=calcTatteredSoulsGain(rebirthForm);
+  var upgradeGain=calcUpgradeTSGain(rebirthForm);
   var bountyGain=eliteBountyTSEarned;
   document.getElementById('rebirth-ts-gain').textContent=gain.toLocaleString();
   var bdEl=document.getElementById('rebirth-ts-breakdown');
