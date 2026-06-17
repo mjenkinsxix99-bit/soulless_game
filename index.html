@@ -209,6 +209,22 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   left: -11px;
 }
 
+/* Elite win tutorial modal */
+#ewt-overlay { display:none; position:fixed; inset:0; z-index:20001; background:rgba(0,0,0,0.65); align-items:center; justify-content:center; }
+#ewt-overlay.open { display:flex; }
+#ewt-box { background:#0d0d1a; border:1px solid #7a2a2a; border-radius:10px; padding:22px 24px 20px; max-width:420px; width:90%; color:#fff; text-align:center; box-shadow:0 6px 40px rgba(0,0,0,0.9),0 0 20px rgba(120,40,40,0.35); }
+#ewt-box p { margin:0 0 14px; font-size:15px; line-height:1.6; font-style:italic; letter-spacing:0.4px; }
+#ewt-forms { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:16px; }
+.ewt-form-thumb { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.ewt-form-thumb img { width:64px; height:64px; border-radius:6px; border:1px solid #7a2a2a; object-fit:cover; }
+.ewt-form-thumb span { font-size:10px; color:#b08888; letter-spacing:0.5px; }
+#ewt-sub { color:#ffe44e; font-weight:bold; font-size:14px; text-shadow:0 0 8px #ffe44e,0 0 18px #ffaa00; margin-bottom:14px !important; }
+#ewt-no-show-wrap { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px; }
+#ewt-no-show-cb { width:16px; height:16px; accent-color:#7a2a2a; cursor:pointer; flex-shrink:0; }
+#ewt-no-show-wrap label { font-size:12px; color:#b08888; cursor:pointer; user-select:none; }
+#ewt-ok { padding:7px 36px; background:#7a2a2a; color:#e8d8c8; border:1px solid #aa4444; border-radius:4px; cursor:pointer; font-size:14px; letter-spacing:1.5px; transition:background 0.2s; }
+#ewt-ok:hover { background:#993333; }
+
 /* Offline progress modal */
 #offline-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 19999; align-items: center; justify-content: center; pointer-events: all; }
 #offline-modal.open { display: flex; }
@@ -955,6 +971,26 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   </div>
 </div>
 
+<div id="ewt-overlay">
+  <div id="ewt-box">
+    <p>Well done! 1st Elite defeated. Now you need more souls, More strength.</p>
+    <div id="ewt-forms">
+      <div class="ewt-form-thumb"><img src="artwork/masculine.webp" alt="Masculine"><span>Masculine</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/feminine.webp" alt="Feminine"><span>Feminine</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/androgynous.webp" alt="Androgynous"><span>Androgynous</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/canine.webp" alt="Canine"><span>Canine</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/feline.webp" alt="Feline"><span>Feline</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/equine.webp" alt="Equine"><span>Equine</span></div>
+    </div>
+    <p id="ewt-sub">Which form will you choose? Grow strong enough to ascend and choose your path!</p>
+    <div id="ewt-no-show-wrap">
+      <input type="checkbox" id="ewt-no-show-cb">
+      <label for="ewt-no-show-cb">Do not show this again</label>
+    </div>
+    <button id="ewt-ok">OK</button>
+  </div>
+</div>
+
 <div id="offline-modal">
   <div id="offline-box">
     <div id="offline-lore">You have consumed souls in your absence.<br>Feeding your hunger.</div>
@@ -1278,7 +1314,7 @@ var showTutorial = true;
 var _tutShown = {
   souls: false, upgrades: false, deeperHunger: false, milestone: false,
   upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
-  ascension: false, honors: false, tatteredShop: false, sacrificeIntro: false
+  ascension: false, honors: false, tatteredShop: false, sacrificeIntro: false, eliteWin: false
 };
 var _tutQueue = [];
 var _tutActive = false;
@@ -2733,6 +2769,9 @@ function onEnemyDeath(){
       return;
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
+    if(eliteKillsTotal===1&&showTutorial&&!_tutShown.eliteWin){
+      setTimeout(showEliteWinTutorial, autoProgressEnabled ? 2000 : 800);
+    }
     if(autoProgressEnabled&&curLevel<LEVELS_PER_REALM){
       (function(nl){ setTimeout(function(){ navigateTo(nl,1); },1200); })(curLevel+1);
     } else {
@@ -5823,6 +5862,25 @@ function _showTutTipNow(text, targetEl, onDone, highlightText) {
 
   okBtn.onclick = dismissTip;
   document.addEventListener('keydown', onTutKey);
+}
+
+function showEliteWinTutorial() {
+  if (_tutShown.eliteWin) return;
+  _tutShown.eliteWin = true;
+  var overlay = document.getElementById('ewt-overlay');
+  var cb = document.getElementById('ewt-no-show-cb');
+  cb.checked = false;
+  overlay.classList.add('open');
+  function dismiss() {
+    if (cb.checked) saveGame();
+    overlay.classList.remove('open');
+    document.removeEventListener('keydown', onEwtKey);
+  }
+  function onEwtKey(e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') { e.preventDefault(); dismiss(); }
+  }
+  document.getElementById('ewt-ok').onclick = dismiss;
+  document.addEventListener('keydown', onEwtKey);
 }
 
 // ── INTRO SEQUENCE ────────────────────────────────────────────────────────────
