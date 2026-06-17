@@ -163,6 +163,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   transition: background 0.2s;
 }
 #tutorial-ok:hover { background: #993333; }
+#tutorial-no-show-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
+#tutorial-no-show-cb { width: 16px; height: 16px; accent-color: #7a2a2a; cursor: pointer; flex-shrink: 0; }
+#tutorial-no-show-wrap label { font-size: 12px; color: #b08888; cursor: pointer; user-select: none; -webkit-user-select: none; }
 .tut-arrow-down {
   position: absolute;
   width: 0; height: 0;
@@ -205,6 +208,22 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   top: 2px;
   left: -11px;
 }
+
+/* Elite win tutorial modal */
+#ewt-overlay { display:none; position:fixed; inset:0; z-index:20001; background:rgba(0,0,0,0.65); align-items:center; justify-content:center; }
+#ewt-overlay.open { display:flex; }
+#ewt-box { background:#0d0d1a; border:1px solid #7a2a2a; border-radius:10px; padding:22px 24px 20px; max-width:420px; width:90%; color:#fff; text-align:center; box-shadow:0 6px 40px rgba(0,0,0,0.9),0 0 20px rgba(120,40,40,0.35); }
+#ewt-box p { margin:0 0 14px; font-size:15px; line-height:1.6; font-style:italic; letter-spacing:0.4px; }
+#ewt-forms { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:16px; }
+.ewt-form-thumb { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.ewt-form-thumb img { width:64px; height:64px; border-radius:6px; border:1px solid #7a2a2a; object-fit:cover; }
+.ewt-form-thumb span { font-size:10px; color:#b08888; letter-spacing:0.5px; }
+#ewt-sub { color:#ffe44e; font-weight:bold; font-size:14px; text-shadow:0 0 8px #ffe44e,0 0 18px #ffaa00; margin-bottom:14px !important; }
+#ewt-no-show-wrap { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:14px; }
+#ewt-no-show-cb { width:16px; height:16px; accent-color:#7a2a2a; cursor:pointer; flex-shrink:0; }
+#ewt-no-show-wrap label { font-size:12px; color:#b08888; cursor:pointer; user-select:none; }
+#ewt-ok { padding:7px 36px; background:#7a2a2a; color:#e8d8c8; border:1px solid #aa4444; border-radius:4px; cursor:pointer; font-size:14px; letter-spacing:1.5px; transition:background 0.2s; }
+#ewt-ok:hover { background:#993333; }
 
 /* Offline progress modal */
 #offline-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 19999; align-items: center; justify-content: center; pointer-events: all; }
@@ -782,7 +801,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       </div>
       <div class="left-tab-bar">
         <button class="left-tab-btn active" data-ltab="entity">Entity</button>
-        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop">Tattered Shop</button>
+        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop">Sacrifice</button>
       </div>
       <div id="left-tab-content">
         <div id="ltab-entity" class="left-tab-pane active">
@@ -851,7 +870,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <button class="buy-btn" data-qty="50">50</button>
       <button class="buy-btn" data-qty="100">100</button>
       <button class="buy-btn" data-qty="max">MAX</button>
-      <button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;">All Augments</button>
+      <button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;background:#2a6e2a;border-color:#3d9e3d;color:#ffffff;">BUY ALL AUGS</button>
       <div id="spell-panel">
         <div class="spell-divider"></div>
         <div id="mana-label">mana</div>
@@ -942,8 +961,33 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 <div id="tutorial-overlay">
   <div id="tutorial-tip">
     <p id="tutorial-text"></p>
+    <p id="tutorial-highlight" style="display:none;margin:0 0 12px;color:#ffe44e;font-weight:bold;font-size:15px;text-shadow:0 0 10px #ffe44e,0 0 20px #ffaa00;letter-spacing:0.3px;"></p>
+    <div id="tutorial-no-show-wrap">
+      <input type="checkbox" id="tutorial-no-show-cb">
+      <label for="tutorial-no-show-cb">Do not show this again</label>
+    </div>
     <button id="tutorial-ok">OK</button>
     <div class="tut-arrow-down" id="tutorial-arrow"></div>
+  </div>
+</div>
+
+<div id="ewt-overlay">
+  <div id="ewt-box">
+    <p>Well done! 1st Elite defeated. Now you need more souls, More strength.</p>
+    <div id="ewt-forms">
+      <div class="ewt-form-thumb"><img src="artwork/masculine.webp" alt="Masculine"><span>Masculine</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/feminine.webp" alt="Feminine"><span>Feminine</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/androgynous.webp" alt="Androgynous"><span>Androgynous</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/canine.webp" alt="Canine"><span>Canine</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/feline.webp" alt="Feline"><span>Feline</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/equine.webp" alt="Equine"><span>Equine</span></div>
+    </div>
+    <p id="ewt-sub">Which form will you choose? Grow strong enough to ascend and choose your path!</p>
+    <div id="ewt-no-show-wrap">
+      <input type="checkbox" id="ewt-no-show-cb">
+      <label for="ewt-no-show-cb">Do not show this again</label>
+    </div>
+    <button id="ewt-ok">OK</button>
   </div>
 </div>
 
@@ -1270,7 +1314,7 @@ var showTutorial = true;
 var _tutShown = {
   souls: false, upgrades: false, deeperHunger: false, milestone: false,
   upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
-  ascension: false, honors: false, tatteredShop: false
+  ascension: false, honors: false, tatteredShop: false, sacrificeIntro: false, eliteWin: false
 };
 var _tutQueue = [];
 var _tutActive = false;
@@ -2079,6 +2123,7 @@ var REALM_NAMES       = ['Void', 'Underworld', 'Purgatory', 'Undead', 'Hades', '
 var MINIMAP_VISIBLE  = 5;
 var minimapNewFloor  = false;
 var autoProgressEnabled = false;
+var hasEverAscended = false;
 
 // Location state
 var curRealm  = 1;
@@ -2494,7 +2539,7 @@ function buildMinimap(){
 function updateAutoProgressBtn(){
   var btn=document.getElementById('mm-auto');
   if(!btn) return;
-  if(!soulShopOwned['auto-progress']){ btn.style.display='none'; return; }
+  if(!soulShopOwned['auto-progress']&&!hasEverAscended){ btn.style.display='none'; return; }
   btn.style.display='';
   btn.classList.toggle('ap-on', autoProgressEnabled);
   btn.classList.toggle('ap-off', !autoProgressEnabled);
@@ -2724,6 +2769,9 @@ function onEnemyDeath(){
       return;
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
+    if(eliteKillsTotal===1&&showTutorial&&!_tutShown.eliteWin){
+      setTimeout(showEliteWinTutorial, autoProgressEnabled ? 2000 : 800);
+    }
     if(autoProgressEnabled&&curLevel<LEVELS_PER_REALM){
       (function(nl){ setTimeout(function(){ navigateTo(nl,1); },1200); })(curLevel+1);
     } else {
@@ -3881,6 +3929,7 @@ function isTattNodeUnlocked(node){
 }
 
 function buyTatteredNode(id){
+  if(rebirthCount<1) return;
   var node=TATTERED_NODES.filter(function(n){return n.id===id;})[0];
   if(!node) return;
   if(soulShopOwned[id]>=1) return;
@@ -3904,11 +3953,12 @@ function doRespec(){
   tatteredSouls+=refund;
   tatteredUpgradesSpent=0;
   TATTERED_NODES.forEach(function(n){ soulShopOwned[n.id]=0; });
+  if(hasEverAscended) soulShopOwned['auto-progress']=1;
   // Clear spell active states since spells are no longer owned
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
   invokePowerStacks=0;
-  autoProgressEnabled=false;
+  if(!hasEverAscended) autoProgressEnabled=false;
   recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
@@ -4040,7 +4090,6 @@ function hideTattTooltip(){
 }
 
 function openTatteredModal(){
-  if(rebirthCount<1) return;
   var modal=document.getElementById('tattered-modal');
   if(!modal) return;
   modal.classList.add('open');
@@ -4051,6 +4100,17 @@ function openTatteredModal(){
   document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
   updateTatteredModalTs();
   renderTatteredGrid();
+  if(rebirthCount<1&&showTutorial&&!_tutShown.sacrificeIntro){
+    _tutShown.sacrificeIntro=true;
+    setTimeout(function(){
+      showTutorialTip(
+        'This is the Tattered Souls sacrifice shop. Sacrifice power-giving Tattered Souls to gain spells and powers. Be careful, the sacrifice can weaken you!',
+        document.getElementById('tattered-upgrades-btn'),
+        null,
+        'Come back after you ascend to claim Auto-progress for FREE!'
+      );
+    },300);
+  }
 }
 function closeTatteredModal(){
   var modal=document.getElementById('tattered-modal');
@@ -4061,13 +4121,8 @@ function closeTatteredModal(){
 function updateTatteredBtn(){
   var btn=document.getElementById('tattered-upgrades-btn');
   if(!btn) return;
-  if(rebirthCount<1){
-    btn.classList.add('locked');
-    btn.title='Unlocks after your first Ascension';
-  } else {
-    btn.classList.remove('locked');
-    btn.title='';
-  }
+  btn.classList.remove('locked');
+  btn.title='';
 }
 
 
@@ -4308,6 +4363,8 @@ function doRebirthReset(chosenForm){
     ascension6Path = null;
   } else {
     rebirthCount++;
+    hasEverAscended=true;
+    soulShopOwned['auto-progress']=1;
   }
   rebirthForm=chosenForm;
   if(rebirthCount===1&&!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You may sacrifice Tattered Souls for the promise of more strength. Weigh your choices carefully. Visit the shop and claim Auto-Progress as a free gift.',document.getElementById('tattered-upgrades-btn'),null); },1500); } }
@@ -4383,6 +4440,7 @@ function saveGame(){
     ascension4Path:ascension4Path,
     ascension5Path:ascension5Path,
     ascension6Path:ascension6Path,
+    hasEverAscended:hasEverAscended,
     soulShopOwned:soulShopOwned,
     tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
@@ -4458,7 +4516,9 @@ function loadGame(){
   ascension4Path=data.ascension4Path||null;
   ascension5Path=data.ascension5Path||null;
   ascension6Path=data.ascension6Path||null;
+  if(data.hasEverAscended) hasEverAscended=data.hasEverAscended;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
+  if(hasEverAscended) soulShopOwned['auto-progress']=1;
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
   invokePowerStacks=data.invokePowerStacks||0;
@@ -5707,15 +5767,15 @@ document.getElementById('import-save-file').addEventListener('change',function(e
 });
 
 // ── TUTORIAL SYSTEM ───────────────────────────────────────────────────────────
-function showTutorialTip(text, targetEl, onDone) {
+function showTutorialTip(text, targetEl, onDone, highlightText) {
   if (_tutActive) {
-    _tutQueue.push({text: text, targetEl: targetEl, onDone: onDone});
+    _tutQueue.push({text: text, targetEl: targetEl, onDone: onDone, highlightText: highlightText});
     return;
   }
-  _showTutTipNow(text, targetEl, onDone);
+  _showTutTipNow(text, targetEl, onDone, highlightText);
 }
 
-function _showTutTipNow(text, targetEl, onDone) {
+function _showTutTipNow(text, targetEl, onDone, highlightText) {
   _tutActive = true;
   var overlay = document.getElementById('tutorial-overlay');
   var tip     = document.getElementById('tutorial-tip');
@@ -5724,6 +5784,10 @@ function _showTutTipNow(text, targetEl, onDone) {
   var okBtn   = document.getElementById('tutorial-ok');
 
   textEl.textContent = text;
+  var hlEl = document.getElementById('tutorial-highlight');
+  if (highlightText) { hlEl.textContent = highlightText; hlEl.style.display = ''; }
+  else { hlEl.textContent = ''; hlEl.style.display = 'none'; }
+  document.getElementById('tutorial-no-show-cb').checked = false;
 
   function positionTip() {
     var tipW = 280;
@@ -5778,14 +5842,14 @@ function _showTutTipNow(text, targetEl, onDone) {
 
   function dismissTip() {
     if (!_tutActive) return;
+    if (document.getElementById('tutorial-no-show-cb').checked) saveGame();
     overlay.classList.remove('open');
     _tutActive = false;
-    overlay.removeEventListener('pointerdown', dismissTip);
     document.removeEventListener('keydown', onTutKey);
     if (onDone) onDone();
     if (_tutQueue.length > 0) {
       var next = _tutQueue.shift();
-      setTimeout(function() { _showTutTipNow(next.text, next.targetEl, next.onDone); }, 300);
+      setTimeout(function() { _showTutTipNow(next.text, next.targetEl, next.onDone, next.highlightText); }, 300);
     }
   }
 
@@ -5797,8 +5861,26 @@ function _showTutTipNow(text, targetEl, onDone) {
   }
 
   okBtn.onclick = dismissTip;
-  overlay.addEventListener('pointerdown', dismissTip);
   document.addEventListener('keydown', onTutKey);
+}
+
+function showEliteWinTutorial() {
+  if (_tutShown.eliteWin) return;
+  _tutShown.eliteWin = true;
+  var overlay = document.getElementById('ewt-overlay');
+  var cb = document.getElementById('ewt-no-show-cb');
+  cb.checked = false;
+  overlay.classList.add('open');
+  function dismiss() {
+    if (cb.checked) saveGame();
+    overlay.classList.remove('open');
+    document.removeEventListener('keydown', onEwtKey);
+  }
+  function onEwtKey(e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') { e.preventDefault(); dismiss(); }
+  }
+  document.getElementById('ewt-ok').onclick = dismiss;
+  document.addEventListener('keydown', onEwtKey);
 }
 
 // ── INTRO SEQUENCE ────────────────────────────────────────────────────────────
