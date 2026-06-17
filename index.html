@@ -682,23 +682,27 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 
 /* ── ACHIEVEMENT BANNER ──────────────────────────────────────────────────── */
 #ach-banner {
-  position:absolute; inset:0; z-index:50;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  pointer-events:none; opacity:0;
-  background:linear-gradient(90deg,transparent 0%,rgba(212,168,67,0.10) 20%,rgba(212,168,67,0.26) 50%,rgba(212,168,67,0.10) 80%,transparent 100%);
-  box-shadow:0 0 60px rgba(212,168,67,0.25) inset;
+  position:fixed; left:370px; top:58px; z-index:200;
+  width:270px; pointer-events:none;
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+  padding:12px 18px 12px 16px;
+  background:linear-gradient(135deg,#1c1500 0%,#2b2000 50%,#171000 100%);
+  border:1px solid #c8a040; border-left:none;
+  border-radius:0 7px 7px 0;
+  box-shadow:4px 6px 24px rgba(212,168,67,0.35), inset 0 0 30px rgba(212,168,67,0.06);
+  opacity:0; transform:translateX(-100%);
 }
-#ach-banner.show { animation:ach-fadeinout 3s ease-out forwards; }
-@keyframes ach-fadeinout {
-  0%   { opacity:0; transform:scaleY(0.88); }
-  9%   { opacity:1; transform:scaleY(1); }
-  68%  { opacity:1; }
-  100% { opacity:0; }
+#ach-banner.show { animation:ach-flag-slide 6.3s ease forwards; }
+@keyframes ach-flag-slide {
+  0%   { transform:translateX(-100%); opacity:0; }
+  8%   { transform:translateX(0);     opacity:1; }
+  80%  { transform:translateX(0);     opacity:1; }
+  100% { transform:translateX(0);     opacity:0; }
 }
-.ach-label { font-size:10px; letter-spacing:5px; color:#c8a040; text-transform:uppercase; text-shadow:0 0 8px rgba(212,168,67,0.7); }
-.ach-name  { font-size:19px; color:#ffd700; letter-spacing:3px; font-weight:bold; margin-top:2px;
-  text-shadow:0 0 16px rgba(255,215,0,1),0 0 34px rgba(255,215,0,0.65),0 0 60px rgba(255,215,0,0.3); }
-.ach-desc  { font-size:12px; color:#b89030; font-style:italic; margin-top:3px; letter-spacing:1px; text-shadow:0 0 8px rgba(212,168,67,0.4); }
+.ach-label { font-size:9px; letter-spacing:5px; color:#c8a040; text-transform:uppercase; text-shadow:0 0 8px rgba(212,168,67,0.7); }
+.ach-name  { font-size:16px; color:#ffd700; letter-spacing:2px; font-weight:bold; margin-top:3px;
+  text-shadow:0 0 12px rgba(255,215,0,1),0 0 28px rgba(255,215,0,0.6); }
+.ach-desc  { font-size:11px; color:#b89030; font-style:italic; margin-top:4px; letter-spacing:1px; text-shadow:0 0 8px rgba(212,168,67,0.4); line-height:1.4; }
 
 /* ── ACHIEVEMENT TAB ─────────────────────────────────────────────────────── */
 .ach-count { font-size:11px; color:#776699; text-align:right; padding:0 0 8px; letter-spacing:1px; }
@@ -763,11 +767,11 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <div class="lbl">tattered souls</div>
       <div class="ts-preview" id="ts-ascend-preview"></div>
     </div>
-    <div id="ach-banner">
-      <div class="ach-label">Achievement Unlocked</div>
-      <div class="ach-name"></div>
-      <div class="ach-desc"></div>
-    </div>
+  </div>
+  <div id="ach-banner">
+    <div class="ach-label">Achievement Unlocked</div>
+    <div class="ach-name"></div>
+    <div class="ach-desc"></div>
   </div>
   <div id="main">
     <div id="left">
@@ -2713,6 +2717,7 @@ function onEnemyDeath(){
         updateHighestFloor();
         buildMinimap();
         updateProgressLabel();
+        bgmPlay(curRealm);
         saveGame();
         spawnEnemy();
       }, 2500);
@@ -3292,7 +3297,7 @@ function drainAchQueue(){
   var a=_achQueue.shift();
   showAchievementBanner(a);
   playChurchBell();
-  setTimeout(drainAchQueue,3400);
+  setTimeout(drainAchQueue,6500);
 }
 function showAchievementBanner(a){
   var banner=document.getElementById('ach-banner');
