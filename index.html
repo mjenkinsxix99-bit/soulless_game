@@ -785,7 +785,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       </div>
       <div class="left-tab-bar">
         <button class="left-tab-btn active" data-ltab="entity">Entity</button>
-        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop">Tattered Shop</button>
+        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop">Sacrifice</button>
       </div>
       <div id="left-tab-content">
         <div id="ltab-entity" class="left-tab-pane active">
@@ -945,6 +945,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 <div id="tutorial-overlay">
   <div id="tutorial-tip">
     <p id="tutorial-text"></p>
+    <p id="tutorial-highlight" style="display:none;margin:0 0 12px;color:#ffe44e;font-weight:bold;font-size:15px;text-shadow:0 0 10px #ffe44e,0 0 20px #ffaa00;letter-spacing:0.3px;"></p>
     <div id="tutorial-no-show-wrap">
       <input type="checkbox" id="tutorial-no-show-cb">
       <label for="tutorial-no-show-cb">Do not show this again</label>
@@ -1277,7 +1278,7 @@ var showTutorial = true;
 var _tutShown = {
   souls: false, upgrades: false, deeperHunger: false, milestone: false,
   upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
-  ascension: false, honors: false, tatteredShop: false
+  ascension: false, honors: false, tatteredShop: false, sacrificeIntro: false
 };
 var _tutQueue = [];
 var _tutActive = false;
@@ -2086,6 +2087,7 @@ var REALM_NAMES       = ['Void', 'Underworld', 'Purgatory', 'Undead', 'Hades', '
 var MINIMAP_VISIBLE  = 5;
 var minimapNewFloor  = false;
 var autoProgressEnabled = false;
+var hasEverAscended = false;
 
 // Location state
 var curRealm  = 1;
@@ -2501,7 +2503,7 @@ function buildMinimap(){
 function updateAutoProgressBtn(){
   var btn=document.getElementById('mm-auto');
   if(!btn) return;
-  if(!soulShopOwned['auto-progress']){ btn.style.display='none'; return; }
+  if(!soulShopOwned['auto-progress']&&!hasEverAscended){ btn.style.display='none'; return; }
   btn.style.display='';
   btn.classList.toggle('ap-on', autoProgressEnabled);
   btn.classList.toggle('ap-off', !autoProgressEnabled);
@@ -3888,6 +3890,7 @@ function isTattNodeUnlocked(node){
 }
 
 function buyTatteredNode(id){
+  if(rebirthCount<1) return;
   var node=TATTERED_NODES.filter(function(n){return n.id===id;})[0];
   if(!node) return;
   if(soulShopOwned[id]>=1) return;
@@ -3911,11 +3914,12 @@ function doRespec(){
   tatteredSouls+=refund;
   tatteredUpgradesSpent=0;
   TATTERED_NODES.forEach(function(n){ soulShopOwned[n.id]=0; });
+  if(hasEverAscended) soulShopOwned['auto-progress']=1;
   // Clear spell active states since spells are no longer owned
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
   invokePowerStacks=0;
-  autoProgressEnabled=false;
+  if(!hasEverAscended) autoProgressEnabled=false;
   recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
@@ -4047,7 +4051,6 @@ function hideTattTooltip(){
 }
 
 function openTatteredModal(){
-  if(rebirthCount<1) return;
   var modal=document.getElementById('tattered-modal');
   if(!modal) return;
   modal.classList.add('open');
@@ -4058,6 +4061,17 @@ function openTatteredModal(){
   document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
   updateTatteredModalTs();
   renderTatteredGrid();
+  if(rebirthCount<1&&showTutorial&&!_tutShown.sacrificeIntro){
+    _tutShown.sacrificeIntro=true;
+    setTimeout(function(){
+      showTutorialTip(
+        'This is the Tattered Souls sacrifice shop. Sacrifice power-giving Tattered Souls to gain spells and powers. Be careful, the sacrifice can weaken you!',
+        document.getElementById('tattered-upgrades-btn'),
+        null,
+        'Come back after you ascend to claim Auto-progress for FREE!'
+      );
+    },300);
+  }
 }
 function closeTatteredModal(){
   var modal=document.getElementById('tattered-modal');
@@ -4068,13 +4082,8 @@ function closeTatteredModal(){
 function updateTatteredBtn(){
   var btn=document.getElementById('tattered-upgrades-btn');
   if(!btn) return;
-  if(rebirthCount<1){
-    btn.classList.add('locked');
-    btn.title='Unlocks after your first Ascension';
-  } else {
-    btn.classList.remove('locked');
-    btn.title='';
-  }
+  btn.classList.remove('locked');
+  btn.title='';
 }
 
 
@@ -4315,6 +4324,8 @@ function doRebirthReset(chosenForm){
     ascension6Path = null;
   } else {
     rebirthCount++;
+    hasEverAscended=true;
+    soulShopOwned['auto-progress']=1;
   }
   rebirthForm=chosenForm;
   if(rebirthCount===1&&!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You may sacrifice Tattered Souls for the promise of more strength. Weigh your choices carefully. Visit the shop and claim Auto-Progress as a free gift.',document.getElementById('tattered-upgrades-btn'),null); },1500); } }
@@ -4390,6 +4401,7 @@ function saveGame(){
     ascension4Path:ascension4Path,
     ascension5Path:ascension5Path,
     ascension6Path:ascension6Path,
+    hasEverAscended:hasEverAscended,
     soulShopOwned:soulShopOwned,
     tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
@@ -4465,7 +4477,9 @@ function loadGame(){
   ascension4Path=data.ascension4Path||null;
   ascension5Path=data.ascension5Path||null;
   ascension6Path=data.ascension6Path||null;
+  if(data.hasEverAscended) hasEverAscended=data.hasEverAscended;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
+  if(hasEverAscended) soulShopOwned['auto-progress']=1;
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
   invokePowerStacks=data.invokePowerStacks||0;
@@ -5714,15 +5728,15 @@ document.getElementById('import-save-file').addEventListener('change',function(e
 });
 
 // ── TUTORIAL SYSTEM ───────────────────────────────────────────────────────────
-function showTutorialTip(text, targetEl, onDone) {
+function showTutorialTip(text, targetEl, onDone, highlightText) {
   if (_tutActive) {
-    _tutQueue.push({text: text, targetEl: targetEl, onDone: onDone});
+    _tutQueue.push({text: text, targetEl: targetEl, onDone: onDone, highlightText: highlightText});
     return;
   }
-  _showTutTipNow(text, targetEl, onDone);
+  _showTutTipNow(text, targetEl, onDone, highlightText);
 }
 
-function _showTutTipNow(text, targetEl, onDone) {
+function _showTutTipNow(text, targetEl, onDone, highlightText) {
   _tutActive = true;
   var overlay = document.getElementById('tutorial-overlay');
   var tip     = document.getElementById('tutorial-tip');
@@ -5731,6 +5745,9 @@ function _showTutTipNow(text, targetEl, onDone) {
   var okBtn   = document.getElementById('tutorial-ok');
 
   textEl.textContent = text;
+  var hlEl = document.getElementById('tutorial-highlight');
+  if (highlightText) { hlEl.textContent = highlightText; hlEl.style.display = ''; }
+  else { hlEl.textContent = ''; hlEl.style.display = 'none'; }
   document.getElementById('tutorial-no-show-cb').checked = false;
 
   function positionTip() {
@@ -5793,7 +5810,7 @@ function _showTutTipNow(text, targetEl, onDone) {
     if (onDone) onDone();
     if (_tutQueue.length > 0) {
       var next = _tutQueue.shift();
-      setTimeout(function() { _showTutTipNow(next.text, next.targetEl, next.onDone); }, 300);
+      setTimeout(function() { _showTutTipNow(next.text, next.targetEl, next.onDone, next.highlightText); }, 300);
     }
   }
 
