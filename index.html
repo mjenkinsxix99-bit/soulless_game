@@ -163,6 +163,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   transition: background 0.2s;
 }
 #tutorial-ok:hover { background: #993333; }
+#tutorial-no-show-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; }
+#tutorial-no-show-cb { width: 16px; height: 16px; accent-color: #7a2a2a; cursor: pointer; flex-shrink: 0; }
+#tutorial-no-show-wrap label { font-size: 12px; color: #b08888; cursor: pointer; user-select: none; -webkit-user-select: none; }
 .tut-arrow-down {
   position: absolute;
   width: 0; height: 0;
@@ -942,6 +945,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 <div id="tutorial-overlay">
   <div id="tutorial-tip">
     <p id="tutorial-text"></p>
+    <div id="tutorial-no-show-wrap">
+      <input type="checkbox" id="tutorial-no-show-cb">
+      <label for="tutorial-no-show-cb">Do not show this again</label>
+    </div>
     <button id="tutorial-ok">OK</button>
     <div class="tut-arrow-down" id="tutorial-arrow"></div>
   </div>
@@ -5724,6 +5731,7 @@ function _showTutTipNow(text, targetEl, onDone) {
   var okBtn   = document.getElementById('tutorial-ok');
 
   textEl.textContent = text;
+  document.getElementById('tutorial-no-show-cb').checked = false;
 
   function positionTip() {
     var tipW = 280;
@@ -5778,9 +5786,9 @@ function _showTutTipNow(text, targetEl, onDone) {
 
   function dismissTip() {
     if (!_tutActive) return;
+    if (document.getElementById('tutorial-no-show-cb').checked) saveGame();
     overlay.classList.remove('open');
     _tutActive = false;
-    overlay.removeEventListener('pointerdown', dismissTip);
     document.removeEventListener('keydown', onTutKey);
     if (onDone) onDone();
     if (_tutQueue.length > 0) {
@@ -5797,7 +5805,6 @@ function _showTutTipNow(text, targetEl, onDone) {
   }
 
   okBtn.onclick = dismissTip;
-  overlay.addEventListener('pointerdown', dismissTip);
   document.addEventListener('keydown', onTutKey);
 }
 
