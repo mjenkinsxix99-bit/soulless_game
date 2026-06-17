@@ -2727,7 +2727,8 @@ function onEnemyDeath(){
   if(isEliteFight()){
     eliteKillsTotal++;
     // Elite beaten — add this level's enemy type to the pool
-    var typeIdx2=(curRealm-1)*LEVELS_PER_REALM+curLevel-1;
+    // Use the same modulo wrap as spawnEnemy's realmOffset so realm 11+ maps back to indices 0-99
+    var typeIdx2=((curRealm-1)%REALM_NAMES.length)*LEVELS_PER_REALM+curLevel-1;
     if(namedEliteFirstKills.indexOf(typeIdx2)<0) namedEliteFirstKills.push(typeIdx2);
     if(defeatedElites.indexOf(typeIdx2)<0){
       defeatedElites.push(typeIdx2);
@@ -2736,7 +2737,7 @@ function onEnemyDeath(){
       if(curRealm===highestRealm){
         // add next type to pool if not already there
         var nextType=typeIdx2+1;
-        var realmEnd=curRealm*LEVELS_PER_REALM;
+        var realmEnd=(((curRealm-1)%REALM_NAMES.length)+1)*LEVELS_PER_REALM;
         if(nextType<realmEnd && nextType<ENEMY_TYPES.length && enemyPool.indexOf(nextType)<0){
           enemyPool.push(nextType);
         }
