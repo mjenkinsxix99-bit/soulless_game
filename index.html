@@ -27,7 +27,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #main { display: flex; flex: 1; overflow: hidden; }
 #left, #right { width: 300px; flex-shrink: 0; padding: 16px 14px; background: #08080e; overflow-y: auto; }
 #left { width: 370px; border-right: 1px solid #1e1845; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 0; background: #000; position: relative; overflow: hidden; }
-#right { border-left: 1px solid #1e1845; width: 415px; }
+#right { border-left: 1px solid #1e1845; flex: 1; min-width: 415px; }
 .ph { font-size: 14px; letter-spacing: 3px; color: #9980dd; text-transform: uppercase; border-bottom: 1px solid #1a1535; padding-bottom: 4px; margin-bottom: 10px; }
 .ph.gap { margin-top: 16px; }
 .ucard { border: 1px solid #c8bca0; border-radius: 5px; padding: 11px 12px; margin-bottom: 9px; cursor: default; opacity: 0.5; background: #f0e8b8; transition: border-color 0.2s, background 0.2s; user-select: none; -webkit-user-select: none; }
@@ -67,7 +67,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .ucard-flex { display: flex; gap: 10px; align-items: flex-start; }
 .ucard-icon { width: 52px; height: 52px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; }
 .ucard-body { flex: 1; min-width: 0; }
-#battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
+#battlefield { flex: 0 0 437px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
 #realm-bg-img-left { display:none; position:absolute; top:0; left:0; pointer-events:none; z-index:1; width:auto; height:auto; transform-origin:top left; }
 #realm-bg-img { display:none; position:absolute; top:0; left:0; transform-origin:top left; pointer-events:none; z-index:1; width:auto; height:auto; }
@@ -6870,13 +6870,17 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       overlay.style.display = (isPortrait && isSmall) ? 'flex' : '';
     }
 
-    var s = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+    // Scale by height only so extra width fills the right panel.
+    // Hard stop at 1923px (bg image right edge: 1672 × 1.15 ≈ 1922.8px).
+    var MAX_GAME_W = 1923;
+    var s = Math.min(vh / DESIGN_H, 1);
     if (s >= 1) {
-      g.style.width  = vw + 'px';
+      g.style.width  = Math.min(vw, MAX_GAME_W) + 'px';
       g.style.height = vh + 'px';
       g.style.transform = '';
     } else {
-      g.style.width  = DESIGN_W + 'px';
+      var cssW = Math.min(Math.ceil(vw / s), MAX_GAME_W);
+      g.style.width  = cssW + 'px';
       g.style.height = DESIGN_H + 'px';
       g.style.transform = 'scale(' + s + ')';
     }
