@@ -870,12 +870,14 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     position: relative;
     z-index: 1;
   }
+  .buy-label { color: #d4a843 !important; }
 
   /* Buy selector: horizontal strip */
   #buy-selector {
     grid-area: buy;
     flex-direction: row !important;
-    width: auto !important; height: auto !important;
+    width: calc(100% - 20px) !important; height: auto !important;
+    margin: 0 auto;
     padding: 5px 6px !important;
     gap: 5px !important;
     border-left: none !important; border-right: none !important;
@@ -897,6 +899,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     flex-shrink: 0;
     display: block !important;
     position: relative;
+    width: calc(100% - 40px);
+    margin: 0 auto;
   }
   #minimap-inner { justify-content: center; }
   #mm-cells { gap: 4px !important; min-height: 36px !important; }
