@@ -833,7 +833,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
           <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
           <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
         </div>
-        <div id="elite-timer-wrap" style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:6px;visibility:hidden;">
+        <div id="elite-timer-wrap" style="display:none;flex-direction:column;align-items:center;gap:4px;margin-top:6px;">
           <div id="elite-timer-label" style="color:#33aa33;font-size:14px;letter-spacing:1px;">Time to Defeat: 20s</div>
           <div class="hp-wrap">
             <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
@@ -2606,13 +2606,13 @@ function spawnEnemy(){
 
   if(elite){
     eliteTimerStart=Date.now();
-    document.getElementById('elite-timer-wrap').style.visibility='visible';
+    document.getElementById('elite-timer-wrap').style.display='flex';
     document.getElementById('elite-timer-bar').style.width='100%';
     document.getElementById('elite-timer-label').textContent='Time to Defeat: 20s';
     if(!_tutShown.elite){ _tutShown.elite=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('Each Level has an Elite enemy. The ruler of the level. Defeat them within the time limit to proceed.',document.getElementById('enemy-canvas'),null); },800); } }
   } else {
     eliteTimerStart=0;
-    document.getElementById('elite-timer-wrap').style.visibility='hidden';
+    document.getElementById('elite-timer-wrap').style.display='none';
   }
 
   updateEnemyPanel();
@@ -6717,19 +6717,31 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
 })();
 
-// Lock the game to its initial layout size and counter-scale on browser zoom.
-// All internal coordinates (%, px, canvas draws) are evaluated at the initial
-// viewport dimensions, so nothing drifts regardless of zoom level.
+// Scale the game to always fit the viewport without clipping.
+// DESIGN_W/H are the dimensions the layout was built for. When the viewport is
+// smaller in either dimension the game shrinks uniformly so nothing is cut off.
+// When the viewport is larger the game simply fills it (content handles extra space).
 (function() {
   var g = document.getElementById('game');
-  var _iw = window.innerWidth, _ih = window.innerHeight;
-  g.style.width  = _iw + 'px';
-  g.style.height = _ih + 'px';
+  var DESIGN_W = 1280, DESIGN_H = 800;
   g.style.transformOrigin = 'top left';
-  window.addEventListener('resize', function() {
-    var s = Math.min(window.innerWidth / _iw, window.innerHeight / _ih);
-    g.style.transform = (s === 1) ? '' : 'scale(' + s + ')';
-  });
+
+  function applyLayout() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var s = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+    if (s >= 1) {
+      g.style.width  = vw + 'px';
+      g.style.height = vh + 'px';
+      g.style.transform = '';
+    } else {
+      g.style.width  = DESIGN_W + 'px';
+      g.style.height = DESIGN_H + 'px';
+      g.style.transform = 'scale(' + s + ')';
+    }
+  }
+
+  applyLayout();
+  window.addEventListener('resize', applyLayout);
 })();
 
 </script>
