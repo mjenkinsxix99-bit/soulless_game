@@ -782,85 +782,118 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 
 /* ── MOBILE PORTRAIT LAYOUT (phones only) ───────────────────────────────── */
 @media (pointer: coarse) and (hover: none) and (max-width: 549px) {
-  /* Game fills full viewport, no scaling transform */
   #game { height: 100dvh; }
 
-  /* Grid: top row (left+battlefield) | buy bar | right panel */
+  /* CSS grid: top row (left+battle) | buy bar | minimap | right panel */
   #main {
     display: grid;
-    grid-template-columns: 150px 1fr;
-    grid-template-rows: 38vh auto 1fr;
+    grid-template-columns: 155px 1fr;
+    grid-template-rows: 38vh auto auto 1fr;
     grid-template-areas:
-      "left  battle"
-      "buy   buy"
-      "right right";
+      "left   battle"
+      "buy    buy"
+      "map    map"
+      "right  right";
+    position: relative;
     overflow: hidden;
   }
 
-  /* ── Top row panels ── */
+  /* Shared realm background (moved to #main via JS) — spans full top row */
+  #realm-bg-img-left {
+    position: absolute !important;
+    top: 0 !important; left: 0 !important;
+    z-index: 0 !important;
+    width: auto !important; height: auto !important;
+  }
+  /* Battlefield-specific bg hidden — shared bg covers both panels */
+  #realm-bg-img  { display: none !important; }
+  #bg-canvas     { display: none !important; }
+  #combat-oval   { display: none !important; }
+
+  /* Left panel: transparent so shared bg shows through */
   #left {
     grid-area: left;
     width: auto;
-    padding-top: 8px;
-    border-right: 1px solid #1e1845;
+    background: transparent !important;
+    padding-top: 4px;
+    border-right: 1px solid rgba(30,24,69,0.6);
+    overflow: hidden;
+    z-index: 1;
   }
-  #battlefield {
-    grid-area: battle;
-    padding-bottom: 8px;
-  }
-
-  /* Entity canvas scaled down */
+  #left-header  { background: transparent !important; padding: 4px 6px 2px; }
+  .left-tab-bar { background: transparent !important; }
   #entity-canvas { width: 120px !important; height: 120px !important; }
 
-  /* Enemy canvas scaled down */
-  #enemy-canvas { width: 150px !important; height: 150px !important; }
-
-  /* Combat-wrap: keep pinned but adjust for narrower battlefield */
-  #combat-wrap {
-    left: 50% !important;
-    top: calc(30% + 80px) !important;
+  /* Battlefield: transparent so shared bg shows through */
+  #battlefield {
+    grid-area: battle;
+    background: transparent !important;
+    padding-bottom: 0;
+    overflow: hidden;
+    z-index: 1;
   }
 
-  /* ── Spell panel repositioned to right edge of battlefield ── */
+  /* Enemy repositioned for narrower battlefield */
+  #combat-wrap {
+    left: calc(50% - 25px) !important;
+    top: 46% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  #enemy-canvas { width: 120px !important; height: 120px !important; }
+  #click-hint   { font-size: 16px !important; }
+  #realm-label  { font-size: 10px !important; left: 6px !important; top: 4px !important; letter-spacing: 1px !important; }
+
+  /* Spell panel: vertical strip on right edge of battlefield */
   #spell-panel {
     position: absolute !important;
-    right: 4px !important;
-    top: 4px !important;
-    bottom: 4px !important;
-    width: 52px !important;
-    padding-top: 4px !important;
-    gap: 6px !important;
+    right: 2px !important; top: 2px !important; bottom: 2px !important;
+    width: 50px !important;
+    padding: 4px 0 !important;
+    gap: 5px !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    background: rgba(8,8,14,0.75) !important;
+    background: rgba(8,8,14,0.82) !important;
     border: 1px solid #1e1845 !important;
-    border-radius: 6px !important;
+    border-radius: 5px !important;
     z-index: 10 !important;
     overflow: hidden !important;
   }
   #spell-panel.visible { display: flex !important; }
-  #mana-bar-outer { height: 60px !important; }
+  #mana-bar-outer { height: 50px !important; }
+  .spell-tt { right: calc(100% + 6px) !important; }
 
-  /* ── Buy selector becomes horizontal strip ── */
+  /* Buy selector: horizontal strip */
   #buy-selector {
     grid-area: buy;
     flex-direction: row !important;
-    width: auto !important;
-    height: auto !important;
-    padding: 6px 8px !important;
-    gap: 6px !important;
-    border-left: none !important;
-    border-right: none !important;
+    width: auto !important; height: auto !important;
+    padding: 5px 6px !important;
+    gap: 5px !important;
+    border-left: none !important; border-right: none !important;
     border-top: 1px solid #1e1845;
     border-bottom: 1px solid #1e1845;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
   }
   .buy-label { padding-bottom: 0 !important; padding-right: 4px; }
-  .buy-btn { width: auto !important; padding: 7px 10px !important; font-size: 11px !important; }
+  .buy-btn   { width: auto !important; padding: 6px 9px !important; font-size: 11px !important; }
 
-  /* ── Right panel: full width, scrollable ── */
+  /* Minimap: own row between buy bar and right panel */
+  #minimap-panel {
+    grid-area: map;
+    padding: 2px 6px !important;
+    background: #08080e;
+    border-bottom: 1px solid #1e1845;
+    flex-shrink: 0;
+    display: block !important;
+    position: relative;
+  }
+  #minimap-inner { justify-content: center; }
+  #mm-cells { gap: 4px !important; min-height: 36px !important; }
+
+  /* Right panel: scrollable */
   #right {
     grid-area: right;
     width: auto !important;
@@ -868,17 +901,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Minimap: tighter on mobile */
-  #minimap-panel { padding: 2px 4px !important; }
-  #mm-cells { gap: 4px !important; }
-
-  /* Realm label repositioned so it doesn't clash with spells */
-  #realm-label { font-size: 11px !important; letter-spacing: 1px !important; }
-
-  /* Achievement banner: offset for mobile */
+  /* Achievement banner */
   #ach-banner { left: 0 !important; border-left: 1px solid #c8a040 !important; border-radius: 7px !important; }
 
-  /* Rotate overlay: hide in portrait on mobile (portrait is now valid) */
+  /* Rotate overlay suppressed — portrait is a valid layout on mobile */
   #rotate-overlay { display: none !important; }
 }
 </style>
@@ -6963,9 +6989,22 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   // Detect phone-sized touch devices and apply mobile portrait layout
   var mobileQuery = window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 549px)');
   if (mobileQuery.matches) {
-    var spellPanel = document.getElementById('spell-panel');
+    var mainEl     = document.getElementById('main');
     var battlefield = document.getElementById('battlefield');
+    var buySel     = document.getElementById('buy-selector');
+
+    // 1. Shared background: move realm-bg-img-left to #main so it spans both panels
+    var bgLeft = document.getElementById('realm-bg-img-left');
+    if (bgLeft && mainEl) mainEl.insertBefore(bgLeft, mainEl.firstChild);
+
+    // 2. Spell panel: move into battlefield so it can sit on the right edge
+    var spellPanel = document.getElementById('spell-panel');
     if (spellPanel && battlefield) battlefield.appendChild(spellPanel);
+
+    // 3. Minimap: move to its own grid row between buy bar and right panel
+    var minimapPanel = document.getElementById('minimap-panel');
+    if (minimapPanel && buySel && buySel.parentNode)
+      buySel.parentNode.insertBefore(minimapPanel, buySel.nextSibling);
   }
 
   function applyLayout() {
