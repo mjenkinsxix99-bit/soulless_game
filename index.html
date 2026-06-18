@@ -780,6 +780,107 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .ss-item.ss-maxed .ss-item-desc { color:#4a3820; }
 .ss-item.ss-maxed .ss-item-cost { color:#4a3010; }
 
+/* ── MOBILE PORTRAIT LAYOUT (phones only) ───────────────────────────────── */
+@media (pointer: coarse) and (hover: none) and (max-width: 549px) {
+  /* Game fills full viewport, no scaling transform */
+  #game { height: 100dvh; }
+
+  /* Grid: top row (left+battlefield) | buy bar | right panel */
+  #main {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    grid-template-rows: 38vh auto 1fr;
+    grid-template-areas:
+      "left  battle"
+      "buy   buy"
+      "right right";
+    overflow: hidden;
+  }
+
+  /* ── Top row panels ── */
+  #left {
+    grid-area: left;
+    width: auto;
+    padding-top: 8px;
+    border-right: 1px solid #1e1845;
+  }
+  #battlefield {
+    grid-area: battle;
+    padding-bottom: 8px;
+  }
+
+  /* Entity canvas scaled down */
+  #entity-canvas { width: 120px !important; height: 120px !important; }
+
+  /* Enemy canvas scaled down */
+  #enemy-canvas { width: 150px !important; height: 150px !important; }
+
+  /* Combat-wrap: keep pinned but adjust for narrower battlefield */
+  #combat-wrap {
+    left: 50% !important;
+    top: calc(30% + 80px) !important;
+  }
+
+  /* ── Spell panel repositioned to right edge of battlefield ── */
+  #spell-panel {
+    position: absolute !important;
+    right: 4px !important;
+    top: 4px !important;
+    bottom: 4px !important;
+    width: 52px !important;
+    padding-top: 4px !important;
+    gap: 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    background: rgba(8,8,14,0.75) !important;
+    border: 1px solid #1e1845 !important;
+    border-radius: 6px !important;
+    z-index: 10 !important;
+    overflow: hidden !important;
+  }
+  #spell-panel.visible { display: flex !important; }
+  #mana-bar-outer { height: 60px !important; }
+
+  /* ── Buy selector becomes horizontal strip ── */
+  #buy-selector {
+    grid-area: buy;
+    flex-direction: row !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 6px 8px !important;
+    gap: 6px !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: 1px solid #1e1845;
+    border-bottom: 1px solid #1e1845;
+    justify-content: center;
+    align-items: center;
+  }
+  .buy-label { padding-bottom: 0 !important; padding-right: 4px; }
+  .buy-btn { width: auto !important; padding: 7px 10px !important; font-size: 11px !important; }
+
+  /* ── Right panel: full width, scrollable ── */
+  #right {
+    grid-area: right;
+    width: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Minimap: tighter on mobile */
+  #minimap-panel { padding: 2px 4px !important; }
+  #mm-cells { gap: 4px !important; }
+
+  /* Realm label repositioned so it doesn't clash with spells */
+  #realm-label { font-size: 11px !important; letter-spacing: 1px !important; }
+
+  /* Achievement banner: offset for mobile */
+  #ach-banner { left: 0 !important; border-left: 1px solid #c8a040 !important; border-radius: 7px !important; }
+
+  /* Rotate overlay: hide in portrait on mobile (portrait is now valid) */
+  #rotate-overlay { display: none !important; }
+}
 </style>
 </head>
 <body>
@@ -6859,11 +6960,27 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   var DESIGN_W = 1280, DESIGN_H = 800;
   g.style.transformOrigin = 'top left';
 
+  // Detect phone-sized touch devices and apply mobile portrait layout
+  var mobileQuery = window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 549px)');
+  if (mobileQuery.matches) {
+    var spellPanel = document.getElementById('spell-panel');
+    var battlefield = document.getElementById('battlefield');
+    if (spellPanel && battlefield) battlefield.appendChild(spellPanel);
+  }
+
   function applyLayout() {
     var vw = document.documentElement.clientWidth;
     var vh = document.documentElement.clientHeight;
 
-    // Show rotate overlay when in portrait on a small screen
+    // Mobile portrait: CSS grid handles layout, no scaling needed
+    if (mobileQuery.matches) {
+      g.style.width  = vw + 'px';
+      g.style.height = vh + 'px';
+      g.style.transform = '';
+      return;
+    }
+
+    // Desktop/landscape: suppress rotate overlay only for non-mobile
     if (overlay) {
       var isPortrait = vh > vw;
       var isSmall = Math.max(vw, vh) <= 900;
