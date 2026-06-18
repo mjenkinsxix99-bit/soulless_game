@@ -9,7 +9,12 @@
 html { zoom: 1; }
 html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e0d8ff; font-family: Georgia, serif; overflow: hidden; }
 #game, #game * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M4,2 L18,5 L13,8 L26,13 L16,14 L15,24 L10,11 L7,16 Z' fill='%23d4a843' stroke='%23000' stroke-width='0.8' stroke-linejoin='round'/%3E%3C/svg%3E") 4 2, crosshair !important; }
-#game { display: flex; flex-direction: column; height: 100vh; min-width: 900px; }
+#game { display: flex; flex-direction: column; height: 100vh; }
+#rotate-overlay { display: none; position: fixed; inset: 0; z-index: 99999; background: #07070f; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+#rotate-overlay svg { animation: rotate-hint 2s ease-in-out infinite; }
+@keyframes rotate-hint { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
+#rotate-overlay p { color: #d0c4ff; font-family: Georgia, serif; font-size: 18px; letter-spacing: 2px; text-align: center; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
+@media (orientation: portrait) and (max-width: 900px) { #rotate-overlay { display: flex; } }
 #topbar { display: flex; align-items: center; gap: 20px; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; position: relative; }
 .title { font-size: 27px; letter-spacing: 4px; color: #d0c4ff; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
 #souls-display { text-align: center; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
@@ -774,6 +779,15 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 </style>
 </head>
 <body>
+<div id="rotate-overlay">
+  <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="20" y="10" width="40" height="60" rx="6" stroke="#d0c4ff" stroke-width="3"/>
+    <circle cx="40" cy="62" r="3" fill="#d0c4ff"/>
+    <path d="M52 28 L64 22 L64 34 Z" fill="#d4a843"/>
+    <path d="M64 22 Q76 40 64 58" stroke="#d4a843" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </svg>
+  <p>ROTATE YOUR DEVICE<br>TO PLAY SOULLESS</p>
+</div>
 <div id="game">
   <div id="topbar">
     <div class="title">SOULLESS</div>
