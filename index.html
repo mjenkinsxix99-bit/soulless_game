@@ -6850,16 +6850,26 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 })();
 
 // Scale the game to always fit the viewport without clipping.
-// DESIGN_W/H are the dimensions the layout was built for. When the viewport is
-// smaller in either dimension the game shrinks uniformly so nothing is cut off.
-// When the viewport is larger the game simply fills it (content handles extra space).
+// Uses documentElement.clientWidth/clientHeight which always reflects the true
+// CSS viewport size regardless of page content width (unlike window.innerWidth
+// which expands to match content on some mobile browsers).
 (function() {
   var g = document.getElementById('game');
+  var overlay = document.getElementById('rotate-overlay');
   var DESIGN_W = 1280, DESIGN_H = 800;
   g.style.transformOrigin = 'top left';
 
   function applyLayout() {
-    var vw = window.innerWidth, vh = window.innerHeight;
+    var vw = document.documentElement.clientWidth;
+    var vh = document.documentElement.clientHeight;
+
+    // Show rotate overlay when in portrait on a small screen
+    if (overlay) {
+      var isPortrait = vh > vw;
+      var isSmall = Math.max(vw, vh) <= 900;
+      overlay.style.display = (isPortrait && isSmall) ? 'flex' : '';
+    }
+
     var s = Math.min(vw / DESIGN_W, vh / DESIGN_H);
     if (s >= 1) {
       g.style.width  = vw + 'px';
@@ -6874,6 +6884,10 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
   applyLayout();
   window.addEventListener('resize', applyLayout);
+  window.addEventListener('orientationchange', function() {
+    // orientationchange fires before dimensions update; delay one frame
+    setTimeout(applyLayout, 100);
+  });
 })();
 
 </script>
