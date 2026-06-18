@@ -2561,6 +2561,9 @@ function navigateTo(level, floor, realm){
   setTimeout(spawnEnemy,400);
   buildMinimap();
   updateProgressLabel();
+  if(!_tutShown.eliteWin&&showTutorial&&eliteKillsTotal>=1&&curRealm===1&&curLevel===2&&curFloor===1){
+    setTimeout(showEliteWinTutorial,800);
+  }
 }
 
 // ── ENEMY SPAWN ───────────────────────────────────────────────────────────────
@@ -2770,9 +2773,6 @@ function onEnemyDeath(){
       return;
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
-    if(eliteKillsTotal===1&&showTutorial&&!_tutShown.eliteWin){
-      setTimeout(showEliteWinTutorial, autoProgressEnabled ? 2000 : 800);
-    }
     if(autoProgressEnabled&&curLevel<LEVELS_PER_REALM){
       (function(nl){ setTimeout(function(){ navigateTo(nl,1); },1200); })(curLevel+1);
     } else {
