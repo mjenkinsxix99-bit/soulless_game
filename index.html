@@ -833,7 +833,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
           <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
           <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
         </div>
-        <div id="elite-timer-wrap" style="display:none;flex-direction:column;align-items:center;gap:4px;margin-top:6px;">
+        <div id="elite-timer-wrap" style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:6px;visibility:hidden;">
           <div id="elite-timer-label" style="color:#33aa33;font-size:14px;letter-spacing:1px;">Time to Defeat: 20s</div>
           <div class="hp-wrap">
             <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
@@ -2606,13 +2606,13 @@ function spawnEnemy(){
 
   if(elite){
     eliteTimerStart=Date.now();
-    document.getElementById('elite-timer-wrap').style.display='flex';
+    document.getElementById('elite-timer-wrap').style.visibility='visible';
     document.getElementById('elite-timer-bar').style.width='100%';
     document.getElementById('elite-timer-label').textContent='Time to Defeat: 20s';
     if(!_tutShown.elite){ _tutShown.elite=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('Each Level has an Elite enemy. The ruler of the level. Defeat them within the time limit to proceed.',document.getElementById('enemy-canvas'),null); },800); } }
   } else {
     eliteTimerStart=0;
-    document.getElementById('elite-timer-wrap').style.display='none';
+    document.getElementById('elite-timer-wrap').style.visibility='hidden';
   }
 
   updateEnemyPanel();
@@ -6723,7 +6723,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 // When the viewport is larger the game simply fills it (content handles extra space).
 (function() {
   var g = document.getElementById('game');
-  var DESIGN_W = 1280, DESIGN_H = 800;
+  var DESIGN_W = 1280, DESIGN_H = 820;
   g.style.transformOrigin = 'top left';
 
   function applyLayout() {
