@@ -7005,6 +7005,9 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     var battlefield = document.getElementById('battlefield');
     var buySel     = document.getElementById('buy-selector');
 
+    // 3-floor minimap on mobile
+    MINIMAP_VISIBLE = 3;
+
     // 1. Shared background: move realm-bg-img-left to #main so it spans both panels
     var bgLeft = document.getElementById('realm-bg-img-left');
     if (bgLeft && mainEl) mainEl.insertBefore(bgLeft, mainEl.firstChild);
