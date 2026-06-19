@@ -895,7 +895,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   #buy-selector {
     grid-area: buy;
     flex-direction: row !important;
-    width: 100% !important; height: auto !important;
+    width: calc(100% - 10px) !important; height: auto !important;
     box-sizing: border-box;
     padding: 5px 16px !important;
     margin-top: -16px;
@@ -910,6 +910,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   .buy-label { padding-bottom: 0 !important; padding-right: 4px; }
   .buy-btn   { width: auto !important; padding: 6px 9px !important; font-size: 11px !important; }
   .buy-btn[data-qty="all"] { font-size: 11px !important; padding: 6px 12px !important; white-space: nowrap !important; }
+  .buy-btn[data-qty="25"] { display: none !important; }
 
   /* Minimap: own row between buy bar and right panel */
   #minimap-panel {
