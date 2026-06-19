@@ -849,7 +849,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   #enemy-zone .hp-wrap { max-width: 80px !important; position: absolute !important; top: -22px !important; left: 50% !important; transform: translateX(-50%) !important; }
   #enemy-zone .hp-track { height: 7px !important; }
   #enemy-zone .hp-numbers { font-size: 8px !important; }
-  #click-hint   { font-size: 16px !important; width: 80px !important; text-align: center !important; }
+  #click-hint   { font-size: 13px !important; width: auto !important; text-align: center !important; padding: 2px 6px !important; color: #9988cc !important; }
   #realm-label  { font-size: 10px !important; left: 6px !important; top: 4px !important; letter-spacing: 1px !important; }
   #souls-display {
     position: absolute !important;
@@ -910,7 +910,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   .buy-label { padding-bottom: 0 !important; padding-right: 4px; }
   .buy-btn   { width: auto !important; padding: 6px 9px !important; font-size: 11px !important; }
   .buy-btn[data-qty="all"] { font-size: 11px !important; padding: 6px 12px !important; white-space: nowrap !important; }
-  .buy-btn[data-qty="25"] { display: none !important; }
 
   /* Minimap: own row between buy bar and right panel */
   #minimap-panel {
@@ -7060,7 +7059,14 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     if (minimapPanel && buySel && buySel.parentNode)
       buySel.parentNode.insertBefore(minimapPanel, buySel.nextSibling);
 
-    // 4. Souls display: move into battlefield, pinned top-right
+    // 4. Click-hint: move into minimap-inner before the right arrow
+    var clickHint = document.getElementById('click-hint');
+    var mmNext = document.getElementById('mm-next');
+    var mmInner = document.getElementById('minimap-inner');
+    if (clickHint && mmNext && mmInner)
+      mmInner.insertBefore(clickHint, mmNext);
+
+    // 6. Souls display: move into battlefield, pinned top-right
     var soulsDisplay = document.getElementById('souls-display');
     if (soulsDisplay && battlefield) battlefield.appendChild(soulsDisplay);
   }
