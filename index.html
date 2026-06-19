@@ -81,7 +81,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     rgba(0,0,0,0.02) 74%,
     transparent 86%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
-#combat-wrap { position:absolute; left:50%; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
+#combat-wrap { position:absolute; left:218px; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
 #enemy-zone { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
 #enemy-zone .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -780,6 +780,200 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .ss-item.ss-maxed .ss-item-desc { color:#4a3820; }
 .ss-item.ss-maxed .ss-item-cost { color:#4a3010; }
 
+/* ── MOBILE PORTRAIT LAYOUT (phones only) ───────────────────────────────── */
+@media (pointer: coarse) and (hover: none) and (max-width: 549px) {
+  #game { height: 100dvh; }
+
+  /* CSS grid: top row (left+battle) | buy bar | minimap | right panel */
+  #main {
+    display: grid;
+    grid-template-columns: 155px 1fr;
+    grid-template-rows: 38vh auto auto 1fr;
+    grid-template-areas:
+      "left   battle"
+      "map    map"
+      "buy    buy"
+      "right  right";
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Shared realm background (moved to #main via JS) — spans full top row */
+  #realm-bg-img-left {
+    position: absolute !important;
+    top: 0 !important; left: 0 !important;
+    z-index: 0 !important;
+    width: auto !important; height: auto !important;
+    /* Override JS translateY(-400px) — show upper portion of artwork on mobile */
+    transform: translateX(0px) translateY(-315px) scale(0.80) !important;
+  }
+  /* Battlefield-specific bg hidden — shared bg covers both panels */
+  #realm-bg-img  { display: none !important; }
+  #bg-canvas     { display: none !important; }
+  #combat-oval   { display: none !important; }
+
+  /* Left panel: transparent so shared bg shows through */
+  #left {
+    grid-area: left;
+    width: auto;
+    background: transparent !important;
+    padding-top: 4px;
+    border-right: 1px solid rgba(30,24,69,0.6);
+    overflow: hidden;
+    z-index: 1;
+  }
+  #left-header  { background: transparent !important; padding: 4px 6px 2px; }
+  .left-tab-bar { background: transparent !important; }
+  #entity-canvas { width: 200px !important; height: 200px !important; }
+  #left #left-entity .canvas-wrap { top: -28px !important; }
+
+  /* Battlefield: transparent so shared bg shows through */
+  #battlefield {
+    grid-area: battle;
+    background: transparent !important;
+    padding-bottom: 0;
+    overflow: visible;
+    z-index: 10;
+  }
+
+  /* Enemy repositioned for narrower battlefield */
+  #combat-wrap {
+    left: calc(50% - 25px) !important;
+    top: calc(46% + 85px) !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 20 !important;
+  }
+  #enemy-canvas  { width: 190px !important; height: 190px !important; }
+  #enemy-zone { position: relative !important; }
+  #enemy-name-label { font-size: 10px !important; letter-spacing: 1px !important; position: absolute !important; top: -15px !important; left: 50% !important; transform: translateX(-50%) !important; white-space: nowrap !important; }
+  #enemy-zone .hp-wrap { max-width: 100px !important; position: absolute !important; top: -22px !important; left: 50% !important; transform: translateX(-50%) !important; }
+  #elite-timer-wrap { position: absolute !important; top: -8px !important; left: 50% !important; transform: translateX(-50%) !important; margin-top: 0 !important; }
+  #enemy-zone .hp-track { height: 7px !important; }
+  #enemy-zone .hp-numbers { font-size: 8px !important; }
+  #click-hint   { font-size: 13px !important; width: auto !important; text-align: center !important; padding: 2px 6px !important; color: #9988cc !important; }
+  #realm-label  { font-size: 10px !important; left: 6px !important; top: 4px !important; letter-spacing: 1px !important; }
+  #souls-display {
+    position: absolute !important;
+    top: 6px !important;
+    right: 58px !important;
+    left: auto !important;
+    transform: none !important;
+    text-align: right !important;
+    pointer-events: none;
+    z-index: 5;
+  }
+  #souls-display .num { font-size: 18px !important; }
+  #souls-display .lbl { font-size: 9px !important; letter-spacing: 1px !important; }
+
+  /* Spell panel: vertical strip on right edge of battlefield */
+  #spell-panel {
+    position: absolute !important;
+    right: 2px !important; top: 2px !important; bottom: 2px !important;
+    width: 50px !important;
+    padding: 4px 0 !important;
+    gap: 5px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    background: rgba(8,8,14,0.82) !important;
+    border: 1px solid #1e1845 !important;
+    border-radius: 5px !important;
+    z-index: 10 !important;
+    overflow: hidden !important;
+  }
+  #spell-panel.visible { display: flex !important; }
+  #mana-bar-outer { height: 50px !important; }
+  .spell-tt { right: calc(100% + 6px) !important; }
+
+  /* Buy selector, minimap, right panel must sit above the absolute bg image and combat-wrap overflow */
+  #buy-selector, #minimap-panel, #right {
+    position: relative;
+    z-index: 25;
+  }
+  .buy-label { color: #d4a843 !important; }
+
+  /* Buy selector: horizontal strip */
+  #buy-selector {
+    grid-area: buy;
+    flex-direction: row !important;
+    width: calc(100% - 10px) !important; height: auto !important;
+    box-sizing: border-box;
+    padding: 5px 16px !important;
+    margin-top: -16px;
+    gap: 5px !important;
+    border-left: none !important; border-right: none !important;
+    border-top: 1px solid #1e1845;
+    border-bottom: 1px solid #1e1845;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .buy-label { padding-bottom: 0 !important; padding-right: 4px; }
+  .buy-btn   { width: auto !important; padding: 6px 9px !important; font-size: 11px !important; }
+  .buy-btn[data-qty="all"] { font-size: 11px !important; padding: 6px 12px !important; white-space: nowrap !important; }
+
+  /* Minimap: own row between buy bar and right panel */
+  #minimap-panel {
+    grid-area: map;
+    padding: 0px 26px !important;
+    background: transparent !important;
+    border-bottom: 1px solid #1e1845;
+    flex-shrink: 0;
+    display: block !important;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: -9px;
+    margin-left: -11px;
+  }
+  #minimap-inner { justify-content: center; }
+  #mm-cells { gap: 4px !important; min-height: 26px !important; }
+
+  /* Tighter upgrade cards */
+  .ucard { padding: 6px 10px !important; margin-bottom: 5px !important; }
+  .ucard .un { font-size: 15px !important; }
+  .ucard .ud { font-size: 13px !important; }
+  .ucard .uc { font-size: 13px !important; }
+  .ucard .uowned { font-size: 13px !important; }
+  .ucard-icon { width: 52px !important; height: 52px !important; }
+
+  /* Right panel: scrollable */
+  #right {
+    grid-area: right;
+    width: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #settings-btn {
+    position: absolute !important;
+    bottom: auto !important;
+    left: auto !important;
+    top: 98px !important;
+    right: 56px !important;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 16px !important;
+    z-index: 10 !important;
+  }
+
+  /* Achievement banner */
+  #ach-banner { left: 0 !important; border-left: 1px solid #c8a040 !important; border-radius: 7px !important; }
+
+  /* Rotate overlay suppressed — portrait is a valid layout on mobile */
+  #rotate-overlay { display: none !important; }
+
+  /* Title size -2px */
+  .title { font-size: 25px !important; }
+
+  /* Inactive tabs brighter */
+  .tab-btn       { color: #9977cc !important; }
+  .left-tab-btn  { color: #9977cc !important; }
+
+  /* Minimap cells 5px shorter */
+  .mm-cell { height: 41px !important; width: 41px !important; }
+  .mm-cell.elite { height: 39px !important; width: 39px !important; }
+}
 </style>
 </head>
 <body>
@@ -2140,7 +2334,7 @@ var WINS_PER_FLOOR    = 10;
 var REALM_NAMES       = ['Void', 'Underworld', 'Purgatory', 'Undead', 'Hades', 'Undersea', 'Swamp', 'Forest', 'Skyland', 'Heaven'];  // indexed by curRealm-1; unnamed realms fall back to number
 
 // No realm cap — break_infinity.js handles arbitrarily large HP values
-var MINIMAP_VISIBLE  = 5;
+var MINIMAP_VISIBLE  = window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 549px)').matches ? 3 : 5;
 var minimapNewFloor  = false;
 var autoProgressEnabled = false;
 var hasEverAscended = false;
@@ -6859,24 +7053,68 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   var DESIGN_W = 1280, DESIGN_H = 800;
   g.style.transformOrigin = 'top left';
 
+  // Detect phone-sized touch devices and apply mobile portrait layout
+  var mobileQuery = window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 549px)');
+  if (mobileQuery.matches) {
+    var mainEl     = document.getElementById('main');
+    var battlefield = document.getElementById('battlefield');
+    var buySel     = document.getElementById('buy-selector');
+
+    // 1. Shared background: move realm-bg-img-left to #main so it spans both panels
+    var bgLeft = document.getElementById('realm-bg-img-left');
+    if (bgLeft && mainEl) mainEl.insertBefore(bgLeft, mainEl.firstChild);
+
+    // 2. Spell panel: move into battlefield so it can sit on the right edge
+    var spellPanel = document.getElementById('spell-panel');
+    if (spellPanel && battlefield) battlefield.appendChild(spellPanel);
+
+    // 3. Minimap: move to its own grid row between buy bar and right panel
+    var minimapPanel = document.getElementById('minimap-panel');
+    if (minimapPanel && buySel && buySel.parentNode)
+      buySel.parentNode.insertBefore(minimapPanel, buySel.nextSibling);
+
+    // 4. Click-hint: move into minimap-inner before the right arrow
+    var clickHint = document.getElementById('click-hint');
+    var mmNext = document.getElementById('mm-next');
+    var mmInner = document.getElementById('minimap-inner');
+    if (clickHint && mmNext && mmInner)
+      mmInner.insertBefore(clickHint, mmNext);
+
+    // 6. Souls display: move into battlefield, pinned top-right
+    var soulsDisplay = document.getElementById('souls-display');
+    if (soulsDisplay && battlefield) battlefield.appendChild(soulsDisplay);
+  }
+
   function applyLayout() {
     var vw = document.documentElement.clientWidth;
     var vh = document.documentElement.clientHeight;
 
-    // Show rotate overlay when in portrait on a small screen
+    // Mobile portrait: CSS grid handles layout, no scaling needed
+    if (mobileQuery.matches) {
+      g.style.width  = vw + 'px';
+      g.style.height = vh + 'px';
+      g.style.transform = '';
+      return;
+    }
+
+    // Desktop/landscape: suppress rotate overlay only for non-mobile
     if (overlay) {
       var isPortrait = vh > vw;
       var isSmall = Math.max(vw, vh) <= 900;
       overlay.style.display = (isPortrait && isSmall) ? 'flex' : '';
     }
 
-    var s = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+    // Scale by height only — battlefield absorbs extra width, right panel stays fixed.
+    // Hard stop at 1923px (bg image right edge: 1672 × 1.15 ≈ 1922.8px).
+    var MAX_GAME_W = 1923;
+    var s = Math.min(vh / DESIGN_H, 1);
     if (s >= 1) {
-      g.style.width  = vw + 'px';
+      g.style.width  = Math.min(vw, MAX_GAME_W) + 'px';
       g.style.height = vh + 'px';
       g.style.transform = '';
     } else {
-      g.style.width  = DESIGN_W + 'px';
+      var cssW = Math.min(Math.ceil(vw / s), MAX_GAME_W);
+      g.style.width  = cssW + 'px';
       g.style.height = DESIGN_H + 'px';
       g.style.transform = 'scale(' + s + ')';
     }
