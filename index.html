@@ -884,10 +884,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   #mana-bar-outer { height: 50px !important; }
   .spell-tt { right: calc(100% + 6px) !important; }
 
-  /* Buy selector, minimap, right panel must sit above the absolute bg image */
+  /* Buy selector, minimap, right panel must sit above the absolute bg image and combat-wrap overflow */
   #buy-selector, #minimap-panel, #right {
     position: relative;
-    z-index: 1;
+    z-index: 25;
   }
   .buy-label { color: #d4a843 !important; }
 
