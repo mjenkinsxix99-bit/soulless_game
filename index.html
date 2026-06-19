@@ -2292,7 +2292,7 @@ var WINS_PER_FLOOR    = 10;
 var REALM_NAMES       = ['Void', 'Underworld', 'Purgatory', 'Undead', 'Hades', 'Undersea', 'Swamp', 'Forest', 'Skyland', 'Heaven'];  // indexed by curRealm-1; unnamed realms fall back to number
 
 // No realm cap — break_infinity.js handles arbitrarily large HP values
-var MINIMAP_VISIBLE  = 5;
+var MINIMAP_VISIBLE  = window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 549px)').matches ? 3 : 5;
 var minimapNewFloor  = false;
 var autoProgressEnabled = false;
 var hasEverAscended = false;
@@ -7017,9 +7017,6 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     var mainEl     = document.getElementById('main');
     var battlefield = document.getElementById('battlefield');
     var buySel     = document.getElementById('buy-selector');
-
-    // 3-floor minimap on mobile
-    MINIMAP_VISIBLE = 3;
 
     // 1. Shared background: move realm-bg-img-left to #main so it spans both panels
     var bgLeft = document.getElementById('realm-bg-img-left');
