@@ -845,6 +845,18 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   #enemy-canvas  { width: 200px !important; height: 200px !important; }
   #click-hint   { font-size: 16px !important; }
   #realm-label  { font-size: 10px !important; left: 6px !important; top: 4px !important; letter-spacing: 1px !important; }
+  #souls-display {
+    position: absolute !important;
+    top: 6px !important;
+    right: 58px !important;
+    left: auto !important;
+    transform: none !important;
+    text-align: right !important;
+    pointer-events: none;
+    z-index: 5;
+  }
+  #souls-display .num { font-size: 18px !important; }
+  #souls-display .lbl { font-size: 9px !important; letter-spacing: 1px !important; }
 
   /* Spell panel: vertical strip on right edge of battlefield */
   #spell-panel {
@@ -7021,6 +7033,10 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     var minimapPanel = document.getElementById('minimap-panel');
     if (minimapPanel && buySel && buySel.parentNode)
       buySel.parentNode.insertBefore(minimapPanel, buySel.nextSibling);
+
+    // 4. Souls display: move into battlefield, pinned top-right
+    var soulsDisplay = document.getElementById('souls-display');
+    if (soulsDisplay && battlefield) battlefield.appendChild(soulsDisplay);
   }
 
   function applyLayout() {
