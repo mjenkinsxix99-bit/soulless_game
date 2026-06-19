@@ -2338,6 +2338,7 @@ var MINIMAP_VISIBLE  = window.matchMedia('(pointer: coarse) and (hover: none) an
 var minimapNewFloor  = false;
 var autoProgressEnabled = false;
 var hasEverAscended = false;
+var hasEverHadAutoProgress = false;
 
 // Location state
 var curRealm  = 1;
@@ -4176,6 +4177,7 @@ function buyTatteredNode(id){
   tatteredSouls-=node.cost;
   tatteredUpgradesSpent+=node.cost;
   soulShopOwned[id]=1;
+  if(id==='auto-progress') hasEverHadAutoProgress=true;
   recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
@@ -4191,12 +4193,12 @@ function doRespec(){
   tatteredSouls+=refund;
   tatteredUpgradesSpent=0;
   TATTERED_NODES.forEach(function(n){ soulShopOwned[n.id]=0; });
-  if(hasEverAscended) soulShopOwned['auto-progress']=1;
+  if(hasEverAscended||hasEverHadAutoProgress) soulShopOwned['auto-progress']=1;
   // Clear spell active states since spells are no longer owned
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
   invokePowerStacks=0;
-  if(!hasEverAscended) autoProgressEnabled=false;
+  if(!hasEverAscended&&!hasEverHadAutoProgress) autoProgressEnabled=false;
   recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
@@ -4367,7 +4369,7 @@ function openTatteredModal(){
         'This is the Tattered Souls sacrifice shop. Sacrifice power-giving Tattered Souls to gain spells and powers. Be careful, the sacrifice can weaken you!',
         document.getElementById('tattered-upgrades-btn'),
         null,
-        'Come back after you ascend to claim Auto-progress for FREE!'
+        'Feel free to look around, but come back after you ascend! You just got auto-progress for free!'
       );
     },300);
   }
@@ -4625,6 +4627,7 @@ function doRebirthReset(chosenForm){
     rebirthCount++;
     hasEverAscended=true;
     soulShopOwned['auto-progress']=1;
+    hasEverHadAutoProgress=true;
   }
   rebirthForm=chosenForm;
   if(rebirthCount===1&&!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You may sacrifice Tattered Souls for the promise of more strength. Weigh your choices carefully. Visit the shop and claim Auto-Progress as a free gift.',document.getElementById('tattered-upgrades-btn'),null); },1500); } }
@@ -4701,6 +4704,7 @@ function saveGame(){
     ascension5Path:ascension5Path,
     ascension6Path:ascension6Path,
     hasEverAscended:hasEverAscended,
+    hasEverHadAutoProgress:hasEverHadAutoProgress,
     soulShopOwned:soulShopOwned,
     tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
@@ -4777,8 +4781,10 @@ function loadGame(){
   ascension5Path=data.ascension5Path||null;
   ascension6Path=data.ascension6Path||null;
   if(data.hasEverAscended) hasEverAscended=data.hasEverAscended;
+  if(data.hasEverHadAutoProgress) hasEverHadAutoProgress=data.hasEverHadAutoProgress;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
-  if(hasEverAscended) soulShopOwned['auto-progress']=1;
+  if(hasEverAscended||hasEverHadAutoProgress) soulShopOwned['auto-progress']=1;
+  if(soulShopOwned['auto-progress']>=1) hasEverHadAutoProgress=true;
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
   invokePowerStacks=data.invokePowerStacks||0;
