@@ -192,10 +192,25 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #mm-roster-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; }
 .mm-roster-card { border:1px solid #1e1040; border-radius:6px; padding:10px 8px; text-align:center; background:#06030f; }
 .mm-roster-card.mm-elite { border-color:#d4a843; background:#0d0a00; box-shadow:0 0 10px rgba(212,168,67,0.3); }
+.mm-roster-card { cursor:default; transition:border-color 0.2s,background 0.2s,box-shadow 0.2s; }
+.mm-roster-card:hover { border-color:#4433aa; background:#0a0620; }
+.mm-roster-card.mm-elite:hover { border-color:#e8c050; box-shadow:0 0 18px rgba(212,168,67,0.5); }
 .mm-rc-name { font-size:12px; color:#9977bb; margin-bottom:4px; }
 .mm-roster-card.mm-elite .mm-rc-name { color:#ffd700; }
 .mm-rc-lvl { font-size:10px; color:#5533aa; }
 .mm-roster-card.mm-elite .mm-rc-lvl { color:#d4a843; font-weight:bold; }
+.mm-rc-gone { color:#2a1244; font-style:italic; }
+.mm-rc-xpbar { width:80%; height:3px; background:#1a0a30; border-radius:2px; margin:4px auto; }
+.mm-rc-xpfill { height:100%; background:#6633bb; border-radius:2px; transition:width 0.3s; }
+.mm-rc-flavor { font-size:10px; color:#442266; font-style:italic; line-height:1.4; margin-top:5px; transition:color 0.2s,text-shadow 0.2s; }
+.mm-roster-card:hover .mm-rc-flavor { color:#cc99ff; text-shadow:0 0 8px rgba(180,100,255,0.6); }
+.mm-roster-card.mm-elite:hover .mm-rc-flavor { color:#ffe066; text-shadow:0 0 8px rgba(212,168,67,0.5); }
+.mm-discovered { border-color:#1a0a38; background:#050212; opacity:0.75; }
+.mm-discovered .mm-rc-name { color:#553388; }
+.mm-undiscovered { border:1px dashed #1a0a38; background:transparent; opacity:0.4; }
+.mm-undiscovered .mm-rc-name { color:#2a1044; }
+.mm-undiscovered .mm-rc-flavor { color:#1a0830; }
+.mm-ec-elite .mm-ec-name { color:#d4a843; }
 .mm-empty { color:#331a55; font-style:italic; font-size:13px; }
 
 /* Tutorial tooltip */
@@ -2149,11 +2164,118 @@ var ENEMY_TYPES = [
 
 
 // ── MINION DATA (job + flavor filled in per enemy) ────────────────────────────
-var MINION_DATA=(function(){
-  var d=[];
-  for(var i=0;i<100;i++) d.push({job:'???',flavor:'???'});
-  return d;
-})();
+var MINION_DATA=[
+  // Realm 1 — Void
+  {flavor:'You are far too loud.'},
+  {flavor:'Fill me.'},
+  {flavor:'Oh how haunting!'},
+  {flavor:'Utterly loathe.'},
+  {flavor:'Can you speak Wale?'},
+  {flavor:'The cold never bothered me anyway.'},
+  {flavor:'You lookin at me?'},
+  {flavor:'*hack* Hairball.'},
+  {flavor:'You shouldn\'t have done that.'},
+  {flavor:'Then we shall fight in the shade.'},
+  // Realm 2 — Underworld
+  {flavor:'Hey, I\'m a bat!'},
+  {flavor:'Demon llama? Where?'},
+  {flavor:'What do you see when you\'re in the dark and the demons come?'},
+  {flavor:'The demon who makes trophies of men.'},
+  {flavor:'*sigh* It\'s pronounced DIE!'},
+  {flavor:'Ninebladed not 2 or 5 or 7, but nine...'},
+  {flavor:'Explorers in the further regions of experience...'},
+  {flavor:'Transference. When you try to sacrifice a virgin without using a virgin.'},
+  {flavor:'Stick to the facts and leave the ghost stories to the kiddies, got it?'},
+  {flavor:'Advance, you demons! Advance!'},
+  // Realm 3 — Purgatory
+  {flavor:'Don\'t torture me so...'},
+  {flavor:'Purgatory\'s kind of like the in-betweeny one.'},
+  {flavor:'Compelled by greed we were, but now… we are consumed by it.'},
+  {flavor:'It is a strange fate that we should suffer so much fear and doubt over so small a thing.'},
+  {flavor:'I\'ve been suffering all my life.'},
+  {flavor:'I know why you seek solitude. You suffer. I see it day by day.'},
+  {flavor:'I lost him in the Swamps of Sadness.'},
+  {flavor:'I can\'t just sit here and do nothing. That\'s all I\'ve ever done.'},
+  {flavor:'I\'m sorry, Wilson! Wilson, I\'m sorry!'},
+  {flavor:'if you don\'t take this Michael McDonald DVD that you\'ve been playing for two years straight off....'},
+  // Realm 4 — Undead
+  {flavor:'Rule #1: Cardio.'},
+  {flavor:'I Could Never Do This With Rick. He Would Just Be Standing There, Scowling...'},
+  {flavor:'I creep you out, But at least I don\'t ask for the Wi-Fi password'},
+  {flavor:'I like not being dead. Anything beyond that is just icing on the cake…'},
+  {flavor:'What\'s a vampire\'s favorite fruit? A blood orange!'},
+  {flavor:'Zombies eat brains. You\'re safe.'},
+  {flavor:'I may be dead, but I\'m still pretty…'},
+  {flavor:'I\'ll call you Mr. Gremblygunk.'},
+  {flavor:'I\'m a talking head… literally.'},
+  {flavor:'You speak of justice? Of cowardice? I will show you the justice of the grave…'},
+  // Realm 5 — Hades
+  {flavor:'No mere mortal can resist The evil of The Thriller'},
+  {flavor:'Redrum! Redrum! Redrum!'},
+  {flavor:'We all float down here.'},
+  {flavor:'2 eyed, 2 horned, purple people basher.'},
+  {flavor:'I\'ll swallow your soul and you\'ll like it.'},
+  {flavor:'But I AM scary!'},
+  {flavor:'Do you know why you\'re afraid when you\'re alone? I do.'},
+  {flavor:'Oh, no tears, please. It\'s a waste of good suffering.'},
+  {flavor:'I never drink… wine.'},
+  {flavor:'To a new world of gods and monsters!'},
+  // Realm 6 — Undersea
+  {flavor:'I am the noodle of danger.'},
+  {flavor:'THIS IS SPARTA!'},
+  {flavor:'That cold ain\'t the weather.'},
+  {flavor:'I don\'t care about a patty recipe.'},
+  {flavor:'Do you have to stand so close? You\'re making me claustrophobic!'},
+  {flavor:'It\'s not my fault. I\'m a shark.'},
+  {flavor:'Wanna hear a finny joke?'},
+  {flavor:'Here, please hit me as hard as you can.'},
+  {flavor:'I\'ve got a tentacle cramp.'},
+  {flavor:'Are you sure it isn\'t time for a colorful metaphor?'},
+  // Realm 7 — Swamp
+  {flavor:'Now you see me, now you don\'t.'},
+  {flavor:'I\'ll only take a little bite.'},
+  {flavor:'Watch out! I bite!'},
+  {flavor:'My strike is much gentler than my bite.'},
+  {flavor:'Now you\'re playing with fire!'},
+  {flavor:'Poots on newts.'},
+  {flavor:'Are my hands clammy?'},
+  {flavor:'You\'ll look great in a boa-tie.'},
+  {flavor:'Ever feel like somebody made a doll of you and poked it? How about now?'},
+  {flavor:'THAT\'S not a knife....'},
+  // Realm 8 — Forest
+  {flavor:'"holy moley" is all you\'ve got? Really?'},
+  {flavor:'Let\'s have a butt kicking contest.'},
+  {flavor:'My dagger is sharp and quick.'},
+  {flavor:'Call me Scarlet one more time...'},
+  {flavor:'I\'m no Doe-eyed fawn.'},
+  {flavor:'A real Wolf pit... exactly how I like it.'},
+  {flavor:'I am a crazy rabid squirrel!'},
+  {flavor:'Time to put your behind in your past.'},
+  {flavor:'I\'m a Tiger... trapped in a mouse\'s body.'},
+  {flavor:'Cue the deer. I\'m the mane character. Yes, MANE.'},
+  // Realm 9 — Skyland
+  {flavor:'Angry Pink Flamingo club. Present.'},
+  {flavor:'I am the angriest bird.'},
+  {flavor:'Patience? No i\'m not waiting.'},
+  {flavor:'Roger, Roger. What\'s our vector, Victor?'},
+  {flavor:'Quick impression for you: Caw! Caw! Bang! Oof, I\'m dead!'},
+  {flavor:'No one laughs at a master of Quack Fu!'},
+  {flavor:'I\'m a wizard. Hoory the wizard.'},
+  {flavor:'I work in the dark to serve the light...'},
+  {flavor:'Never. More.'},
+  {flavor:'So. What ya wanna do?'},
+  // Realm 10 — Heaven
+  {flavor:'Perhaps angels have no names, only beautiful faces.'},
+  {flavor:'It\'s just a flesh wound.'},
+  {flavor:'So we shall flow a river forth to Thee and teeming with souls shall it ever be.'},
+  {flavor:'Not all angels are guardians.'},
+  {flavor:'Don\'t be stupid.'},
+  {flavor:'This is the hour of your death.'},
+  {flavor:'I\'m not that kind of angel.'},
+  {flavor:'I carry a big stick and I\'m the meanest angel in the valley!'},
+  {flavor:'She says she talks to Angels.'},
+  {flavor:'Every time a bell rings... shut up and fight.'}
+];
 
 // ── MINION XP / COST HELPERS ─────────────────────────────────────────────────
 var MINION_ELITE_LEVEL=777;
@@ -2199,6 +2321,7 @@ function attemptMinionCapture(typeIdx){
   if(minionPoints<cost) return;
   minionPoints-=cost;
   minionSlots.push({typeIdx:typeIdx,level:1,xp:0,isElite:false});
+  if(discoveredMinions.indexOf(typeIdx)<0) discoveredMinions.push(typeIdx);
   showMinionCaptureNotif(typeIdx);
   saveGame();
 }
@@ -2262,45 +2385,75 @@ function renderMinionModal(){
     }
   }
 
-  // Enemy grid (capture target selection)
+  // Enemy grid (capture target selection) — all enemy types you've encountered
   var grid=document.getElementById('mm-enemy-grid');
   if(grid){
     grid.innerHTML='';
     ENEMY_TYPES.forEach(function(et,i){
-      if(!et.isElite){
-        var unlocked=(killCounts[i]&&killCounts[i]>0)||i===0;
-        if(!unlocked) return;
-        var card=document.createElement('div');
-        card.className='mm-enemy-card'+(i===captureTargetIdx?' selected':'');
-        card.innerHTML='<div class="mm-ec-name">'+et.name+'</div>';
-        card.addEventListener('click',function(){
-          captureTargetIdx=i;
-          renderMinionModal();
-        });
-        grid.appendChild(card);
-      }
+      var unlocked=(killCounts[i]&&killCounts[i]>0)||i===0;
+      if(!unlocked) return;
+      var card=document.createElement('div');
+      card.className='mm-enemy-card'+(i===captureTargetIdx?' selected':'')+(et.isElite?' mm-ec-elite':'');
+      card.innerHTML='<div class="mm-ec-name">'+et.name+(et.isElite?' ★':'')+'</div>';
+      card.addEventListener('click',function(){
+        captureTargetIdx=i;
+        renderMinionModal();
+      });
+      grid.appendChild(card);
     });
   }
 
-  // Roster grid
+  // Roster grid — shows all discovered minion types + currently held ones
   var roster=document.getElementById('mm-roster-grid');
   if(roster){
     roster.innerHTML='';
-    if(minionSlots.length===0){
-      roster.innerHTML='<div class="mm-empty">No minions yet. Capture an enemy to begin.</div>';
+    if(minionSlots.length===0&&discoveredMinions.length===0){
+      roster.innerHTML='<div class="mm-empty">No minions yet. Set a capture target and fight.</div>';
     } else {
-      minionSlots.forEach(function(m,idx){
+      // Build a combined set: currently held + previously discovered (show once per typeIdx)
+      var shown={};
+      // Currently held minions first
+      minionSlots.forEach(function(m){
+        var key=m.typeIdx+(m.isElite?'_e':'');
+        if(shown[key]) return;
+        shown[key]=true;
         var et=ENEMY_TYPES[m.typeIdx]||{name:'???'};
+        var md=MINION_DATA[m.typeIdx]||{flavor:'???'};
+        var lvlText=m.isElite?'ELITE':'Lv '+m.level;
+        var xpPct=m.isElite?100:Math.floor(m.xp/getMinionXpForLevel(m.level)*100);
         var card=document.createElement('div');
         card.className='mm-roster-card'+(m.isElite?' mm-elite':'');
-        var lvlText=m.isElite?'ELITE':'Lv '+m.level;
-        var xpText=m.isElite?'':' ('+m.xp+'/'+getMinionXpForLevel(m.level)+' XP)';
-        card.innerHTML='<div class="mm-rc-name">'+et.name+'</div>'
-          +'<div class="mm-rc-lvl">'+lvlText+xpText+'</div>';
+        card.innerHTML=
+          '<div class="mm-rc-name">'+(m.isElite?'★ ':'')+et.name+'</div>'
+          +'<div class="mm-rc-lvl">'+lvlText+'</div>'
+          +(m.isElite?'':'<div class="mm-rc-xpbar"><div class="mm-rc-xpfill" style="width:'+xpPct+'%"></div></div>')
+          +'<div class="mm-rc-flavor">&ldquo;'+md.flavor+'&rdquo;</div>';
+        roster.appendChild(card);
+      });
+      // Previously discovered but not currently held
+      discoveredMinions.forEach(function(typeIdx){
+        var held=minionSlots.some(function(m){return m.typeIdx===typeIdx;});
+        if(held) return;
+        var et=ENEMY_TYPES[typeIdx]||{name:'???'};
+        var md=MINION_DATA[typeIdx]||{flavor:'???'};
+        var card=document.createElement('div');
+        card.className='mm-roster-card mm-discovered';
+        card.innerHTML=
+          '<div class="mm-rc-name">'+et.name+'</div>'
+          +'<div class="mm-rc-lvl mm-rc-gone">Not summoned</div>'
+          +'<div class="mm-rc-flavor">&ldquo;'+md.flavor+'&rdquo;</div>';
         roster.appendChild(card);
       });
     }
   }
+}
+
+function renderMinionRosterUndiscovered(){
+  // Called for unsummoned, unseen enemy types shown in the modal — outline only
+  var card=document.createElement('div');
+  card.className='mm-roster-card mm-undiscovered';
+  card.innerHTML='<div class="mm-rc-name">???</div><div class="mm-rc-flavor">???</div>';
+  return card;
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2440,6 +2593,7 @@ var minionPoints=0;
 var captureTargetIdx=-1;
 var minionSlots=[];
 var minionUnlocked=false;
+var discoveredMinions=[];
 var tatteredSouls=0;
 var rebirthCount=0;
 var _offlineSavedAt=0;
@@ -4564,6 +4718,7 @@ function saveGame(){
     minionSlots:minionSlots.slice(),
     minionUnlocked:minionUnlocked,
     captureTargetIdx:captureTargetIdx,
+    discoveredMinions:discoveredMinions.slice(),
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -4645,6 +4800,7 @@ function loadGame(){
   if(data.minionSlots) minionSlots=data.minionSlots;
   if(data.minionUnlocked) minionUnlocked=data.minionUnlocked;
   if(data.captureTargetIdx!==undefined) captureTargetIdx=data.captureTargetIdx;
+  if(data.discoveredMinions) discoveredMinions=data.discoveredMinions;
   _offlineSavedAt=data.savedAt||0;
   return true;
 }
