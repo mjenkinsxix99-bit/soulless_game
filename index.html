@@ -152,7 +152,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card-elite { border-color:#3a2800; }
 .mm-card-elite.mm-card-discovered { border-color:#d4a843; box-shadow:0 0 8px rgba(212,168,67,0.25); }
 .mm-card-elite:hover { border-color:#e8c050; box-shadow:0 0 14px rgba(212,168,67,0.4); }
-.mm-card-canvas { display:block; width:128px; height:128px; border-radius:4px; }
+.mm-card-canvas { display:block; width:100%; aspect-ratio:1; border-radius:6px 6px 0 0; }
 .mm-card-name { font-size:11px; color:#7755aa; letter-spacing:1px; line-height:1.2; }
 .mm-card-discovered .mm-card-name { color:#bb99ff; }
 .mm-card-elite.mm-card-discovered .mm-card-name { color:#ffd700; }
@@ -2362,7 +2362,7 @@ function renderMinionModal(){
       // Portrait canvas
       var cv=document.createElement('canvas');
       cv.className='mm-card-canvas';
-      cv.width=128; cv.height=128;
+      cv.width=256; cv.height=256;
       cv.setAttribute('data-ei', String(idx));
       if(!discovered) cv.style.filter='brightness(0) opacity(0.20)';
       card.appendChild(cv);
