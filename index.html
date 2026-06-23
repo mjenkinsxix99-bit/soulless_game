@@ -164,6 +164,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card-discovered .mm-card-flavor { color:#664488; }
 .mm-card:hover .mm-card-flavor { color:#cc99ff; }
 .mm-card-elite.mm-card-discovered:hover .mm-card-flavor { color:#ffe066; }
+.mm-card-element { font-size:11px; color:#3a1a5a; letter-spacing:1px; margin-top:2px; text-transform:capitalize; }
+.mm-card-discovered .mm-card-element { color:#8855bb; }
+.mm-card-elite.mm-card-discovered .mm-card-element { color:#d4a843; }
 /* Capture notification */
 #minion-capture-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2000; background:#0a0520; border:2px solid #9966ff; border-radius:10px; padding:24px 32px; text-align:center; pointer-events:none; box-shadow:0 0 40px rgba(150,80,255,0.5); }
 #minion-capture-modal.open { display:block; }
@@ -2110,8 +2113,117 @@ var ENEMY_TYPES = [
 
 // ── MINION DATA (job + flavor filled in per enemy) ────────────────────────────
 var MINION_DATA=[
-  // Realm 1 — Void
-  {flavor:'You are far too loud.'},
+  // Realm 1 — Void          elements: dark,holy,research,fire,water,plant,wood,metal,stone,earth
+  {flavor:'You are far too loud.',              element:'dark'},
+  {flavor:'Fill me.',                           element:'holy'},
+  {flavor:'Oh how haunting!',                   element:'research'},
+  {flavor:'Utterly loathe.',                    element:'fire'},
+  {flavor:'Can you speak Wale?',                element:'water'},
+  {flavor:'The cold never bothered me anyway.', element:'plant'},
+  {flavor:'You lookin at me?',                  element:'wood'},
+  {flavor:'*hack* Hairball.',                   element:'metal'},
+  {flavor:'You shouldn\'t have done that.',     element:'stone'},
+  {flavor:'Then we shall fight in the shade.',  element:'earth'},
+  // Realm 2 — Underworld     elements: earth,dark,holy,research,fire,water,plant,wood,metal,stone
+  {flavor:'Hey, I\'m a bat!',                                               element:'earth'},
+  {flavor:'Demon llama? Where?',                                            element:'dark'},
+  {flavor:'What do you see when you\'re in the dark and the demons come?',  element:'holy'},
+  {flavor:'The demon who makes trophies of men.',                           element:'research'},
+  {flavor:'*sigh* It\'s pronounced DIE!',                                   element:'fire'},
+  {flavor:'Ninebladed not 2 or 5 or 7, but nine...',                        element:'water'},
+  {flavor:'Explorers in the further regions of experience...',              element:'plant'},
+  {flavor:'Transference. When you try to sacrifice a virgin without using a virgin.', element:'wood'},
+  {flavor:'Stick to the facts and leave the ghost stories to the kiddies, got it?',   element:'metal'},
+  {flavor:'Advance, you demons! Advance!',                                  element:'stone'},
+  // Realm 3 — Purgatory      elements: stone,earth,dark,holy,research,fire,water,plant,wood,metal
+  {flavor:'Don\'t torture me so...',                                                         element:'stone'},
+  {flavor:'Purgatory\'s kind of like the in-betweeny one.',                                 element:'earth'},
+  {flavor:'Compelled by greed we were, but now… we are consumed by it.',                    element:'dark'},
+  {flavor:'It is a strange fate that we should suffer so much fear and doubt over so small a thing.', element:'holy'},
+  {flavor:'I\'ve been suffering all my life.',                                               element:'research'},
+  {flavor:'I know why you seek solitude. You suffer. I see it day by day.',                 element:'fire'},
+  {flavor:'I lost him in the Swamps of Sadness.',                                           element:'water'},
+  {flavor:'I can\'t just sit here and do nothing. That\'s all I\'ve ever done.',            element:'plant'},
+  {flavor:'I\'m sorry, Wilson! Wilson, I\'m sorry!',                                        element:'wood'},
+  {flavor:'if you don\'t take this Michael McDonald DVD that you\'ve been playing for two years straight off....', element:'metal'},
+  // Realm 4 — Undead         elements: metal,stone,earth,dark,holy,research,fire,water,plant,wood
+  {flavor:'Rule #1: Cardio.',                                                         element:'metal'},
+  {flavor:'I Could Never Do This With Rick. He Would Just Be Standing There, Scowling...', element:'stone'},
+  {flavor:'I creep you out, But at least I don\'t ask for the Wi-Fi password',        element:'earth'},
+  {flavor:'I like not being dead. Anything beyond that is just icing on the cake…',   element:'dark'},
+  {flavor:'What\'s a vampire\'s favorite fruit? A blood orange!',                     element:'holy'},
+  {flavor:'Zombies eat brains. You\'re safe.',                                         element:'research'},
+  {flavor:'I may be dead, but I\'m still pretty…',                                    element:'fire'},
+  {flavor:'I\'ll call you Mr. Gremblygunk.',                                           element:'water'},
+  {flavor:'I\'m a talking head… literally.',                                           element:'plant'},
+  {flavor:'You speak of justice? Of cowardice? I will show you the justice of the grave…', element:'wood'},
+  // Realm 5 — Hades          elements: wood,metal,stone,earth,dark,holy,research,fire,water,plant
+  {flavor:'No mere mortal can resist The evil of The Thriller', element:'wood'},
+  {flavor:'Redrum! Redrum! Redrum!',                            element:'metal'},
+  {flavor:'We all float down here.',                            element:'stone'},
+  {flavor:'2 eyed, 2 horned, purple people basher.',            element:'earth'},
+  {flavor:'I\'ll swallow your soul and you\'ll like it.',       element:'dark'},
+  {flavor:'But I AM scary!',                                    element:'holy'},
+  {flavor:'Do you know why you\'re afraid when you\'re alone? I do.', element:'research'},
+  {flavor:'Oh, no tears, please. It\'s a waste of good suffering.',   element:'fire'},
+  {flavor:'I never drink… wine.',                               element:'water'},
+  {flavor:'To a new world of gods and monsters!',               element:'plant'},
+  // Realm 6 — Undersea       elements: plant,wood,metal,stone,earth,dark,holy,research,fire,water
+  {flavor:'I am the noodle of danger.',                                   element:'plant'},
+  {flavor:'THIS IS SPARTA!',                                              element:'wood'},
+  {flavor:'That cold ain\'t the weather.',                                element:'metal'},
+  {flavor:'I don\'t care about a patty recipe.',                          element:'stone'},
+  {flavor:'Do you have to stand so close? You\'re making me claustrophobic!', element:'earth'},
+  {flavor:'It\'s not my fault. I\'m a shark.',                            element:'dark'},
+  {flavor:'Wanna hear a finny joke?',                                     element:'holy'},
+  {flavor:'Here, please hit me as hard as you can.',                      element:'research'},
+  {flavor:'I\'ve got a tentacle cramp.',                                  element:'fire'},
+  {flavor:'Are you sure it isn\'t time for a colorful metaphor?',         element:'water'},
+  // Realm 7 — Swamp          elements: water,plant,wood,metal,stone,earth,dark,holy,research,fire
+  {flavor:'Now you see me, now you don\'t.',                                     element:'water'},
+  {flavor:'I\'ll only take a little bite.',                                      element:'plant'},
+  {flavor:'Watch out! I bite!',                                                  element:'wood'},
+  {flavor:'My strike is much gentler than my bite.',                             element:'metal'},
+  {flavor:'Now you\'re playing with fire!',                                      element:'stone'},
+  {flavor:'Poots on newts.',                                                     element:'earth'},
+  {flavor:'Are my hands clammy?',                                                element:'dark'},
+  {flavor:'You\'ll look great in a boa-tie.',                                    element:'holy'},
+  {flavor:'Ever feel like somebody made a doll of you and poked it? How about now?', element:'research'},
+  {flavor:'THAT\'S not a knife....',                                             element:'fire'},
+  // Realm 8 — Forest         elements: fire,water,plant,wood,metal,stone,earth,dark,holy,research
+  {flavor:'"holy moley" is all you\'ve got? Really?',    element:'fire'},
+  {flavor:'Let\'s have a butt kicking contest.',         element:'water'},
+  {flavor:'My dagger is sharp and quick.',               element:'plant'},
+  {flavor:'Call me Scarlet one more time...',            element:'wood'},
+  {flavor:'I\'m no Doe-eyed fawn.',                      element:'metal'},
+  {flavor:'A real Wolf pit... exactly how I like it.',   element:'stone'},
+  {flavor:'I am a crazy rabid squirrel!',                element:'earth'},
+  {flavor:'Time to put your behind in your past.',       element:'dark'},
+  {flavor:'I\'m a Tiger... trapped in a mouse\'s body.', element:'holy'},
+  {flavor:'Cue the deer. I\'m the mane character. Yes, MANE.', element:'research'},
+  // Realm 9 — Skyland        elements: research,fire,water,plant,wood,metal,stone,earth,dark,holy
+  {flavor:'Angry Pink Flamingo club. Present.',                      element:'research'},
+  {flavor:'I am the angriest bird.',                                 element:'fire'},
+  {flavor:'Patience? No i\'m not waiting.',                          element:'water'},
+  {flavor:'Roger, Roger. What\'s our vector, Victor?',               element:'plant'},
+  {flavor:'Quick impression for you: Caw! Caw! Bang! Oof, I\'m dead!', element:'wood'},
+  {flavor:'No one laughs at a master of Quack Fu!',                  element:'metal'},
+  {flavor:'I\'m a wizard. Hoory the wizard.',                        element:'stone'},
+  {flavor:'I work in the dark to serve the light...',                element:'earth'},
+  {flavor:'Never. More.',                                            element:'dark'},
+  {flavor:'So. What ya wanna do?',                                   element:'holy'},
+  // Realm 10 — Heaven        elements: holy,research,fire,water,plant,wood,metal,stone,earth,dark
+  {flavor:'Perhaps angels have no names, only beautiful faces.',     element:'holy'},
+  {flavor:'It\'s just a flesh wound.',                               element:'research'},
+  {flavor:'So we shall flow a river forth to Thee and teeming with souls shall it ever be.', element:'fire'},
+  {flavor:'Not all angels are guardians.',                           element:'water'},
+  {flavor:'Don\'t be stupid.',                                       element:'plant'},
+  {flavor:'This is the hour of your death.',                         element:'wood'},
+  {flavor:'I\'m not that kind of angel.',                            element:'metal'},
+  {flavor:'I carry a big stick and I\'m the meanest angel in the valley!', element:'stone'},
+  {flavor:'She says she talks to Angels.',                           element:'earth'},
+  {flavor:'Every time a bell rings... shut up and fight.',           element:'dark'}
+];
   {flavor:'Fill me.'},
   {flavor:'Oh how haunting!'},
   {flavor:'Utterly loathe.'},
@@ -2393,6 +2505,12 @@ function renderMinionModal(){
       cv.setAttribute('data-ei', String(idx));
       if(!discovered) cv.style.filter='brightness(0)';
       card.appendChild(cv);
+
+      // Element
+      var elemEl=document.createElement('div');
+      elemEl.className='mm-card-element';
+      elemEl.textContent=discovered?('Element: '+(md.element||'???')):'Element: ???';
+      card.appendChild(elemEl);
 
       // Click = set as capture target
       (function(captureIdx){
