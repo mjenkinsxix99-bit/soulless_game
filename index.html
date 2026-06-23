@@ -167,6 +167,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card-element { font-size:11px; color:#3a1a5a; letter-spacing:1px; margin-top:2px; text-transform:capitalize; }
 .mm-card-discovered .mm-card-element { color:#8855bb; }
 .mm-card-elite.mm-card-discovered .mm-card-element { color:#d4a843; }
+.mm-card-bonus { font-size:11px; color:#4a2266; font-style:italic; margin-top:2px; line-height:1.3; }
+.mm-card-discovered .mm-card-bonus { color:#9966cc; }
+.mm-card-elite.mm-card-discovered .mm-card-bonus { color:#ffd700; }
 /* Capture notification */
 #minion-capture-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2000; background:#0a0520; border:2px solid #9966ff; border-radius:10px; padding:24px 32px; text-align:center; pointer-events:none; box-shadow:0 0 40px rgba(150,80,255,0.5); }
 #minion-capture-modal.open { display:block; }
@@ -2481,8 +2484,7 @@ function renderMinionModal(){
       if(heldMinion){
         var badgeEl=document.createElement('div');
         badgeEl.className='mm-card-badge'+(heldMinion.isElite?' mm-card-badge-elite':'');
-        var mult=(1+heldMinion.level*0.009).toFixed(2)+'x';
-        badgeEl.textContent=heldMinion.isElite?'ELITE ★  7.00x':'Lv '+heldMinion.level+'  '+mult;
+        badgeEl.textContent=heldMinion.isElite?'ELITE ★':'Lv '+heldMinion.level;
         card.appendChild(badgeEl);
         if(!heldMinion.isElite){
           var xpPct=Math.floor(heldMinion.xp/getMinionXpForLevel(heldMinion.level)*100);
@@ -2512,6 +2514,18 @@ function renderMinionModal(){
       elemEl.className='mm-card-element';
       elemEl.textContent='Element: '+(md.element||'???');
       card.appendChild(elemEl);
+
+      // Bonus descriptor
+      var bonusEl=document.createElement('div');
+      bonusEl.className='mm-card-bonus';
+      if(heldMinion){
+        var lvl=heldMinion.isElite?777:heldMinion.level;
+        var bMult=(1+lvl*0.009).toFixed(2)+'x';
+        bonusEl.textContent='Give '+bMult+' bonus to souls gained';
+      } else {
+        bonusEl.textContent='Give n bonus to souls gained';
+      }
+      card.appendChild(bonusEl);
 
       // Click = set as capture target
       (function(captureIdx){
