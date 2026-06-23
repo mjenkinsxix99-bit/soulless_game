@@ -2509,7 +2509,7 @@ function renderMinionModal(){
       // Element
       var elemEl=document.createElement('div');
       elemEl.className='mm-card-element';
-      elemEl.textContent=discovered?('Element: '+(md.element||'???')):'Element: ???';
+      elemEl.textContent='Element: '+(md.element||'???');
       card.appendChild(elemEl);
 
       // Click = set as capture target
