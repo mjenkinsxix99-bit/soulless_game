@@ -2481,7 +2481,8 @@ function renderMinionModal(){
       if(heldMinion){
         var badgeEl=document.createElement('div');
         badgeEl.className='mm-card-badge'+(heldMinion.isElite?' mm-card-badge-elite':'');
-        badgeEl.textContent=heldMinion.isElite?'ELITE ★':'Lv '+heldMinion.level;
+        var mult=(1+heldMinion.level*0.009).toFixed(2)+'x';
+        badgeEl.textContent=heldMinion.isElite?'ELITE ★  7.00x':'Lv '+heldMinion.level+'  '+mult;
         card.appendChild(badgeEl);
         if(!heldMinion.isElite){
           var xpPct=Math.floor(heldMinion.xp/getMinionXpForLevel(heldMinion.level)*100);
