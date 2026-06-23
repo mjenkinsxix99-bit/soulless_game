@@ -129,6 +129,75 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #tattered-display .lbl { font-size: 11px; color: #ff9900; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(255,140,0,0.9), 0 0 18px rgba(255,80,0,0.5); }
 #tattered-display .ts-preview { font-size: 10px; color: #cc7700; letter-spacing: 1px; margin-top: 2px; }
 
+/* ── MINION MODAL ──────────────────────────────────────────────────────────── */
+#minion-modal { display:none; position:fixed; top:0;left:370px;right:0;bottom:0; background:#02010e; z-index:900; flex-direction:column; }
+#minion-modal.open { display:flex; }
+#mm-header { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; background:#05030e; border-bottom:1px solid #1e1548; flex-shrink:0; gap:16px; }
+#mm-header-title { font-size:18px; color:#c0a0ff; letter-spacing:3px; font-family:Georgia,serif; }
+#mm-mp-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
+#mm-mp-label { font-size:9px; color:#6a3a8a; letter-spacing:3px; text-transform:uppercase; }
+#mm-mp-val { font-size:18px; color:#bb77ff; font-family:Georgia,serif; letter-spacing:2px; text-shadow:0 0 10px rgba(180,100,255,0.7); }
+#mm-close-btn { width:36px; height:36px; background:transparent; border:1px solid #2a1a5a; color:#554477; font-size:20px; border-radius:5px; cursor:pointer; line-height:1; transition:all 0.2s; }
+#mm-close-btn:hover { border-color:#7755aa; color:#9980dd; }
+#mm-body { flex:1; overflow-y:auto; padding:16px 18px; }
+#mm-capture-row { display:flex; align-items:center; gap:10px; padding:10px 14px; background:#0a0520; border:1px solid #2a1060; border-radius:6px; margin-bottom:16px; font-size:13px; color:#9977bb; }
+.mm-target-name { color:#cc99ff; font-weight:bold; }
+.mm-target-none { color:#442266; font-style:italic; }
+#mm-next-cost { font-size:12px; color:#7744aa; margin-left:auto; }
+.mm-realm-section { margin-bottom:20px; }
+.mm-realm-title { font-size:13px; color:#6644aa; letter-spacing:3px; text-transform:uppercase; border-bottom:1px solid #1a0a40; padding-bottom:4px; margin-bottom:10px; }
+.mm-slot-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+.mm-slot { border:1px solid #1e1040; border-radius:6px; padding:8px 6px; text-align:center; cursor:pointer; background:#06030f; transition:border-color 0.2s,background 0.2s; min-height:90px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
+.mm-slot:hover { border-color:#4433aa; background:#0a0620; }
+.mm-slot.captured { border-color:#3322aa; background:#080415; }
+.mm-slot.elite { border-color:#d4a843; background:#0d0a00; box-shadow:0 0 12px rgba(212,168,67,0.4); }
+.mm-slot.target-selected { border-color:#9966ff; background:#0d0520; box-shadow:0 0 8px rgba(150,80,255,0.5); }
+.mm-slot-name { font-size:11px; color:#7755aa; letter-spacing:1px; line-height:1.2; }
+.mm-slot.captured .mm-slot-name { color:#bb99ff; }
+.mm-slot.elite .mm-slot-name { color:#ffd700; }
+.mm-slot-flavor { font-size:9px; color:#331a55; font-style:italic; line-height:1.3; }
+.mm-slot.captured .mm-slot-flavor { color:#664488; }
+.mm-slot-level { font-size:10px; color:#8855cc; }
+.mm-slot.elite .mm-slot-level { color:#ffd700; font-weight:bold; }
+.mm-xp-bar-wrap { width:80%; height:3px; background:#1a0a30; border-radius:2px; margin-top:2px; }
+.mm-xp-bar-fill { height:100%; background:#7744cc; border-radius:2px; transition:width 0.3s; }
+.mm-slot.elite .mm-xp-bar-fill { background:#d4a843; }
+.mm-slot-cost { font-size:9px; color:#442266; margin-top:2px; }
+.mm-slot-dup { font-size:9px; color:#7755aa; margin-top:1px; }
+/* Capture notification */
+#minion-capture-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2000; background:#0a0520; border:2px solid #9966ff; border-radius:10px; padding:24px 32px; text-align:center; pointer-events:none; box-shadow:0 0 40px rgba(150,80,255,0.5); }
+#minion-capture-modal.open { display:block; }
+#mcm-title { font-size:18px; color:#cc99ff; letter-spacing:2px; font-family:Georgia,serif; margin-bottom:8px; }
+#mcm-name { font-size:24px; color:#ffffff; font-weight:bold; font-family:Georgia,serif; letter-spacing:1px; }
+#mcm-sub { font-size:13px; color:#9977bb; margin-top:6px; font-style:italic; }
+#mcm-msg { font-size:13px; color:#9977bb; margin-top:6px; font-style:italic; }
+#mm-title { font-size:18px; color:#c0a0ff; letter-spacing:3px; font-family:Georgia,serif; }
+#mm-top-bar { display:flex; align-items:center; gap:14px; padding:10px 18px; background:#05030e; border-bottom:1px solid #1a0a38; flex-shrink:0; font-size:13px; color:#9977bb; }
+#mm-mp-display { color:#bb77ff; font-family:Georgia,serif; font-size:15px; }
+#mm-slots-display { color:#7755aa; }
+#mm-sacrifice-btn { background:#0a0520; border:1px solid #4a2080; color:#aa66dd; font-size:11px; border-radius:5px; padding:4px 10px; cursor:pointer; transition:all 0.2s; }
+#mm-sacrifice-btn:hover { border-color:#8844cc; color:#cc88ff; background:#110630; }
+#mm-ct-display { margin-left:auto; color:#664488; font-size:11px; font-style:italic; }
+#mm-body { flex:1; overflow-y:auto; padding:16px 18px; }
+#mm-panels { display:flex; gap:16px; height:100%; }
+#mm-capture-panel { flex:0 0 260px; }
+#mm-roster-panel { flex:1; }
+.mm-section-title { font-size:11px; color:#6644aa; letter-spacing:3px; text-transform:uppercase; border-bottom:1px solid #1a0a40; padding-bottom:4px; margin-bottom:10px; }
+#mm-enemy-grid { display:flex; flex-direction:column; gap:4px; overflow-y:auto; max-height:calc(100vh - 200px); }
+.mm-enemy-card { padding:7px 12px; border:1px solid #1e1040; border-radius:5px; background:#06030f; cursor:pointer; transition:all 0.2s; }
+.mm-enemy-card:hover { border-color:#4433aa; background:#0a0620; }
+.mm-enemy-card.selected { border-color:#9966ff; background:#0d0520; box-shadow:0 0 6px rgba(150,80,255,0.4); }
+.mm-ec-name { font-size:12px; color:#9977bb; }
+.mm-enemy-card.selected .mm-ec-name { color:#cc99ff; }
+#mm-roster-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; }
+.mm-roster-card { border:1px solid #1e1040; border-radius:6px; padding:10px 8px; text-align:center; background:#06030f; }
+.mm-roster-card.mm-elite { border-color:#d4a843; background:#0d0a00; box-shadow:0 0 10px rgba(212,168,67,0.3); }
+.mm-rc-name { font-size:12px; color:#9977bb; margin-bottom:4px; }
+.mm-roster-card.mm-elite .mm-rc-name { color:#ffd700; }
+.mm-rc-lvl { font-size:10px; color:#5533aa; }
+.mm-roster-card.mm-elite .mm-rc-lvl { color:#d4a843; font-weight:bold; }
+.mm-empty { color:#331a55; font-style:italic; font-size:13px; }
+
 /* Tutorial tooltip */
 #tutorial-overlay { display: none; position: fixed; inset: 0; z-index: 20000; }
 #tutorial-overlay.open { display: block; }
@@ -778,7 +847,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       </div>
       <div class="left-tab-bar">
         <button class="left-tab-btn active" data-ltab="entity">Entity</button>
-        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop">Tattered Shop</button>
+        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop">Sacrifice</button>
+        <button class="left-tab-btn" id="minion-tab-btn" data-ltab="minions">Minions</button>
       </div>
       <div id="left-tab-content">
         <div id="ltab-entity" class="left-tab-pane active">
@@ -794,6 +864,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
           </div>
         </div>
         <div id="ltab-soul-shop" class="left-tab-pane"></div>
+        <div id="ltab-minions" class="left-tab-pane"></div>
       </div>
     </div>
     <div id="battlefield">
@@ -1200,6 +1271,38 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <button id="final-confirm-no">Go Back</button>
     </div>
   </div>
+</div>
+
+<!-- Minion Modal -->
+<div id="minion-modal">
+  <div id="mm-header">
+    <span id="mm-title">Minion Summoning</span>
+    <button id="mm-close-btn">✕</button>
+  </div>
+  <div id="mm-body">
+    <div id="mm-top-bar">
+      <span id="mm-mp-display">MP: <span id="mm-mp-val">0</span></span>
+      <span id="mm-slots-display">Slots: <span id="mm-slots-val">0</span></span>
+      <button id="mm-sacrifice-btn" title="Sacrifice 777 TS for 1 MP">Sacrifice 777 TS → 1 MP</button>
+      <span id="mm-ct-display"></span>
+    </div>
+    <div id="mm-panels">
+      <div id="mm-capture-panel">
+        <div class="mm-section-title">Set Capture Target</div>
+        <div id="mm-enemy-grid"></div>
+      </div>
+      <div id="mm-roster-panel">
+        <div class="mm-section-title">Your Minions</div>
+        <div id="mm-roster-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Minion Capture Notification -->
+<div id="minion-capture-modal">
+  <div id="mcm-name"></div>
+  <div id="mcm-msg">Minion Captured!</div>
 </div>
 
 <!-- Intro sequence overlay -->
@@ -2045,6 +2148,161 @@ var ENEMY_TYPES = [
 ];
 
 
+// ── MINION DATA (job + flavor filled in per enemy) ────────────────────────────
+var MINION_DATA=(function(){
+  var d=[];
+  for(var i=0;i<100;i++) d.push({job:'???',flavor:'???'});
+  return d;
+})();
+
+// ── MINION XP / COST HELPERS ─────────────────────────────────────────────────
+var MINION_ELITE_LEVEL=777;
+var MINION_XP_BASE=10;
+var MINION_XP_GROWTH=1.0133;
+
+function getMinionXpForLevel(level){
+  return Math.floor(MINION_XP_BASE*Math.pow(MINION_XP_GROWTH,level-1));
+}
+
+function getMinionNextMpCost(){
+  var eliteCount=minionSlots.filter(function(m){return m.isElite;}).length;
+  var n=Math.max(minionSlots.length,eliteCount);
+  if(n===0) return 0; // first minion free
+  return Math.floor(Math.pow(n,1.33));
+}
+
+function checkMinionUnlock(){
+  if(minionUnlocked) return;
+  var formUlts=['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-canine','form-ult-feline','form-ult-equine'];
+  for(var i=0;i<formUlts.length;i++){
+    if(achievementsEarned.indexOf(formUlts[i])>=0){ minionUnlocked=true; updateMinionTabBtn(); return; }
+  }
+}
+
+function updateMinionTabBtn(){
+  var btn=document.getElementById('minion-tab-btn');
+  if(!btn) return;
+  if(!minionUnlocked){
+    btn.classList.add('locked');
+    btn.title='Unlocks upon earning any Ultimate Form achievement';
+  } else {
+    btn.classList.remove('locked');
+    btn.title='';
+  }
+}
+
+function attemptMinionCapture(typeIdx){
+  if(!minionUnlocked) return;
+  if(captureTargetIdx!==typeIdx) return;
+  if(Math.random()>0.20) return;
+  var cost=getMinionNextMpCost();
+  if(minionPoints<cost) return;
+  minionPoints-=cost;
+  minionSlots.push({typeIdx:typeIdx,level:1,xp:0,isElite:false});
+  showMinionCaptureNotif(typeIdx);
+  saveGame();
+}
+
+function addMinionXp(){
+  minionSlots.forEach(function(m){
+    if(m.isElite) return;
+    m.xp++;
+    var needed=getMinionXpForLevel(m.level);
+    while(m.xp>=needed&&m.level<MINION_ELITE_LEVEL){
+      m.xp-=needed;
+      m.level++;
+      needed=getMinionXpForLevel(m.level);
+      if(m.level>=MINION_ELITE_LEVEL){ m.isElite=true; m.xp=0; break; }
+    }
+  });
+}
+
+function showMinionCaptureNotif(typeIdx){
+  var enemy=ENEMY_TYPES[typeIdx];
+  var modal=document.getElementById('minion-capture-modal');
+  if(!modal) return;
+  document.getElementById('mcm-name').textContent=enemy.name;
+  modal.classList.add('open');
+  setTimeout(function(){ modal.classList.remove('open'); },3000);
+}
+
+function wipeNonEliteMinions(){
+  minionSlots=minionSlots.filter(function(m){return m.isElite;});
+}
+
+var REALM_NAMES_MM=['Purgatory','Limbo','Underworld','Void','Abyss','Inferno','Pandemonium','Tartarus','Oblivion','Eternity'];
+
+function openMinionModal(){
+  var modal=document.getElementById('minion-modal');
+  if(!modal) return;
+  modal.classList.add('open');
+  renderMinionModal();
+}
+
+function closeMinionModal(){
+  var modal=document.getElementById('minion-modal');
+  if(modal) modal.classList.remove('open');
+}
+
+function renderMinionModal(){
+  // MP display
+  var mpEl=document.getElementById('mm-mp-val');
+  if(mpEl) mpEl.textContent=minionPoints.toLocaleString();
+  var slotsEl=document.getElementById('mm-slots-val');
+  if(slotsEl) slotsEl.textContent=minionSlots.length;
+
+  // Capture target display
+  var ctEl=document.getElementById('mm-ct-display');
+  if(ctEl){
+    if(captureTargetIdx>=0&&captureTargetIdx<ENEMY_TYPES.length){
+      var nextCost=getMinionNextMpCost();
+      ctEl.textContent='Target: '+ENEMY_TYPES[captureTargetIdx].name+' ('+nextCost+' MP, 20% chance)';
+    } else {
+      ctEl.textContent='No target set';
+    }
+  }
+
+  // Enemy grid (capture target selection)
+  var grid=document.getElementById('mm-enemy-grid');
+  if(grid){
+    grid.innerHTML='';
+    ENEMY_TYPES.forEach(function(et,i){
+      if(!et.isElite){
+        var unlocked=(killCounts[i]&&killCounts[i]>0)||i===0;
+        if(!unlocked) return;
+        var card=document.createElement('div');
+        card.className='mm-enemy-card'+(i===captureTargetIdx?' selected':'');
+        card.innerHTML='<div class="mm-ec-name">'+et.name+'</div>';
+        card.addEventListener('click',function(){
+          captureTargetIdx=i;
+          renderMinionModal();
+        });
+        grid.appendChild(card);
+      }
+    });
+  }
+
+  // Roster grid
+  var roster=document.getElementById('mm-roster-grid');
+  if(roster){
+    roster.innerHTML='';
+    if(minionSlots.length===0){
+      roster.innerHTML='<div class="mm-empty">No minions yet. Capture an enemy to begin.</div>';
+    } else {
+      minionSlots.forEach(function(m,idx){
+        var et=ENEMY_TYPES[m.typeIdx]||{name:'???'};
+        var card=document.createElement('div');
+        card.className='mm-roster-card'+(m.isElite?' mm-elite':'');
+        var lvlText=m.isElite?'ELITE':'Lv '+m.level;
+        var xpText=m.isElite?'':' ('+m.xp+'/'+getMinionXpForLevel(m.level)+' XP)';
+        card.innerHTML='<div class="mm-rc-name">'+et.name+'</div>'
+          +'<div class="mm-rc-lvl">'+lvlText+xpText+'</div>';
+        roster.appendChild(card);
+      });
+    }
+  }
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // STRUCTURE
 // Realm  → 10 Levels
@@ -2178,6 +2436,10 @@ var totalMilestonePurchases=0;
 var ascendCount=0;
 var currentAscensionKills=0;
 var eliteBountyTSEarned=0;
+var minionPoints=0;
+var captureTargetIdx=-1;
+var minionSlots=[];
+var minionUnlocked=false;
 var tatteredSouls=0;
 var rebirthCount=0;
 var _offlineSavedAt=0;
@@ -2675,6 +2937,8 @@ function onEnemyDeath(){
   }
   killCounts[d.id]=(killCounts[d.id]||0)+1;
   currentAscensionKills++;
+  attemptMinionCapture(currentEnemyTypeIdx);
+  addMinionXp();
   updateEnemyDefeatsPanel();
 
   if(isEliteFight()){
@@ -3281,6 +3545,7 @@ function checkAchievements(silent){
       _achievementsTabDirty=false;
     }
   }
+  checkMinionUnlock();
 }
 
 function queueAchievement(a){
@@ -4206,6 +4471,7 @@ function doRebirthReset(chosenForm){
     ascension4Path = null;
     ascension5Path = null;
     ascension6Path = null;
+    wipeNonEliteMinions();
   } else {
     rebirthCount++;
   }
@@ -4294,6 +4560,10 @@ function saveGame(){
     showTutorial:showTutorial,
     tutShown:_tutShown,
     frontierWins:_frontierWins,
+    minionPoints:minionPoints,
+    minionSlots:minionSlots.slice(),
+    minionUnlocked:minionUnlocked,
+    captureTargetIdx:captureTargetIdx,
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -4371,6 +4641,10 @@ function loadGame(){
   showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
   if(data.tutShown) _tutShown=Object.assign(_tutShown,data.tutShown);
   _frontierWins=data.frontierWins||0;
+  if(data.minionPoints!==undefined) minionPoints=data.minionPoints;
+  if(data.minionSlots) minionSlots=data.minionSlots;
+  if(data.minionUnlocked) minionUnlocked=data.minionUnlocked;
+  if(data.captureTargetIdx!==undefined) captureTargetIdx=data.captureTargetIdx;
   _offlineSavedAt=data.savedAt||0;
   return true;
 }
@@ -5897,6 +6171,7 @@ if(!_hadSave && showIntro){
 }
 spawnEnemy();
 checkAchievements(true);
+updateMinionTabBtn();
 renderAchievementsTab();
 requestAnimationFrame(gameLoop);
 
@@ -5920,6 +6195,12 @@ document.querySelectorAll('.left-tab-btn').forEach(function(btn){
       else openTatteredModal();
       return;
     }
+    if(ltab==='minions'){
+      var _mm=document.getElementById('minion-modal');
+      if(_mm&&_mm.classList.contains('open')) closeMinionModal();
+      else openMinionModal();
+      return;
+    }
     document.querySelectorAll('.left-tab-btn').forEach(function(b){b.classList.remove('active');});
     document.querySelectorAll('.left-tab-pane').forEach(function(p){p.classList.remove('active');});
     btn.classList.add('active');
@@ -5929,6 +6210,16 @@ document.querySelectorAll('.left-tab-btn').forEach(function(btn){
 
 // ── TATTERED MODAL EVENTS ─────────────────────────────────────────────────────
 document.getElementById('tm-close-btn').addEventListener('click', closeTatteredModal);
+document.getElementById('mm-close-btn').addEventListener('click', closeMinionModal);
+document.getElementById('mm-sacrifice-btn').addEventListener('click', function(){
+  var TS_PER_MP=777;
+  if(tatteredSouls<TS_PER_MP) return;
+  tatteredSouls-=TS_PER_MP;
+  minionPoints++;
+  updateTatteredDisplay();
+  renderMinionModal();
+  saveGame();
+});
 
 document.getElementById('tm-respec-btn').addEventListener('click', function(){
   if(tatteredUpgradesSpent<=0) return;
