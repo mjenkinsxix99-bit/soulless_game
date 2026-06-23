@@ -152,7 +152,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card-elite { border-color:#3a2800; }
 .mm-card-elite.mm-card-discovered { border-color:#d4a843; box-shadow:0 0 8px rgba(212,168,67,0.25); }
 .mm-card-elite:hover { border-color:#e8c050; box-shadow:0 0 14px rgba(212,168,67,0.4); }
-.mm-card-canvas { display:block; width:100%; aspect-ratio:1; border-radius:6px 6px 0 0; transform:scaleX(-1); }
+.mm-card-canvas { display:block; width:100%; aspect-ratio:1; border-radius:0 0 6px 6px; transform:scaleX(-1); }
 .mm-card-name { font-size:13px; color:#7755aa; letter-spacing:1px; line-height:1.2; }
 .mm-card-discovered .mm-card-name { color:#bb99ff; }
 .mm-card-elite.mm-card-discovered .mm-card-name { color:#ffd700; }
@@ -2359,14 +2359,6 @@ function renderMinionModal(){
       var isEliteType=et.isElite;
       card.className='mm-card'+(isEliteType?' mm-card-elite':'')+(discovered?' mm-card-discovered':'');
 
-      // Portrait canvas
-      var cv=document.createElement('canvas');
-      cv.className='mm-card-canvas';
-      cv.width=256; cv.height=256;
-      cv.setAttribute('data-ei', String(idx));
-      if(!discovered) cv.style.filter='brightness(0)';
-      card.appendChild(cv);
-
       // Name
       var nameEl=document.createElement('div');
       nameEl.className='mm-card-name';
@@ -2393,6 +2385,14 @@ function renderMinionModal(){
       flavorEl.className='mm-card-flavor';
       flavorEl.textContent=discovered?('"'+md.flavor+'"'):'???';
       card.appendChild(flavorEl);
+
+      // Portrait canvas
+      var cv=document.createElement('canvas');
+      cv.className='mm-card-canvas';
+      cv.width=256; cv.height=256;
+      cv.setAttribute('data-ei', String(idx));
+      if(!discovered) cv.style.filter='brightness(0)';
+      card.appendChild(cv);
 
       // Click = set as capture target
       (function(captureIdx){
