@@ -6772,7 +6772,7 @@ document.getElementById('mm-next').addEventListener('click',function(){
   navigateTo(r.level,r.floor,r.realm);
 });
 document.getElementById('mm-auto').addEventListener('click',function(){
-  if(rebirthCount<1) return;
+  if(!soulShopOwned['auto-progress']) return;
   autoProgressEnabled=!autoProgressEnabled;
   updateAutoProgressBtn();
   saveGame();
