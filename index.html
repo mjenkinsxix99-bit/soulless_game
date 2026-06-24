@@ -6371,7 +6371,6 @@ function _showTutTipNow(text, targetEl, onDone) {
     if (!_tutActive) return;
     overlay.classList.remove('open');
     _tutActive = false;
-    overlay.removeEventListener('pointerdown', dismissTip);
     document.removeEventListener('keydown', onTutKey);
     if (onDone) onDone();
     if (_tutQueue.length > 0) {
@@ -6388,7 +6387,6 @@ function _showTutTipNow(text, targetEl, onDone) {
   }
 
   okBtn.onclick = dismissTip;
-  overlay.addEventListener('pointerdown', dismissTip);
   document.addEventListener('keydown', onTutKey);
 }
 
