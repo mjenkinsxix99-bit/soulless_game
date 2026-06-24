@@ -1338,7 +1338,7 @@ var showTutorial = true;
 var _tutShown = {
   souls: false, upgrades: false, deeperHunger: false, milestone: false,
   upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
-  ascension: false, honors: false, tatteredShop: false
+  ascension: false, honors: false, tatteredShop: false, minionTab: false
 };
 var _tutQueue = [];
 var _tutActive = false;
@@ -2397,6 +2397,7 @@ function openMinionModal(){
   modal.classList.add('open');
   renderMinionModal();
   if(!_minionModalAnimId) _minionModalAnimId = requestAnimationFrame(_animateMinionCards);
+  if(!_tutShown.minionTab){ _tutShown.minionTab=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">You have discovered the Minions!</span> Turn your enemies into allies through sacrifice and make them fight for you.<br><br>This unlocks after you have obtained your first <span style="color:#ffd700;font-weight:bold;">Ultimate Form</span>. Gain their allegiance and make their power yours!<br><br>666 Tattered Souls sacrificed will gain 1 Minion Point when you <span style="color:#ffd700;font-weight:bold;">Reincarnate</span>.',document.getElementById('minion-tab-btn'),null); },600); } }
 }
 
 function closeMinionModal(){
