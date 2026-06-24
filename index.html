@@ -211,6 +211,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   -webkit-user-select: none;
 }
 #tutorial-tip p { margin: 0 0 14px; font-style: italic; color: #ffffff; letter-spacing: 0.4px; }
+#tutorial-dns { display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:12px; cursor:pointer; user-select:none; -webkit-user-select:none; }
+#tutorial-dns input { accent-color:#7a2a2a; cursor:pointer; width:14px; height:14px; }
+#tutorial-dns label { font-size:11px; color:#886666; letter-spacing:1px; cursor:pointer; }
 #tutorial-ok {
   padding: 7px 30px;
   background: #7a2a2a;
@@ -1019,6 +1022,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 <div id="tutorial-overlay">
   <div id="tutorial-tip">
     <p id="tutorial-text"></p>
+    <div id="tutorial-dns"><input type="checkbox" id="tutorial-dns-chk"><label for="tutorial-dns-chk">Do not show again</label></div>
     <button id="tutorial-ok">OK</button>
     <div class="tut-arrow-down" id="tutorial-arrow"></div>
   </div>
@@ -6328,7 +6332,9 @@ function _showTutTipNow(text, targetEl, onDone) {
   var textEl  = document.getElementById('tutorial-text');
   var arrow   = document.getElementById('tutorial-arrow');
   var okBtn   = document.getElementById('tutorial-ok');
+  var dnsChk  = document.getElementById('tutorial-dns-chk');
 
+  dnsChk.checked = false;
   textEl.innerHTML = text;
 
   function positionTip() {
@@ -6384,6 +6390,7 @@ function _showTutTipNow(text, targetEl, onDone) {
 
   function dismissTip() {
     if (!_tutActive) return;
+    if (dnsChk.checked) { showTutorial = false; saveGame(); }
     overlay.classList.remove('open');
     _tutActive = false;
     document.removeEventListener('keydown', onTutKey);
