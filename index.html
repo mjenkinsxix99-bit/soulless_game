@@ -9,10 +9,17 @@
 html { zoom: 1; }
 html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e0d8ff; font-family: Georgia, serif; overflow: hidden; }
 #game, #game * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M4,2 L18,5 L13,8 L26,13 L16,14 L15,24 L10,11 L7,16 Z' fill='%23d4a843' stroke='%23000' stroke-width='0.8' stroke-linejoin='round'/%3E%3C/svg%3E") 4 2, crosshair !important; }
-#game { display: flex; flex-direction: column; height: 100vh; min-width: 900px; }
+#game { display: flex; flex-direction: column; height: 100vh; touch-action: manipulation; }
+#rotate-overlay { display: none; position: fixed; inset: 0; z-index: 99999; background: #07070f; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+#rotate-overlay svg { animation: rotate-hint 2s ease-in-out infinite; }
+@keyframes rotate-hint { 0%,100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
+#rotate-overlay p { color: #d0c4ff; font-family: Georgia, serif; font-size: 18px; letter-spacing: 2px; text-align: center; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
+@media (orientation: portrait) and (max-width: 900px) { #rotate-overlay { display: flex; } }
+#touch-hint-toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: rgba(9,9,15,0.92); border: 1px solid #3a2e6e; border-radius: 8px; padding: 10px 18px; color: #d0c4ff; font-family: Georgia,serif; font-size: 13px; letter-spacing: 1px; text-align: center; pointer-events: none; opacity: 0; transition: opacity 0.5s; z-index: 9999; white-space: nowrap; }
+#touch-hint-toast.show { opacity: 1; }
 #topbar { display: flex; align-items: center; gap: 20px; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; position: relative; }
 .title { font-size: 27px; letter-spacing: 4px; color: #d0c4ff; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
-#souls-display { text-align: left; }
+#souls-display { text-align: center; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
 #tattered-display { margin-left: auto; }
 #souls-display .num { font-size: 33px; color: #ffffff; font-weight: bold; text-shadow: 0 0 8px rgba(200,180,255,0.9), 0 0 18px rgba(160,120,255,0.5); }
 #souls-display .lbl { font-size: 14px; color: #c0b0f0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 6px rgba(150,120,240,0.4); }
@@ -74,7 +81,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     rgba(0,0,0,0.02) 74%,
     transparent 86%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
-#combat-wrap { position:absolute; left:50%; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
+#combat-wrap { position:absolute; left:218px; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
 #enemy-zone { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
 #enemy-zone .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -226,6 +233,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   transition: background 0.2s;
 }
 #tutorial-ok:hover { background: #993333; }
+#tutorial-no-show-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; padding: 6px 0; }
+#tutorial-no-show-cb { width: 22px; height: 22px; accent-color: #7a2a2a; cursor: pointer; flex-shrink: 0; }
+#tutorial-no-show-wrap label { font-size: 12px; color: #b08888; cursor: pointer; user-select: none; -webkit-user-select: none; }
 .tut-arrow-down {
   position: absolute;
   width: 0; height: 0;
@@ -268,6 +278,22 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   top: 2px;
   left: -11px;
 }
+
+/* Elite win tutorial modal */
+#ewt-overlay { display:none; position:fixed; inset:0; z-index:20001; background:rgba(0,0,0,0.65); align-items:center; justify-content:center; }
+#ewt-overlay.open { display:flex; }
+#ewt-box { background:#0d0d1a; border:1px solid #7a2a2a; border-radius:10px; padding:22px 24px 20px; max-width:420px; width:90%; color:#fff; text-align:center; box-shadow:0 6px 40px rgba(0,0,0,0.9),0 0 20px rgba(120,40,40,0.35); }
+#ewt-box p { margin:0 0 14px; font-size:15px; line-height:1.6; font-style:italic; letter-spacing:0.4px; }
+#ewt-forms { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:16px; }
+.ewt-form-thumb { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.ewt-form-thumb img { width:64px; height:64px; border-radius:6px; border:1px solid #7a2a2a; object-fit:cover; }
+.ewt-form-thumb span { font-size:10px; color:#b08888; letter-spacing:0.5px; }
+#ewt-sub { color:#ffe44e; font-weight:bold; font-size:14px; text-shadow:0 0 8px #ffe44e,0 0 18px #ffaa00; margin-bottom:14px !important; }
+#ewt-no-show-wrap { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:14px; padding:6px 0; }
+#ewt-no-show-cb { width:22px; height:22px; accent-color:#7a2a2a; cursor:pointer; flex-shrink:0; }
+#ewt-no-show-wrap label { font-size:12px; color:#b08888; cursor:pointer; user-select:none; }
+#ewt-ok { padding:7px 36px; background:#7a2a2a; color:#e8d8c8; border:1px solid #aa4444; border-radius:4px; cursor:pointer; font-size:14px; letter-spacing:1.5px; transition:background 0.2s; }
+#ewt-ok:hover { background:#993333; }
 
 /* Offline progress modal */
 #offline-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 19999; align-items: center; justify-content: center; pointer-events: all; }
@@ -502,7 +528,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1540; }
 .settings-row:last-of-type { border-bottom: none; }
 .settings-label { font-size: 15px; color: #9988bb; letter-spacing: 1px; }
-#intro-toggle, #tutorial-toggle { padding: 6px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
+#intro-toggle, #tutorial-toggle { padding: 11px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
 #intro-toggle:hover, #tutorial-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
 #intro-toggle.muted, #tutorial-toggle.muted { border-color: #554477; color: #554477; }
 #volume-slider { -webkit-appearance:none; appearance:none; width:130px; height:4px; border-radius:2px; background:linear-gradient(to right,#7755cc 0%,#7755cc var(--vp,70%),#2a1f44 var(--vp,70%),#2a1f44 100%); outline:none; cursor:pointer; vertical-align:middle; }
@@ -561,9 +587,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-realm-sep { width:3px;height:40px;background:#5a3a80;margin:0 6px;flex-shrink:0; }
 @keyframes pulse-gold { 0%,100%{box-shadow:0 0 5px rgba(255,215,0,0.35);} 50%{box-shadow:0 0 12px rgba(255,215,0,0.85),0 0 22px rgba(255,215,0,0.4);} }
 .tab-bar { display:flex; gap:0; border-bottom:1px solid #1e1845; flex-shrink:0; margin-bottom:0; }
-.tab-btn { background:transparent; border:none; border-bottom:2px solid transparent; color:#554477; padding:5px 10px; cursor:pointer; transition:border-color 0.15s,filter 0.15s; margin-bottom:-1px; line-height:0; position:relative; }
+.tab-btn { background:transparent; border:none; border-bottom:2px solid transparent; color:#554477; font-family:Georgia,serif; font-size:12px; letter-spacing:2px; text-transform:uppercase; padding:5px 10px; cursor:pointer; transition:color 0.15s,border-color 0.15s,filter 0.15s; margin-bottom:-1px; line-height:0; position:relative; }
+.tab-btn:hover { color:#9980dd; }
 .tab-btn:hover .ui-icon { filter:drop-shadow(0 0 6px rgba(153,128,221,0.9)) brightness(1.2); }
-.tab-btn.active { border-bottom-color:#d4a843; }
+.tab-btn.active { color:#d4a843; border-bottom-color:#d4a843; }
 .tab-btn.active .ui-icon { filter:drop-shadow(0 0 5px rgba(212,168,67,0.95)) brightness(1.3); }
 .tab-pane { display:none; }
 .tab-pane.active { display:block; }
@@ -576,9 +603,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #right { display:flex; flex-direction:column; overflow:hidden; padding:0; }
 /* Scrollable tab content */
 #tab-content-area { flex:1; overflow-y:auto; padding:12px 14px 16px; }
-::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1e1845; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: #3a2e6e; border-radius: 2px; }
+#tab-content-area, #left { -webkit-overflow-scrolling: touch; }
 
 #upgrade-list { padding-right: 4px; }
 
@@ -605,6 +633,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 @keyframes spellGlow { 0%,100%{box-shadow:0 0 10px rgba(90,140,255,0.6),0 0 22px rgba(70,120,255,0.3);} 50%{box-shadow:0 0 18px rgba(120,170,255,0.9),0 0 38px rgba(100,160,255,0.5);} }
 .spell-tt { position:absolute; right:calc(100% + 10px); top:50%; transform:translateY(-50%); width:210px; background:#06041a; border:1px solid #2a3688; border-radius:7px; padding:11px 13px; pointer-events:none; z-index:500; display:none; box-shadow:0 4px 22px rgba(0,0,40,0.85); white-space:normal; }
 .spell-btn:hover .spell-tt { display:block; }
+.spell-btn.spell-tt-open .spell-tt { display:block; }
 .spell-tt-name { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; margin-bottom:5px; }
 .spell-tt-cost { font-size:11px; color:#6688cc; margin-bottom:5px; }
 .spell-tt-desc { font-size:12px; color:#c8c0e8; line-height:1.5; }
@@ -621,7 +650,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #tm-respec-btn:hover { border-color:#ff3333; color:#ff6666; background:#220606; box-shadow:0 0 16px rgba(255,50,50,0.4); text-shadow:0 0 12px rgba(255,80,80,0.8); }
 #tm-respec-btn:disabled { opacity:0.25; cursor:default; box-shadow:none; text-shadow:none; }
 #tm-close-btn { width:36px; height:36px; background:#880000; border:2px solid #cc0000; color:#000; font-size:20px; border-radius:5px; cursor:pointer; line-height:1; transition:all 0.2s; font-weight:bold; }
-#tm-close-btn:hover { background:#cc0000; border-color:#ff2222; }
+#tm-close-btn:hover { background:#cc0000; border-color:#ff2222; color:#9980dd; }
 #tm-canvas-wrap { flex:1; overflow:hidden; position:relative; cursor:grab; }
 #tm-canvas-wrap.dragging { cursor:grabbing; }
 #tm-grid { position:absolute; left:0; top:0; will-change:transform; }
@@ -761,23 +790,27 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 
 /* ── ACHIEVEMENT BANNER ──────────────────────────────────────────────────── */
 #ach-banner {
-  position:absolute; inset:0; z-index:50;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  pointer-events:none; opacity:0;
-  background:linear-gradient(90deg,transparent 0%,rgba(212,168,67,0.10) 20%,rgba(212,168,67,0.26) 50%,rgba(212,168,67,0.10) 80%,transparent 100%);
-  box-shadow:0 0 60px rgba(212,168,67,0.25) inset;
+  position:fixed; left:370px; top:58px; z-index:200;
+  width:270px; pointer-events:none;
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+  padding:12px 18px 12px 16px;
+  background:linear-gradient(135deg,#1c1500 0%,#2b2000 50%,#171000 100%);
+  border:1px solid #c8a040; border-left:none;
+  border-radius:0 7px 7px 0;
+  box-shadow:4px 6px 24px rgba(212,168,67,0.35), inset 0 0 30px rgba(212,168,67,0.06);
+  opacity:0; transform:translateX(-100%);
 }
-#ach-banner.show { animation:ach-fadeinout 3s ease-out forwards; }
-@keyframes ach-fadeinout {
-  0%   { opacity:0; transform:scaleY(0.88); }
-  9%   { opacity:1; transform:scaleY(1); }
-  68%  { opacity:1; }
-  100% { opacity:0; }
+#ach-banner.show { animation:ach-flag-slide 6.3s ease forwards; }
+@keyframes ach-flag-slide {
+  0%   { transform:translateX(-100%); opacity:0; }
+  8%   { transform:translateX(0);     opacity:1; }
+  80%  { transform:translateX(0);     opacity:1; }
+  100% { transform:translateX(0);     opacity:0; }
 }
-.ach-label { font-size:10px; letter-spacing:5px; color:#c8a040; text-transform:uppercase; text-shadow:0 0 8px rgba(212,168,67,0.7); }
-.ach-name  { font-size:19px; color:#ffd700; letter-spacing:3px; font-weight:bold; margin-top:2px;
-  text-shadow:0 0 16px rgba(255,215,0,1),0 0 34px rgba(255,215,0,0.65),0 0 60px rgba(255,215,0,0.3); }
-.ach-desc  { font-size:12px; color:#b89030; font-style:italic; margin-top:3px; letter-spacing:1px; text-shadow:0 0 8px rgba(212,168,67,0.4); }
+.ach-label { font-size:9px; letter-spacing:5px; color:#c8a040; text-transform:uppercase; text-shadow:0 0 8px rgba(212,168,67,0.7); }
+.ach-name  { font-size:16px; color:#ffd700; letter-spacing:2px; font-weight:bold; margin-top:3px;
+  text-shadow:0 0 12px rgba(255,215,0,1),0 0 28px rgba(255,215,0,0.6); }
+.ach-desc  { font-size:11px; color:#b89030; font-style:italic; margin-top:4px; letter-spacing:1px; text-shadow:0 0 8px rgba(212,168,67,0.4); line-height:1.4; }
 
 /* ── ACHIEVEMENT TAB ─────────────────────────────────────────────────────── */
 .ach-count { font-size:11px; color:#776699; text-align:right; padding:0 0 8px; letter-spacing:1px; }
@@ -798,11 +831,13 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #left-header { width:100%; text-align:center; padding-bottom:6px; position:relative; z-index:2; background:#000; }
 .left-tab-bar { display:flex; width:100%; border-bottom:1px solid #1e1845; margin-bottom:10px; position:relative; z-index:2; background:#000; }
 .left-tab-btn { flex:1; background:transparent; border:none; border-bottom:2px solid transparent;
-  padding:6px 4px; cursor:pointer; transition:border-color 0.15s,filter 0.15s; margin-bottom:-1px; line-height:0; position:relative; }
+  color:#554477; font-family:Georgia,serif; font-size:11px; letter-spacing:2px; text-transform:uppercase;
+  padding:6px 4px; cursor:pointer; transition:color 0.15s,border-color 0.15s,filter 0.15s; margin-bottom:-1px; line-height:0; position:relative; }
+.left-tab-btn:hover:not(.locked) { color:#9980dd; }
 .left-tab-btn:hover:not(.locked) .ui-icon { filter:drop-shadow(0 0 6px rgba(153,128,221,0.9)) brightness(1.2); }
-.left-tab-btn.active { border-bottom-color:#d4a843; }
+.left-tab-btn.active { color:#d4a843; border-bottom-color:#d4a843; }
 .left-tab-btn.active .ui-icon { filter:drop-shadow(0 0 5px rgba(212,168,67,0.95)) brightness(1.3); }
-.left-tab-btn.locked { cursor:default; opacity:0.25; }
+.left-tab-btn.locked { color:#2a2040; cursor:default; opacity:0.25; }
 #left-tab-content { width:100%; position:relative; }
 .left-tab-pane { display:none; width:100%; }
 .left-tab-pane.active { display:block; }
@@ -827,9 +862,213 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .ss-item.ss-maxed .ss-item-desc { color:#4a3820; }
 .ss-item.ss-maxed .ss-item-cost { color:#4a3010; }
 
+/* ── MOBILE PORTRAIT LAYOUT (phones only) ───────────────────────────────── */
+@media (pointer: coarse) and (hover: none) and (max-width: 549px) {
+  #game { height: 100dvh; }
+
+  /* CSS grid: top row (left+battle) | buy bar | minimap | right panel */
+  #main {
+    display: grid;
+    grid-template-columns: 155px 1fr;
+    grid-template-rows: 38vh auto auto 1fr;
+    grid-template-areas:
+      "left   battle"
+      "map    map"
+      "buy    buy"
+      "right  right";
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Shared realm background (moved to #main via JS) — spans full top row */
+  #realm-bg-img-left {
+    position: absolute !important;
+    top: 0 !important; left: 0 !important;
+    z-index: 0 !important;
+    width: auto !important; height: auto !important;
+    /* Override JS translateY(-400px) — show upper portion of artwork on mobile */
+    transform: translateX(0px) translateY(-315px) scale(0.80) !important;
+  }
+  /* Battlefield-specific bg hidden — shared bg covers both panels */
+  #realm-bg-img  { display: none !important; }
+  #bg-canvas     { display: none !important; }
+  #combat-oval   { display: none !important; }
+
+  /* Left panel: transparent so shared bg shows through */
+  #left {
+    grid-area: left;
+    width: auto;
+    background: transparent !important;
+    padding-top: 4px;
+    border-right: 1px solid rgba(30,24,69,0.6);
+    overflow: hidden;
+    z-index: 1;
+  }
+  #left-header  { background: transparent !important; padding: 4px 6px 2px; }
+  .left-tab-bar { background: transparent !important; }
+  #entity-canvas { width: 200px !important; height: 200px !important; }
+  #left #left-entity .canvas-wrap { top: -28px !important; }
+
+  /* Battlefield: transparent so shared bg shows through */
+  #battlefield {
+    grid-area: battle;
+    background: transparent !important;
+    padding-bottom: 0;
+    overflow: visible;
+    z-index: 10;
+  }
+
+  /* Enemy repositioned for narrower battlefield */
+  #combat-wrap {
+    left: calc(50% - 25px) !important;
+    top: calc(46% + 85px) !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 20 !important;
+  }
+  #enemy-canvas  { width: 190px !important; height: 190px !important; }
+  #enemy-zone { position: relative !important; }
+  #enemy-name-label { font-size: 10px !important; letter-spacing: 1px !important; position: absolute !important; top: -15px !important; left: 50% !important; transform: translateX(-50%) !important; white-space: nowrap !important; }
+  #enemy-zone .hp-wrap { max-width: 100px !important; position: absolute !important; top: -22px !important; left: 50% !important; transform: translateX(-50%) !important; }
+  #elite-timer-wrap { position: absolute !important; top: -8px !important; left: 50% !important; transform: translateX(-50%) !important; margin-top: 0 !important; }
+  #enemy-zone .hp-track { height: 7px !important; }
+  #enemy-zone .hp-numbers { font-size: 8px !important; }
+  #click-hint   { font-size: 13px !important; width: auto !important; text-align: center !important; padding: 2px 6px !important; color: #9988cc !important; }
+  #realm-label  { font-size: 10px !important; left: 6px !important; top: 4px !important; letter-spacing: 1px !important; }
+  #souls-display {
+    position: absolute !important;
+    top: 6px !important;
+    right: 58px !important;
+    left: auto !important;
+    transform: none !important;
+    text-align: right !important;
+    pointer-events: none;
+    z-index: 5;
+  }
+  #souls-display .num { font-size: 18px !important; }
+  #souls-display .lbl { font-size: 9px !important; letter-spacing: 1px !important; }
+
+  /* Spell panel: vertical strip on right edge of battlefield */
+  #spell-panel {
+    position: absolute !important;
+    right: 2px !important; top: 2px !important; bottom: 2px !important;
+    width: 50px !important;
+    padding: 4px 0 !important;
+    gap: 5px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    background: rgba(8,8,14,0.82) !important;
+    border: 1px solid #1e1845 !important;
+    border-radius: 5px !important;
+    z-index: 10 !important;
+    overflow: hidden !important;
+  }
+  #spell-panel.visible { display: flex !important; }
+  #mana-bar-outer { height: 50px !important; }
+  .spell-tt { right: calc(100% + 6px) !important; }
+
+  /* Buy selector, minimap, right panel must sit above the absolute bg image and combat-wrap overflow */
+  #buy-selector, #minimap-panel, #right {
+    position: relative;
+    z-index: 25;
+  }
+  .buy-label { color: #d4a843 !important; }
+
+  /* Buy selector: horizontal strip */
+  #buy-selector {
+    grid-area: buy;
+    flex-direction: row !important;
+    width: calc(100% - 10px) !important; height: auto !important;
+    box-sizing: border-box;
+    padding: 5px 16px !important;
+    margin-top: -16px;
+    gap: 5px !important;
+    border-left: none !important; border-right: none !important;
+    border-top: 1px solid #1e1845;
+    border-bottom: 1px solid #1e1845;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .buy-label { padding-bottom: 0 !important; padding-right: 4px; }
+  .buy-btn   { width: auto !important; padding: 6px 9px !important; font-size: 11px !important; }
+  .buy-btn[data-qty="all"] { font-size: 11px !important; padding: 6px 12px !important; white-space: nowrap !important; }
+
+  /* Minimap: own row between buy bar and right panel */
+  #minimap-panel {
+    grid-area: map;
+    padding: 0px 26px !important;
+    background: transparent !important;
+    border-bottom: 1px solid #1e1845;
+    flex-shrink: 0;
+    display: block !important;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: -9px;
+    margin-left: -11px;
+  }
+  #minimap-inner { justify-content: center; }
+  #mm-cells { gap: 4px !important; min-height: 26px !important; }
+
+  /* Tighter upgrade cards */
+  .ucard { padding: 6px 10px !important; margin-bottom: 5px !important; }
+  .ucard .un { font-size: 15px !important; }
+  .ucard .ud { font-size: 13px !important; }
+  .ucard .uc { font-size: 13px !important; }
+  .ucard .uowned { font-size: 13px !important; }
+  .ucard-icon { width: 52px !important; height: 52px !important; }
+
+  /* Right panel: scrollable */
+  #right {
+    grid-area: right;
+    width: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #settings-btn {
+    position: absolute !important;
+    bottom: auto !important;
+    left: auto !important;
+    top: 98px !important;
+    right: 56px !important;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 16px !important;
+    z-index: 10 !important;
+  }
+
+  /* Achievement banner */
+  #ach-banner { left: 0 !important; border-left: 1px solid #c8a040 !important; border-radius: 7px !important; }
+
+  /* Rotate overlay suppressed — portrait is a valid layout on mobile */
+  #rotate-overlay { display: none !important; }
+
+  /* Title size -2px */
+  .title { font-size: 25px !important; }
+
+  /* Inactive tabs brighter */
+  .tab-btn       { color: #9977cc !important; }
+  .left-tab-btn  { color: #9977cc !important; }
+
+  /* Minimap cells 5px shorter */
+  .mm-cell { height: 41px !important; width: 41px !important; }
+  .mm-cell.elite { height: 39px !important; width: 39px !important; }
+}
 </style>
 </head>
 <body>
+<div id="rotate-overlay">
+  <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="20" y="10" width="40" height="60" rx="6" stroke="#d0c4ff" stroke-width="3"/>
+    <circle cx="40" cy="62" r="3" fill="#d0c4ff"/>
+    <path d="M52 28 L64 22 L64 34 Z" fill="#d4a843"/>
+    <path d="M64 22 Q76 40 64 58" stroke="#d4a843" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </svg>
+  <p>ROTATE YOUR DEVICE<br>TO PLAY SOULLESS</p>
+</div>
+<div id="touch-hint-toast">Long-press nodes &amp; icons to view details</div>
 <div id="game">
   <div id="topbar">
     <div class="title">SOULLESS</div>
@@ -842,11 +1081,11 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <div class="lbl">tattered souls</div>
       <div class="ts-preview" id="ts-ascend-preview"></div>
     </div>
-    <div id="ach-banner">
-      <div class="ach-label">Achievement Unlocked</div>
-      <div class="ach-name"></div>
-      <div class="ach-desc"></div>
-    </div>
+  </div>
+  <div id="ach-banner">
+    <div class="ach-label">Achievement Unlocked</div>
+    <div class="ach-name"></div>
+    <div class="ach-desc"></div>
   </div>
   <div id="main">
     <div id="left">
@@ -892,10 +1131,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
           <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
           <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
         </div>
-        <div id="elite-timer-wrap" style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:6px;visibility:hidden;">
-          <div id="elite-timer-label" style="color:#33aa33;font-size:14px;letter-spacing:1px;">Time to Defeat: 20s</div>
-          <div class="hp-wrap">
+        <div id="elite-timer-wrap" style="visibility:hidden;">
+          <div class="hp-wrap" style="position:relative;">
             <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
+            <div id="elite-timer-label" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:1px;pointer-events:none;color:#fff;text-shadow:0 0 3px rgba(0,0,0,0.9);white-space:nowrap;overflow:hidden;">Time to Defeat: 20s</div>
           </div>
         </div>
         <div id="minimap-panel">
@@ -929,7 +1168,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <button class="buy-btn" data-qty="50">50</button>
       <button class="buy-btn" data-qty="100">100</button>
       <button class="buy-btn" data-qty="max">MAX</button>
-      <button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;">All Augments</button>
+      <button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;background:#2a6e2a;border-color:#3d9e3d;color:#ffffff;">BUY ALL AUGS</button>
       <div id="spell-panel">
         <div class="spell-divider"></div>
         <div id="mana-label">mana</div>
@@ -1023,8 +1262,33 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   <div id="tutorial-tip">
     <p id="tutorial-text"></p>
     <div id="tutorial-dns"><input type="checkbox" id="tutorial-dns-chk"><label for="tutorial-dns-chk">Do not show again</label></div>
+    <p id="tutorial-highlight" style="display:none;margin:0 0 12px;color:#ffe44e;font-weight:bold;font-size:15px;text-shadow:0 0 10px #ffe44e,0 0 20px #ffaa00;letter-spacing:0.3px;"></p>
+    <div id="tutorial-no-show-wrap">
+      <input type="checkbox" id="tutorial-no-show-cb">
+      <label for="tutorial-no-show-cb">Do not show this again</label>
+    </div>
     <button id="tutorial-ok">OK</button>
     <div class="tut-arrow-down" id="tutorial-arrow"></div>
+  </div>
+</div>
+
+<div id="ewt-overlay">
+  <div id="ewt-box">
+    <p>Well done! 1st Elite defeated. Now you need more souls, More strength.</p>
+    <div id="ewt-forms">
+      <div class="ewt-form-thumb"><img src="artwork/masculine.webp" alt="Masculine"><span>Masculine</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/feminine.webp" alt="Feminine"><span>Feminine</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/androgynous.webp" alt="Androgynous"><span>Androgynous</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/canine.webp" alt="Canine"><span>Canine</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/feline.webp" alt="Feline"><span>Feline</span></div>
+      <div class="ewt-form-thumb"><img src="artwork/equine.webp" alt="Equine"><span>Equine</span></div>
+    </div>
+    <p id="ewt-sub">Which form will you choose? Grow strong enough to ascend and choose your path!</p>
+    <div id="ewt-no-show-wrap">
+      <input type="checkbox" id="ewt-no-show-cb">
+      <label for="ewt-no-show-cb">Do not show this again</label>
+    </div>
+    <button id="ewt-ok">OK</button>
   </div>
 </div>
 
@@ -1383,7 +1647,8 @@ var showTutorial = true;
 var _tutShown = {
   souls: false, upgrades: false, deeperHunger: false, milestone: false,
   upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
-  ascension: false, honors: false, tatteredShop: false, minionTab: false, minionCapture: false
+  ascension: false, honors: false, tatteredShop: false, minionTab: false, minionCapture: false,
+  sacrificeIntro: false, eliteWin: false, touchHint: false
 };
 var _tutQueue = [];
 var _tutActive = false;
@@ -1733,8 +1998,9 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
   var float = (dead || !floatSpeed) ? 0 : Math.sin(t * floatSpeed) * 6;
-  // Elite: bias sprite toward bottom of canvas (0.75 of remaining space above)
-  var dy = elite ? (H - drawH) * 0.75 + float : (H - drawH) / 2 + float;
+  // All enemies share the same bottom anchor so elite appears larger (not lower)
+  var bottomAnchor = H * 0.75;
+  var dy = (bottomAnchor - drawH) + float;
   var cx = W / 2, cy = dy + drawH / 2;
 
   // Hit squish: stretch wide, squish tall
@@ -2589,9 +2855,11 @@ var WINS_PER_FLOOR    = 10;
 var REALM_NAMES       = ['Void', 'Underworld', 'Purgatory', 'Undead', 'Hades', 'Undersea', 'Swamp', 'Forest', 'Skyland', 'Heaven'];  // indexed by curRealm-1; unnamed realms fall back to number
 
 // No realm cap — break_infinity.js handles arbitrarily large HP values
-var MINIMAP_VISIBLE  = 5;
+var MINIMAP_VISIBLE  = window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 549px)').matches ? 3 : 5;
 var minimapNewFloor  = false;
 var autoProgressEnabled = false;
+var hasEverAscended = false;
+var hasEverHadAutoProgress = false;
 
 // Location state
 var curRealm  = 1;
@@ -3017,7 +3285,7 @@ function buildMinimap(){
 function updateAutoProgressBtn(){
   var btn=document.getElementById('mm-auto');
   if(!btn) return;
-  if(!soulShopOwned['auto-progress']){ btn.style.display='none'; return; }
+  if(!soulShopOwned['auto-progress']&&!hasEverAscended){ btn.style.display='none'; return; }
   btn.style.display='';
   btn.classList.toggle('ap-on', autoProgressEnabled);
   btn.classList.toggle('ap-off', !autoProgressEnabled);
@@ -3039,6 +3307,9 @@ function navigateTo(level, floor, realm){
   setTimeout(spawnEnemy,400);
   buildMinimap();
   updateProgressLabel();
+  if(!_tutShown.eliteWin&&showTutorial&&eliteKillsTotal>=1&&curRealm===1&&curLevel===2&&curFloor===1){
+    setTimeout(showEliteWinTutorial,800);
+  }
 }
 
 // ── ENEMY SPAWN ───────────────────────────────────────────────────────────────
@@ -3096,11 +3367,8 @@ function spawnEnemy(){
   updateEnemyPanel();
   updateProgressLabel();
   updateHpBars();
-  setHint();
   buildMinimap();
 }
-
-function setHint(){}
 
 function updateProgressLabel(){
   var elite=isEliteFight();
@@ -3212,7 +3480,8 @@ function onEnemyDeath(){
   if(isEliteFight()){
     eliteKillsTotal++;
     // Elite beaten — add this level's enemy type to the pool
-    var typeIdx2=(curRealm-1)*LEVELS_PER_REALM+curLevel-1;
+    // Use the same modulo wrap as spawnEnemy's realmOffset so realm 11+ maps back to indices 0-99
+    var typeIdx2=((curRealm-1)%REALM_NAMES.length)*LEVELS_PER_REALM+curLevel-1;
     if(namedEliteFirstKills.indexOf(typeIdx2)<0) namedEliteFirstKills.push(typeIdx2);
     if(defeatedElites.indexOf(typeIdx2)<0){
       defeatedElites.push(typeIdx2);
@@ -3221,7 +3490,7 @@ function onEnemyDeath(){
       if(curRealm===highestRealm){
         // add next type to pool if not already there
         var nextType=typeIdx2+1;
-        var realmEnd=curRealm*LEVELS_PER_REALM;
+        var realmEnd=(((curRealm-1)%REALM_NAMES.length)+1)*LEVELS_PER_REALM;
         if(nextType<realmEnd && nextType<ENEMY_TYPES.length && enemyPool.indexOf(nextType)<0){
           enemyPool.push(nextType);
         }
@@ -3247,6 +3516,7 @@ function onEnemyDeath(){
         updateHighestFloor();
         buildMinimap();
         updateProgressLabel();
+        bgmPlay(curRealm);
         saveGame();
         spawnEnemy();
       }, 2500);
@@ -3659,6 +3929,24 @@ var REP_UPGRADES=[
 // Convert all upgrade costs to Decimal after definition
 REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
 
+// Upgrade visibility: two rules in addition to "previous was purchased":
+//   1. Affordable — the upgrade itself is currently affordable (show it).
+//   2. Preview  — the previous upgrade is affordable (show this one as +1 ahead).
+// Both rules use the current live cost, so a player who left the game running
+// and can now afford a lower upgrade will see it (and one beyond) automatically.
+REP_UPGRADES.forEach(function(u, idx) {
+  if (idx === 0) return; // first upgrade is always visible; keep its existing vis
+  u.vis = (function(i) {
+    return function() {
+      var prev = REP_UPGRADES[i - 1];
+      if (prev.level >= 1) return true;           // purchased rule
+      if (souls.gte(REP_UPGRADES[i].cost)) return true; // affordable rule
+      if (souls.gte(prev.cost)) return true;      // preview (+1) rule
+      return false;
+    };
+  })(idx);
+});
+
 // DV DPS→Click milestone indices and their step multipliers from the previous DPS→Click milestone
 var DV_DPS_MS_IDX=[0,1,3,4,6,7,9];
 var DV_DPS_MS_STEP=[12,100,1000,10000,100000,1000000];
@@ -3792,6 +4080,105 @@ var ACHIEVEMENTS=[
   {id:'elite-first-phlegm', cat:'Elite Prey', name:'Phantom Purged',         desc:'Defeat the Phlegm elite for the first time',        check:function(){return namedEliteFirstKills.indexOf(7)>=0;}},
   {id:'elite-first-banshee',cat:'Elite Prey', name:'Banshee Quieted',        desc:'Defeat the Banshee elite for the first time',       check:function(){return namedEliteFirstKills.indexOf(8)>=0;}},
   {id:'elite-first-demon',  cat:'Elite Prey', name:'Demon Unmade',           desc:'Defeat the Queen Shayd elite for the first time',   check:function(){return namedEliteFirstKills.indexOf(9)>=0;}},
+  // Underworld elites (indices 10-19)
+  {id:'elite-first-blick',     cat:'Elite Prey', name:'Ember Extinguished',      desc:'Defeat the Blick elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(10)>=0;}},
+  {id:'elite-first-bongo',     cat:'Elite Prey', name:'Ash to Ash',              desc:'Defeat the Bongo elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(11)>=0;}},
+  {id:'elite-first-chuck',     cat:'Elite Prey', name:'Good Chuck, Bad Outcome', desc:'Defeat the Chuck elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(12)>=0;}},
+  {id:'elite-first-dee',       cat:'Elite Prey', name:'The Heat Is Off',         desc:'Defeat the Dee elite for the first time',                check:function(){return namedEliteFirstKills.indexOf(13)>=0;}},
+  {id:'elite-first-digh',      cat:'Elite Prey', name:'Memories Buried',         desc:'Defeat the Digh elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(14)>=0;}},
+  {id:'elite-first-dongo',     cat:'Elite Prey', name:'Misguided No More',       desc:'Defeat the Dongo elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(15)>=0;}},
+  {id:'elite-first-glugg',     cat:'Elite Prey', name:'Down for Good',           desc:'Defeat the Glugg elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(16)>=0;}},
+  {id:'elite-first-rongo',     cat:'Elite Prey', name:'Willing or Not',          desc:'Defeat the Rongo elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(17)>=0;}},
+  {id:'elite-first-stinky',    cat:'Elite Prey', name:'Finally Dead Enough',     desc:'Defeat the Stinky elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(18)>=0;}},
+  {id:'elite-first-seethe',    cat:'Elite Prey', name:'Fire Out',                desc:'Defeat the Seethe elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(19)>=0;}},
+  // Purgatory elites (indices 20-29)
+  {id:'elite-first-devienne',  cat:'Elite Prey', name:'The Wait Is Over',        desc:'Defeat the Devienne elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(20)>=0;}},
+  {id:'elite-first-glutny',    cat:'Elite Prey', name:'Appetite Suppressed',     desc:'Defeat the Glutny elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(21)>=0;}},
+  {id:'elite-first-greidi',    cat:'Elite Prey', name:'Nothing Left to Want',    desc:'Defeat the Greidi elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(22)>=0;}},
+  {id:'elite-first-kovet',     cat:'Elite Prey', name:'Coveted No More',         desc:'Defeat the Kovet elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(23)>=0;}},
+  {id:'elite-first-onvee',     cat:'Elite Prey', name:'Green with Gone',         desc:'Defeat the Onvee elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(24)>=0;}},
+  {id:'elite-first-pryde',     cat:'Elite Prey', name:'Pride Before the Fall',   desc:'Defeat the Pryde elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(25)>=0;}},
+  {id:'elite-first-sleth',     cat:'Elite Prey', name:'Moved, Finally',          desc:'Defeat the Sleth elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(26)>=0;}},
+  {id:'elite-first-sluth',     cat:'Elite Prey', name:'No Rest for the Dead',    desc:'Defeat the Sluth elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(27)>=0;}},
+  {id:'elite-first-wroth',     cat:'Elite Prey', name:'Anger Management',        desc:'Defeat the Wroth elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(28)>=0;}},
+  {id:'elite-first-rath',      cat:'Elite Prey', name:'King No More',            desc:'Defeat the Rath elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(29)>=0;}},
+  // Undying elites (indices 30-39)
+  {id:'elite-first-basha',     cat:'Elite Prey', name:'Still Dead Now',          desc:'Defeat the Basha elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(30)>=0;}},
+  {id:'elite-first-bonejangle',cat:'Elite Prey', name:'Rattled Apart',           desc:'Defeat the Bonejangle elite for the first time',         check:function(){return namedEliteFirstKills.indexOf(31)>=0;}},
+  {id:'elite-first-brain',     cat:'Elite Prey', name:'No-Brainer',              desc:'Defeat the Brain elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(32)>=0;}},
+  {id:'elite-first-drjack',    cat:'Elite Prey', name:'Malpractice',             desc:'Defeat the Dr. Jack elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(33)>=0;}},
+  {id:'elite-first-dracack',   cat:'Elite Prey', name:'Cold Case Closed',        desc:'Defeat the Dracack elite for the first time',            check:function(){return namedEliteFirstKills.indexOf(34)>=0;}},
+  {id:'elite-first-etta',      cat:'Elite Prey', name:'Unstitched',              desc:'Defeat the Etta elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(35)>=0;}},
+  {id:'elite-first-feemur',    cat:'Elite Prey', name:'Defemured',               desc:'Defeat the Feemur elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(36)>=0;}},
+  {id:'elite-first-fronk',     cat:'Elite Prey', name:'Shambles No More',        desc:'Defeat the Fronk elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(37)>=0;}},
+  {id:'elite-first-heddina',   cat:'Elite Prey', name:'Off With Her Head',       desc:'Defeat the Heddina elite for the first time',            check:function(){return namedEliteFirstKills.indexOf(38)>=0;}},
+  {id:'elite-first-royalich',  cat:'Elite Prey', name:'The Undying... Died',     desc:'Defeat the Royalich elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(39)>=0;}},
+  // Hades elites (indices 40-49)
+  {id:'elite-first-aligos',    cat:'Elite Prey', name:'Pest Control',            desc:'Defeat the Aligos elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(40)>=0;}},
+  {id:'elite-first-aria',      cat:'Elite Prey', name:'Curtain Call',            desc:'Defeat the Aria elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(41)>=0;}},
+  {id:'elite-first-chasme',    cat:'Elite Prey', name:'Buzzkill',                desc:'Defeat the Chasme elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(42)>=0;}},
+  {id:'elite-first-endras',    cat:'Elite Prey', name:'Corruption Removed',      desc:'Defeat the Endras elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(43)>=0;}},
+  {id:'elite-first-firfur',    cat:'Elite Prey', name:'Doused',                  desc:'Defeat the Firfur elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(44)>=0;}},
+  {id:'elite-first-gricelle',  cat:'Elite Prey', name:'Cold Cruelty, Warmed Up', desc:'Defeat the Gricelle elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(45)>=0;}},
+  {id:'elite-first-paag',      cat:'Elite Prey', name:'Pitted',                  desc:'Defeat the Paag elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(46)>=0;}},
+  {id:'elite-first-vroke',     cat:'Elite Prey', name:'Broke First',             desc:'Defeat the Vroke elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(47)>=0;}},
+  {id:'elite-first-vymp',      cat:'Elite Prey', name:'Warmth Restored',         desc:'Defeat the Vymp elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(48)>=0;}},
+  {id:'elite-first-molok',     cat:'Elite Prey', name:'Lord of Nothing Now',     desc:'Defeat the Molok elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(49)>=0;}},
+  // Undersea elites (indices 50-59)
+  {id:'elite-first-csnek',     cat:'Elite Prey', name:'No Longer Sneaking',      desc:'Defeat the C. Snek elite for the first time',            check:function(){return namedEliteFirstKills.indexOf(50)>=0;}},
+  {id:'elite-first-halfshell', cat:'Elite Prey', name:'Half-Sunk Spartan',       desc:'Defeat the Halfshell Spartan elite for the first time',  check:function(){return namedEliteFirstKills.indexOf(51)>=0;}},
+  {id:'elite-first-jelleeza',  cat:'Elite Prey', name:'Dejellied',               desc:'Defeat the Jelleeza elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(52)>=0;}},
+  {id:'elite-first-kapkreb',   cat:'Elite Prey', name:'Claws Down',              desc:'Defeat the Kap Kreb elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(53)>=0;}},
+  {id:'elite-first-rayes',     cat:'Elite Prey', name:'Grounded',                desc:'Defeat the Rayes elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(54)>=0;}},
+  {id:'elite-first-shrak',     cat:'Elite Prey', name:'Stop Circling',           desc:'Defeat the Shrak elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(55)>=0;}},
+  {id:'elite-first-spike',     cat:'Elite Prey', name:'Poked Back',              desc:'Defeat the Spike elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(56)>=0;}},
+  {id:'elite-first-squidica',  cat:'Elite Prey', name:'All Arms Down',           desc:'Defeat the Squidica elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(57)>=0;}},
+  {id:'elite-first-tentaclan', cat:'Elite Prey', name:'Untangled',               desc:'Defeat the Tentaclan elite for the first time',          check:function(){return namedEliteFirstKills.indexOf(58)>=0;}},
+  {id:'elite-first-orking',    cat:'Elite Prey', name:'Depth Defied',            desc:'Defeat the Orking elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(59)>=0;}},
+  // Swamp elites (indices 60-69)
+  {id:'elite-first-chamo',     cat:'Elite Prey', name:'Found You',               desc:'Defeat the Chamo elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(60)>=0;}},
+  {id:'elite-first-crocette',  cat:'Elite Prey', name:'Off the Waterline',       desc:'Defeat the Crocette elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(61)>=0;}},
+  {id:'elite-first-gatorado',  cat:'Elite Prey', name:'Slowed Down',             desc:'Defeat the Gatorado elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(62)>=0;}},
+  {id:'elite-first-nagai',     cat:'Elite Prey', name:'Patience Ran Out',        desc:'Defeat the Nagai elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(63)>=0;}},
+  {id:'elite-first-nootina',   cat:'Elite Prey', name:'Out of the Reeds',        desc:'Defeat the Nootina elite for the first time',            check:function(){return namedEliteFirstKills.indexOf(64)>=0;}},
+  {id:'elite-first-nuut',      cat:'Elite Prey', name:'Small Win',               desc:'Defeat the Nuut elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(65)>=0;}},
+  {id:'elite-first-shellitor', cat:'Elite Prey', name:'Shell Cracked',           desc:'Defeat the Shellitor elite for the first time',          check:function(){return namedEliteFirstKills.indexOf(66)>=0;}},
+  {id:'elite-first-slither',   cat:'Elite Prey', name:'Left a Trail',            desc:'Defeat the Slither elite for the first time',            check:function(){return namedEliteFirstKills.indexOf(67)>=0;}},
+  {id:'elite-first-voodooliz', cat:'Elite Prey', name:'Hex Broken',              desc:'Defeat the Voodoo Liz elite for the first time',         check:function(){return namedEliteFirstKills.indexOf(68)>=0;}},
+  {id:'elite-first-cruk',      cat:'Elite Prey', name:'Swamp Drained',           desc:'Defeat the Cruk elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(69)>=0;}},
+  // Forest elites (indices 70-79)
+  {id:'elite-first-diggo',     cat:'Elite Prey', name:'Filled In',               desc:'Defeat the Diggo elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(70)>=0;}},
+  {id:'elite-first-kwill',     cat:'Elite Prey', name:'Rustling Silenced',       desc:'Defeat the Kwill elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(71)>=0;}},
+  {id:'elite-first-melu',      cat:'Elite Prey', name:'Out of the Shadows',      desc:'Defeat the Melu elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(72)>=0;}},
+  {id:'elite-first-nib',       cat:'Elite Prey', name:'Big Attitude, Gone',      desc:'Defeat the Nib elite for the first time',                check:function(){return namedEliteFirstKills.indexOf(73)>=0;}},
+  {id:'elite-first-pepper',    cat:'Elite Prey', name:'Spice Swept',             desc:'Defeat the Pepper elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(74)>=0;}},
+  {id:'elite-first-robber',    cat:'Elite Prey', name:'Robbed Back',             desc:'Defeat the Robber elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(75)>=0;}},
+  {id:'elite-first-scurri',    cat:'Elite Prey', name:'Caught It',               desc:'Defeat the Scurri elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(76)>=0;}},
+  {id:'elite-first-skawk',     cat:'Elite Prey', name:'Forest Goes Quiet',       desc:'Defeat the Skawk elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(77)>=0;}},
+  {id:'elite-first-taroo',     cat:'Elite Prey', name:'Made It Hurry',           desc:'Defeat the Taroo elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(78)>=0;}},
+  {id:'elite-first-booker',    cat:'Elite Prey', name:'Forest Closed',           desc:'Defeat the Booker elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(79)>=0;}},
+  // Sky elites (indices 80-89)
+  {id:'elite-first-bashinga',  cat:'Elite Prey', name:'Look Up',                 desc:'Defeat the Bashinga elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(80)>=0;}},
+  {id:'elite-first-bommer',    cat:'Elite Prey', name:'Nothing Dropped',         desc:'Defeat the Bommer elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(81)>=0;}},
+  {id:'elite-first-buzz',      cat:'Elite Prey', name:'Swatted',                 desc:'Defeat the Buzz elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(82)>=0;}},
+  {id:'elite-first-captcgull', cat:'Elite Prey', name:'Mutiny',                  desc:'Defeat the Capt. C. Gull elite for the first time',      check:function(){return namedEliteFirstKills.indexOf(83)>=0;}},
+  {id:'elite-first-crowbo',    cat:'Elite Prey', name:'Crow-Boned',              desc:'Defeat the Crowbo elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(84)>=0;}},
+  {id:'elite-first-duckfu',    cat:'Elite Prey', name:'Duck Hunt',               desc:'Defeat the Duckfu elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(85)>=0;}},
+  {id:'elite-first-hoory',     cat:'Elite Prey', name:'Precision Dodged',        desc:'Defeat the Hoory elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(86)>=0;}},
+  {id:'elite-first-jaysassin', cat:'Elite Prey', name:'Assassination Foiled',    desc:'Defeat the Jaysassin elite for the first time',          check:function(){return namedEliteFirstKills.indexOf(87)>=0;}},
+  {id:'elite-first-rayven',    cat:'Elite Prey', name:'Shadow Lifted',           desc:'Defeat the Ray Ven elite for the first time',            check:function(){return namedEliteFirstKills.indexOf(88)>=0;}},
+  {id:'elite-first-condoria',  cat:'Elite Prey', name:'Queen Dethroned',         desc:'Defeat the Condoria elite for the first time',           check:function(){return namedEliteFirstKills.indexOf(89)>=0;}},
+  // Heaven elites (indices 90-99)
+  {id:'elite-first-becca',     cat:'Elite Prey', name:'Wrong Turn, Becca',       desc:'Defeat the Becca elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(90)>=0;}},
+  {id:'elite-first-carl',      cat:'Elite Prey', name:'Comfort Interrupted',     desc:'Defeat the Carl elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(91)>=0;}},
+  {id:'elite-first-gabe',      cat:'Elite Prey', name:'Not So Angelic',          desc:'Defeat the Gabe elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(92)>=0;}},
+  {id:'elite-first-kevin',     cat:'Elite Prey', name:'Still No One Knows',      desc:'Defeat the Kevin elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(93)>=0;}},
+  {id:'elite-first-leela',     cat:'Elite Prey', name:'Well-Intentioned Loss',   desc:'Defeat the Leela elite for the first time',              check:function(){return namedEliteFirstKills.indexOf(94)>=0;}},
+  {id:'elite-first-matilda',   cat:'Elite Prey', name:'Unearned Now',            desc:'Defeat the Matilda elite for the first time',            check:function(){return namedEliteFirstKills.indexOf(95)>=0;}},
+  {id:'elite-first-mike',      cat:'Elite Prey', name:'Aggression Noted',        desc:'Defeat the Mike elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(96)>=0;}},
+  {id:'elite-first-pete',      cat:'Elite Prey', name:'Gate Unguarded',          desc:'Defeat the Pete elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(97)>=0;}},
+  {id:'elite-first-sara',      cat:'Elite Prey', name:'Radiance Dimmed',         desc:'Defeat the Sara elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(98)>=0;}},
+  {id:'elite-first-steven',    cat:'Elite Prey', name:'Commander Fallen',        desc:'Defeat the Steven elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(99)>=0;}},
 ];
 
 function allSixFormsComplete(){
@@ -3832,7 +4219,7 @@ function drainAchQueue(){
   var a=_achQueue.shift();
   showAchievementBanner(a);
   playChurchBell();
-  setTimeout(drainAchQueue,3400);
+  setTimeout(drainAchQueue,6500);
 }
 function showAchievementBanner(a){
   var banner=document.getElementById('ach-banner');
@@ -4031,6 +4418,11 @@ function renderSpellPanel(){
     if(canCast){
       btn.addEventListener('click',function(){castSpell(spell.id);});
     }
+    // Long-press to show spell tooltip on touch devices
+    var _slpt;
+    btn.addEventListener('touchstart',function(){ _slpt=setTimeout(function(){ btn.classList.add('spell-tt-open'); },500); },{passive:true});
+    btn.addEventListener('touchend',function(){ clearTimeout(_slpt); btn.classList.remove('spell-tt-open'); });
+    btn.addEventListener('touchmove',function(){ clearTimeout(_slpt); });
     panel.appendChild(btn);
   });
 }
@@ -4046,175 +4438,175 @@ var TATTERED_NODES = [
   { id:'auto-progress', type:'center', name:'Auto Progress', icon:'⟳', cost:0,
     desc:'Unlocks the Auto Progress button. Floors advance automatically when cleared.',
     x:0, y:0, requires:[] },
-  { id:'spell-flurry',      type:'spell', name:'Flurry of Strikes', icon:'⚡', cost:10,
+  { id:'spell-flurry',      type:'spell', name:'Flurry of Strikes', icon:'⚡', cost:5,
     desc:'Unlocks the spell Flurry of Strikes. Cast for 20 Mana: 7 strikes per second for 33.3s, each dealing strike damage.',
     x:0,    y:-210, requires:[] },
-  { id:'spell-critStrike',  type:'spell', name:'Critical Strike',   icon:'✦', cost:50,
+  { id:'spell-critStrike',  type:'spell', name:'Critical Strike',   icon:'✦', cost:10,
     desc:'Unlocks the spell Critical Strike. Cast for 33 Mana: critical strike chance +66.6% for 33.3s.',
     x:200,  y:-65,  requires:[] },
-  { id:'spell-twinBlades',  type:'spell', name:'Twin Blades',       icon:'⚔', cost:100,
+  { id:'spell-twinBlades',  type:'spell', name:'Twin Blades',       icon:'⚔', cost:20,
     desc:'Unlocks the spell Twin Blades. Cast for 33 Mana: DPS output ×2 for 33.3s.',
     x:123,  y:170,  requires:[] },
-  { id:'spell-twinSouls',   type:'spell', name:'Twin Souls',        icon:'∞', cost:250,
+  { id:'spell-twinSouls',   type:'spell', name:'Twin Souls',        icon:'∞', cost:40,
     desc:'Unlocks the spell Twin Souls. Cast for 33 Mana: all souls gained ×2 for 33.3s.',
     x:-123, y:170,  requires:[] },
-  { id:'spell-ruleOf3',     type:'spell', name:'Rule of 3',         icon:'Ⅲ', cost:1000,
+  { id:'spell-ruleOf3',     type:'spell', name:'Rule of 3',         icon:'Ⅲ', cost:80,
     desc:'Unlocks the spell Rule of 3. Cast for 66 Mana: each strike instantly grants current enemy\'s death soul reward ×3 for 33.3s.',
     x:-199, y:-65,  requires:[] },
-  { id:'spell-twinStrikes', type:'spell', name:'Twin Strikes',      icon:'⊕', cost:2500,
+  { id:'spell-twinStrikes', type:'spell', name:'Twin Strikes',      icon:'⊕', cost:160,
     desc:'Unlocks the spell Twin Strikes. Cast for 99 Mana: each strike deals ×2 damage for 33.3s.',
     x:-185, y:-255, requires:[] },
-  { id:'spell-powerOf3',    type:'spell', name:'Power of 3',        icon:'❖', cost:5000,
+  { id:'spell-powerOf3',    type:'spell', name:'Power of 3',        icon:'❖', cost:320,
     desc:'Unlocks the spell Power of 3. Cast for 199 Mana: the next spell activated gives 3× its effect, then this buff is consumed.',
     x:186,  y:-255, requires:[] },
-  { id:'spell-manaHungry',  type:'spell', name:'Mana Hungry',       icon:'◉', cost:10000,
+  { id:'spell-manaHungry',  type:'spell', name:'Mana Hungry',       icon:'◉', cost:640,
     desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3s.',
     x:300,  y:97,  requires:[] },
-  { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:20000,
+  { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:1280,
     desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Persists this Ascension.',
     x:-300, y:97,  requires:[] },
   // Stat nodes clustered around Flurry of Strikes (0, -300) — pentacle, point toward center
-  { id:'flurry-dps-1',    type:'dps',    name:'DPS +9%',        icon:'', cost:5,
+  { id:'flurry-dps-1',    type:'dps',    name:'DPS +9%',        icon:'', cost:12,
     desc:'Increases DPS of all upgrades by +9%.',
     x:0,    y:-157, requires:[] },
-  { id:'flurry-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:10,
+  { id:'flurry-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:27,
     desc:'Increases all souls gained by 33.3%.',
     x:-31,  y:-253, requires:[] },
-  { id:'flurry-dps-2',    type:'dps',    name:'DPS +9%',        icon:'', cost:10,
+  { id:'flurry-dps-2',    type:'dps',    name:'DPS +9%',        icon:'', cost:5,
     desc:'Increases DPS of all upgrades by +9%.',
     x:31,   y:-253, requires:[] },
-  { id:'flurry-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:5,
+  { id:'flurry-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:8,
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
     x:50,   y:-194, requires:[] },
-  { id:'flurry-speed',    type:'mana',   name:'Mana Well',      icon:'', cost:25,
+  { id:'flurry-speed',    type:'mana',   name:'Mana Well',      icon:'', cost:18,
     desc:'Increases Mana cap by 50 and Mana regen rate by 10%.',
     x:-50,  y:-194, requires:[] },
   // Stat nodes clustered around Critical Strike (285, -93) — pentacle, point toward center
-  { id:'crit-dps-1',    type:'dps',    name:'DPS +11%',       icon:'', cost:25,
+  { id:'crit-dps-1',    type:'dps',    name:'DPS +11%',       icon:'', cost:35,
     desc:'Increases DPS of all upgrades by +11%.',
     x:150,  y:-49,  requires:[] },
-  { id:'crit-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:33,
+  { id:'crit-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:53,
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
     x:169,  y:-108, requires:[] },
-  { id:'crit-dps-2',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:50,
+  { id:'crit-dps-2',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:10,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:230,  y:-108, requires:[] },
-  { id:'crit-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:77,
+  { id:'crit-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:15,
     desc:'Increases all souls gained by 33.3%.',
     x:249,  y:-49,  requires:[] },
-  { id:'crit-speed',    type:'mana',   name:'Mana Well',      icon:'', cost:100,
+  { id:'crit-speed',    type:'mana',   name:'Mana Well',      icon:'', cost:23,
     desc:'Increases Mana cap by 75 and Mana regen rate by 15%.',
     x:200,  y:-13,  requires:[] },
   // Stat nodes clustered around Twin Blades (176, 243) — pentacle, point toward center
-  { id:'blade-dps',      type:'dps',    name:'DPS +33.3%',     icon:'', cost:100,
+  { id:'blade-dps',      type:'dps',    name:'DPS +33.3%',     icon:'', cost:102,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:92,  y:127,  requires:[] },
-  { id:'blade-speed',    type:'mana',   name:'Mana Well',      icon:'', cost:133,
+  { id:'blade-speed',    type:'mana',   name:'Mana Well',      icon:'', cost:20,
     desc:'Increases Mana cap by 100 and Mana regen rate by 20%.',
     x:154,  y:127,  requires:[] },
-  { id:'blade-strike-1', type:'strike', name:'Strike Bonus',   icon:'', cost:177,
+  { id:'blade-strike-1', type:'strike', name:'Strike Bonus',   icon:'', cost:30,
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
     x:173,  y:186,  requires:[] },
-  { id:'blade-hp',       type:'hp',     name:'HP Drain +1.11%',icon:'', cost:200,
+  { id:'blade-hp',       type:'hp',     name:'HP Drain +1.11%',icon:'', cost:45,
     desc:'Increases max HP drain of Divine Hunger by +1.11%.',
     x:123,  y:223,  requires:[] },
-  { id:'blade-strike-2', type:'strike', name:'Crit Chance',    icon:'', cost:250,
+  { id:'blade-strike-2', type:'strike', name:'Crit Chance',    icon:'', cost:68,
     desc:'Increases your Critical Strike chance by +3.33%.',
     x:74,  y:186,  requires:[] },
   // Stat nodes clustered around Twin Souls (-176, 243) — pentacle, point toward center
-  { id:'souls-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:277,
+  { id:'souls-souls',    type:'souls',  name:'Soul Gain',      icon:'', cost:40,
     desc:'Increases all souls gained by 33.3%.',
     x:-92, y:127,  requires:[] },
-  { id:'souls-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:369,
+  { id:'souls-strike',   type:'strike', name:'Strike Bonus',   icon:'', cost:60,
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
     x:-73, y:186,  requires:[] },
-  { id:'souls-speed',    type:'mana',   name:'Mana Channel',   icon:'', cost:555,
+  { id:'souls-speed',    type:'mana',   name:'Mana Channel',   icon:'', cost:90,
     desc:'Increases Mana cap by 125 and Mana regen rate by 30%.',
     x:-123, y:223,  requires:[] },
-  { id:'souls-dps-2',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:777,
+  { id:'souls-dps-2',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:135,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-173, y:186,  requires:[] },
-  { id:'souls-dps-1',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:999,
+  { id:'souls-dps-1',    type:'dps',    name:'DPS +33.3%',     icon:'', cost:203,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-154, y:127,  requires:[] },
   // Stat nodes clustered around Rule of 3 (-285, -93) — pentacle, point toward center
-  { id:'rule-hp',        type:'hp',     name:'HP Drain +1.11%',icon:'', cost:999,
+  { id:'rule-hp',        type:'hp',     name:'HP Drain +1.11%',icon:'', cost:120,
     desc:'Increases max HP drain of Divine Hunger by +1.11%.',
     x:-150, y:-49,  requires:[] },
-  { id:'rule-dps-1',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:1111,
+  { id:'rule-dps-1',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:180,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-199, y:-13,  requires:[] },
-  { id:'rule-speed',     type:'mana',   name:'Mana Channel',   icon:'', cost:1555,
+  { id:'rule-speed',     type:'mana',   name:'Mana Channel',   icon:'', cost:270,
     desc:'Increases Mana cap by 150 and Mana regen rate by 40%.',
     x:-249, y:-49,  requires:[] },
-  { id:'rule-souls',     type:'souls',  name:'Soul Gain',      icon:'', cost:1999,
+  { id:'rule-souls',     type:'souls',  name:'Soul Gain',      icon:'', cost:405,
     desc:'Increases all souls gained by 33.3%.',
     x:-230, y:-108, requires:[] },
-  { id:'rule-dps-2',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:2333,
+  { id:'rule-dps-2',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:80,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-169, y:-108, requires:[] },
   // Stat nodes clustered around Twin Strikes (-265, -364) — pentacle, point straight up
-  { id:'strikes-speed',  type:'mana',   name:'Mana Channel',   icon:'', cost:2555,
+  { id:'strikes-speed',  type:'mana',   name:'Mana Channel',   icon:'', cost:810,
     desc:'Increases Mana cap by 175 and Mana regen rate by 50%.',
     x:-185, y:-307, requires:[] },
-  { id:'strikes-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:2999,
+  { id:'strikes-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:160,
     desc:'Increases your Critical Strike chance by +3.33%.',
     x:-136, y:-271, requires:[] },
-  { id:'strikes-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:3333,
+  { id:'strikes-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:240,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-155, y:-212, requires:[] },
-  { id:'strikes-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:3999,
+  { id:'strikes-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:360,
     desc:'Increases all souls gained by 33.3%.',
     x:-216, y:-212, requires:[] },
-  { id:'strikes-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:4666,
+  { id:'strikes-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:540,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-235, y:-271, requires:[] },
   // Stat nodes clustered around Power of 3 (265, -364) — pentagon, point straight up, clockwise
-  { id:'power3-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:5333,
+  { id:'power3-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:1620,
     desc:'Increases Mana cap by 225 and Mana regen rate by 65%.',
     x:186,  y:-307, requires:[] },
-  { id:'power3-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:7777,
+  { id:'power3-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:320,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:235,  y:-271, requires:[] },
-  { id:'power3-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:8888,
+  { id:'power3-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:480,
     desc:'Increases all souls gained by 33.3%.',
     x:216,  y:-212, requires:[] },
-  { id:'power3-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:9333,
+  { id:'power3-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:720,
     desc:'Increases your Critical Strike chance by +3.33%.',
     x:155,  y:-212, requires:[] },
-  { id:'power3-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:9999,
+  { id:'power3-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:1080,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:136,  y:-271, requires:[] },
   // Stat nodes clustered around Mana Hungry (428, 139) — pentagon, point straight up, clockwise
-  { id:'mana-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:12777,
+  { id:'mana-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:3240,
     desc:'Increases Mana cap by 250 and Mana regen rate by 85%.',
     x:300,  y:45,   requires:[] },
-  { id:'mana-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:10333,
+  { id:'mana-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:640,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:349,  y:81,  requires:[] },
-  { id:'mana-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:15666,
+  { id:'mana-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:960,
     desc:'Increases all souls gained by 66.6%.',
     x:330,  y:140,  requires:[] },
-  { id:'mana-crit',   type:'strike', name:'Crit Mult',      icon:'', cost:17777,
+  { id:'mana-crit',   type:'strike', name:'Crit Mult',      icon:'', cost:1440,
     desc:'Increases your Critical Strike multiplier by 3.33.',
     x:269,  y:140,  requires:[] },
-  { id:'mana-dps-2',  type:'dps',    name:'DPS +66.6%',     icon:'', cost:19999,
+  { id:'mana-dps-2',  type:'dps',    name:'DPS +66.6%',     icon:'', cost:2160,
     desc:'Increases DPS of all upgrades by +66.6%.',
     x:250,  y:81,  requires:[] },
   // Stat nodes clustered around Invoke Power (-428, 139) — pentagon, point straight up, clockwise
-  { id:'invoke-speed',   type:'mana',   name:'Mana Conduit',   icon:'', cost:24999,
+  { id:'invoke-speed',   type:'mana',   name:'Mana Conduit',   icon:'', cost:6480,
     desc:'Increases Mana cap by 250 and Mana regen rate by 135%.',
     x:-300, y:45,   requires:[] },
-  { id:'invoke-dps-1',   type:'dps',    name:'DPS +66.6%',     icon:'', cost:21777,
+  { id:'invoke-dps-1',   type:'dps',    name:'DPS +66.6%',     icon:'', cost:1280,
     desc:'Increases DPS of all upgrades by +66.6%.',
     x:-250, y:81,  requires:[] },
-  { id:'invoke-souls',   type:'souls',  name:'Soul Gain',      icon:'', cost:22666,
+  { id:'invoke-souls',   type:'souls',  name:'Soul Gain',      icon:'', cost:1920,
     desc:'Increases all souls gained by 99.9%.',
     x:-269, y:140,  requires:[] },
-  { id:'invoke-strike',  type:'strike', name:'Strike Bonus',   icon:'', cost:23777,
+  { id:'invoke-strike',  type:'strike', name:'Strike Bonus',   icon:'', cost:2880,
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
     x:-330, y:140,  requires:[] },
-  { id:'invoke-dps-2',   type:'dps',    name:'DPS +33.3%',     icon:'', cost:20333,
+  { id:'invoke-dps-2',   type:'dps',    name:'DPS +33.3%',     icon:'', cost:4320,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-349, y:81,  requires:[] },
 ];
@@ -4317,6 +4709,7 @@ function isTattNodeUnlocked(node){
 }
 
 function buyTatteredNode(id){
+  if(rebirthCount<1) return;
   var node=TATTERED_NODES.filter(function(n){return n.id===id;})[0];
   if(!node) return;
   if(soulShopOwned[id]>=1) return;
@@ -4325,6 +4718,7 @@ function buyTatteredNode(id){
   tatteredSouls-=node.cost;
   tatteredUpgradesSpent+=node.cost;
   soulShopOwned[id]=1;
+  if(id==='auto-progress') hasEverHadAutoProgress=true;
   recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
@@ -4343,12 +4737,14 @@ function doRespec(){
     if(n.id==='auto-progress') return; // free permanent unlock — never wiped by respec
     soulShopOwned[n.id]=0;
   });
+  if(hasEverAscended||hasEverHadAutoProgress) soulShopOwned['auto-progress']=1;
   // Clear spell active states since spells are no longer owned
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
   invokePowerStacks=0;
   // auto-progress is a free permanent unlock; don't disable it on respec
   if(!soulShopOwned['auto-progress']) autoProgressEnabled=false;
+  if(!hasEverAscended&&!hasEverHadAutoProgress) autoProgressEnabled=false;
   recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
@@ -4431,6 +4827,15 @@ function renderTatteredGrid(){
     ring.addEventListener('mouseenter',function(e){showTattTooltip(node,state,e.clientX,e.clientY);});
     ring.addEventListener('mousemove',function(e){posTattTooltip(e.clientX,e.clientY);});
     ring.addEventListener('mouseleave',hideTattTooltip);
+    (function(n,s){
+      var _lpt;
+      ring.addEventListener('touchstart',function(e){
+        var t=e.touches[0];
+        _lpt=setTimeout(function(){ showTattTooltip(n,s,t.clientX,t.clientY); },500);
+      },{passive:true});
+      ring.addEventListener('touchend',function(){ clearTimeout(_lpt); hideTattTooltip(); });
+      ring.addEventListener('touchmove',function(){ clearTimeout(_lpt); });
+    })(node,state);
     grid.appendChild(el);
   });
 }
@@ -4491,7 +4896,32 @@ function openTatteredModal(){
   updateTatteredModalTs();
   renderTatteredGrid();
   // First-visit tutorial: explain TS and the free Auto Progress gift
-  if(!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress is a free gift waiting for you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600); } } }
+  if(!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress is a free gift waiting for you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600); } }
+  if('ontouchstart' in window && !_tutShown.touchHint){
+    _tutShown.touchHint=true;
+    var _thTimer=setTimeout(function(){
+      var toast=document.getElementById('touch-hint-toast');
+      if(!toast) return;
+      toast.classList.add('show');
+      setTimeout(function(){ toast.classList.remove('show'); },4000);
+    },10000);
+    document.getElementById('tattered-modal').addEventListener('click',function _thCancel(){
+      clearTimeout(_thTimer);
+      document.getElementById('tattered-modal').removeEventListener('click',_thCancel);
+    },{once:true});
+  }
+  if(rebirthCount<1&&showTutorial&&!_tutShown.sacrificeIntro){
+    _tutShown.sacrificeIntro=true;
+    setTimeout(function(){
+      showTutorialTip(
+        'This is the Tattered Souls sacrifice shop. Sacrifice power-giving Tattered Souls to gain spells and powers. Be careful, the sacrifice can weaken you!',
+        document.getElementById('tattered-upgrades-btn'),
+        null,
+        'Feel free to look around, but come back after you ascend! You just got auto-progress for free!'
+      );
+    },300);
+  }
+}
 function closeTatteredModal(){
   var modal=document.getElementById('tattered-modal');
   if(modal) modal.classList.remove('open');
@@ -4643,8 +5073,6 @@ function getMaleAscGridPos(rc, p3, p4, p5, p6){
   var i6 = p6 ? (_MALE_P6[p6]||0) : 0;
   return            45 + i3*27 + i4*9 + i5*3 + i6;
 }
-function preloadFormImages(){}
-
 function calcUpgradeTSGain(chosenForm){
   var base=Math.floor(totalUpgradePurchases/666);
   var form=chosenForm!==undefined?chosenForm:rebirthForm;
@@ -4740,7 +5168,7 @@ function updateTatteredDisplay(){
   var disp=document.getElementById('tattered-display');
   if(disp) disp.style.display=rebirthCount>0?'block':'none';
   var preview=document.getElementById('ts-ascend-preview');
-  if(preview) preview.textContent='Ascend for '+calcTatteredSoulsGain(null).toLocaleString()+' TS';
+  if(preview) preview.textContent='Ascend for '+calcTatteredSoulsGain(rebirthForm).toLocaleString()+' TS';
   updateTatteredBtn();
 }
 
@@ -4755,8 +5183,8 @@ var ASCENSION_SPECIAL=[
 ];
 
 function openRebirthModal(){
-  var gain=calcTatteredSoulsGain(null);
-  var upgradeGain=calcUpgradeTSGain(null);
+  var gain=calcTatteredSoulsGain(rebirthForm);
+  var upgradeGain=calcUpgradeTSGain(rebirthForm);
   var bountyGain=eliteBountyTSEarned;
   document.getElementById('rebirth-ts-gain').textContent=gain.toLocaleString();
   var bdEl=document.getElementById('rebirth-ts-breakdown');
@@ -4814,6 +5242,9 @@ function doRebirthReset(chosenForm){
     wipeNonEliteMinions();
   } else {
     rebirthCount++;
+    hasEverAscended=true;
+    soulShopOwned['auto-progress']=1;
+    hasEverHadAutoProgress=true;
   }
   rebirthForm=chosenForm;
 
@@ -4888,6 +5319,8 @@ function saveGame(){
     ascension4Path:ascension4Path,
     ascension5Path:ascension5Path,
     ascension6Path:ascension6Path,
+    hasEverAscended:hasEverAscended,
+    hasEverHadAutoProgress:hasEverHadAutoProgress,
     soulShopOwned:soulShopOwned,
     tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
@@ -4970,7 +5403,11 @@ function loadGame(){
   ascension4Path=data.ascension4Path||null;
   ascension5Path=data.ascension5Path||null;
   ascension6Path=data.ascension6Path||null;
+  if(data.hasEverAscended) hasEverAscended=data.hasEverAscended;
+  if(data.hasEverHadAutoProgress) hasEverHadAutoProgress=data.hasEverHadAutoProgress;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
+  if(hasEverAscended||hasEverHadAutoProgress) soulShopOwned['auto-progress']=1;
+  if(soulShopOwned['auto-progress']>=1) hasEverHadAutoProgress=true;
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
   invokePowerStacks=data.invokePowerStacks||0;
@@ -5261,6 +5698,15 @@ function createUpgradeCard(u, can, bought, actualN, cost){
     box.addEventListener('mouseenter',function(e){ showMsTip(e,u,mi); });
     box.addEventListener('mousemove',positionMsTip);
     box.addEventListener('mouseleave',hideMsTip);
+    (function(pu,pmi){
+      var _lpt;
+      box.addEventListener('touchstart',function(e){
+        var t=e.touches[0];
+        _lpt=setTimeout(function(){ showMsTip({clientX:t.clientX,clientY:t.clientY},pu,pmi); },500);
+      },{passive:true});
+      box.addEventListener('touchend',function(){ clearTimeout(_lpt); hideMsTip(); });
+      box.addEventListener('touchmove',function(){ clearTimeout(_lpt); });
+    })(u,mi);
   });
 
   // Upgrade tooltip — icon only
@@ -5269,6 +5715,15 @@ function createUpgradeCard(u, can, bought, actualN, cost){
     iconEl.addEventListener('mouseenter',function(e){ showUpgradeTip(e,u); });
     iconEl.addEventListener('mousemove',positionUpgradeTip);
     iconEl.addEventListener('mouseleave',hideUpgradeTip);
+    (function(pu){
+      var _lpt;
+      iconEl.addEventListener('touchstart',function(e){
+        var t=e.touches[0];
+        _lpt=setTimeout(function(){ showUpgradeTip({clientX:t.clientX,clientY:t.clientY},pu); },500);
+      },{passive:true});
+      iconEl.addEventListener('touchend',function(){ clearTimeout(_lpt); hideUpgradeTip(); });
+      iconEl.addEventListener('touchmove',function(){ clearTimeout(_lpt); });
+    })(u);
   }
 
   // Card buy click — always attached; affordability checked at call time
@@ -5288,8 +5743,8 @@ function createUpgradeCard(u, can, bought, actualN, cost){
       recalcStats();
       buildUpgrades(); lastRebuildU=Date.now(); dirtyU=false;
       updateEntityStatsPanel();
+      updateTatteredDisplay();
       document.getElementById('soul-count').textContent=fmt(souls);
-      setHint();
       checkAchievements();
       checkRebirthButton();
       saveGame();
@@ -5985,6 +6440,10 @@ document.getElementById('enemy-canvas').addEventListener('mousedown',function(e)
   if(e.button!==0) return;
   entityAttack(false);
 });
+document.getElementById('enemy-canvas').addEventListener('touchstart',function(e){
+  e.preventDefault();
+  entityAttack(false);
+},{passive:false});
 document.getElementById('reform-btn').addEventListener('click',reform);
 
 // ── GAME LOOP ─────────────────────────────────────────────────────────────────
@@ -6251,7 +6710,7 @@ document.getElementById('volume-slider').addEventListener('input',function(){
   soundVolume=parseInt(this.value,10)/100;
   updateVolumeSlider();
   bgmSetVolume();
-  if(soundVolume>0 && _bgmRealm===curRealm && !_bgmAudio) bgmPlay(curRealm);
+  if(soundVolume>0 && !_bgmAudio) bgmPlay(curRealm);
   if(soundVolume<=0) bgmStop();
   saveGame(); saveSettings();
 });
@@ -6317,15 +6776,15 @@ document.getElementById('import-save-file').addEventListener('change',function(e
 });
 
 // ── TUTORIAL SYSTEM ───────────────────────────────────────────────────────────
-function showTutorialTip(text, targetEl, onDone) {
+function showTutorialTip(text, targetEl, onDone, highlightText) {
   if (_tutActive) {
-    _tutQueue.push({text: text, targetEl: targetEl, onDone: onDone});
+    _tutQueue.push({text: text, targetEl: targetEl, onDone: onDone, highlightText: highlightText});
     return;
   }
-  _showTutTipNow(text, targetEl, onDone);
+  _showTutTipNow(text, targetEl, onDone, highlightText);
 }
 
-function _showTutTipNow(text, targetEl, onDone) {
+function _showTutTipNow(text, targetEl, onDone, highlightText) {
   _tutActive = true;
   var overlay = document.getElementById('tutorial-overlay');
   var tip     = document.getElementById('tutorial-tip');
@@ -6336,6 +6795,10 @@ function _showTutTipNow(text, targetEl, onDone) {
 
   dnsChk.checked = false;
   textEl.innerHTML = text;
+  var hlEl = document.getElementById('tutorial-highlight');
+  if (highlightText) { hlEl.textContent = highlightText; hlEl.style.display = ''; }
+  else { hlEl.textContent = ''; hlEl.style.display = 'none'; }
+  document.getElementById('tutorial-no-show-cb').checked = false;
 
   function positionTip() {
     var tipW = 280;
@@ -6391,13 +6854,14 @@ function _showTutTipNow(text, targetEl, onDone) {
   function dismissTip() {
     if (!_tutActive) return;
     if (dnsChk.checked) { showTutorial = false; saveGame(); }
+    if (document.getElementById('tutorial-no-show-cb').checked) saveGame();
     overlay.classList.remove('open');
     _tutActive = false;
     document.removeEventListener('keydown', onTutKey);
     if (onDone) onDone();
     if (_tutQueue.length > 0) {
       var next = _tutQueue.shift();
-      setTimeout(function() { _showTutTipNow(next.text, next.targetEl, next.onDone); }, 300);
+      setTimeout(function() { _showTutTipNow(next.text, next.targetEl, next.onDone, next.highlightText); }, 300);
     }
   }
 
@@ -6409,7 +6873,29 @@ function _showTutTipNow(text, targetEl, onDone) {
   }
 
   okBtn.onclick = dismissTip;
+  okBtn.addEventListener('touchstart',function(e){ e.preventDefault(); dismissTip(); },{passive:false});
   document.addEventListener('keydown', onTutKey);
+}
+
+function showEliteWinTutorial() {
+  if (_tutShown.eliteWin) return;
+  _tutShown.eliteWin = true;
+  var overlay = document.getElementById('ewt-overlay');
+  var cb = document.getElementById('ewt-no-show-cb');
+  cb.checked = false;
+  overlay.classList.add('open');
+  function dismiss() {
+    if (cb.checked) saveGame();
+    overlay.classList.remove('open');
+    document.removeEventListener('keydown', onEwtKey);
+  }
+  function onEwtKey(e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') { e.preventDefault(); dismiss(); }
+  }
+  var ewtOk=document.getElementById('ewt-ok');
+  ewtOk.onclick = dismiss;
+  ewtOk.addEventListener('touchstart',function(e){ e.preventDefault(); dismiss(); },{passive:false});
+  document.addEventListener('keydown', onEwtKey);
 }
 
 // ── INTRO SEQUENCE ────────────────────────────────────────────────────────────
@@ -6533,6 +7019,7 @@ function showIntroSequence(onDone) {
         panel.style.transition = '';
         panel.style.opacity = '';
         clearLines();
+        bgmPlay(curRealm);
         if(onDone) onDone();
       }, 720);
     }
@@ -6566,7 +7053,6 @@ document.getElementById('tutorial-toggle').addEventListener('click', function(){
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
 initMist(28);
-preloadFormImages();
 loadSettings();
 var _hadSave = loadGame();
 updateHighestFloor();
@@ -6582,8 +7068,15 @@ updateTatteredBtn();
 updateManaBar();
 renderSpellPanel();
 updateVolumeSlider();
+// Start BGM on first user interaction (autoplay policy requires a gesture).
+// Skip if the intro overlay is still open — BGM is started explicitly when it closes.
 function _registerBgmStart(){
-  function _startBgm(){ bgmPlay(curRealm); document.removeEventListener('click',_startBgm); document.removeEventListener('keydown',_startBgm); }
+  function _startBgm(){
+    if(document.getElementById('intro-overlay').classList.contains('open')) return;
+    bgmPlay(curRealm);
+    document.removeEventListener('click',_startBgm);
+    document.removeEventListener('keydown',_startBgm);
+  }
   document.addEventListener('click',_startBgm);
   document.addEventListener('keydown',_startBgm);
 }
@@ -6706,6 +7199,48 @@ _tmWrap.addEventListener('wheel',function(e){
   _tattScale=newScale;
   document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
 },{passive:false});
+
+// Touch drag + pinch-to-zoom for tattered tree
+var _tattTouchDragging=false, _tattPinching=false, _tattPinchDist=0;
+function _tattPinchDistance(t){ var dx=t[0].clientX-t[1].clientX, dy=t[0].clientY-t[1].clientY; return Math.sqrt(dx*dx+dy*dy); }
+_tmWrap.addEventListener('touchstart',function(e){
+  if(e.touches.length===1){
+    if(e.target.closest('.tm-node-ring')) return;
+    _tattTouchDragging=true; _tattPinching=false;
+    _tattDragSX=e.touches[0].clientX; _tattDragSY=e.touches[0].clientY;
+    _tattDragPX=_tattPanX; _tattDragPY=_tattPanY;
+    _tmWrap.classList.add('dragging');
+  } else if(e.touches.length===2){
+    _tattTouchDragging=false; _tattPinching=true;
+    _tattPinchDist=_tattPinchDistance(e.touches);
+    _tattDragPX=_tattPanX; _tattDragPY=_tattPanY;
+  }
+},{passive:true});
+_tmWrap.addEventListener('touchmove',function(e){
+  e.preventDefault();
+  var grid=document.getElementById('tm-grid');
+  if(_tattPinching&&e.touches.length===2){
+    var newDist=_tattPinchDistance(e.touches);
+    var factor=newDist/_tattPinchDist;
+    var rect=_tmWrap.getBoundingClientRect();
+    var mx=((e.touches[0].clientX+e.touches[1].clientX)/2)-rect.left;
+    var my=((e.touches[0].clientY+e.touches[1].clientY)/2)-rect.top;
+    var newScale=Math.min(3,Math.max(0.3,_tattScale*factor));
+    var gx=(mx-_tattPanX)/_tattScale, gy=(my-_tattPanY)/_tattScale;
+    _tattPanX=mx-gx*newScale; _tattPanY=my-gy*newScale;
+    _tattScale=newScale;
+    _tattPinchDist=newDist;
+    grid.style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
+  } else if(_tattTouchDragging&&e.touches.length===1){
+    _tattPanX=_tattDragPX+(e.touches[0].clientX-_tattDragSX);
+    _tattPanY=_tattDragPY+(e.touches[0].clientY-_tattDragSY);
+    grid.style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
+  }
+},{passive:false});
+_tmWrap.addEventListener('touchend',function(){
+  _tattTouchDragging=false; _tattPinching=false;
+  _tmWrap.classList.remove('dragging');
+});
 // Close modal on backdrop click (not on grid itself)
 document.getElementById('tattered-modal').addEventListener('click',function(e){
   if(e.target===this) closeTatteredModal();
@@ -6739,8 +7274,8 @@ function buyAllAffordable(){
     recalcStats();
     dirtyU=true;
     updateEntityStatsPanel();
+    updateTatteredDisplay();
     document.getElementById('soul-count').textContent=fmt(souls);
-    setHint();
     checkAchievements();
     checkRebirthButton();
     saveGame();
@@ -7262,18 +7797,88 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 
 })();
 
-// Lock the game to its initial layout size and counter-scale on browser zoom.
-// All internal coordinates (%, px, canvas draws) are evaluated at the initial
-// viewport dimensions, so nothing drifts regardless of zoom level.
+// Scale the game to always fit the viewport without clipping.
+// Uses documentElement.clientWidth/clientHeight which always reflects the true
+// CSS viewport size regardless of page content width (unlike window.innerWidth
+// which expands to match content on some mobile browsers).
 (function() {
   var g = document.getElementById('game');
-  var _iw = window.innerWidth, _ih = window.innerHeight;
-  g.style.width  = _iw + 'px';
-  g.style.height = _ih + 'px';
+  var overlay = document.getElementById('rotate-overlay');
+  var DESIGN_W = 1280, DESIGN_H = 800;
   g.style.transformOrigin = 'top left';
-  window.addEventListener('resize', function() {
-    var s = Math.min(window.innerWidth / _iw, window.innerHeight / _ih);
-    g.style.transform = (s === 1) ? '' : 'scale(' + s + ')';
+
+  // Detect phone-sized touch devices and apply mobile portrait layout
+  var mobileQuery = window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 549px)');
+  if (mobileQuery.matches) {
+    var mainEl     = document.getElementById('main');
+    var battlefield = document.getElementById('battlefield');
+    var buySel     = document.getElementById('buy-selector');
+
+    // 1. Shared background: move realm-bg-img-left to #main so it spans both panels
+    var bgLeft = document.getElementById('realm-bg-img-left');
+    if (bgLeft && mainEl) mainEl.insertBefore(bgLeft, mainEl.firstChild);
+
+    // 2. Spell panel: move into battlefield so it can sit on the right edge
+    var spellPanel = document.getElementById('spell-panel');
+    if (spellPanel && battlefield) battlefield.appendChild(spellPanel);
+
+    // 3. Minimap: move to its own grid row between buy bar and right panel
+    var minimapPanel = document.getElementById('minimap-panel');
+    if (minimapPanel && buySel && buySel.parentNode)
+      buySel.parentNode.insertBefore(minimapPanel, buySel.nextSibling);
+
+    // 4. Click-hint: move into minimap-inner before the right arrow
+    var clickHint = document.getElementById('click-hint');
+    var mmNext = document.getElementById('mm-next');
+    var mmInner = document.getElementById('minimap-inner');
+    if (clickHint && mmNext && mmInner)
+      mmInner.insertBefore(clickHint, mmNext);
+
+    // 6. Souls display: move into battlefield, pinned top-right
+    var soulsDisplay = document.getElementById('souls-display');
+    if (soulsDisplay && battlefield) battlefield.appendChild(soulsDisplay);
+  }
+
+  function applyLayout() {
+    var vw = document.documentElement.clientWidth;
+    var vh = document.documentElement.clientHeight;
+
+    // Mobile portrait: CSS grid handles layout, no scaling needed
+    if (mobileQuery.matches) {
+      g.style.width  = vw + 'px';
+      g.style.height = vh + 'px';
+      g.style.transform = '';
+      return;
+    }
+
+    // Desktop/landscape: suppress rotate overlay only for non-mobile
+    if (overlay) {
+      var isPortrait = vh > vw;
+      var isSmall = Math.max(vw, vh) <= 900;
+      overlay.style.display = (isPortrait && isSmall) ? 'flex' : '';
+    }
+
+    // Scale by height only — battlefield absorbs extra width, right panel stays fixed.
+    // Hard stop at 1923px (bg image right edge: 1672 × 1.15 ≈ 1922.8px).
+    var MAX_GAME_W = 1923;
+    var s = Math.min(vh / DESIGN_H, 1);
+    if (s >= 1) {
+      g.style.width  = Math.min(vw, MAX_GAME_W) + 'px';
+      g.style.height = vh + 'px';
+      g.style.transform = '';
+    } else {
+      var cssW = Math.min(Math.ceil(vw / s), MAX_GAME_W);
+      g.style.width  = cssW + 'px';
+      g.style.height = DESIGN_H + 'px';
+      g.style.transform = 'scale(' + s + ')';
+    }
+  }
+
+  applyLayout();
+  window.addEventListener('resize', applyLayout);
+  window.addEventListener('orientationchange', function() {
+    // orientationchange fires before dimensions update; delay one frame
+    setTimeout(applyLayout, 100);
   });
 })();
 
