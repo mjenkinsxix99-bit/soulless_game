@@ -2380,13 +2380,7 @@ function checkMinionUnlock(){
 function updateMinionTabBtn(){
   var btn=document.getElementById('minion-tab-btn');
   if(!btn) return;
-  if(!minionUnlocked){
-    btn.classList.add('locked');
-    btn.title='Unlocks upon earning any Ultimate Form achievement';
-  } else {
-    btn.classList.remove('locked');
-    btn.title='';
-  }
+  btn.classList.remove('locked');
 }
 
 function attemptMinionCapture(typeIdx){
