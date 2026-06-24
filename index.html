@@ -2673,6 +2673,7 @@ var EV_THRESH=[D(500000),D(500),D(2000),D(10000)];
 var SNAMES=['Ether','Wraith','Nascent Being','Ascendant'];
 var SDESCS=['Shapeless. Hungry.','A form emerges.','Soul and substance entwine.','Between god and monster.'];
 var dirtyU=true, lastRebuildU=0;
+var _shownUpgrades={}; // sticky: once visible, stays visible until reset
 var buyQty=1;
 
 // ── ACHIEVEMENT STATE ─────────────────────────────────────────────────────────
@@ -4673,6 +4674,7 @@ function doReincarnate(){
   mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0;
   for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
+  _shownUpgrades={};
   REP_UPGRADES.forEach(function(u){
     u.level=0;
     u.cost=D(u._baseCost||u.cost);
@@ -4781,6 +4783,7 @@ function doRebirthReset(chosenForm){
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
 
   // Reset upgrades
+  _shownUpgrades={};
   REP_UPGRADES.forEach(function(u){
     u.level=0;
     u.cost=D(u._baseCost||u.cost); // reset cost — stored during init
@@ -5319,14 +5322,16 @@ function patchMilestoneRow(card, u){
 function buildUpgrades(){
   var el=document.getElementById('upgrade-list');
 
-  // Remove cards for upgrades that are no longer visible
+  // Remove cards for upgrades that are no longer visible (sticky: never remove once shown)
   el.querySelectorAll('.ucard[data-uid]').forEach(function(card){
     var u=REP_UPGRADES.find(function(x){ return x.id===card.getAttribute('data-uid'); });
-    if(!u||!u.vis()) el.removeChild(card);
+    if(!u||(!u.vis()&&!_shownUpgrades[u.id])) el.removeChild(card);
   });
 
   REP_UPGRADES.forEach(function(u){
-    if(!u.vis()) return;
+    var visible=u.vis()||_shownUpgrades[u.id];
+    if(u.vis()) _shownUpgrades[u.id]=true;
+    if(!visible) return;
     var actualN, cost, can;
     if(buyQty==='max'){
       actualN=maxAffordableN(u);
