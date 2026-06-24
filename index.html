@@ -4888,8 +4888,15 @@ function openTatteredModal(){
   document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
   updateTatteredModalTs();
   renderTatteredGrid();
-  // First-visit tutorial: explain TS and the free Auto Progress gift
-  if(!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress is a free gift waiting for you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600); } }
+  // First-visit tutorial: explain TS and award the free Auto Progress gift
+  if(!_tutShown.tatteredShop){
+    _tutShown.tatteredShop=true;
+    soulShopOwned['auto-progress']=1;
+    hasEverHadAutoProgress=true;
+    updateAutoProgressBtn();
+    saveGame();
+    if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress has been gifted to you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600); }
+  }
   if('ontouchstart' in window && !_tutShown.touchHint){
     _tutShown.touchHint=true;
     var _thTimer=setTimeout(function(){
