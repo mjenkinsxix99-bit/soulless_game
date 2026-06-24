@@ -6465,15 +6465,15 @@ updateTatteredBtn();
 updateManaBar();
 renderSpellPanel();
 updateVolumeSlider();
-// Start BGM on first user interaction (autoplay policy requires a gesture)
-(function(){
+function _registerBgmStart(){
   function _startBgm(){ bgmPlay(curRealm); document.removeEventListener('click',_startBgm); document.removeEventListener('keydown',_startBgm); }
   document.addEventListener('click',_startBgm);
   document.addEventListener('keydown',_startBgm);
-})();
+}
 syncIntroToggleUI();
 if(!_hadSave && showIntro){
   showIntroSequence(function(){
+    _registerBgmStart();
     if(showTutorial){
       showTutorialTip(
         'This is an enemy, your source for souls. Click to drink deeply of their pain...',
@@ -6482,12 +6482,16 @@ if(!_hadSave && showIntro){
       );
     }
   });
-} else if(!_hadSave && !showIntro && showTutorial){
-  showTutorialTip(
-    'This is an enemy, your source for souls. Click to drink deeply of their pain...',
-    document.getElementById('enemy-canvas'),
-    null
-  );
+} else {
+  // No intro shown (returning save, or intro disabled) — start BGM on first interaction
+  _registerBgmStart();
+  if(!_hadSave && !showIntro && showTutorial){
+    showTutorialTip(
+      'This is an enemy, your source for souls. Click to drink deeply of their pain...',
+      document.getElementById('enemy-canvas'),
+      null
+    );
+  }
 }
 spawnEnemy();
 checkAchievements(true);
