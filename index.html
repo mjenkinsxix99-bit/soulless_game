@@ -659,6 +659,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 /* center node */
 .tm-node.type-center .tm-node-ring { width:54px; height:54px; border-color:#4a2e88; background:#0c0620; }
 .tm-node.type-center.state-purchased .tm-node-ring { border-color:#cc88ff; background:#120830; box-shadow:0 0 20px rgba(180,100,255,0.65),0 0 44px rgba(140,60,240,0.25); }
+.tm-node[data-id="auto-progress"].state-purchased .tm-node-ring { border-color:#9955dd; background:#ffffff; box-shadow:0 0 18px rgba(160,100,255,0.6); }
+.tm-node[data-id="auto-progress"].state-purchased .tm-node-name { color:#6622bb; }
+.tm-node[data-id="auto-progress"].state-purchased .tm-node-icon { color:#6622bb; }
 .tm-node.type-center.state-affordable .tm-node-ring { border-color:#8855cc; background:#0f0628; box-shadow:0 0 12px rgba(120,70,220,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
 /* spell nodes — red theme */
 .tm-node.type-spell .tm-node-ring { width:47px; height:47px; border-color:#771818; background:#120608; }
@@ -4803,6 +4806,7 @@ function renderTatteredGrid(){
     var state=isPurchased?'purchased':(isUnlocked&&canAfford?'affordable':'locked');
     var el=document.createElement('div');
     el.className='tm-node type-'+node.type+' state-'+state;
+    el.dataset.id=node.id;
     el.style.left=node.x+'px';
     el.style.top=node.y+'px';
     var ring=document.createElement('div');
