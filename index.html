@@ -3563,7 +3563,7 @@ function onEliteDpsCheckFail(){
   combatActive=false; eliteTimerStart=0;
   hitFlashTime=0; attackFlashTime=0;
   document.getElementById('elite-timer-wrap').style.visibility='hidden';
-  curFloor=FLOORS_PER_LEVEL; floorWins=0;
+  curFloor=FLOORS_PER_LEVEL; floorWins=WINS_PER_FLOOR;
   if(autoProgressEnabled){ autoProgressEnabled=false; saveGame(); }
   buildMinimap();
   if(!_tutShown.eliteFail){ _tutShown.eliteFail=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You are not strong enough to Proceed. You must grow stronger. More souls. Feed the hunger.',document.getElementById('enemy-canvas'),null); },700); } }
