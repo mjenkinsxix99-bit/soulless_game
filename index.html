@@ -4295,12 +4295,16 @@ function doRespec(){
   var refund=Math.floor(tatteredUpgradesSpent*0.9);
   tatteredSouls+=refund;
   tatteredUpgradesSpent=0;
-  TATTERED_NODES.forEach(function(n){ soulShopOwned[n.id]=0; });
+  TATTERED_NODES.forEach(function(n){
+    if(n.id==='auto-progress') return; // free permanent unlock — never wiped by respec
+    soulShopOwned[n.id]=0;
+  });
   // Clear spell active states since spells are no longer owned
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
   invokePowerStacks=0;
-  autoProgressEnabled=false;
+  // auto-progress is a free permanent unlock; don't disable it on respec
+  if(!soulShopOwned['auto-progress']) autoProgressEnabled=false;
   recalcStats();
   updateTatteredDisplay();
   updateTatteredModalTs();
