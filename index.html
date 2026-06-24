@@ -146,7 +146,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 /* ── MINION MODAL ──────────────────────────────────────────────────────────── */
 #minion-modal { display:none; position:fixed; top:0; left:370px; right:0; bottom:0; background:#02010e; z-index:900; flex-direction:column; overflow:hidden; }
 #minion-modal.open { display:flex; }
-#mm-header { display:flex; align-items:center; justify-content:space-between; padding:10px 18px; background:#05030e; border-bottom:1px solid #1e1548; flex-shrink:0; }
+#mm-header { display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:14px; padding:10px 18px; background:#05030e; border-bottom:1px solid #1e1548; flex-shrink:0; }
 #mm-title { font-size:16px; color:#c0a0ff; letter-spacing:3px; font-family:Georgia,serif; }
 #mm-header-right { display:flex; align-items:center; gap:12px; }
 #mm-mp-display { font-size:14px; color:#bb77ff; font-family:Georgia,serif; }
@@ -1299,11 +1299,11 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 <!-- Minion Modal -->
 <div id="minion-modal">
   <div id="mm-header">
+    <button id="mm-close-btn">✕</button>
     <span id="mm-title">Minion Compendium</span>
     <div id="mm-header-right">
       <span id="mm-mp-display">MP: <span id="mm-mp-val">0</span></span>
       <span id="mm-ct-display"></span>
-      <button id="mm-close-btn">✕</button>
     </div>
   </div>
   <div id="mm-body"></div>
