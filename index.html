@@ -233,9 +233,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   transition: background 0.2s;
 }
 #tutorial-ok:hover { background: #993333; }
-#tutorial-no-show-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; padding: 6px 0; }
-#tutorial-no-show-cb { width: 22px; height: 22px; accent-color: #7a2a2a; cursor: pointer; flex-shrink: 0; }
-#tutorial-no-show-wrap label { font-size: 12px; color: #b08888; cursor: pointer; user-select: none; -webkit-user-select: none; }
 .tut-arrow-down {
   position: absolute;
   width: 0; height: 0;
@@ -1263,10 +1260,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <p id="tutorial-text"></p>
     <div id="tutorial-dns"><input type="checkbox" id="tutorial-dns-chk"><label for="tutorial-dns-chk">Do not show again</label></div>
     <p id="tutorial-highlight" style="display:none;margin:0 0 12px;color:#ffe44e;font-weight:bold;font-size:15px;text-shadow:0 0 10px #ffe44e,0 0 20px #ffaa00;letter-spacing:0.3px;"></p>
-    <div id="tutorial-no-show-wrap">
-      <input type="checkbox" id="tutorial-no-show-cb">
-      <label for="tutorial-no-show-cb">Do not show this again</label>
-    </div>
     <button id="tutorial-ok">OK</button>
     <div class="tut-arrow-down" id="tutorial-arrow"></div>
   </div>
@@ -6798,7 +6791,6 @@ function _showTutTipNow(text, targetEl, onDone, highlightText) {
   var hlEl = document.getElementById('tutorial-highlight');
   if (highlightText) { hlEl.textContent = highlightText; hlEl.style.display = ''; }
   else { hlEl.textContent = ''; hlEl.style.display = 'none'; }
-  document.getElementById('tutorial-no-show-cb').checked = false;
 
   function positionTip() {
     var tipW = 280;
@@ -6854,7 +6846,6 @@ function _showTutTipNow(text, targetEl, onDone, highlightText) {
   function dismissTip() {
     if (!_tutActive) return;
     if (dnsChk.checked) { showTutorial = false; saveGame(); }
-    if (document.getElementById('tutorial-no-show-cb').checked) saveGame();
     overlay.classList.remove('open');
     _tutActive = false;
     document.removeEventListener('keydown', onTutKey);
