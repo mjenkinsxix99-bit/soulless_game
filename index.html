@@ -1641,7 +1641,7 @@ var _tutShown = {
   souls: false, upgrades: false, deeperHunger: false, milestone: false,
   upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
   ascension: false, honors: false, tatteredShop: false, minionTab: false, minionCapture: false,
-  sacrificeIntro: false, eliteWin: false, touchHint: false
+  eliteWin: false, touchHint: false
 };
 var _tutQueue = [];
 var _tutActive = false;
@@ -4902,17 +4902,6 @@ function openTatteredModal(){
       clearTimeout(_thTimer);
       document.getElementById('tattered-modal').removeEventListener('click',_thCancel);
     },{once:true});
-  }
-  if(rebirthCount<1&&showTutorial&&!_tutShown.sacrificeIntro){
-    _tutShown.sacrificeIntro=true;
-    setTimeout(function(){
-      showTutorialTip(
-        'This is the Tattered Souls sacrifice shop. Sacrifice power-giving Tattered Souls to gain spells and powers. Be careful, the sacrifice can weaken you!',
-        document.getElementById('tattered-upgrades-btn'),
-        null,
-        'Feel free to look around, but come back after you ascend! You just got auto-progress for free!'
-      );
-    },300);
   }
 }
 function closeTatteredModal(){
