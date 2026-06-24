@@ -4432,7 +4432,6 @@ function hideTattTooltip(){
 }
 
 function openTatteredModal(){
-  if(rebirthCount<1) return;
   var modal=document.getElementById('tattered-modal');
   if(!modal) return;
   modal.classList.add('open');
@@ -4443,7 +4442,8 @@ function openTatteredModal(){
   document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
   updateTatteredModalTs();
   renderTatteredGrid();
-}
+  // First-visit tutorial: explain TS and the free Auto Progress gift
+  if(!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('When you Ascend you earn Tattered Souls — spend them here for permanent power. Auto Progress is a free gift waiting for you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600); } } }
 function closeTatteredModal(){
   var modal=document.getElementById('tattered-modal');
   if(modal) modal.classList.remove('open');
@@ -4453,13 +4453,8 @@ function closeTatteredModal(){
 function updateTatteredBtn(){
   var btn=document.getElementById('tattered-upgrades-btn');
   if(!btn) return;
-  if(rebirthCount<1){
-    btn.classList.add('locked');
-    btn.title='Unlocks after your first Ascension';
-  } else {
-    btn.classList.remove('locked');
-    btn.title='';
-  }
+  btn.classList.remove('locked');
+  btn.title='';
 }
 
 
@@ -4707,7 +4702,6 @@ function doRebirthReset(chosenForm){
     rebirthCount++;
   }
   rebirthForm=chosenForm;
-  if(rebirthCount===1&&!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You may sacrifice Tattered Souls for the promise of more strength. Weigh your choices carefully. Visit the shop and claim Auto-Progress as a free gift.',document.getElementById('tattered-upgrades-btn'),null); },1500); } }
 
   // Reload entity image as chosen form image
   _rebirthEntityOverride=chosenForm;
