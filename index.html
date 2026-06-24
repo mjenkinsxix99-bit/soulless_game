@@ -81,7 +81,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     rgba(0,0,0,0.02) 74%,
     transparent 86%);
   pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
-#combat-wrap { position:absolute; left:218px; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
+#combat-wrap { position:absolute; left:50%; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
 #enemy-zone { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
 #enemy-zone .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -233,9 +233,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   transition: background 0.2s;
 }
 #tutorial-ok:hover { background: #993333; }
-#tutorial-no-show-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; padding: 6px 0; }
-#tutorial-no-show-cb { width: 22px; height: 22px; accent-color: #7a2a2a; cursor: pointer; flex-shrink: 0; }
-#tutorial-no-show-wrap label { font-size: 12px; color: #b08888; cursor: pointer; user-select: none; -webkit-user-select: none; }
 .tut-arrow-down {
   position: absolute;
   width: 0; height: 0;
@@ -662,6 +659,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 /* center node */
 .tm-node.type-center .tm-node-ring { width:54px; height:54px; border-color:#4a2e88; background:#0c0620; }
 .tm-node.type-center.state-purchased .tm-node-ring { border-color:#cc88ff; background:#120830; box-shadow:0 0 20px rgba(180,100,255,0.65),0 0 44px rgba(140,60,240,0.25); }
+.tm-node[data-id="auto-progress"].state-purchased .tm-node-ring { border-color:#9955dd; background:#ffffff; box-shadow:0 0 18px rgba(160,100,255,0.6); }
+.tm-node[data-id="auto-progress"].state-purchased .tm-node-name { color:#6622bb; }
+.tm-node[data-id="auto-progress"].state-purchased .tm-node-icon { color:#6622bb; }
 .tm-node.type-center.state-affordable .tm-node-ring { border-color:#8855cc; background:#0f0628; box-shadow:0 0 12px rgba(120,70,220,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
 /* spell nodes — red theme */
 .tm-node.type-spell .tm-node-ring { width:47px; height:47px; border-color:#771818; background:#120608; }
@@ -765,7 +765,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-nav:hover .ui-icon { filter:drop-shadow(0 0 8px rgba(255,215,0,0.95)) brightness(1.25); }
 .mm-nav:disabled { background:transparent; border-color:rgba(60,40,80,0.3); cursor:default; }
 .mm-nav:disabled .ui-icon { filter:brightness(0.2); }
-#mm-auto { font-size:13px; padding:4px 10px; }
+#mm-auto { font-size:13px; padding:8px 16px; }
 #mm-auto.ap-on { color:#ffd700; background:rgba(212,168,67,0.25); border-color:rgba(212,168,67,0.7); text-shadow:0 0 10px rgba(255,215,0,0.8); }
 #mm-auto.ap-off { color:#7a5a20; background:rgba(212,168,67,0.04); border-color:rgba(212,168,67,0.2); text-shadow:none; }
 
@@ -1263,10 +1263,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <p id="tutorial-text"></p>
     <div id="tutorial-dns"><input type="checkbox" id="tutorial-dns-chk"><label for="tutorial-dns-chk">Do not show again</label></div>
     <p id="tutorial-highlight" style="display:none;margin:0 0 12px;color:#ffe44e;font-weight:bold;font-size:15px;text-shadow:0 0 10px #ffe44e,0 0 20px #ffaa00;letter-spacing:0.3px;"></p>
-    <div id="tutorial-no-show-wrap">
-      <input type="checkbox" id="tutorial-no-show-cb">
-      <label for="tutorial-no-show-cb">Do not show this again</label>
-    </div>
     <button id="tutorial-ok">OK</button>
     <div class="tut-arrow-down" id="tutorial-arrow"></div>
   </div>
@@ -1648,7 +1644,7 @@ var _tutShown = {
   souls: false, upgrades: false, deeperHunger: false, milestone: false,
   upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
   ascension: false, honors: false, tatteredShop: false, minionTab: false, minionCapture: false,
-  sacrificeIntro: false, eliteWin: false, touchHint: false
+  eliteWin: false, touchHint: false
 };
 var _tutQueue = [];
 var _tutActive = false;
@@ -3567,7 +3563,7 @@ function onEliteDpsCheckFail(){
   combatActive=false; eliteTimerStart=0;
   hitFlashTime=0; attackFlashTime=0;
   document.getElementById('elite-timer-wrap').style.visibility='hidden';
-  curFloor=FLOORS_PER_LEVEL; floorWins=0;
+  curFloor=FLOORS_PER_LEVEL; floorWins=WINS_PER_FLOOR;
   if(autoProgressEnabled){ autoProgressEnabled=false; saveGame(); }
   buildMinimap();
   if(!_tutShown.eliteFail){ _tutShown.eliteFail=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You are not strong enough to Proceed. You must grow stronger. More souls. Feed the hunger.',document.getElementById('enemy-canvas'),null); },700); } }
@@ -4810,6 +4806,7 @@ function renderTatteredGrid(){
     var state=isPurchased?'purchased':(isUnlocked&&canAfford?'affordable':'locked');
     var el=document.createElement('div');
     el.className='tm-node type-'+node.type+' state-'+state;
+    el.dataset.id=node.id;
     el.style.left=node.x+'px';
     el.style.top=node.y+'px';
     var ring=document.createElement('div');
@@ -4895,8 +4892,16 @@ function openTatteredModal(){
   document.getElementById('tm-grid').style.transform='translate('+_tattPanX+'px,'+_tattPanY+'px) scale('+_tattScale+')';
   updateTatteredModalTs();
   renderTatteredGrid();
-  // First-visit tutorial: explain TS and the free Auto Progress gift
-  if(!_tutShown.tatteredShop){ _tutShown.tatteredShop=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress is a free gift waiting for you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600); } }
+  // First-visit tutorial: explain TS and award the free Auto Progress gift
+  if(!_tutShown.tatteredShop){
+    _tutShown.tatteredShop=true;
+    soulShopOwned['auto-progress']=1;
+    hasEverHadAutoProgress=true;
+    updateAutoProgressBtn();
+    renderTatteredGrid();
+    saveGame();
+    if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress has been gifted to you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600); }
+  }
   if('ontouchstart' in window && !_tutShown.touchHint){
     _tutShown.touchHint=true;
     var _thTimer=setTimeout(function(){
@@ -4909,17 +4914,6 @@ function openTatteredModal(){
       clearTimeout(_thTimer);
       document.getElementById('tattered-modal').removeEventListener('click',_thCancel);
     },{once:true});
-  }
-  if(rebirthCount<1&&showTutorial&&!_tutShown.sacrificeIntro){
-    _tutShown.sacrificeIntro=true;
-    setTimeout(function(){
-      showTutorialTip(
-        'This is the Tattered Souls sacrifice shop. Sacrifice power-giving Tattered Souls to gain spells and powers. Be careful, the sacrifice can weaken you!',
-        document.getElementById('tattered-upgrades-btn'),
-        null,
-        'Feel free to look around, but come back after you ascend! You just got auto-progress for free!'
-      );
-    },300);
   }
 }
 function closeTatteredModal(){
@@ -6798,7 +6792,6 @@ function _showTutTipNow(text, targetEl, onDone, highlightText) {
   var hlEl = document.getElementById('tutorial-highlight');
   if (highlightText) { hlEl.textContent = highlightText; hlEl.style.display = ''; }
   else { hlEl.textContent = ''; hlEl.style.display = 'none'; }
-  document.getElementById('tutorial-no-show-cb').checked = false;
 
   function positionTip() {
     var tipW = 280;
@@ -6854,7 +6847,6 @@ function _showTutTipNow(text, targetEl, onDone, highlightText) {
   function dismissTip() {
     if (!_tutActive) return;
     if (dnsChk.checked) { showTutorial = false; saveGame(); }
-    if (document.getElementById('tutorial-no-show-cb').checked) saveGame();
     overlay.classList.remove('open');
     _tutActive = false;
     document.removeEventListener('keydown', onTutKey);
