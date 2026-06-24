@@ -558,7 +558,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-realm-sep { width:3px;height:40px;background:#5a3a80;margin:0 6px;flex-shrink:0; }
 @keyframes pulse-gold { 0%,100%{box-shadow:0 0 5px rgba(255,215,0,0.35);} 50%{box-shadow:0 0 12px rgba(255,215,0,0.85),0 0 22px rgba(255,215,0,0.4);} }
 .tab-bar { display:flex; gap:0; border-bottom:1px solid #1e1845; flex-shrink:0; margin-bottom:0; }
-.tab-btn { background:transparent; border:none; border-bottom:2px solid transparent; color:#554477; padding:5px 10px; cursor:pointer; transition:border-color 0.15s,filter 0.15s; margin-bottom:-1px; line-height:0; }
+.tab-btn { background:transparent; border:none; border-bottom:2px solid transparent; color:#554477; padding:5px 10px; cursor:pointer; transition:border-color 0.15s,filter 0.15s; margin-bottom:-1px; line-height:0; position:relative; }
 .tab-btn:hover .ui-icon { filter:drop-shadow(0 0 6px rgba(153,128,221,0.9)) brightness(1.2); }
 .tab-btn.active { border-bottom-color:#d4a843; }
 .tab-btn.active .ui-icon { filter:drop-shadow(0 0 5px rgba(212,168,67,0.95)) brightness(1.3); }
@@ -713,11 +713,21 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 
 /* UI icon sprite — sprites_ui.webp, 128×128 per cell, displayed at 36px */
 .ui-icon { display:inline-block; width:36px; height:36px; background-image:url('artwork/sprites_ui.webp'); background-size:468px 36px; background-repeat:no-repeat; image-rendering:pixelated; vertical-align:middle; }
+/* Tab/nav icon hover tooltip — appears after 3s hold */
+.tab-tip { position:absolute; top:calc(100% + 5px); left:50%; transform:translateX(-50%);
+  background:#120c22; border:1px solid #d4a843; color:#d4a843; font-family:Georgia,serif;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase; white-space:nowrap;
+  padding:4px 9px; border-radius:4px; pointer-events:none; z-index:200;
+  opacity:0; animation:none; }
+.left-tab-btn:hover .tab-tip,
+.tab-btn:hover .tab-tip,
+.mm-nav:hover .tab-tip { animation:tabtip-in 0.15s forwards; animation-delay:3s; }
+@keyframes tabtip-in { to { opacity:1; } }
 /* Minimap nav arrows */
 .mm-nav { background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.35);
   border-radius:5px; color:#d4a843; font-size:13px; line-height:0; cursor:pointer;
   padding:3px 6px; font-family:Georgia,serif; transition:filter 0.15s,background 0.15s,border-color 0.15s;
-  flex-shrink:0; }
+  flex-shrink:0; position:relative; }
 .mm-nav .ui-icon { filter:drop-shadow(0 0 4px rgba(212,168,67,0.6)); }
 .mm-nav:hover { background:rgba(212,168,67,0.18); border-color:rgba(212,168,67,0.7); }
 .mm-nav:hover .ui-icon { filter:drop-shadow(0 0 8px rgba(255,215,0,0.95)) brightness(1.25); }
@@ -785,7 +795,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #left-header { width:100%; text-align:center; padding-bottom:6px; position:relative; z-index:2; background:#000; }
 .left-tab-bar { display:flex; width:100%; border-bottom:1px solid #1e1845; margin-bottom:10px; position:relative; z-index:2; background:#000; }
 .left-tab-btn { flex:1; background:transparent; border:none; border-bottom:2px solid transparent;
-  padding:6px 4px; cursor:pointer; transition:border-color 0.15s,filter 0.15s; margin-bottom:-1px; line-height:0; }
+  padding:6px 4px; cursor:pointer; transition:border-color 0.15s,filter 0.15s; margin-bottom:-1px; line-height:0; position:relative; }
 .left-tab-btn:hover:not(.locked) .ui-icon { filter:drop-shadow(0 0 6px rgba(153,128,221,0.9)) brightness(1.2); }
 .left-tab-btn.active { border-bottom-color:#d4a843; }
 .left-tab-btn.active .ui-icon { filter:drop-shadow(0 0 5px rgba(212,168,67,0.95)) brightness(1.3); }
@@ -843,9 +853,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
         <div id="stage-desc">Shapeless. Hungry.</div>
       </div>
       <div class="left-tab-bar">
-        <button class="left-tab-btn active" data-ltab="entity" title="Entity"><span class="ui-icon" style="background-position:0 0"></span></button>
-        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop" title="Sacrifice"><span class="ui-icon" style="background-position:-36px 0"></span></button>
-        <button class="left-tab-btn" id="minion-tab-btn" data-ltab="minions" title="Minions"><span class="ui-icon" style="background-position:-72px 0"></span></button>
+        <button class="left-tab-btn active" data-ltab="entity"><span class="ui-icon" style="background-position:0 0"></span><span class="tab-tip">Entity</span></button>
+        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop"><span class="ui-icon" style="background-position:-36px 0"></span><span class="tab-tip">Sacrifice</span></button>
+        <button class="left-tab-btn" id="minion-tab-btn" data-ltab="minions"><span class="ui-icon" style="background-position:-72px 0"></span><span class="tab-tip">Minions</span></button>
       </div>
       <div id="left-tab-content">
         <div id="ltab-entity" class="left-tab-pane active">
@@ -887,9 +897,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
         </div>
         <div id="minimap-panel">
           <div id="minimap-inner">
-            <button class="mm-nav" id="mm-prev" title="Scroll left"><span class="ui-icon" style="background-position:-216px 0"></span></button>
+            <button class="mm-nav" id="mm-prev"><span class="ui-icon" style="background-position:-216px 0"></span><span class="tab-tip">Scroll Left</span></button>
             <div id="mm-cells"></div>
-            <button class="mm-nav" id="mm-next" title="Scroll right"><span class="ui-icon" style="background-position:-252px 0"></span></button>
+            <button class="mm-nav" id="mm-next"><span class="ui-icon" style="background-position:-252px 0"></span><span class="tab-tip">Scroll Right</span></button>
             <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
           </div>
           <div id="mm-new-arrow">&#9660;</div>
@@ -931,9 +941,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
         <div class="ds-row"><span class="ds-label">DPS</span><span class="ds-val" id="ds-auto">—</span></div>
       </div>
       <div class="tab-bar">
-        <button class="tab-btn active" data-tab="upgrades" title="Upgrades"><span class="ui-icon" style="background-position:-108px 0"></span></button>
-        <button class="tab-btn" data-tab="honors" title="Honors"><span class="ui-icon" style="background-position:-144px 0"></span></button>
-        <button class="tab-btn" data-tab="stats" title="Stats"><span class="ui-icon" style="background-position:-180px 0"></span></button>
+        <button class="tab-btn active" data-tab="upgrades"><span class="ui-icon" style="background-position:-108px 0"></span><span class="tab-tip">Upgrades</span></button>
+        <button class="tab-btn" data-tab="honors"><span class="ui-icon" style="background-position:-144px 0"></span><span class="tab-tip">Honors</span></button>
+        <button class="tab-btn" data-tab="stats"><span class="ui-icon" style="background-position:-180px 0"></span><span class="tab-tip">Stats</span></button>
       </div>
       <div id="tab-content-area">
       <div id="tab-upgrades" class="tab-pane active">
