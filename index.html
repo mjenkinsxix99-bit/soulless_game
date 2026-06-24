@@ -122,6 +122,20 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 /* Ascend (Rebirth) button */
 #ascend-btn { display: none; position: absolute; top: 410px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #cc0000; border: 2px solid #d4a843; color: #2a0a4a; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
 #ascend-btn:hover { background: #ee0000; box-shadow: 0 0 14px rgba(212,168,67,0.6); }
+#reincarnate-btn { display: none; position: absolute; top: 452px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #1a5c1a; border: 2px solid #44cc44; color: #ccffcc; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
+#reincarnate-btn:hover { background: #226622; box-shadow: 0 0 14px rgba(68,204,68,0.6); }
+#reincarnate-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; align-items: center; justify-content: center; }
+#reincarnate-modal.open { display: flex; }
+#reincarnate-box { background: linear-gradient(160deg,#020d04,#051205); border: 2px solid #44cc44; border-radius: 14px; padding: 38px 44px; max-width: 480px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(68,204,68,0.25); }
+#reincarnate-lore { font-family: Georgia,serif; font-size: 16px; color: #aaddaa; font-style: italic; line-height: 1.7; margin-bottom: 22px; }
+#reincarnate-mp-line { font-family: Georgia,serif; font-size: 20px; color: #44cc44; font-weight: bold; margin-bottom: 18px; letter-spacing: 1px; }
+.reincarnate-info { font-size: 13px; color: #557755; margin: 6px 0; }
+.reincarnate-loss { color: #884444; }
+.reincarnate-keep { color: #448844; }
+#reincarnate-now-btn { margin-top: 22px; padding: 11px 30px; background: #1a5c1a; border: 2px solid #44cc44; color: #ccffcc; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; font-weight: bold; transition: background 0.2s, box-shadow 0.2s; }
+#reincarnate-now-btn:hover { background: #226622; box-shadow: 0 0 18px rgba(68,204,68,0.5); }
+#reincarnate-cancel-btn { margin-top: 10px; display: block; background: transparent; border: none; color: #446644; font-family: Georgia,serif; font-size: 13px; cursor: pointer; letter-spacing: 1px; }
+#reincarnate-cancel-btn:hover { color: #88aa88; }
 
 /* Tattered Souls display in topbar */
 #tattered-display { display: none; text-align: center; }
@@ -136,8 +150,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #mm-title { font-size:16px; color:#c0a0ff; letter-spacing:3px; font-family:Georgia,serif; }
 #mm-header-right { display:flex; align-items:center; gap:12px; }
 #mm-mp-display { font-size:14px; color:#bb77ff; font-family:Georgia,serif; }
-#mm-sacrifice-btn { background:#0a0520; border:1px solid #4a2080; color:#aa66dd; font-size:11px; border-radius:5px; padding:4px 10px; cursor:pointer; transition:all 0.2s; }
-#mm-sacrifice-btn:hover { border-color:#8844cc; color:#cc88ff; background:#110630; }
 #mm-ct-display { font-size:11px; color:#664488; font-style:italic; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #mm-close-btn { width:32px; height:32px; background:transparent; border:1px solid #2a1a5a; color:#554477; font-size:18px; border-radius:5px; cursor:pointer; line-height:1; transition:all 0.2s; }
 #mm-close-btn:hover { border-color:#7755aa; color:#9980dd; }
@@ -840,6 +852,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
               <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
             </div>
             <button id="ascend-btn">✦ ASCEND ✦</button>
+            <button id="reincarnate-btn">✦ REINCARNATE ✦</button>
           </div>
         </div>
         <div id="ltab-soul-shop" class="left-tab-pane"></div>
@@ -1014,6 +1027,19 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <button id="rebirth-ascend-now">✦ Ascend Now ✦</button>
     <br>
     <button id="rebirth-cancel">Not yet</button>
+  </div>
+</div>
+
+<div id="reincarnate-modal">
+  <div id="reincarnate-box">
+    <div id="reincarnate-lore">Sacrifice is giving up something good for something better.<br>You have gained much, but to lead others must follow.<br>Are you prepared to take the next step?</div>
+    <div class="reincarnate-info">You will gain <strong id="reincarnate-mp-gain" style="color:#44cc44">0</strong> Minion Points to turn enemies into friends. Maxed level Minions become Elite and stay with you.</div>
+    <div class="reincarnate-info"><span class="reincarnate-loss">You will lose all progress, souls, upgrades and Tattered Souls.</span></div>
+    <div class="reincarnate-info"><span class="reincarnate-keep">You will keep all Honors and this form's bonus.</span></div>
+    <div id="reincarnate-mp-line">Reincarnate for <span id="reincarnate-mp-confirm">0</span> MP?</div>
+    <button id="reincarnate-now-btn">✦ Reincarnate Now ✦</button>
+    <br>
+    <button id="reincarnate-cancel-btn">Not yet</button>
   </div>
 </div>
 
@@ -1260,7 +1286,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <span id="mm-title">Minion Compendium</span>
     <div id="mm-header-right">
       <span id="mm-mp-display">MP: <span id="mm-mp-val">0</span></span>
-      <button id="mm-sacrifice-btn" title="Sacrifice 777 TS for 1 MP">Sacrifice 777 TS → 1 MP</button>
       <span id="mm-ct-display"></span>
       <button id="mm-close-btn">✕</button>
     </div>
@@ -4617,12 +4642,76 @@ function calcTatteredSoulsGain(chosenForm){
   return calcUpgradeTSGain(chosenForm)+eliteBountyTSEarned;
 }
 
+function calcReincarnateMP(){
+  return Math.floor(tatteredSouls/666);
+}
+
+function openReincarnateModal(){
+  var mp=calcReincarnateMP();
+  document.getElementById('reincarnate-mp-gain').textContent=mp.toLocaleString();
+  document.getElementById('reincarnate-mp-confirm').textContent=mp.toLocaleString();
+  document.getElementById('reincarnate-modal').classList.add('open');
+}
+
+function doReincarnate(){
+  var mp=calcReincarnateMP();
+  minionPoints+=mp;
+
+  // Full reset — same as ascension but also wipes TS and soulShop (except auto-progress)
+  souls=D(0); totalSouls=D(0);
+  curRealm=1; curLevel=1; curFloor=1; floorWins=0;
+  highestRealm=1; highestLevel=1; highestFloor=1;
+  highestGlobalFloorEver=0;
+  defeatedElites=[]; firstKillDone={}; killCounts={};
+  enemyPool=[0]; currentEnemyTypeIdx=0;
+  stage=0; traits={sex:null,adds:[],aff:null,outfit:null};
+  totalUpgradePurchases=0; totalMilestonePurchases=0;
+  currentAscensionKills=0; eliteBountyTSEarned=0;
+  mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0;
+  for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
+  if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
+  REP_UPGRADES.forEach(function(u){
+    u.level=0;
+    u.cost=D(u._baseCost||u.cost);
+    u.milestones=mkMs();
+  });
+
+  // Wipe TS and tattered shop (but keep auto-progress)
+  var hadAutoProgress=soulShopOwned['auto-progress'];
+  tatteredSouls=0; tatteredUpgradesSpent=0;
+  TATTERED_NODES.forEach(function(n){ soulShopOwned[n.id]=0; });
+  if(hadAutoProgress) soulShopOwned['auto-progress']=1;
+  autoProgressEnabled=hadAutoProgress?autoProgressEnabled:false;
+
+  // Keep: rebirthForm, achievementsEarned, discoveredMinions, elite minions
+  wipeNonEliteMinions();
+  rebirthCount=0;
+
+  recalcStats();
+  updateTatteredDisplay();
+  updateTraitsRow();
+  checkRebirthButton();
+  dirtyU=true;
+  document.getElementById('soul-count').textContent=fmt(souls);
+  var _np=FORM_NAMEPLATES[rebirthForm];
+  document.getElementById('entity-stage-label').textContent=_np?_np.label:'You are Ether.';
+  document.getElementById('stage-desc').textContent=_np?_np.desc:'Shapeless. Hungry.';
+  buildMinimap();
+  updateProgressLabel();
+  updateHighestFloor();
+  updateAutoProgressBtn();
+  saveGame();
+  spawnEnemy();
+}
+
 function checkRebirthButton(){
   var btn=document.getElementById('ascend-btn');
+  var rBtn=document.getElementById('reincarnate-btn');
   if(!btn) return;
   var doomUpgrade=REP_UPGRADES.find(function(u){return u.id==='dm';});
   var canAscend=doomUpgrade&&doomUpgrade.level>=1;
   btn.style.display=canAscend?'block':'none';
+  if(rBtn) rBtn.style.display=(canAscend&&minionUnlocked)?'block':'none';
   if(canAscend&&!_tutShown.ascension){ _tutShown.ascension=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You have grown strong enough to Ascend, if you choose. You will gain Tattered Souls which make you stronger that can be sacrificed to gain power. Own as many of each upgrade as you can. Every 666 purchases gives you 1 Tattered Soul.',document.getElementById('ascend-btn'),null); },400); } }
 }
 
@@ -6541,14 +6630,13 @@ document.querySelectorAll('.left-tab-btn').forEach(function(btn){
 // ── TATTERED MODAL EVENTS ─────────────────────────────────────────────────────
 document.getElementById('tm-close-btn').addEventListener('click', closeTatteredModal);
 document.getElementById('mm-close-btn').addEventListener('click', closeMinionModal);
-document.getElementById('mm-sacrifice-btn').addEventListener('click', function(){
-  var TS_PER_MP=666;
-  if(tatteredSouls<TS_PER_MP) return;
-  tatteredSouls-=TS_PER_MP;
-  minionPoints++;
-  updateTatteredDisplay();
-  renderMinionModal();
-  saveGame();
+document.getElementById('reincarnate-btn').addEventListener('click', openReincarnateModal);
+document.getElementById('reincarnate-cancel-btn').addEventListener('click', function(){
+  document.getElementById('reincarnate-modal').classList.remove('open');
+});
+document.getElementById('reincarnate-now-btn').addEventListener('click', function(){
+  document.getElementById('reincarnate-modal').classList.remove('open');
+  doReincarnate();
 });
 
 document.getElementById('tm-respec-btn').addEventListener('click', function(){
