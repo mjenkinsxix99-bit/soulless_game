@@ -18,10 +18,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #souls-display .lbl { font-size: 14px; color: #c0b0f0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 6px rgba(150,120,240,0.4); }
 #stage-desc { font-size: 13px; color: #7766aa; font-style: italic; text-align: center; }
 #main { display: flex; flex: 1; overflow: hidden; }
-#center-area { display: flex; flex: 1; overflow: hidden; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); }
+#center-area { display: flex; flex: 1; overflow: hidden; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); min-width: 0; }
 #left, #right { width: 300px; flex-shrink: 0; padding: 16px 14px; background: #08080e; overflow-y: auto; }
 #left { width: 370px; border-right: 1px solid #1e1845; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 0; background: transparent; position: relative; overflow: hidden; }
-#right { border-left: 1px solid #1e1845; width: 415px; }
+#right { border-left: 1px solid #1e1845; width: 415px; background: #08080e; position: relative; z-index: 2; flex-shrink: 0; }
 .ph { font-size: 14px; letter-spacing: 3px; color: #9980dd; text-transform: uppercase; border-bottom: 1px solid #1a1535; padding-bottom: 4px; margin-bottom: 10px; }
 .ph.gap { margin-top: 16px; }
 .ucard { border: 1px solid #c8bca0; border-radius: 5px; padding: 11px 12px; margin-bottom: 9px; cursor: default; opacity: 0.5; background: #f0e8b8; transition: border-color 0.2s, background 0.2s; user-select: none; -webkit-user-select: none; }
