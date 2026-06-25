@@ -761,6 +761,12 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tab-btn:hover .tab-tip,
 .mm-nav:hover .tab-tip { animation:tabtip-in 0.15s forwards; animation-delay:3s; }
 @keyframes tabtip-in { to { opacity:1; } }
+/* Tattered-souls counter tooltip */
+#ts-counter-tip { display:none; position:fixed; z-index:1200; background:#06041a; border:1px solid #d4a843;
+  border-radius:7px; padding:9px 13px; font-family:Georgia,serif; font-size:13px; color:#e8d080;
+  pointer-events:none; max-width:220px; line-height:1.6; box-shadow:0 4px 22px rgba(180,130,0,0.45);
+  text-align:center; }
+#ts-counter-tip.show { display:block; }
 /* Minimap nav arrows */
 .mm-nav { background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.35);
   border-radius:5px; color:#d4a843; font-size:13px; line-height:0; cursor:pointer;
@@ -1082,7 +1088,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <div class="num" id="soul-count">0</div>
       <div class="lbl">souls collected</div>
     </div>
-    <div id="tattered-display">
+    <div id="tattered-display" style="cursor:pointer;">
       <div class="num" id="tattered-count">0</div>
       <div class="lbl">tattered souls</div>
       <div class="ts-preview" id="ts-ascend-preview"></div>
@@ -1566,6 +1572,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   </div>
 </div>
 
+<!-- Tattered souls counter tooltip -->
+<div id="ts-counter-tip"></div>
+
 <!-- Minion Modal -->
 <div id="minion-modal">
   <div id="mm-header">
@@ -1575,6 +1584,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <span id="mm-mp-display">MP: <span id="mm-mp-val">0</span></span>
       <span id="mm-ct-display"></span>
     </div>
+  </div>
+  <div id="mm-reincarnate-reminder" style="text-align:center;padding:6px 12px 2px;font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#ffcc33;text-shadow:0 0 10px rgba(255,200,50,0.7);letter-spacing:1px;">
+    Every 666 Tattered Souls at Reincarnation = 1 MP!
   </div>
   <div id="mm-body"></div>
 </div>
@@ -7249,6 +7261,36 @@ _tmWrap.addEventListener('touchend',function(){
 document.getElementById('tattered-modal').addEventListener('click',function(e){
   if(e.target===this) closeTatteredModal();
 });
+
+// Tattered souls counter tooltip — shows on 3s hover or immediate click
+(function(){
+  var TIP_TEXT='Remember, 666 Upgrades = 1 TS.<br>Bounties on Elites on floor 150+ = TS!';
+  var tip=document.getElementById('ts-counter-tip');
+  var disp=document.getElementById('tattered-display');
+  if(!tip||!disp) return;
+  var hoverTimer=null;
+  function showTip(e){
+    tip.innerHTML=TIP_TEXT;
+    var r=disp.getBoundingClientRect();
+    tip.style.left=Math.min(r.left,window.innerWidth-230)+'px';
+    tip.style.top=(r.bottom+6)+'px';
+    tip.classList.add('show');
+  }
+  function hideTip(){
+    clearTimeout(hoverTimer);
+    tip.classList.remove('show');
+  }
+  disp.addEventListener('mouseenter',function(e){ hoverTimer=setTimeout(function(){ showTip(e); },3000); });
+  disp.addEventListener('mouseleave',hideTip);
+  disp.addEventListener('click',function(e){ clearTimeout(hoverTimer); if(tip.classList.contains('show')){ hideTip(); } else { showTip(e); } });
+  // Touch: long-press 1.5s
+  var touchTimer=null;
+  disp.addEventListener('touchstart',function(e){ touchTimer=setTimeout(function(){ showTip(e); },1500); },{passive:true});
+  disp.addEventListener('touchend',function(){ clearTimeout(touchTimer); });
+  disp.addEventListener('touchmove',function(){ clearTimeout(touchTimer); });
+  // Hide on outside click
+  document.addEventListener('click',function(e){ if(!disp.contains(e.target)) hideTip(); });
+})();
 
 function buyAllAffordable(){
   var changed=false;
