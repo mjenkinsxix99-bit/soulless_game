@@ -1768,7 +1768,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     </div>
   </div>
   <div id="mm-reincarnate-reminder" style="text-align:center;padding:6px 12px 2px;font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#ffcc33;text-shadow:0 0 10px rgba(255,200,50,0.7);letter-spacing:1px;">
-    Every 666 Tattered Souls at Reincarnation = 1 MP!
+    <span id="mm-reinc-mp-gain">0</span> MP on Reincarnation &nbsp;|&nbsp; <span id="mm-reinc-ts-next">666</span> TS to next MP
   </div>
   <div id="mm-body"></div>
 </div>
@@ -2962,6 +2962,10 @@ function closeMinionModal(){
 function renderMinionModal(){
   var mpEl=document.getElementById('mm-mp-val');
   if(mpEl) mpEl.textContent=minionPoints.toLocaleString();
+  var mpGainEl=document.getElementById('mm-reinc-mp-gain');
+  if(mpGainEl) mpGainEl.textContent=calcReincarnateMP().toLocaleString();
+  var tsNextEl=document.getElementById('mm-reinc-ts-next');
+  if(tsNextEl) tsNextEl.textContent=calcTSToNextMP().toLocaleString();
   var slotsEl=document.getElementById('mm-slots-val');
   if(slotsEl) slotsEl.textContent=minionSlots.length;
 
@@ -3237,6 +3241,7 @@ var discoveredMinions=[];
 var elementStocks={earth:0,stone:0,metal:0,wood:0,plant:0,water:0,fire:0,research:0,holy:0,dark:0};
 var _lastElementTick=0;
 var tatteredSouls=0;
+var totalTSSacrificed=0;
 var rebirthCount=0;
 var _offlineSavedAt=0;
 var _frontierWins=0;
@@ -5357,7 +5362,15 @@ function calcTatteredSoulsGain(chosenForm){
 }
 
 function calcReincarnateMP(){
-  return Math.floor(tatteredSouls/666);
+  var tsThisCycle=tatteredSouls+tatteredUpgradesSpent;
+  var newTotal=totalTSSacrificed+tsThisCycle;
+  return Math.floor(newTotal/666)-Math.floor(totalTSSacrificed/666);
+}
+
+function calcTSToNextMP(){
+  var current=totalTSSacrificed+tatteredSouls+tatteredUpgradesSpent;
+  var rem=current%666;
+  return rem===0?666:666-rem;
 }
 
 function openReincarnateModal(){
@@ -5368,7 +5381,9 @@ function openReincarnateModal(){
 }
 
 function doReincarnate(){
-  var mp=calcReincarnateMP();
+  var tsThisCycle=tatteredSouls+tatteredUpgradesSpent;
+  totalTSSacrificed+=tsThisCycle;
+  var mp=Math.floor(totalTSSacrificed/666)-Math.floor((totalTSSacrificed-tsThisCycle)/666);
   minionPoints+=mp;
 
   // Full reset — same as ascension but also wipes TS and soulShop (except auto-progress)
@@ -5582,6 +5597,7 @@ function saveGame(){
     traitChoicesEver:traitChoicesEver.slice(),
     namedEliteFirstKills:namedEliteFirstKills.slice(),
     tatteredSouls:tatteredSouls,
+    totalTSSacrificed:totalTSSacrificed,
     rebirthCount:rebirthCount,
     rebirthForm:rebirthForm,
     formBonusMult:formBonusMult,
@@ -5667,6 +5683,7 @@ function loadGame(){
   traitChoicesEver=data.traitChoicesEver||[];
   namedEliteFirstKills=data.namedEliteFirstKills||[];
   tatteredSouls=data.tatteredSouls||0;
+  totalTSSacrificed=data.totalTSSacrificed||0;
   rebirthCount=data.rebirthCount||0;
   rebirthForm=data.rebirthForm||null;
   formBonusMult=data.formBonusMult||1.0;
