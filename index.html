@@ -7162,13 +7162,8 @@ document.getElementById('hard-reset-btn').addEventListener('click',function(){
 
 // ── PROMO CODES ───────────────────────────────────────────────────────────────
 var PROMO_CODES = {
-  'MPHOTFIX': { mp: 2, requiresUltForm: true }
+  'MPHOTFIX': 2
 };
-
-function hasAnyUltimateForm(){
-  var ultForms=['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine'];
-  return ultForms.some(function(id){ return achievementsEarned.indexOf(id)>=0; });
-}
 
 function redeemPromoCode(){
   var inp=document.getElementById('promo-input');
@@ -7176,16 +7171,15 @@ function redeemPromoCode(){
   var code=(inp.value||'').trim().toUpperCase();
   if(!code){ msg.className='err'; msg.textContent='Enter a code first.'; return; }
   if(redeemedCodes.indexOf(code)!==-1){ msg.className='err'; msg.textContent='Code already redeemed.'; return; }
-  var entry=PROMO_CODES[code];
-  if(entry===undefined){ msg.className='err'; msg.textContent='Invalid code.'; return; }
-  if(entry.requiresUltForm && !hasAnyUltimateForm()){ msg.className='err'; msg.textContent='You must obtain an Ultimate Form first.'; return; }
+  var reward=PROMO_CODES[code];
+  if(reward===undefined){ msg.className='err'; msg.textContent='Invalid code.'; return; }
   redeemedCodes.push(code);
-  minionPoints+=entry.mp;
+  minionPoints+=reward;
   saveGame();
   updateMinionUI();
   inp.value='';
   msg.className='ok';
-  msg.textContent='Redeemed! You received '+entry.mp+' MP.';
+  msg.textContent='Redeemed! You received '+reward+' MP.';
 }
 
 document.getElementById('promo-btn').addEventListener('click', redeemPromoCode);
