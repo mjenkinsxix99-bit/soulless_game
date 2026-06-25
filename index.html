@@ -167,7 +167,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-realm-section { margin-bottom:28px; }
 .mm-realm-title { font-size:11px; color:#6644aa; letter-spacing:3px; text-transform:uppercase; border-bottom:1px solid #1a0a40; padding-bottom:4px; margin-bottom:12px; }
 .mm-card-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
-.mm-card { border:1px solid #1e1040; border-radius:8px; padding:8px 6px; text-align:center; background:#100828; cursor:pointer; transition:border-color 0.2s,background 0.2s,box-shadow 0.2s; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.mm-card { border:1px solid #1e1040; border-radius:8px; padding:8px 6px; text-align:center; background:#100828; cursor:pointer; transition:border-color 0.2s,background 0.2s,box-shadow 0.2s; display:flex; flex-direction:column; align-items:center; gap:4px; position:relative; }
 .mm-card:hover { border-color:#4433aa; background:#0a0520; }
 .mm-card-targeted { border-color:#9966ff !important; background:#0d0520 !important; box-shadow:0 0 10px rgba(150,80,255,0.4); }
 .mm-card-discovered { border-color:#2a1a5a; }
@@ -175,6 +175,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card-elite.mm-card-discovered { border-color:#d4a843; box-shadow:0 0 8px rgba(212,168,67,0.25); }
 .mm-card-elite:hover { border-color:#e8c050; box-shadow:0 0 14px rgba(212,168,67,0.4); }
 .mm-card-canvas { display:block; width:100%; aspect-ratio:1; border-radius:0 0 6px 6px; transform:scaleX(-1); }
+.mm-pet-btn { position:absolute; top:4px; left:4px; background:#1a6b1a; border:1px solid #33aa33; color:#aaffaa; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; cursor:pointer; z-index:2; font-family:Georgia,serif; transition:all 0.15s; }
+.mm-pet-btn:hover { background:#22aa22; border-color:#55ff55; }
+.mm-pet-btn-active { background:#33cc33; border-color:#88ff88; color:#000; box-shadow:0 0 6px rgba(80,255,80,0.6); }
 .mm-card-name { font-size:16px; font-weight:bold; color:#336633; letter-spacing:1px; line-height:1.2; }
 .mm-card-discovered .mm-card-name { color:#44cc44; }
 .mm-card-elite.mm-card-discovered .mm-card-name { color:#ffd700; }
@@ -1120,6 +1123,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
             <div class="canvas-wrap" style="position:absolute;top:42px;left:0;right:0;z-index:1;">
               <canvas id="entity-canvas" width="330" height="330"></canvas>
             </div>
+            <canvas id="pet-canvas" width="160" height="160" style="display:none;position:absolute;bottom:68px;right:6px;width:110px;height:110px;z-index:2;pointer-events:none;"></canvas>
             <div class="hp-wrap" style="visibility:hidden;position:absolute;bottom:60px;left:0;right:0;display:flex;justify-content:center;">
               <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
               <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
@@ -2721,6 +2725,23 @@ function releaseMinion(typeIdx){
   saveGame();
 }
 
+function setPetMinion(typeIdx){
+  petMinionIdx=(petMinionIdx===typeIdx)?-1:typeIdx;
+  var cv=document.getElementById('pet-canvas');
+  if(cv) cv.style.display=petMinionIdx>=0?'block':'none';
+  renderMinionModal();
+  saveGame();
+}
+
+function drawPetMinion(t){
+  var cv=document.getElementById('pet-canvas');
+  if(!cv||petMinionIdx<0) return;
+  var et=ENEMY_TYPES[petMinionIdx];
+  if(!et) return;
+  var fn=MINION_DRAW_FNS[et.id];
+  if(fn) fn(cv,t,false,false);
+}
+
 function addMinionXp(){
   var _mXpMult=1+getMinionTotalBonus('minionxp');
   minionSlots.forEach(function(m){
@@ -2811,6 +2832,18 @@ function renderMinionModal(){
       var card=document.createElement('div');
       var isEliteType=et.isElite;
       card.className='mm-card'+(isEliteType?' mm-card-elite':'')+(discovered?' mm-card-discovered':'');
+
+      // Pet button (top-left of card)
+      (function(petIdx){
+        var petBtn=document.createElement('button');
+        petBtn.className='mm-pet-btn'+(petMinionIdx===petIdx?' mm-pet-btn-active':'');
+        petBtn.textContent='Pet';
+        petBtn.addEventListener('click',function(e){
+          e.stopPropagation();
+          setPetMinion(petIdx);
+        });
+        card.appendChild(petBtn);
+      })(idx);
 
       // Name
       var nameEl=document.createElement('div');
@@ -3026,6 +3059,7 @@ var eliteBountyTSEarned=0;
 var minionPoints=0;
 var captureTargetIdx=-1;
 var releaseMode=false;
+var petMinionIdx=-1;
 var minionSlots=[];
 var minionUnlocked=false;
 var discoveredMinions=[];
@@ -5401,6 +5435,7 @@ function saveGame(){
     minionSlots:minionSlots.slice(),
     minionUnlocked:minionUnlocked,
     captureTargetIdx:captureTargetIdx,
+    petMinionIdx:petMinionIdx,
     discoveredMinions:discoveredMinions.slice(),
     elementStocks:JSON.parse(JSON.stringify(elementStocks)),
     lastElementTick:_lastElementTick,
@@ -5489,6 +5524,7 @@ function loadGame(){
   if(data.minionSlots) minionSlots=data.minionSlots;
   if(data.minionUnlocked) minionUnlocked=data.minionUnlocked;
   if(data.captureTargetIdx!==undefined) captureTargetIdx=data.captureTargetIdx;
+  if(data.petMinionIdx!==undefined){ petMinionIdx=data.petMinionIdx; var _pc=document.getElementById('pet-canvas'); if(_pc) _pc.style.display=petMinionIdx>=0?'block':'none'; }
   if(data.discoveredMinions) discoveredMinions=data.discoveredMinions;
   if(data.elementStocks) elementStocks=data.elementStocks;
   if(data.lastElementTick) _lastElementTick=data.lastElementTick;
@@ -6550,6 +6586,7 @@ function gameLoop(){
   tickElementProduction(now);
 
   drawEntityCanvas(now);
+  drawPetMinion(now);
 
   var ecv=document.getElementById('enemy-canvas');
   var eid=def()?def().id:'wisp';
