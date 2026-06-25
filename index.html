@@ -694,7 +694,13 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tm-node.type-speed.state-affordable .tm-node-ring  { border-color:#9aaabb; background:#111520; animation:nodeAffordPulse 2s ease-in-out infinite; }
 .tm-node.type-dps.state-locked .tm-node-ring,.tm-node.type-strike.state-locked .tm-node-ring,
 .tm-node.type-souls.state-locked .tm-node-ring,.tm-node.type-hp.state-locked .tm-node-ring,
-.tm-node.type-mana.state-locked .tm-node-ring,.tm-node.type-speed.state-locked .tm-node-ring { opacity:0.35; cursor:default; }
+.tm-node.type-mana.state-locked .tm-node-ring,.tm-node.type-speed.state-locked .tm-node-ring,
+.tm-node.type-ts.state-locked .tm-node-ring { opacity:0.35; cursor:default; }
+.tm-node.type-ts .tm-node-ring   { width:30px; height:30px; border-color:#994400; background:#1e0d00; }
+.tm-node.type-ts.state-purchased .tm-node-ring { border-color:#ff8800; background:#4a2000; box-shadow:0 0 10px rgba(255,130,0,0.7); }
+.tm-node.type-ts.state-affordable .tm-node-ring { border-color:#cc6600; background:#1e0d00; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-ts .tm-node-name { display:none; }
+.tm-node.type-ts .tm-node-icon { display:none; }
 @keyframes nodeAffordPulse { 0%,100%{opacity:0.7;} 50%{opacity:1;} }
 .tm-node-icon { font-size:16px; line-height:1; pointer-events:none; }
 .tm-node.type-center .tm-node-icon { font-size:18px; }
@@ -755,6 +761,12 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tab-btn:hover .tab-tip,
 .mm-nav:hover .tab-tip { animation:tabtip-in 0.15s forwards; animation-delay:3s; }
 @keyframes tabtip-in { to { opacity:1; } }
+/* Tattered-souls counter tooltip */
+#ts-counter-tip { display:none; position:fixed; z-index:1200; background:#06041a; border:1px solid #d4a843;
+  border-radius:7px; padding:9px 13px; font-family:Georgia,serif; font-size:13px; color:#e8d080;
+  pointer-events:none; max-width:220px; line-height:1.6; box-shadow:0 4px 22px rgba(180,130,0,0.45);
+  text-align:center; }
+#ts-counter-tip.show { display:block; }
 /* Minimap nav arrows */
 .mm-nav { background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.35);
   border-radius:5px; color:#d4a843; font-size:13px; line-height:0; cursor:pointer;
@@ -1076,7 +1088,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <div class="num" id="soul-count">0</div>
       <div class="lbl">souls collected</div>
     </div>
-    <div id="tattered-display">
+    <div id="tattered-display" style="cursor:pointer;">
       <div class="num" id="tattered-count">0</div>
       <div class="lbl">tattered souls</div>
       <div class="ts-preview" id="ts-ascend-preview"></div>
@@ -1228,6 +1240,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <span id="tm-ts-label">Tattered Souls</span>
       <span id="tm-ts-val">0</span>
     </div>
+  </div>
+  <div id="tm-ts-reminder" style="text-align:center;padding:5px 12px 2px;font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#ffcc33;text-shadow:0 0 10px rgba(255,200,50,0.7);letter-spacing:1px;">
+    Remember, 666 Upgrades = 1 TS.<br>Bounties on Elites on floor 150+ = TS!
   </div>
   <div id="tm-canvas-wrap">
     <div id="tm-grid">
@@ -1560,6 +1575,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   </div>
 </div>
 
+<!-- Tattered souls counter tooltip -->
+<div id="ts-counter-tip"></div>
+
 <!-- Minion Modal -->
 <div id="minion-modal">
   <div id="mm-header">
@@ -1569,6 +1587,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <span id="mm-mp-display">MP: <span id="mm-mp-val">0</span></span>
       <span id="mm-ct-display"></span>
     </div>
+  </div>
+  <div id="mm-reincarnate-reminder" style="text-align:center;padding:6px 12px 2px;font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#ffcc33;text-shadow:0 0 10px rgba(255,200,50,0.7);letter-spacing:1px;">
+    Every 666 Tattered Souls at Reincarnation = 1 MP!
   </div>
   <div id="mm-body"></div>
 </div>
@@ -2700,7 +2721,7 @@ function openMinionModal(){
   modal.classList.add('open');
   renderMinionModal();
   if(!_minionModalAnimId) _minionModalAnimId = requestAnimationFrame(_animateMinionCards);
-  if(!_tutShown.minionTab){ _tutShown.minionTab=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">You have discovered the Minions!</span> Turn your enemies into allies through sacrifice and make them fight for you.<br><br>This unlocks after you have obtained your first <span style="color:#ffd700;font-weight:bold;">Ultimate Form</span>. Gain their allegiance and make their power yours!<br><br>666 Tattered Souls sacrificed will gain 1 Minion Point when you <span style="color:#ffd700;font-weight:bold;">Reincarnate</span>.',document.getElementById('minion-tab-btn'),null); },600); } }
+  if(!_tutShown.minionTab){ _tutShown.minionTab=true; setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">You have discovered the Minions!</span> Turn your enemies into allies through sacrifice and make them fight for you.<br><br>This unlocks after you have obtained your first <span style="color:#ffd700;font-weight:bold;">Ultimate Form</span>. Gain their allegiance and make their power yours!<br><br>666 Tattered Souls sacrificed will gain 1 Minion Point when you <span style="color:#ffd700;font-weight:bold;">Reincarnate</span>.',document.getElementById('minion-tab-btn'),null); },600); }
   if(!_tutShown.minionCapture&&minionUnlocked&&minionPoints>=1){ _tutShown.minionCapture=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('To capture an enemy you must select which enemy you want to capture.<br>Each time you defeat them, you have a chance to capture them in exchange for MP.<br><br>Max level Minions become Elite and will survive through Ascension.<br>Non-Elite Minions refund your MP and you must recapture them.',document.getElementById('minion-tab-btn'),null); },_tutShown.minionTab?3000:600); } }
 }
 
@@ -3056,6 +3077,8 @@ function fmtCoin(n){
 function spawnSoulCoins(){
   var _tm=document.getElementById('tattered-modal');
   if(_tm&&_tm.classList.contains('open')) return;
+  var _mm=document.getElementById('minion-modal');
+  if(_mm&&_mm.classList.contains('open')) return;
   // Mana gain: each of the 3 bubbles contributes 0.00001 × completed floors this ascension
   var _floorsComp=completedFloorsThisAscension.length;
   if(_floorsComp>0){
@@ -3585,7 +3608,7 @@ function updateHpBars(){
 // ── UPGRADES ──────────────────────────────────────────────────────────────────
 var autoAttackEnabled=false, autoAttackInterval=3000;
 var entityDmgBonus=D(0);
-var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0;
+var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0, tattTsGainMult=0;
 var critClickChance=0, critClickMult=0, dvDpsToClickRatio=0, soulAbsorbBonus=0;
 
 // ── MANA & SPELLS ─────────────────────────────────────────────────────────────
@@ -3650,7 +3673,7 @@ function getMileMult(u){
   return 1+bonus;
 }
 function recalcStats(){
-  clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; autoAttackEnabled=false;
+  clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; tattTsGainMult=0; autoAttackEnabled=false;
   critClickChance=0; critClickMult=0; dvDpsToClickRatio=0; soulAbsorbBonus=0;
   REP_UPGRADES.forEach(function(u){
     if(u.level===0) return;
@@ -3690,7 +3713,7 @@ function recalcStats(){
   var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
     'blade-dps':0.333,'souls-dps-1':0.333,'souls-dps-2':0.333,'rule-dps-1':0.333,'rule-dps-2':0.333,
     'strikes-dps-1':0.333,'strikes-dps-2':0.333,'power3-dps-1':0.333,'power3-dps-2':0.333,
-    'mana-dps-1':0.333,'mana-dps-2':0.666,'invoke-dps-1':0.666,'invoke-dps-2':0.333};
+    'mana-dps-2':0.666,'invoke-dps-1':0.666,'invoke-dps-2':0.333};
   var _tdpsSum=0;
   for(var _dk in _tdps){if(soulShopOwned[_dk]>=1)_tdpsSum+=_tdps[_dk];}
   if(_tdpsSum>0){totalDps=totalDps.mul(1+_tdpsSum);clickDmgBonus=clickDmgBonus.mul(1+_tdpsSum);}
@@ -3703,8 +3726,9 @@ function recalcStats(){
   // Crit multiplier
   if(soulShopOwned['mana-crit']>=1) critClickMult+=3.33;
   // HP drain
-  if(soulShopOwned['blade-hp']>=1) enemyHpDrainPct+=0.0111;
-  if(soulShopOwned['rule-hp']>=1) enemyHpDrainPct+=0.0111;
+  if(soulShopOwned['blade-hp']>=1) tattTsGainMult+=0.333;
+  if(soulShopOwned['rule-hp']>=1) tattTsGainMult+=0.333;
+  if(soulShopOwned['mana-dps-1']>=1) tattTsGainMult+=0.333;
   // Mana cap: recompute from purchased mana nodes
   var _tmana={'flurry-speed':50,'crit-speed':75,'blade-speed':100,'souls-speed':125,'rule-speed':150,
     'strikes-speed':175,'power3-speed':225,'mana-speed':250,'invoke-speed':250};
@@ -4503,8 +4527,8 @@ var TATTERED_NODES = [
   { id:'blade-strike-1', type:'strike', name:'Strike Bonus',   icon:'', cost:30,
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
     x:173,  y:186,  requires:[] },
-  { id:'blade-hp',       type:'hp',     name:'HP Drain +1.11%',icon:'', cost:45,
-    desc:'Increases max HP drain of Divine Hunger by +1.11%.',
+  { id:'blade-hp',       type:'souls',  name:'Tattered Souls +33.3%',icon:'', cost:45,
+    desc:'Increases Tattered Souls gained on Ascension by +33.3%.',
     x:123,  y:223,  requires:[] },
   { id:'blade-strike-2', type:'strike', name:'Crit Chance',    icon:'', cost:68,
     desc:'Increases your Critical Strike chance by +3.33%.',
@@ -4526,8 +4550,8 @@ var TATTERED_NODES = [
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-154, y:127,  requires:[] },
   // Stat nodes clustered around Rule of 3 (-285, -93) — pentacle, point toward center
-  { id:'rule-hp',        type:'hp',     name:'HP Drain +1.11%',icon:'', cost:120,
-    desc:'Increases max HP drain of Divine Hunger by +1.11%.',
+  { id:'rule-hp',        type:'souls',  name:'Tattered Souls +33.3%',icon:'', cost:120,
+    desc:'Increases Tattered Souls gained on Ascension by +33.3%.',
     x:-150, y:-49,  requires:[] },
   { id:'rule-dps-1',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:180,
     desc:'Increases DPS of all upgrades by +33.3%.',
@@ -4577,8 +4601,8 @@ var TATTERED_NODES = [
   { id:'mana-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:3240,
     desc:'Increases Mana cap by 250 and Mana regen rate by 85%.',
     x:300,  y:45,   requires:[] },
-  { id:'mana-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:640,
-    desc:'Increases DPS of all upgrades by +33.3%.',
+  { id:'mana-dps-1',  type:'ts',     name:'Tattered Souls +33.3%', icon:'', cost:640,
+    desc:'Increases Tattered Souls gained on Ascension by +33.3%.',
     x:349,  y:81,  requires:[] },
   { id:'mana-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:960,
     desc:'Increases all souls gained by 66.6%.',
@@ -4696,12 +4720,14 @@ var TATTERED_EDGES = [
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
 
 function isTattNodeUnlocked(node){
-  if(!node.requires || node.requires.length===0){
-    if(!node.requiresAny || node.requiresAny.length===0) return true;
-  }
-  var reqOk=!node.requires||node.requires.length===0||node.requires.every(function(rid){return soulShopOwned[rid]>=1;});
-  var anyOk=!node.requiresAny||node.requiresAny.length===0||node.requiresAny.some(function(rid){return soulShopOwned[rid]>=1;});
-  return reqOk&&anyOk;
+  // Center node is always available
+  if(node.type==='center') return true;
+  // A node is unlocked only if an edge-connected neighbor has been purchased
+  return TATTERED_EDGES.some(function(edge){
+    if(edge.from===node.id) return soulShopOwned[edge.to]>=1;
+    if(edge.to===node.id)   return soulShopOwned[edge.from]>=1;
+    return false;
+  });
 }
 
 function buyTatteredNode(id){
@@ -4900,7 +4926,7 @@ function openTatteredModal(){
     updateAutoProgressBtn();
     renderTatteredGrid();
     saveGame();
-    if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress has been gifted to you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600); }
+    setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress has been gifted to you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600);
   }
   if('ontouchstart' in window && !_tutShown.touchHint){
     _tutShown.touchHint=true;
@@ -5076,6 +5102,7 @@ function calcUpgradeTSGain(chosenForm){
   if(ascension6Path==='leather') base=Math.floor(base*1.10);
   var _mTs=getMinionTotalBonus('ts');
   if(_mTs>0) base=Math.floor(base*(1+_mTs));
+  if(tattTsGainMult>0) base=Math.floor(base*(1+tattTsGainMult));
   return Math.max(0,base);
 }
 function calcTatteredSoulsGain(chosenForm){
@@ -7237,6 +7264,36 @@ _tmWrap.addEventListener('touchend',function(){
 document.getElementById('tattered-modal').addEventListener('click',function(e){
   if(e.target===this) closeTatteredModal();
 });
+
+// Tattered souls counter tooltip — shows on 3s hover or immediate click
+(function(){
+  var TIP_TEXT='Remember, 666 Upgrades = 1 TS.<br>Bounties on Elites on floor 150+ = TS!';
+  var tip=document.getElementById('ts-counter-tip');
+  var disp=document.getElementById('tattered-display');
+  if(!tip||!disp) return;
+  var hoverTimer=null;
+  function showTip(e){
+    tip.innerHTML=TIP_TEXT;
+    var r=disp.getBoundingClientRect();
+    tip.style.left=Math.min(r.left,window.innerWidth-230)+'px';
+    tip.style.top=(r.bottom+6)+'px';
+    tip.classList.add('show');
+  }
+  function hideTip(){
+    clearTimeout(hoverTimer);
+    tip.classList.remove('show');
+  }
+  disp.addEventListener('mouseenter',function(e){ hoverTimer=setTimeout(function(){ showTip(e); },3000); });
+  disp.addEventListener('mouseleave',hideTip);
+  disp.addEventListener('click',function(e){ clearTimeout(hoverTimer); if(tip.classList.contains('show')){ hideTip(); } else { showTip(e); } });
+  // Touch: long-press 1.5s
+  var touchTimer=null;
+  disp.addEventListener('touchstart',function(e){ touchTimer=setTimeout(function(){ showTip(e); },1500); },{passive:true});
+  disp.addEventListener('touchend',function(){ clearTimeout(touchTimer); });
+  disp.addEventListener('touchmove',function(){ clearTimeout(touchTimer); });
+  // Hide on outside click
+  document.addEventListener('click',function(e){ if(!disp.contains(e.target)) hideTip(); });
+})();
 
 function buyAllAffordable(){
   var changed=false;
