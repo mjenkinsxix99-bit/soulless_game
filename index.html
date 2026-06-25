@@ -155,9 +155,12 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #minion-modal.open { display:flex; }
 #mm-header { display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:14px; padding:10px 18px; background:#05030e; border-bottom:1px solid #1e1548; flex-shrink:0; }
 #mm-title { font-size:16px; color:#c0a0ff; letter-spacing:3px; font-family:Georgia,serif; }
-#mm-header-right { display:flex; align-items:center; gap:12px; }
+#mm-header-right { display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
 #mm-mp-display { font-size:14px; color:#bb77ff; font-family:Georgia,serif; }
 #mm-ct-display { font-size:11px; color:#664488; font-style:italic; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#mm-release-btn { background:#cc0000; border:2px solid #ff2222; color:#000; font-size:12px; font-weight:bold; padding:3px 10px; border-radius:4px; cursor:pointer; letter-spacing:1px; font-family:Georgia,serif; transition:all 0.2s; }
+#mm-release-btn:hover { background:#ff2222; }
+#mm-release-btn.active { background:#ff4444; border-color:#ffaaaa; box-shadow:0 0 8px rgba(255,80,80,0.7); }
 #mm-close-btn { width:32px; height:32px; background:#880000; border:2px solid #cc0000; color:#000; font-size:18px; border-radius:5px; cursor:pointer; line-height:1; transition:all 0.2s; font-weight:bold; }
 #mm-close-btn:hover { background:#cc0000; border-color:#ff2222; }
 #mm-body { flex:1; overflow-y:auto; padding:16px 20px; }
@@ -1585,6 +1588,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <span id="mm-title">Minion Compendium</span>
     <div id="mm-header-right">
       <span id="mm-mp-display">MP: <span id="mm-mp-val">0</span></span>
+      <button id="mm-release-btn">Release Minion</button>
       <span id="mm-ct-display"></span>
     </div>
   </div>
@@ -2675,13 +2679,45 @@ function attemptMinionCapture(typeIdx){
   if(captureTargetIdx!==typeIdx) return;
   var cost=getMinionNextMpCost();
   if(minionPoints<cost) return;
-  if(Math.random()>0.20) return;
+  if(Math.random()>0.07) return;
   minionPoints-=cost;
   captureTargetIdx=-1; // deselect after successful capture
   minionSlots.push({typeIdx:typeIdx,level:1,xp:0,isElite:false});
   if(discoveredMinions.indexOf(typeIdx)<0) discoveredMinions.push(typeIdx);
   showMinionCaptureNotif(typeIdx);
   renderMinionModal();
+  saveGame();
+}
+
+function enterReleaseMode(){
+  if(!_tutShown.minionRelease){
+    _tutShown.minionRelease=true;
+    showTutorialTip('Releasing a minion will reset its level, return it to the wild, and refund the MP cost of that minion.',document.getElementById('mm-release-btn'),null);
+  }
+  releaseMode=true;
+  var btn=document.getElementById('mm-release-btn');
+  if(btn) btn.classList.add('active');
+  var ctEl=document.getElementById('mm-ct-display');
+  if(ctEl) ctEl.textContent='Click a captured minion to release it';
+}
+
+function exitReleaseMode(){
+  releaseMode=false;
+  var btn=document.getElementById('mm-release-btn');
+  if(btn) btn.classList.remove('active');
+  renderMinionModal();
+}
+
+function releaseMinion(typeIdx){
+  var slotIdx=-1;
+  for(var i=0;i<minionSlots.length;i++){
+    if(minionSlots[i].typeIdx===typeIdx){ slotIdx=i; break; }
+  }
+  if(slotIdx===-1){ exitReleaseMode(); return; }
+  minionSlots.splice(slotIdx,1);
+  var refund=getMinionNextMpCost();
+  minionPoints+=refund;
+  exitReleaseMode();
   saveGame();
 }
 
@@ -2741,7 +2777,7 @@ function renderMinionModal(){
   if(ctEl){
     if(captureTargetIdx>=0&&captureTargetIdx<ENEMY_TYPES.length){
       var nextCost=getMinionNextMpCost();
-      ctEl.textContent='Target: '+ENEMY_TYPES[captureTargetIdx].name+' ('+nextCost+' MP, 20% chance)';
+      ctEl.textContent='Target: '+ENEMY_TYPES[captureTargetIdx].name+' ('+nextCost+' MP, 7% chance)';
     } else {
       ctEl.textContent='No capture target set';
     }
@@ -2823,19 +2859,24 @@ function renderMinionModal(){
       bonusEl.textContent=getMinionBonusDesc(md.bonus||'souls', heldMinion);
       card.appendChild(bonusEl);
 
-      // Click = set as capture target
-      (function(captureIdx){
-        card.addEventListener('click',function(){
+      // Click = release (if in release mode and held) or set as capture target
+      (function(captureIdx, cardEl, heldMinionRef){
+        cardEl.addEventListener('click',function(){
+          if(releaseMode){
+            if(heldMinionRef) releaseMinion(captureIdx);
+            else exitReleaseMode();
+            return;
+          }
           captureTargetIdx=captureIdx;
           var ctE=document.getElementById('mm-ct-display');
           if(ctE){
             var nc=getMinionNextMpCost();
-            ctE.textContent='Target: '+ENEMY_TYPES[captureIdx].name+' ('+nc+' MP, 20% chance)';
+            ctE.textContent='Target: '+ENEMY_TYPES[captureIdx].name+' ('+nc+' MP, 7% chance)';
           }
           document.querySelectorAll('.mm-card').forEach(function(c){c.classList.remove('mm-card-targeted');});
-          card.classList.add('mm-card-targeted');
+          cardEl.classList.add('mm-card-targeted');
         });
-      })(idx);
+      })(idx, card, heldMinion);
 
       if(captureTargetIdx===idx) card.classList.add('mm-card-targeted');
 
@@ -2984,6 +3025,7 @@ var currentAscensionKills=0;
 var eliteBountyTSEarned=0;
 var minionPoints=0;
 var captureTargetIdx=-1;
+var releaseMode=false;
 var minionSlots=[];
 var minionUnlocked=false;
 var discoveredMinions=[];
@@ -5255,6 +5297,7 @@ function doRebirthReset(chosenForm){
 
   // Apply rebirth
   captureTargetIdx=-1;
+  releaseMode=false;
   if(chosenForm === null){
     rebirthCount = 0;
     ascension3Path = null;
@@ -7168,6 +7211,7 @@ document.querySelectorAll('.left-tab-btn').forEach(function(btn){
 // ── TATTERED MODAL EVENTS ─────────────────────────────────────────────────────
 document.getElementById('tm-close-btn').addEventListener('click', closeTatteredModal);
 document.getElementById('mm-close-btn').addEventListener('click', closeMinionModal);
+document.getElementById('mm-release-btn').addEventListener('click', function(){ if(!releaseMode) enterReleaseMode(); });
 document.getElementById('reincarnate-btn').addEventListener('click', openReincarnateModal);
 document.getElementById('reincarnate-cancel-btn').addEventListener('click', function(){
   document.getElementById('reincarnate-modal').classList.remove('open');
