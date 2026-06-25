@@ -5384,13 +5384,13 @@ function calcTatteredSoulsGain(chosenForm){
 }
 
 function calcReincarnateMP(){
-  var tsThisCycle=tatteredSouls+tatteredUpgradesSpent;
+  var tsThisCycle=tatteredSouls+tatteredUpgradesSpent+calcTatteredSoulsGain(rebirthForm);
   var newTotal=totalTSSacrificed+tsThisCycle;
   return Math.floor(newTotal/666)-Math.floor(totalTSSacrificed/666);
 }
 
 function calcTSToNextMP(){
-  var current=totalTSSacrificed+tatteredSouls+tatteredUpgradesSpent;
+  var current=totalTSSacrificed+tatteredSouls+tatteredUpgradesSpent+calcTatteredSoulsGain(rebirthForm);
   var rem=current%666;
   return rem===0?666:666-rem;
 }
@@ -5403,6 +5403,7 @@ function openReincarnateModal(){
 }
 
 function doReincarnate(){
+  tatteredSouls+=calcTatteredSoulsGain(rebirthForm); // claim pending ascension TS before sacrificing
   var tsThisCycle=tatteredSouls+tatteredUpgradesSpent;
   totalTSSacrificed+=tsThisCycle;
   var mp=Math.floor(totalTSSacrificed/666)-Math.floor((totalTSSacrificed-tsThisCycle)/666);
