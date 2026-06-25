@@ -4696,12 +4696,14 @@ var TATTERED_EDGES = [
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
 
 function isTattNodeUnlocked(node){
-  if(!node.requires || node.requires.length===0){
-    if(!node.requiresAny || node.requiresAny.length===0) return true;
-  }
-  var reqOk=!node.requires||node.requires.length===0||node.requires.every(function(rid){return soulShopOwned[rid]>=1;});
-  var anyOk=!node.requiresAny||node.requiresAny.length===0||node.requiresAny.some(function(rid){return soulShopOwned[rid]>=1;});
-  return reqOk&&anyOk;
+  // Center node is always available
+  if(node.type==='center') return true;
+  // A node is unlocked only if an edge-connected neighbor has been purchased
+  return TATTERED_EDGES.some(function(edge){
+    if(edge.from===node.id) return soulShopOwned[edge.to]>=1;
+    if(edge.to===node.id)   return soulShopOwned[edge.from]>=1;
+    return false;
+  });
 }
 
 function buyTatteredNode(id){
