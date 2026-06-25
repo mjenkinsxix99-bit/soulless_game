@@ -3062,6 +3062,8 @@ function fmtCoin(n){
 function spawnSoulCoins(){
   var _tm=document.getElementById('tattered-modal');
   if(_tm&&_tm.classList.contains('open')) return;
+  var _mm=document.getElementById('minion-modal');
+  if(_mm&&_mm.classList.contains('open')) return;
   // Mana gain: each of the 3 bubbles contributes 0.00001 × completed floors this ascension
   var _floorsComp=completedFloorsThisAscension.length;
   if(_floorsComp>0){
