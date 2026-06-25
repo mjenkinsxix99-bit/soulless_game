@@ -506,6 +506,39 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #final-confirm-no { padding: 8px 16px; background: transparent; border: 1px solid #332244; color: #554477; font-family: Georgia,serif; font-size: 14px; cursor: pointer; border-radius: 4px; }
 #final-confirm-no:hover { border-color: #554466; color: #776699; }
 
+/* ── FORM MASTER MODAL ──────────────────────────────────────────────────────── */
+#form-master-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 10008; align-items: center; justify-content: center; }
+#form-master-modal.open { display: flex; }
+#form-master-box { background: #0a0a18; border: 1px solid #d4a843; border-radius: 10px; padding: 26px 28px; max-width: 660px; width: 96%; max-height: 92vh; overflow-y: auto; text-align: center; box-shadow: 0 0 40px rgba(212,168,67,0.2); }
+#form-master-title { font-size: 26px; color: #ffd700; letter-spacing: 3px; margin-bottom: 8px; font-family: Georgia,serif; text-shadow: 0 0 18px rgba(212,168,67,0.6); }
+#form-master-subtitle { font-size: 13px; color: #9977aa; letter-spacing: 0.5px; line-height: 1.6; margin-bottom: 18px; }
+#fm-form-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 14px; }
+.fm-form-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 7px; padding: 8px 4px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
+.fm-form-card:hover { border-color: #4433aa; background: #111128; }
+.fm-form-card.picked { border-color: #ffd700; background: #1a1200; box-shadow: 0 0 10px rgba(212,168,67,0.35); }
+.fm-form-card img { width: 54px; height: 54px; border-radius: 3px; display: block; margin: 0 auto 5px; object-fit: cover; }
+.fm-form-name { font-size: 11px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 0.5px; margin-bottom: 2px; }
+.fm-form-bonus { font-size: 10px; color: #557733; letter-spacing: 0.3px; }
+#fm-preview { display: flex; align-items: center; gap: 0; margin: 6px 0 14px; }
+#fm-preview-line, #fm-preview-line2 { flex: 1; height: 1px; background: linear-gradient(to right, transparent, #3a2e6e, transparent); }
+#fm-preview-inner { flex: 0 0 auto; padding: 0 14px; }
+#fm-preview-canvas { display: block; width: 128px; height: 128px; border-radius: 4px; image-rendering: pixelated; }
+.fm-path-section { margin-bottom: 10px; }
+.fm-path-label { font-size: 10px; color: #554477; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+.fm-path-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fm-path-card { background: #0d0d1e; border: 2px solid #1e1845; border-radius: 7px; padding: 10px 6px; cursor: pointer; text-align: center; transition: border-color 0.2s, background 0.2s; }
+.fm-path-card:hover { border-color: #4433aa; background: #111128; }
+.fm-path-card.picked { border-color: #ffd700; background: #1a1200; box-shadow: 0 0 10px rgba(212,168,67,0.35); }
+.fm-path-art { width: 60px; height: 60px; border-radius: 3px; margin: 0 auto 6px; background-size: 360px 60px; background-repeat: no-repeat; }
+.fm-path-name { font-size: 12px; color: #c0a0ff; font-family: Georgia,serif; letter-spacing: 0.5px; margin-bottom: 2px; }
+.fm-path-bonus { font-size: 10px; color: #557733; letter-spacing: 0.3px; }
+#fm-buttons { display: flex; gap: 14px; justify-content: center; margin-top: 18px; }
+#fm-ether-btn { flex: 1; max-width: 200px; padding: 12px 16px; background: #3a0070; border: 2px solid #8833cc; color: #ffd700; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.2s, box-shadow 0.2s; }
+#fm-ether-btn:hover { background: #4a0090; box-shadow: 0 0 14px rgba(136,51,204,0.5); }
+#fm-begin-btn { flex: 1; max-width: 160px; padding: 12px 16px; background: #0a3a0a; border: 2px solid #226622; color: #aaaaaa; font-family: Georgia,serif; font-size: 14px; letter-spacing: 2px; cursor: default; border-radius: 6px; opacity: 0.45; transition: background 0.2s, box-shadow 0.2s, opacity 0.2s; }
+#fm-begin-btn.ready { background: #0d5a0d; border-color: #44bb44; color: #ffd700; opacity: 1; cursor: pointer; box-shadow: 0 0 12px rgba(68,187,68,0.4); }
+#fm-begin-btn.ready:hover { background: #0f700f; box-shadow: 0 0 22px rgba(68,187,68,0.7); }
+
 /* ── INTRO SEQUENCE ─────────────────────────────────────────────────────────── */
 #intro-overlay { display:none; position:fixed; inset:0; z-index:99999; background:#000; flex-direction:column; align-items:center; justify-content:center; }
 #intro-overlay.open { display:flex; }
@@ -1578,6 +1611,144 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <p id="final-confirm-text"></p>
       <button id="final-confirm-yes">Yes.</button>
       <button id="final-confirm-no">Go Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- Form Master Modal (unlocked after earning all 6 form ultimates) -->
+<div id="form-master-modal">
+  <div id="form-master-box">
+    <div id="form-master-title">Form Master</div>
+    <div id="form-master-subtitle">You may choose all your forms now, or choose to start as Ether again.</div>
+
+    <div id="fm-form-grid">
+      <div class="fm-form-card" data-form="masculine">
+        <img src="artwork/masculine.webp" alt="Masculine">
+        <div class="fm-form-name">Masculine</div>
+        <div class="fm-form-bonus">+10% DPS</div>
+      </div>
+      <div class="fm-form-card" data-form="feminine">
+        <img src="artwork/feminine.webp" alt="Feminine">
+        <div class="fm-form-name">Feminine</div>
+        <div class="fm-form-bonus">+10% Tattered Souls</div>
+      </div>
+      <div class="fm-form-card" data-form="androgynous">
+        <img src="artwork/androgynous.webp" alt="Androgynous">
+        <div class="fm-form-name">Androgynous</div>
+        <div class="fm-form-bonus">+10% Souls</div>
+      </div>
+      <div class="fm-form-card" data-form="canine">
+        <img src="artwork/canine.webp" alt="Canine">
+        <div class="fm-form-name">Canine</div>
+        <div class="fm-form-bonus">+10% Strike Dmg</div>
+      </div>
+      <div class="fm-form-card" data-form="feline">
+        <img src="artwork/feline.webp" alt="Feline">
+        <div class="fm-form-name">Feline</div>
+        <div class="fm-form-bonus">+10% Mana</div>
+      </div>
+      <div class="fm-form-card" data-form="equine">
+        <img src="artwork/equine.webp" alt="Equine">
+        <div class="fm-form-name">Equine</div>
+        <div class="fm-form-bonus">-10% Augment Cost</div>
+      </div>
+    </div>
+
+    <div id="fm-preview">
+      <div id="fm-preview-line"></div>
+      <div id="fm-preview-inner">
+        <canvas id="fm-preview-canvas" width="128" height="128"></canvas>
+      </div>
+      <div id="fm-preview-line2"></div>
+    </div>
+
+    <div class="fm-path-section">
+      <div class="fm-path-label">Ascension III</div>
+      <div class="fm-path-grid" id="fm-path3-grid">
+        <div class="fm-path-card" data-path3="shadow">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:0px 0;"></div>
+          <div class="fm-path-name">Shadow</div>
+          <div class="fm-path-bonus">+5% Tattered Souls</div>
+        </div>
+        <div class="fm-path-card" data-path3="holy">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:-60px 0;"></div>
+          <div class="fm-path-name">Holy</div>
+          <div class="fm-path-bonus">+5% DPS</div>
+        </div>
+        <div class="fm-path-card" data-path3="mystic">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:-120px 0;"></div>
+          <div class="fm-path-name">Mystic</div>
+          <div class="fm-path-bonus">+5% Souls gained</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fm-path-section">
+      <div class="fm-path-label">Ascension IV</div>
+      <div class="fm-path-grid" id="fm-path4-grid">
+        <div class="fm-path-card" data-path4="shadow">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:0px 0;"></div>
+          <div class="fm-path-name">Shadow</div>
+          <div class="fm-path-bonus">+5% Mana Gain</div>
+        </div>
+        <div class="fm-path-card" data-path4="holy">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:-60px 0;"></div>
+          <div class="fm-path-name">Holy</div>
+          <div class="fm-path-bonus">+5% Strike Damage</div>
+        </div>
+        <div class="fm-path-card" data-path4="mystic">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:-120px 0;"></div>
+          <div class="fm-path-name">Mystic</div>
+          <div class="fm-path-bonus">-5% Augment Cost</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fm-path-section">
+      <div class="fm-path-label">Ascension V</div>
+      <div class="fm-path-grid" id="fm-path5-grid">
+        <div class="fm-path-card" data-path5="shadow">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:0px 0;"></div>
+          <div class="fm-path-name">Shadow</div>
+          <div class="fm-path-bonus">+5% DPS</div>
+        </div>
+        <div class="fm-path-card" data-path5="holy">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:-60px 0;"></div>
+          <div class="fm-path-name">Holy</div>
+          <div class="fm-path-bonus">+5% Mana Gain</div>
+        </div>
+        <div class="fm-path-card" data-path5="mystic">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:-120px 0;"></div>
+          <div class="fm-path-name">Mystic</div>
+          <div class="fm-path-bonus">+5% Strike Damage</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fm-path-section">
+      <div class="fm-path-label">Ascension VI</div>
+      <div class="fm-path-grid" id="fm-path6-grid">
+        <div class="fm-path-card" data-path6="steel">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:-240px 0;"></div>
+          <div class="fm-path-name">Steel</div>
+          <div class="fm-path-bonus">+10% DPS</div>
+        </div>
+        <div class="fm-path-card" data-path6="leather">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:-180px 0;"></div>
+          <div class="fm-path-name">Leather</div>
+          <div class="fm-path-bonus">+10% Tattered Souls</div>
+        </div>
+        <div class="fm-path-card" data-path6="knowledge">
+          <div class="fm-path-art" style="background-image:url('artwork/sprites_asc_paths.webp');background-position:-300px 0;"></div>
+          <div class="fm-path-name">Wisdom</div>
+          <div class="fm-path-bonus">+10% Mana Generation</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="fm-buttons">
+      <button id="fm-ether-btn">Play from Ether</button>
+      <button id="fm-begin-btn">Begin</button>
     </div>
   </div>
 </div>
@@ -6172,9 +6343,13 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
     document.getElementById('final-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('final-modal').classList.add('open');
   } else {
-    document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
-    document.getElementById('form-confirm-btn').classList.remove('show');
-    document.getElementById('form-modal').classList.add('open');
+    if(hasAllFormUlts()){
+      openFormMasterModal();
+    } else {
+      document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
+      document.getElementById('form-confirm-btn').classList.remove('show');
+      document.getElementById('form-modal').classList.add('open');
+    }
   }
 });
 
@@ -6534,6 +6709,133 @@ document.getElementById('final-confirm-yes').addEventListener('click',function()
 document.getElementById('final-confirm-no').addEventListener('click',function(){
   document.getElementById('final-confirm').classList.remove('show');
   _pendingFinalChoice=null;
+});
+
+// ── FORM MASTER MODAL ────────────────────────────────────────────────────────
+function hasAllFormUlts(){
+  return ['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine'].every(function(id){return achievementsEarned.indexOf(id)>=0;});
+}
+
+var _fmForm=null, _fmPath3=null, _fmPath4=null, _fmPath5=null, _fmPath6=null;
+
+var _FM_SHEETS={
+  masculine:   function(){return maleAscSheet;},
+  feminine:    function(){return femaleAscSheet;},
+  androgynous: function(){return androAscSheet;},
+  feline:      function(){return felineAscSheet;},
+  canine:      function(){return canineAscSheet;},
+  equine:      function(){return equineAscSheet;}
+};
+var _FM_GRID_FNS={
+  masculine:   getMaleAscGridPos,
+  feminine:    getFemaleAscGridPos,
+  androgynous: getAndroAscGridPos,
+  feline:      getFelineAscGridPos,
+  canine:      getCanineAscGridPos,
+  equine:      getEquineAscGridPos
+};
+
+function _fmDrawPreview(){
+  var canvas=document.getElementById('fm-preview-canvas');
+  var ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!_fmForm){
+    ctx.fillStyle='#332255';
+    ctx.font='italic 11px Georgia';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('— choose a form —',canvas.width/2,canvas.height/2);
+    return;
+  }
+  var sheet=_FM_SHEETS[_fmForm]&&_FM_SHEETS[_fmForm]();
+  var getPos=_FM_GRID_FNS[_fmForm];
+  if(!sheet||!getPos||!sheet.naturalWidth){ return; }
+  var gpos=getPos(6,_fmPath3,_fmPath4,_fmPath5,_fmPath6);
+  var gcol=gpos%MALE_ASC_COLS;
+  var grow=Math.floor(gpos/MALE_ASC_COLS);
+  ctx.drawImage(sheet,gcol*MALE_ASC_CELL,grow*MALE_ASC_CELL,MALE_ASC_CELL,MALE_ASC_CELL,0,0,canvas.width,canvas.height);
+}
+
+function openFormMasterModal(){
+  _fmForm=null; _fmPath3=null; _fmPath4=null; _fmPath5=null; _fmPath6=null;
+  document.querySelectorAll('.fm-form-card,.fm-path-card').forEach(function(c){c.classList.remove('picked');});
+  document.getElementById('fm-begin-btn').classList.remove('ready');
+  document.getElementById('form-master-modal').classList.add('open');
+  _fmDrawPreview();
+}
+
+function _fmCheckReady(){
+  var ready=_fmForm&&_fmPath3&&_fmPath4&&_fmPath5&&_fmPath6;
+  document.getElementById('fm-begin-btn').classList.toggle('ready',!!ready);
+}
+
+document.querySelectorAll('.fm-form-card').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.fm-form-card').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _fmForm=card.getAttribute('data-form');
+    _fmDrawPreview();
+    _fmCheckReady();
+  });
+});
+
+document.querySelectorAll('.fm-path-card[data-path3]').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.fm-path-card[data-path3]').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _fmPath3=card.getAttribute('data-path3');
+    _fmDrawPreview();
+    _fmCheckReady();
+  });
+});
+document.querySelectorAll('.fm-path-card[data-path4]').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.fm-path-card[data-path4]').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _fmPath4=card.getAttribute('data-path4');
+    _fmDrawPreview();
+    _fmCheckReady();
+  });
+});
+document.querySelectorAll('.fm-path-card[data-path5]').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.fm-path-card[data-path5]').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _fmPath5=card.getAttribute('data-path5');
+    _fmDrawPreview();
+    _fmCheckReady();
+  });
+});
+document.querySelectorAll('.fm-path-card[data-path6]').forEach(function(card){
+  card.addEventListener('click',function(){
+    document.querySelectorAll('.fm-path-card[data-path6]').forEach(function(c){c.classList.remove('picked');});
+    card.classList.add('picked');
+    _fmPath6=card.getAttribute('data-path6');
+    _fmDrawPreview();
+    _fmCheckReady();
+  });
+});
+
+document.getElementById('fm-ether-btn').addEventListener('click',function(){
+  document.getElementById('form-master-modal').classList.remove('open');
+  document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
+  document.getElementById('form-confirm-btn').classList.remove('show');
+  document.getElementById('form-modal').classList.add('open');
+});
+
+document.getElementById('fm-begin-btn').addEventListener('click',function(){
+  if(!_fmForm||!_fmPath3||!_fmPath4||!_fmPath5||!_fmPath6) return;
+  document.getElementById('form-master-modal').classList.remove('open');
+  ascension3Path=_fmPath3;
+  ascension4Path=_fmPath4;
+  ascension5Path=_fmPath5;
+  ascension6Path=_fmPath6;
+  rebirthCount=5;
+  hasEverAscended=true;
+  soulShopOwned['auto-progress']=1;
+  hasEverHadAutoProgress=true;
+  doRebirthReset(_fmForm);
+  _fmForm=null; _fmPath3=null; _fmPath4=null; _fmPath5=null; _fmPath6=null;
 });
 
 // ── INPUT ─────────────────────────────────────────────────────────────────────
