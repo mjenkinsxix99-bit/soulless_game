@@ -7506,13 +7506,6 @@ if(!_hadSave && showIntro){
   }
 }
 spawnEnemy();
-// TESTING: grant all form ultimates and show Ascend button for Form Master modal testing
-['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine','form-ult-all'].forEach(function(id){
-  if(achievementsEarned.indexOf(id)<0) achievementsEarned.push(id);
-});
-(function(){ var dm=REP_UPGRADES.find(function(u){return u.id==='dm';}); if(dm&&dm.level<1) dm.level=1; })();
-rebirthCount=0; rebirthForm=null; ascension3Path=null; ascension4Path=null; ascension5Path=null; ascension6Path=null;
-document.getElementById('ascend-btn').style.display='block';
 checkAchievements(true);
 updateMinionTabBtn();
 renderAchievementsTab();
