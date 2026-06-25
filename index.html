@@ -521,9 +521,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .fm-form-bonus { font-size: 10px; color: #557733; letter-spacing: 0.3px; }
 #fm-preview { display: flex; align-items: center; gap: 0; margin: 6px 0 14px; }
 #fm-preview-line, #fm-preview-line2 { flex: 1; height: 1px; background: linear-gradient(to right, transparent, #3a2e6e, transparent); }
-#fm-preview-inner { flex: 0 0 auto; padding: 0 14px; min-width: 80px; min-height: 70px; display: flex; align-items: center; justify-content: center; }
-#fm-preview-img { width: 80px; height: 80px; border-radius: 4px; object-fit: cover; display: none; }
-#fm-preview-placeholder { font-size: 11px; color: #332255; letter-spacing: 1px; font-family: Georgia,serif; font-style: italic; }
+#fm-preview-inner { flex: 0 0 auto; padding: 0 14px; }
+#fm-preview-canvas { display: block; width: 128px; height: 128px; border-radius: 4px; image-rendering: pixelated; }
 .fm-path-section { margin-bottom: 10px; }
 .fm-path-label { font-size: 10px; color: #554477; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
 .fm-path-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -1658,8 +1657,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <div id="fm-preview">
       <div id="fm-preview-line"></div>
       <div id="fm-preview-inner">
-        <img id="fm-preview-img" src="" alt="">
-        <div id="fm-preview-placeholder">— choose a form —</div>
+        <canvas id="fm-preview-canvas" width="128" height="128"></canvas>
       </div>
       <div id="fm-preview-line2"></div>
     </div>
@@ -6720,14 +6718,50 @@ function hasAllFormUlts(){
 
 var _fmForm=null, _fmPath3=null, _fmPath4=null, _fmPath5=null, _fmPath6=null;
 
+var _FM_SHEETS={
+  masculine:   function(){return maleAscSheet;},
+  feminine:    function(){return femaleAscSheet;},
+  androgynous: function(){return androAscSheet;},
+  feline:      function(){return felineAscSheet;},
+  canine:      function(){return canineAscSheet;},
+  equine:      function(){return equineAscSheet;}
+};
+var _FM_GRID_FNS={
+  masculine:   getMaleAscGridPos,
+  feminine:    getFemaleAscGridPos,
+  androgynous: getAndroAscGridPos,
+  feline:      getFelineAscGridPos,
+  canine:      getCanineAscGridPos,
+  equine:      getEquineAscGridPos
+};
+
+function _fmDrawPreview(){
+  var canvas=document.getElementById('fm-preview-canvas');
+  var ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!_fmForm){
+    ctx.fillStyle='#332255';
+    ctx.font='italic 11px Georgia';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('— choose a form —',canvas.width/2,canvas.height/2);
+    return;
+  }
+  var sheet=_FM_SHEETS[_fmForm]&&_FM_SHEETS[_fmForm]();
+  var getPos=_FM_GRID_FNS[_fmForm];
+  if(!sheet||!getPos||!sheet.naturalWidth){ return; }
+  var gpos=getPos(6,_fmPath3,_fmPath4,_fmPath5,_fmPath6);
+  var gcol=gpos%MALE_ASC_COLS;
+  var grow=Math.floor(gpos/MALE_ASC_COLS);
+  ctx.drawImage(sheet,gcol*MALE_ASC_CELL,grow*MALE_ASC_CELL,MALE_ASC_CELL,MALE_ASC_CELL,0,0,canvas.width,canvas.height);
+}
+
 function openFormMasterModal(){
   _fmForm=null; _fmPath3=null; _fmPath4=null; _fmPath5=null; _fmPath6=null;
   document.querySelectorAll('.fm-form-card,.fm-path-card').forEach(function(c){c.classList.remove('picked');});
-  document.getElementById('fm-preview-img').style.display='none';
-  document.getElementById('fm-preview-img').src='';
-  document.getElementById('fm-preview-placeholder').style.display='';
   document.getElementById('fm-begin-btn').classList.remove('ready');
   document.getElementById('form-master-modal').classList.add('open');
+  _fmDrawPreview();
 }
 
 function _fmCheckReady(){
@@ -6740,10 +6774,7 @@ document.querySelectorAll('.fm-form-card').forEach(function(card){
     document.querySelectorAll('.fm-form-card').forEach(function(c){c.classList.remove('picked');});
     card.classList.add('picked');
     _fmForm=card.getAttribute('data-form');
-    var img=document.getElementById('fm-preview-img');
-    img.src='artwork/'+_fmForm+'.webp';
-    img.style.display='block';
-    document.getElementById('fm-preview-placeholder').style.display='none';
+    _fmDrawPreview();
     _fmCheckReady();
   });
 });
@@ -6753,6 +6784,7 @@ document.querySelectorAll('.fm-path-card[data-path3]').forEach(function(card){
     document.querySelectorAll('.fm-path-card[data-path3]').forEach(function(c){c.classList.remove('picked');});
     card.classList.add('picked');
     _fmPath3=card.getAttribute('data-path3');
+    _fmDrawPreview();
     _fmCheckReady();
   });
 });
@@ -6761,6 +6793,7 @@ document.querySelectorAll('.fm-path-card[data-path4]').forEach(function(card){
     document.querySelectorAll('.fm-path-card[data-path4]').forEach(function(c){c.classList.remove('picked');});
     card.classList.add('picked');
     _fmPath4=card.getAttribute('data-path4');
+    _fmDrawPreview();
     _fmCheckReady();
   });
 });
@@ -6769,6 +6802,7 @@ document.querySelectorAll('.fm-path-card[data-path5]').forEach(function(card){
     document.querySelectorAll('.fm-path-card[data-path5]').forEach(function(c){c.classList.remove('picked');});
     card.classList.add('picked');
     _fmPath5=card.getAttribute('data-path5');
+    _fmDrawPreview();
     _fmCheckReady();
   });
 });
@@ -6777,6 +6811,7 @@ document.querySelectorAll('.fm-path-card[data-path6]').forEach(function(card){
     document.querySelectorAll('.fm-path-card[data-path6]').forEach(function(c){c.classList.remove('picked');});
     card.classList.add('picked');
     _fmPath6=card.getAttribute('data-path6');
+    _fmDrawPreview();
     _fmCheckReady();
   });
 });
