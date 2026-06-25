@@ -694,7 +694,13 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tm-node.type-speed.state-affordable .tm-node-ring  { border-color:#9aaabb; background:#111520; animation:nodeAffordPulse 2s ease-in-out infinite; }
 .tm-node.type-dps.state-locked .tm-node-ring,.tm-node.type-strike.state-locked .tm-node-ring,
 .tm-node.type-souls.state-locked .tm-node-ring,.tm-node.type-hp.state-locked .tm-node-ring,
-.tm-node.type-mana.state-locked .tm-node-ring,.tm-node.type-speed.state-locked .tm-node-ring { opacity:0.35; cursor:default; }
+.tm-node.type-mana.state-locked .tm-node-ring,.tm-node.type-speed.state-locked .tm-node-ring,
+.tm-node.type-ts.state-locked .tm-node-ring { opacity:0.35; cursor:default; }
+.tm-node.type-ts .tm-node-ring   { width:30px; height:30px; border-color:#994400; background:#1e0d00; }
+.tm-node.type-ts.state-purchased .tm-node-ring { border-color:#ff8800; background:#4a2000; box-shadow:0 0 10px rgba(255,130,0,0.7); }
+.tm-node.type-ts.state-affordable .tm-node-ring { border-color:#cc6600; background:#1e0d00; animation:nodeAffordPulse 2s ease-in-out infinite; }
+.tm-node.type-ts .tm-node-name { display:none; }
+.tm-node.type-ts .tm-node-icon { display:none; }
 @keyframes nodeAffordPulse { 0%,100%{opacity:0.7;} 50%{opacity:1;} }
 .tm-node-icon { font-size:16px; line-height:1; pointer-events:none; }
 .tm-node.type-center .tm-node-icon { font-size:18px; }
@@ -3690,7 +3696,7 @@ function recalcStats(){
   var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
     'blade-dps':0.333,'souls-dps-1':0.333,'souls-dps-2':0.333,'rule-dps-1':0.333,'rule-dps-2':0.333,
     'strikes-dps-1':0.333,'strikes-dps-2':0.333,'power3-dps-1':0.333,'power3-dps-2':0.333,
-    'mana-dps-1':0.333,'mana-dps-2':0.666,'invoke-dps-1':0.666,'invoke-dps-2':0.333};
+    'mana-dps-2':0.666,'invoke-dps-1':0.666,'invoke-dps-2':0.333};
   var _tdpsSum=0;
   for(var _dk in _tdps){if(soulShopOwned[_dk]>=1)_tdpsSum+=_tdps[_dk];}
   if(_tdpsSum>0){totalDps=totalDps.mul(1+_tdpsSum);clickDmgBonus=clickDmgBonus.mul(1+_tdpsSum);}
@@ -3705,6 +3711,7 @@ function recalcStats(){
   // HP drain
   if(soulShopOwned['blade-hp']>=1) tattTsGainMult+=0.333;
   if(soulShopOwned['rule-hp']>=1) tattTsGainMult+=0.333;
+  if(soulShopOwned['mana-dps-1']>=1) tattTsGainMult+=0.333;
   // Mana cap: recompute from purchased mana nodes
   var _tmana={'flurry-speed':50,'crit-speed':75,'blade-speed':100,'souls-speed':125,'rule-speed':150,
     'strikes-speed':175,'power3-speed':225,'mana-speed':250,'invoke-speed':250};
@@ -4577,8 +4584,8 @@ var TATTERED_NODES = [
   { id:'mana-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:3240,
     desc:'Increases Mana cap by 250 and Mana regen rate by 85%.',
     x:300,  y:45,   requires:[] },
-  { id:'mana-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:640,
-    desc:'Increases DPS of all upgrades by +33.3%.',
+  { id:'mana-dps-1',  type:'ts',     name:'Tattered Souls +33.3%', icon:'', cost:640,
+    desc:'Increases Tattered Souls gained on Ascension by +33.3%.',
     x:349,  y:81,  requires:[] },
   { id:'mana-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:960,
     desc:'Increases all souls gained by 66.6%.',
