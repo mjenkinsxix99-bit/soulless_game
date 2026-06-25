@@ -2706,7 +2706,7 @@ function openMinionModal(){
   modal.classList.add('open');
   renderMinionModal();
   if(!_minionModalAnimId) _minionModalAnimId = requestAnimationFrame(_animateMinionCards);
-  if(!_tutShown.minionTab){ _tutShown.minionTab=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">You have discovered the Minions!</span> Turn your enemies into allies through sacrifice and make them fight for you.<br><br>This unlocks after you have obtained your first <span style="color:#ffd700;font-weight:bold;">Ultimate Form</span>. Gain their allegiance and make their power yours!<br><br>666 Tattered Souls sacrificed will gain 1 Minion Point when you <span style="color:#ffd700;font-weight:bold;">Reincarnate</span>.',document.getElementById('minion-tab-btn'),null); },600); } }
+  if(!_tutShown.minionTab){ _tutShown.minionTab=true; setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">You have discovered the Minions!</span> Turn your enemies into allies through sacrifice and make them fight for you.<br><br>This unlocks after you have obtained your first <span style="color:#ffd700;font-weight:bold;">Ultimate Form</span>. Gain their allegiance and make their power yours!<br><br>666 Tattered Souls sacrificed will gain 1 Minion Point when you <span style="color:#ffd700;font-weight:bold;">Reincarnate</span>.',document.getElementById('minion-tab-btn'),null); },600); }
   if(!_tutShown.minionCapture&&minionUnlocked&&minionPoints>=1){ _tutShown.minionCapture=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('To capture an enemy you must select which enemy you want to capture.<br>Each time you defeat them, you have a chance to capture them in exchange for MP.<br><br>Max level Minions become Elite and will survive through Ascension.<br>Non-Elite Minions refund your MP and you must recapture them.',document.getElementById('minion-tab-btn'),null); },_tutShown.minionTab?3000:600); } }
 }
 
@@ -4911,7 +4911,7 @@ function openTatteredModal(){
     updateAutoProgressBtn();
     renderTatteredGrid();
     saveGame();
-    if(showTutorial){ setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress has been gifted to you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600); }
+    setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">Welcome to the Sacrifice Grid!</span><br><br>When you Ascend you earn <span style="color:#ffd700;font-weight:bold;">Tattered Souls</span> (1 per 666 upgrades purchased and from each Elite past floor 150) — Each <span style="color:#ffd700;font-weight:bold;">TS</span> boosts your DPS, or you can spend them here for greater power.<br><br>Auto Progress has been gifted to you. Come back after your first Ascension!',document.getElementById('tattered-upgrades-btn'),null); },600);
   }
   if('ontouchstart' in window && !_tutShown.touchHint){
     _tutShown.touchHint=true;
