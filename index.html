@@ -586,6 +586,15 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #export-save-btn:hover, #import-save-label:hover { border-color: #6655cc; color: #c0b0ff; }
 #import-save-file { display: none; }
 #import-save-msg { font-size: 12px; color: #556644; margin-top: 8px; min-height: 1.4em; letter-spacing: 0.3px; }
+#promo-row { margin-top: 14px; display: flex; gap: 8px; }
+#promo-input { flex: 1; padding: 8px 10px; background: #06041a; border: 1px solid #3a2d6a; border-radius: 4px; color: #c0b0ff; font-family: Georgia,serif; font-size: 13px; letter-spacing: 1px; outline: none; }
+#promo-input:focus { border-color: #6655cc; }
+#promo-input::placeholder { color: #443366; }
+#promo-btn { padding: 8px 14px; background: transparent; border: 1px solid #3a2d6a; color: #7766aa; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; white-space: nowrap; transition: border-color 0.2s, color 0.2s; }
+#promo-btn:hover { border-color: #6655cc; color: #c0b0ff; }
+#promo-msg { font-size: 12px; margin-top: 6px; min-height: 1.4em; letter-spacing: 0.3px; }
+#promo-msg.ok { color: #55bb66; }
+#promo-msg.err { color: #bb4444; }
 .stat-row { display: flex; justify-content: space-between; font-size: 15px; color: #776699; padding: 3px 0; border-bottom: 1px solid #0f0f1e; }
 .stat-row .sv { color: #7766aa; }
 .stat-row .sv.good { color: #88aa88; }
@@ -1820,6 +1829,11 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       </label>
     </div>
     <div id="import-save-msg"></div>
+    <div id="promo-row">
+      <input type="text" id="promo-input" placeholder="Enter code..." maxlength="32" autocomplete="off" spellcheck="false">
+      <button id="promo-btn">Redeem</button>
+    </div>
+    <div id="promo-msg"></div>
     <button id="hard-reset-btn">Hard Reset</button>
     <br>
     <button id="settings-close">Close</button>
@@ -3232,6 +3246,7 @@ var ascendCount=0;
 var currentAscensionKills=0;
 var eliteBountyTSEarned=0;
 var minionPoints=0;
+var redeemedCodes=[];
 var captureTargetIdx=-1;
 var releaseMode=false;
 var petMinionIdx=-1;
@@ -5626,6 +5641,7 @@ function saveGame(){
     discoveredMinions:discoveredMinions.slice(),
     elementStocks:JSON.parse(JSON.stringify(elementStocks)),
     lastElementTick:_lastElementTick,
+    redeemedCodes:redeemedCodes.slice(),
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -5716,6 +5732,7 @@ function loadGame(){
   if(data.discoveredMinions) discoveredMinions=data.discoveredMinions;
   if(data.elementStocks) elementStocks=data.elementStocks;
   if(data.lastElementTick) _lastElementTick=data.lastElementTick;
+  if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
   _offlineSavedAt=data.savedAt||0;
   return true;
 }
@@ -7116,6 +7133,8 @@ document.getElementById('settings-btn').addEventListener('click',function(){
   document.getElementById('hard-reset-btn').style.display='';
   updateVolumeSlider();
   syncIntroToggleUI();
+  var pm=document.getElementById('promo-msg'); if(pm){ pm.textContent=''; pm.className=''; }
+  var pi=document.getElementById('promo-input'); if(pi) pi.value='';
   document.getElementById('settings-modal').classList.add('open');
 });
 
@@ -7139,6 +7158,35 @@ document.getElementById('volume-slider').addEventListener('input',function(){
 document.getElementById('hard-reset-btn').addEventListener('click',function(){
   document.getElementById('hard-reset-confirm').style.display='block';
   this.style.display='none';
+});
+
+// ── PROMO CODES ───────────────────────────────────────────────────────────────
+var PROMO_CODES = {
+  'SOULLESS2': 2,
+  'MINION3': 3,
+  'DARKGIFT5': 5
+};
+
+function redeemPromoCode(){
+  var inp=document.getElementById('promo-input');
+  var msg=document.getElementById('promo-msg');
+  var code=(inp.value||'').trim().toUpperCase();
+  if(!code){ msg.className='err'; msg.textContent='Enter a code first.'; return; }
+  if(redeemedCodes.indexOf(code)!==-1){ msg.className='err'; msg.textContent='Code already redeemed.'; return; }
+  var reward=PROMO_CODES[code];
+  if(reward===undefined){ msg.className='err'; msg.textContent='Invalid code.'; return; }
+  redeemedCodes.push(code);
+  minionPoints+=reward;
+  saveGame();
+  updateMinionUI();
+  inp.value='';
+  msg.className='ok';
+  msg.textContent='Redeemed! You received '+reward+' MP.';
+}
+
+document.getElementById('promo-btn').addEventListener('click', redeemPromoCode);
+document.getElementById('promo-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter') redeemPromoCode();
 });
 
 document.getElementById('hard-reset-no').addEventListener('click',function(){
