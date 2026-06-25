@@ -6714,6 +6714,10 @@ document.getElementById('final-confirm-no').addEventListener('click',function(){
 });
 
 // ── FORM MASTER MODAL ────────────────────────────────────────────────────────
+function hasAllFormUlts(){
+  return ['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine'].every(function(id){return achievementsEarned.indexOf(id)>=0;});
+}
+
 var _fmForm=null, _fmPath3=null, _fmPath4=null, _fmPath5=null, _fmPath6=null;
 
 function openFormMasterModal(){
