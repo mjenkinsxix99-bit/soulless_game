@@ -178,6 +178,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-pet-btn { position:absolute; top:4px; left:4px; background:#1a6b1a; border:1px solid #33aa33; color:#aaffaa; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; cursor:pointer; z-index:2; font-family:Georgia,serif; transition:all 0.15s; }
 .mm-pet-btn:hover { background:#22aa22; border-color:#55ff55; }
 .mm-pet-btn-active { background:#33cc33; border-color:#88ff88; color:#000; box-shadow:0 0 6px rgba(80,255,80,0.6); }
+.mm-pet-btn-disabled { background:#1a1a1a; border:1px solid #444; color:#555; cursor:not-allowed; opacity:0.45; }
 .mm-card-name { font-size:16px; font-weight:bold; color:#336633; letter-spacing:1px; line-height:1.2; }
 .mm-card-discovered .mm-card-name { color:#44cc44; }
 .mm-card-elite.mm-card-discovered .mm-card-name { color:#ffd700; }
@@ -3023,16 +3024,22 @@ function renderMinionModal(){
       card.className='mm-card'+(isEliteType?' mm-card-elite':'')+(discovered?' mm-card-discovered':'');
 
       // Pet button (top-left of card)
-      (function(petIdx){
+      (function(petIdx, owned){
         var petBtn=document.createElement('button');
-        petBtn.className='mm-pet-btn'+(petMinionIdx===petIdx?' mm-pet-btn-active':'');
-        petBtn.textContent='Pet';
-        petBtn.addEventListener('click',function(e){
-          e.stopPropagation();
-          setPetMinion(petIdx);
-        });
+        if(!owned){
+          petBtn.className='mm-pet-btn mm-pet-btn-disabled';
+          petBtn.textContent='Pet';
+          petBtn.disabled=true;
+        } else {
+          petBtn.className='mm-pet-btn'+(petMinionIdx===petIdx?' mm-pet-btn-active':'');
+          petBtn.textContent='Pet';
+          petBtn.addEventListener('click',function(e){
+            e.stopPropagation();
+            setPetMinion(petIdx);
+          });
+        }
         card.appendChild(petBtn);
-      })(idx);
+      })(idx, !!heldMinion);
 
       // Name
       var nameEl=document.createElement('div');
