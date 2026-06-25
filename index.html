@@ -3581,7 +3581,7 @@ function onEnemyDeath(){
     if(defeatedElites.indexOf(typeIdx2)<0){
       defeatedElites.push(typeIdx2);
       var _eliteGF=absGlobalFloor(curRealm,curLevel,FLOORS_PER_LEVEL+1);
-      if(_eliteGF>=150) eliteBountyTSEarned+=Math.floor(_eliteGF/100);
+      if(_eliteGF>=150) eliteBountyTSEarned+=Math.round(_eliteGF/100);
       if(curRealm===highestRealm){
         // add next type to pool if not already there
         var nextType=typeIdx2+1;
