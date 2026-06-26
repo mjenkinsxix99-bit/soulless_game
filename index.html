@@ -5414,6 +5414,7 @@ function doReincarnate(){
   totalTSSacrificed+=tsThisCycle;
   var mp=Math.floor(totalTSSacrificed/666)-Math.floor((totalTSSacrificed-tsThisCycle)/666);
   minionPoints+=mp;
+  saveGame(); // persist MP gain before any reset code can interfere
 
   // Full reset — same as ascension but also wipes TS and soulShop (except auto-progress)
   souls=D(0); totalSouls=D(0);
