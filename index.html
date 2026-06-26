@@ -5409,12 +5409,10 @@ function openReincarnateModal(){
 }
 
 function doReincarnate(){
-  tatteredSouls+=calcTatteredSoulsGain(rebirthForm); // claim pending ascension TS before sacrificing
-  var tsThisCycle=tatteredSouls+tatteredUpgradesSpent;
-  totalTSSacrificed+=tsThisCycle;
-  var mp=Math.floor(totalTSSacrificed/666)-Math.floor((totalTSSacrificed-tsThisCycle)/666);
+  var mp=calcReincarnateMP(); // capture before any state changes — same value the modal showed
+  tatteredSouls+=calcTatteredSoulsGain(rebirthForm);
+  totalTSSacrificed+=tatteredSouls+tatteredUpgradesSpent;
   minionPoints+=mp;
-  saveGame(); // persist MP gain before any reset code can interfere
 
   // Full reset — same as ascension but also wipes TS and soulShop (except auto-progress)
   souls=D(0); totalSouls=D(0);
