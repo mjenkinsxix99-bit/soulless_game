@@ -5453,6 +5453,7 @@ function doReincarnate(){
   updateProgressLabel();
   updateHighestFloor();
   updateAutoProgressBtn();
+  renderMinionModal();
   saveGame();
   spawnEnemy();
 }
@@ -7184,7 +7185,7 @@ function redeemPromoCode(){
   redeemedCodes.push(code);
   minionPoints+=reward;
   saveGame();
-  updateMinionUI();
+  renderMinionModal();
   inp.value='';
   msg.className='ok';
   msg.textContent='Redeemed! You received '+reward+' MP.';
