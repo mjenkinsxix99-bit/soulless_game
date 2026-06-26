@@ -1381,6 +1381,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     <div class="reincarnate-info">You will gain <strong id="reincarnate-mp-gain" style="color:#44cc44">0</strong> Minion Points to turn enemies into friends. Maxed level Minions become Elite and stay with you.</div>
     <div class="reincarnate-info"><span class="reincarnate-loss">You will lose all progress, souls, upgrades and Tattered Souls.</span></div>
     <div class="reincarnate-info"><span class="reincarnate-keep">You will keep all Honors and this form's bonus.</span></div>
+    <div id="reincarnate-zero-warning" style="display:none;margin-bottom:14px;"><span style="color:#ff4444;font-family:Georgia,serif;font-size:15px;font-weight:bold;letter-spacing:1px;">⚠ WARNING!</span> <span style="color:#ffd700;font-family:Georgia,serif;font-size:14px;">Reincarnating now will give 0 MP. Are you sure?</span></div>
     <div id="reincarnate-mp-line">Reincarnate for <span id="reincarnate-mp-confirm">0</span> MP?</div>
     <button id="reincarnate-now-btn">✦ Reincarnate Now ✦</button>
     <br>
@@ -5405,6 +5406,7 @@ function openReincarnateModal(){
   var mp=calcReincarnateMP();
   document.getElementById('reincarnate-mp-gain').textContent=mp.toLocaleString();
   document.getElementById('reincarnate-mp-confirm').textContent=mp.toLocaleString();
+  document.getElementById('reincarnate-zero-warning').style.display=mp===0?'block':'none';
   document.getElementById('reincarnate-modal').classList.add('open');
 }
 
