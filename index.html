@@ -5409,10 +5409,12 @@ function openReincarnateModal(){
 }
 
 function doReincarnate(){
-  tatteredSouls+=calcTatteredSoulsGain(rebirthForm); // claim pending ascension TS before sacrificing
+  var _dbgTsBefore=tatteredSouls, _dbgTsSpent=tatteredUpgradesSpent, _dbgTsGain=calcTatteredSoulsGain(rebirthForm), _dbgTotalBefore=totalTSSacrificed;
+  tatteredSouls+=_dbgTsGain; // claim pending ascension TS before sacrificing
   var tsThisCycle=tatteredSouls+tatteredUpgradesSpent;
   totalTSSacrificed+=tsThisCycle;
   var mp=Math.floor(totalTSSacrificed/666)-Math.floor((totalTSSacrificed-tsThisCycle)/666);
+  console.log('[REINC DEBUG] tatteredSouls='+_dbgTsBefore+' upgradesSpent='+_dbgTsSpent+' tsGain='+_dbgTsGain+' totalTSSacrificed_before='+_dbgTotalBefore+' tsThisCycle='+tsThisCycle+' mp='+mp+' minionPoints_before='+minionPoints);
   minionPoints+=mp;
 
   // Full reset — same as ascension but also wipes TS and soulShop (except auto-progress)
