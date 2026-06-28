@@ -4643,7 +4643,7 @@ function castSpell(id){
   var p3=isSpellActive('powerOf3')&&id!=='powerOf3';
   var durMult=p3?3:1;
 
-  invoke-=spell.manaCost;
+  mana-=spell.manaCost;
 
   if(id==='flurry'){
     if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
