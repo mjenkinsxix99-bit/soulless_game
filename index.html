@@ -667,11 +667,11 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #spell-panel { display:none; flex-direction:column; align-items:center; gap:4px; width:100%; padding-top:6px; }
 #spell-panel.visible { display:flex; }
 .spell-divider { width:80%; height:1px; background:#2a1a5a; margin:3px 0; }
-#mana-label { font-size:8px; color:#2d3a7a; letter-spacing:2px; text-transform:uppercase; text-align:center; margin-top:2px; }
-#mana-bar-outer { width:12px; height:80px; background:#04030f; border:1px solid #1a1a3a; border-radius:4px; overflow:hidden; position:relative; margin:1px auto; }
-#mana-bar-fill { position:absolute; bottom:0; left:0; right:0; height:0%; background:linear-gradient(to top,#1a3399,#66aaff); transition:height 0.3s ease; border-radius:3px 3px 0 0; }
-#mana-bar-fill.mana-full { background:linear-gradient(to top,#2255cc,#aaccff); box-shadow:0 0 6px rgba(100,170,255,0.6); }
-#mana-num { font-size:8px; color:#334477; text-align:center; letter-spacing:0; line-height:1.2; }
+#invoke-label { font-size:8px; color:#2d3a7a; letter-spacing:2px; text-transform:uppercase; text-align:center; margin-top:2px; }
+#invoke-bar-outer { width:12px; height:80px; background:#04030f; border:1px solid #1a1a3a; border-radius:4px; overflow:hidden; position:relative; margin:1px auto; }
+#invoke-bar-fill { position:absolute; bottom:0; left:0; right:0; height:0%; background:linear-gradient(to top,#1a3399,#66aaff); transition:height 0.3s ease; border-radius:3px 3px 0 0; }
+#invoke-bar-fill.invoke-full { background:linear-gradient(to top,#2255cc,#aaccff); box-shadow:0 0 6px rgba(100,170,255,0.6); }
+#invoke-num { font-size:8px; color:#334477; text-align:center; letter-spacing:0; line-height:1.2; }
 .spell-btn { width:44px; height:44px; border-radius:7px; border:1px solid #1a1535; background:#05040e; cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center; font-size:19px; line-height:1; flex-shrink:0; transition:border-color 0.2s,box-shadow 0.2s,opacity 0.2s; overflow:visible; }
 .spell-btn.spell-lit { border-color:#3355aa; box-shadow:0 0 7px rgba(50,90,200,0.3); opacity:1; }
 .spell-btn.spell-dim { border-color:#141230; opacity:0.35; cursor:default; }
@@ -1025,7 +1025,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     overflow: hidden !important;
   }
   #spell-panel.visible { display: flex !important; }
-  #mana-bar-outer { height: 50px !important; }
+  #invoke-bar-outer { height: 50px !important; }
   .spell-tt { right: calc(100% + 6px) !important; }
 
   /* Buy selector, minimap, right panel must sit above the absolute bg image and combat-wrap overflow */
@@ -1233,9 +1233,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;background:#2a6e2a;border-color:#3d9e3d;color:#ffffff;">BUY ALL AUGS</button>
       <div id="spell-panel">
         <div class="spell-divider"></div>
-        <div id="mana-label">mana</div>
-        <div id="mana-bar-outer"><div id="mana-bar-fill"></div></div>
-        <div id="mana-num">0<br>—<br>100</div>
+        <div id="invoke-label">mana</div>
+        <div id="invoke-bar-outer"><div id="invoke-bar-fill"></div></div>
+        <div id="invoke-num">0<br>—<br>100</div>
         <div class="spell-divider"></div>
       </div>
     </div>
@@ -3370,7 +3370,7 @@ function spawnSoulCoins(){
     if(ascension5Path==='holy') _mg*=1.05;
     if(ascension6Path==='knowledge') _mg*=1.10;
     var _tregens={'flurry-speed':0.10,'crit-speed':0.15,'blade-speed':0.20,'souls-speed':0.30,
-      'rule-speed':0.40,'strikes-speed':0.50,'power3-speed':0.65,'mana-speed':0.85,'invoke-speed':1.35};
+      'rule-speed':0.40,'power3-speed':0.50,'mana-speed':0.65,'invoke-speed':0.85,'strikes-speed':1.35};
     var _tregenSum=0;
     for(var _rk in _tregens){if(soulShopOwned[_rk]>=1)_tregenSum+=_tregens[_rk];}
     if(_tregenSum>0) _mg*=(1+_tregenSum);
@@ -3754,7 +3754,7 @@ function onEnemyDeath(){
   if(isSpellActive('twinSouls')) soulMult*=2;
   // Tattered Shop: souls gain bonus nodes
   var _tsouls={'flurry-souls':0.333,'crit-souls':0.333,'souls-souls':0.333,'rule-souls':0.333,
-    'strikes-souls':0.333,'power3-souls':0.333,'mana-souls':0.666,'invoke-souls':0.999};
+    'power3-souls':0.333,'mana-souls':0.333,'invoke-souls':0.666,'strikes-souls':0.999};
   var _tsoulsSum=0;
   for(var _sk in _tsouls){if(soulShopOwned[_sk]>=1)_tsoulsSum+=_tsouls[_sk];}
   if(_tsoulsSum>0) soulMult*=(1+_tsoulsSum);
@@ -3992,26 +3992,26 @@ function recalcStats(){
   // Tattered Shop stat node bonuses
   var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
     'blade-dps':0.333,'souls-dps-1':0.333,'souls-dps-2':0.333,'rule-dps-1':0.333,'rule-dps-2':0.333,
-    'strikes-dps-1':0.333,'strikes-dps-2':0.333,'power3-dps-1':0.333,'power3-dps-2':0.333,
-    'mana-dps-2':0.666,'invoke-dps-1':0.666,'invoke-dps-2':0.333};
+    'power3-dps-1':0.333,'power3-dps-2':0.333,'mana-dps-1':0.333,'mana-dps-2':0.333,
+    'invoke-dps-2':0.666,'strikes-dps-1':0.666,'strikes-dps-2':0.333};
   var _tdpsSum=0;
   for(var _dk in _tdps){if(soulShopOwned[_dk]>=1)_tdpsSum+=_tdps[_dk];}
   if(_tdpsSum>0){totalDps=totalDps.mul(1+_tdpsSum);clickDmgBonus=clickDmgBonus.mul(1+_tdpsSum);}
   // Strike: +0.666% of total DPS added as strike damage per node
   var _tstrSum=0;
-  ['flurry-strike','crit-strike','blade-strike-1','souls-strike','invoke-strike'].forEach(function(s){if(soulShopOwned[s]>=1)_tstrSum+=0.00666;});
+  ['flurry-strike','crit-strike','blade-strike-1','souls-strike','strikes-strike'].forEach(function(s){if(soulShopOwned[s]>=1)_tstrSum+=0.00666;});
   if(_tstrSum>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(_tstrSum));
   // Crit chance nodes (+3.33% each)
-  ['blade-strike-2','strikes-crit','power3-crit'].forEach(function(s){if(soulShopOwned[s]>=1)critClickChance+=0.0333;});
+  ['blade-strike-2','power3-crit','mana-crit'].forEach(function(s){if(soulShopOwned[s]>=1)critClickChance+=0.0333;});
   // Crit multiplier
-  if(soulShopOwned['mana-crit']>=1) critClickMult+=3.33;
+  if(soulShopOwned['invoke-crit']>=1) critClickMult+=3.33;
   // HP drain
   if(soulShopOwned['blade-hp']>=1) tattTsGainMult+=0.333;
   if(soulShopOwned['rule-hp']>=1) tattTsGainMult+=0.333;
-  if(soulShopOwned['mana-dps-1']>=1) tattTsGainMult+=0.333;
+  if(soulShopOwned['invoke-dps-1']>=1) tattTsGainMult+=0.333;
   // Mana cap: recompute from purchased mana nodes
   var _tmana={'flurry-speed':50,'crit-speed':75,'blade-speed':100,'souls-speed':125,'rule-speed':150,
-    'strikes-speed':175,'power3-speed':225,'mana-speed':250,'invoke-speed':250};
+    'power3-speed':175,'mana-speed':225,'invoke-speed':250,'strikes-speed':250};
   var _tmanaBonus=0;
   for(var _mk in _tmana){if(soulShopOwned[_mk]>=1)_tmanaBonus+=_tmana[_mk];}
   manaMax=100+_tmanaBonus;
@@ -4642,7 +4642,7 @@ function castSpell(id){
   var p3=isSpellActive('powerOf3')&&id!=='powerOf3';
   var durMult=p3?3:1;
 
-  mana-=spell.manaCost;
+  invoke-=spell.manaCost;
 
   if(id==='flurry'){
     if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
@@ -4670,13 +4670,13 @@ function castSpell(id){
 
 function updateManaBar(){
   var pct=Math.min(1,mana/manaMax)*100;
-  var fill=document.getElementById('mana-bar-fill');
+  var fill=document.getElementById('invoke-bar-fill');
   if(fill){
     fill.style.height=pct+'%';
-    if(pct>=100) fill.classList.add('mana-full');
-    else fill.classList.remove('mana-full');
+    if(pct>=100) fill.classList.add('invoke-full');
+    else fill.classList.remove('invoke-full');
   }
-  var num=document.getElementById('mana-num');
+  var num=document.getElementById('invoke-num');
   if(num) num.innerHTML=Math.floor(mana)+'<br>—<br>'+manaMax;
 }
 
@@ -4845,68 +4845,68 @@ var TATTERED_NODES = [
   { id:'rule-dps-2',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:80,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-169, y:-108, requires:[] },
-  // Stat nodes clustered around Twin Strikes (-265, -364) — pentacle, point straight up
-  { id:'strikes-speed',  type:'mana',   name:'Mana Channel',   icon:'', cost:810,
+  // Stat nodes clustered around Power of 3 (-265, -364) — pentacle, point straight up
+  { id:'power3-speed',  type:'mana',   name:'Mana Channel',   icon:'', cost:810,
     desc:'Increases Mana cap by 175 and Mana regen rate by 50%.',
     x:-185, y:-307, requires:[] },
-  { id:'strikes-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:160,
+  { id:'power3-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:160,
     desc:'Increases your Critical Strike chance by +3.33%.',
     x:-136, y:-271, requires:[] },
-  { id:'strikes-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:240,
+  { id:'power3-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:240,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-155, y:-212, requires:[] },
-  { id:'strikes-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:360,
+  { id:'power3-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:360,
     desc:'Increases all souls gained by 33.3%.',
     x:-216, y:-212, requires:[] },
-  { id:'strikes-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:540,
+  { id:'power3-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:540,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-235, y:-271, requires:[] },
-  // Stat nodes clustered around Power of 3 (265, -364) — pentagon, point straight up, clockwise
-  { id:'power3-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:1620,
+  // Stat nodes clustered around Mana Hungry (265, -364) — pentagon, point straight up, clockwise
+  { id:'mana-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:1620,
     desc:'Increases Mana cap by 225 and Mana regen rate by 65%.',
     x:186,  y:-307, requires:[] },
-  { id:'power3-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:320,
+  { id:'mana-dps-1',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:320,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:235,  y:-271, requires:[] },
-  { id:'power3-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:480,
+  { id:'mana-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:480,
     desc:'Increases all souls gained by 33.3%.',
     x:216,  y:-212, requires:[] },
-  { id:'power3-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:720,
+  { id:'mana-crit',   type:'strike', name:'Crit Chance',    icon:'', cost:720,
     desc:'Increases your Critical Strike chance by +3.33%.',
     x:155,  y:-212, requires:[] },
-  { id:'power3-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:1080,
+  { id:'mana-dps-2',  type:'dps',    name:'DPS +33.3%',     icon:'', cost:1080,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:136,  y:-271, requires:[] },
-  // Stat nodes clustered around Mana Hungry (428, 139) — pentagon, point straight up, clockwise
-  { id:'mana-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:3240,
+  // Stat nodes clustered around Invoke Power (428, 139) — pentagon, point straight up, clockwise
+  { id:'invoke-speed',  type:'mana',   name:'Mana Conduit',   icon:'', cost:3240,
     desc:'Increases Mana cap by 250 and Mana regen rate by 85%.',
     x:300,  y:45,   requires:[] },
-  { id:'mana-dps-1',  type:'ts',     name:'Tattered Souls +33.3%', icon:'', cost:640,
+  { id:'invoke-dps-1',  type:'ts',     name:'Tattered Souls +33.3%', icon:'', cost:640,
     desc:'Increases Tattered Souls gained on Ascension by +33.3%.',
     x:349,  y:81,  requires:[] },
-  { id:'mana-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:960,
+  { id:'invoke-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:960,
     desc:'Increases all souls gained by 66.6%.',
     x:330,  y:140,  requires:[] },
-  { id:'mana-crit',   type:'strike', name:'Crit Mult',      icon:'', cost:1440,
+  { id:'invoke-crit',   type:'strike', name:'Crit Mult',      icon:'', cost:1440,
     desc:'Increases your Critical Strike multiplier by 3.33.',
     x:269,  y:140,  requires:[] },
-  { id:'mana-dps-2',  type:'dps',    name:'DPS +66.6%',     icon:'', cost:2160,
+  { id:'invoke-dps-2',  type:'dps',    name:'DPS +66.6%',     icon:'', cost:2160,
     desc:'Increases DPS of all upgrades by +66.6%.',
     x:250,  y:81,  requires:[] },
-  // Stat nodes clustered around Invoke Power (-428, 139) — pentagon, point straight up, clockwise
-  { id:'invoke-speed',   type:'mana',   name:'Mana Conduit',   icon:'', cost:6480,
+  // Stat nodes clustered around Twin Strikes (-428, 139) — pentagon, point straight up, clockwise
+  { id:'strikes-speed',   type:'mana',   name:'Mana Conduit',   icon:'', cost:6480,
     desc:'Increases Mana cap by 250 and Mana regen rate by 135%.',
     x:-300, y:45,   requires:[] },
-  { id:'invoke-dps-1',   type:'dps',    name:'DPS +66.6%',     icon:'', cost:1280,
+  { id:'strikes-dps-1',   type:'dps',    name:'DPS +66.6%',     icon:'', cost:1280,
     desc:'Increases DPS of all upgrades by +66.6%.',
     x:-250, y:81,  requires:[] },
-  { id:'invoke-souls',   type:'souls',  name:'Soul Gain',      icon:'', cost:1920,
+  { id:'strikes-souls',   type:'souls',  name:'Soul Gain',      icon:'', cost:1920,
     desc:'Increases all souls gained by 99.9%.',
     x:-269, y:140,  requires:[] },
-  { id:'invoke-strike',  type:'strike', name:'Strike Bonus',   icon:'', cost:2880,
+  { id:'strikes-strike',  type:'strike', name:'Strike Bonus',   icon:'', cost:2880,
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
     x:-330, y:140,  requires:[] },
-  { id:'invoke-dps-2',   type:'dps',    name:'DPS +33.3%',     icon:'', cost:4320,
+  { id:'strikes-dps-2',   type:'dps',    name:'DPS +33.3%',     icon:'', cost:4320,
     desc:'Increases DPS of all upgrades by +33.3%.',
     x:-349, y:81,  requires:[] },
 ];
@@ -4926,7 +4926,7 @@ var TATTERED_EDGES = [
   {from:'blade-dps',    to:'souls-souls'},
   {from:'souls-souls',  to:'rule-hp'},
   // Outer cluster links
-  {from:'rule-souls', to:'strikes-souls'},
+  {from:'rule-souls', to:'power3-souls'},
   // Rule of 3 cluster — pentagon ring, rule-hp connects to spell
   {from:'spell-ruleOf3', to:'rule-hp'},
   {from:'rule-hp',    to:'rule-dps-1'},
@@ -4961,38 +4961,38 @@ var TATTERED_EDGES = [
   {from:'crit-strike', to:'crit-dps-2'},
   {from:'crit-speed',  to:'crit-souls'},
   {from:'crit-dps-2',  to:'crit-souls'},
-  // Twin Strikes cluster — pentagon ring, strikes-speed connects to spell
-  {from:'spell-powerOf3', to:'strikes-souls'},
-  {from:'strikes-speed',  to:'strikes-crit'},
-  {from:'strikes-crit',   to:'strikes-dps-1'},
-  {from:'strikes-dps-1',  to:'strikes-souls'},
-  {from:'strikes-souls',  to:'strikes-dps-2'},
-  {from:'strikes-dps-2',  to:'strikes-speed'},
-  // Power of 3 cluster — pentagon ring, power3-speed connects to spell
-  {from:'spell-manaHungry', to:'power3-speed'},
-  {from:'power3-speed',  to:'power3-dps-1'},
+  // Twin Strikes cluster — pentagon ring, power3-speed connects to spell
+  {from:'spell-powerOf3', to:'power3-souls'},
+  {from:'power3-speed',  to:'power3-crit'},
+  {from:'power3-crit',   to:'power3-dps-1'},
   {from:'power3-dps-1',  to:'power3-souls'},
-  {from:'power3-souls',  to:'power3-crit'},
-  {from:'power3-crit',   to:'power3-dps-2'},
+  {from:'power3-souls',  to:'power3-dps-2'},
   {from:'power3-dps-2',  to:'power3-speed'},
-  // Mana Hungry cluster — pentagon ring, mana-speed connects to spell
-  {from:'spell-invokePower', to:'mana-dps-1'},
+  // Power of 3 cluster — pentagon ring, mana-speed connects to spell
+  {from:'spell-manaHungry', to:'mana-speed'},
   {from:'mana-speed',  to:'mana-dps-1'},
   {from:'mana-dps-1',  to:'mana-souls'},
   {from:'mana-souls',  to:'mana-crit'},
   {from:'mana-crit',   to:'mana-dps-2'},
   {from:'mana-dps-2',  to:'mana-speed'},
-  // Invoke Power cluster — pentagon ring, invoke-speed connects to spell
-  {from:'spell-twinStrikes', to:'invoke-dps-2'},
+  // Mana Hungry cluster — pentagon ring, invoke-speed connects to spell
+  {from:'spell-invokePower', to:'invoke-dps-1'},
   {from:'invoke-speed',  to:'invoke-dps-1'},
   {from:'invoke-dps-1',  to:'invoke-souls'},
-  {from:'invoke-souls',  to:'invoke-strike'},
-  {from:'invoke-strike', to:'invoke-dps-2'},
+  {from:'invoke-souls',  to:'invoke-crit'},
+  {from:'invoke-crit',   to:'invoke-dps-2'},
   {from:'invoke-dps-2',  to:'invoke-speed'},
+  // Invoke Power cluster — pentagon ring, strikes-speed connects to spell
+  {from:'spell-twinStrikes', to:'strikes-dps-2'},
+  {from:'strikes-speed',  to:'strikes-dps-1'},
+  {from:'strikes-dps-1',  to:'strikes-souls'},
+  {from:'strikes-souls',  to:'strikes-strike'},
+  {from:'strikes-strike', to:'strikes-dps-2'},
+  {from:'strikes-dps-2',  to:'strikes-speed'},
   // Outer arched connections (curved to follow outer ring, r≈358)
-  {from:'invoke-dps-2',  to:'strikes-dps-2', cp:{x:-388, y:-127}},
-  {from:'strikes-speed', to:'power3-speed',  cp:{x:0,    y:-409}},
-  {from:'power3-dps-1',  to:'mana-dps-1',    cp:{x:388,  y:-127}},
+  {from:'strikes-dps-2',  to:'power3-dps-2', cp:{x:-388, y:-127}},
+  {from:'power3-speed', to:'mana-speed',  cp:{x:0,    y:-409}},
+  {from:'mana-dps-1',  to:'invoke-dps-1',    cp:{x:388,  y:-127}},
 ];
 
 var soulShopOwned = {}; // persisted; maps nodeId -> 1 when purchased
