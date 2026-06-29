@@ -1117,6 +1117,30 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   .mm-cell { height: 41px !important; width: 41px !important; }
   .mm-cell.elite { height: 39px !important; width: 39px !important; }
 }
+/* ── MINION CLICKER ─────────────────────────────────────────────────────────── */
+#mc-dock { position:absolute; bottom:8px; left:8px; z-index:50; display:none; flex-direction:column; align-items:center; gap:3px; }
+#mc-dock-sprite { width:48px; height:48px; background-image:url('artwork/sprites_ui.webp'); background-size:672px 48px; background-position:-624px 0; cursor:grab; image-rendering:pixelated; border:2px solid #9966ff; border-radius:6px; background-color:rgba(20,10,40,0.8); box-shadow:0 0 10px rgba(153,102,255,0.5); }
+#mc-dock-sprite:active { cursor:grabbing; }
+#mc-dock-sprite.mc-empty { opacity:0.4; cursor:default; }
+#mc-dock-counter { font-family:Georgia,serif; font-size:11px; color:#cc99ff; text-align:center; line-height:1.3; }
+#mc-dock-recall { background:#330000; border:1px solid #cc2222; color:#ff4444; border-radius:4px; font-size:10px; padding:2px 6px; cursor:pointer; font-family:Georgia,serif; line-height:1.4; }
+#mc-dock-recall:hover { background:#550000; }
+#mc-drag-ghost { position:fixed; width:36px; height:36px; background-image:url('artwork/sprites_ui.webp'); background-size:504px 36px; background-position:-468px 0; pointer-events:none; z-index:9999; display:none; border:2px solid #9966ff; border-radius:4px; background-color:rgba(20,10,40,0.85); opacity:0.9; image-rendering:pixelated; }
+.mc-drop-hl { position:absolute; inset:0; background:rgba(130,50,255,0.15); border:2px dashed #9966ff; border-radius:4px; pointer-events:none; z-index:15; display:none; }
+body.mc-dragging .mc-drop-hl { display:block; }
+body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
+#enemy-mc-zone { position:absolute; right:-44px; top:50%; transform:translateY(-50%); width:40px; display:flex; flex-direction:column; gap:4px; align-items:center; }
+.mc-enemy-slot { width:32px; height:32px; border:1px dashed #664488; border-radius:4px; display:flex; align-items:center; justify-content:center; position:relative; }
+.mc-enemy-slot.mc-filled { border-color:#9966ff; }
+.mc-placed-icon { width:28px; height:28px; background-image:url('artwork/sprites_ui.webp'); background-size:392px 28px; background-position:-364px 0; image-rendering:pixelated; border-radius:3px; cursor:pointer; position:relative; }
+.mc-placed-icon .mc-recall-x { display:none; position:absolute; inset:0; background:rgba(180,0,0,0.85); border-radius:3px; color:#fff; font-size:14px; font-weight:bold; align-items:center; justify-content:center; line-height:1; }
+.mc-placed-icon:hover .mc-recall-x,
+.mc-placed-icon.mc-show-x .mc-recall-x { display:flex; }
+.mc-upg-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:20; width:28px; height:28px; background-image:url('artwork/sprites_ui.webp'); background-size:392px 28px; background-position:-364px 0; image-rendering:pixelated; border-radius:3px; cursor:pointer; background-color:rgba(20,10,40,0.7); border:1px solid #9966ff; }
+.mc-upg-icon .mc-recall-x { display:none; position:absolute; inset:0; background:rgba(180,0,0,0.85); border-radius:3px; color:#fff; font-size:14px; font-weight:bold; align-items:center; justify-content:center; line-height:1; }
+.mc-upg-icon:hover .mc-recall-x,
+.mc-upg-icon.mc-show-x .mc-recall-x { display:flex; }
+#mc-buyall-wrap { position:relative; display:inline-block; }
 </style>
 </head>
 <body>
@@ -1187,6 +1211,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
         <div class="canvas-wrap" style="position:relative;">
           <canvas id="enemy-canvas" width="330" height="330"></canvas>
           <div id="crown"></div>
+          <div id="enemy-mc-zone"><div class="mc-drop-hl"></div></div>
         </div>
         <div class="cname enemy-label" id="enemy-name-label">Wisper</div>
         <div class="hp-wrap">
@@ -1221,6 +1246,12 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
         <button id="reform-btn">Return</button>
       </div>
       <div id="float-layer"></div>
+      <!-- Minion clicker dock -->
+      <div id="mc-dock">
+        <div id="mc-dock-sprite" title="Drag to place a minion clicker"></div>
+        <div id="mc-dock-counter">0 / 0</div>
+        <button id="mc-dock-recall">✕ Recall All</button>
+      </div>
     </div>
     <div id="buy-selector">
       <div class="buy-label">BUY</div>
@@ -1230,7 +1261,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <button class="buy-btn" data-qty="50">50</button>
       <button class="buy-btn" data-qty="100">100</button>
       <button class="buy-btn" data-qty="max">MAX</button>
-      <button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;background:#2a6e2a;border-color:#3d9e3d;color:#ffffff;">BUY ALL AUGS</button>
+      <div id="mc-buyall-wrap"><button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;background:#2a6e2a;border-color:#3d9e3d;color:#ffffff;">BUY ALL AUGS</button><div class="mc-drop-hl"></div></div>
       <div id="spell-panel">
         <div class="spell-divider"></div>
         <div id="invoke-label">mana</div>
@@ -2798,7 +2829,7 @@ function getMinionBonusDesc(bonusType, heldMinion){
     case 'minionxp':   label='minion XP multiplier (stacking)'; break;
     case 'upgradecost':label='reduction to upgrade costs'; break;
     case 'elitetimer': label='seconds to elite timer'; break;
-    case 'minionpower':label='element output multiplier (stacking)'; break;
+    case 'minionpower':label='Your very own minion clicker!'; break;
     case 'spelllength':label='seconds to spell duration'; break;
     default: label='bonus'; break;
   }
@@ -2834,8 +2865,7 @@ function tickElementProduction(nowMs){
   if(elapsed<INTERVAL_MS) return;
   var ticks=Math.floor(elapsed/INTERVAL_MS);
   _lastElementTick+=ticks*INTERVAL_MS;
-  var minionPowerBonus=getMinionTotalBonus('minionpower');
-  var eliteMult=1+minionPowerBonus;
+  var eliteMult=1;
   minionSlots.forEach(function(m){
     var md=MINION_DATA[m.typeIdx];
     if(!md||!md.element) return;
@@ -2874,6 +2904,7 @@ function attemptMinionCapture(typeIdx){
   minionPoints-=cost;
   captureTargetIdx=-1; // deselect after successful capture
   minionSlots.push({typeIdx:typeIdx,level:1,xp:0,isElite:false});
+  updateMinionClickerDock();
   if(discoveredMinions.indexOf(typeIdx)<0) discoveredMinions.push(typeIdx);
   showMinionCaptureNotif(typeIdx);
   renderMinionModal();
@@ -2906,6 +2937,7 @@ function releaseMinion(typeIdx){
   }
   if(slotIdx===-1){ exitReleaseMode(); return; }
   minionSlots.splice(slotIdx,1);
+  clampMinionClickerAssignments();
   var refund=getMinionNextMpCost();
   minionPoints+=refund;
   exitReleaseMode();
@@ -2961,6 +2993,7 @@ function wipeNonEliteMinions(){
     var cv=document.getElementById('pet-canvas');
     if(cv) cv.style.display='none';
   }
+  clampMinionClickerAssignments();
 }
 
 var REALM_NAMES_MM=['Purgatory','Limbo','Underworld','Void','Abyss','Inferno','Pandemonium','Tartarus','Oblivion','Eternity'];
@@ -3887,7 +3920,7 @@ function updateHpBars(){
 }
 
 // ── UPGRADES ──────────────────────────────────────────────────────────────────
-var autoAttackEnabled=false, autoAttackInterval=3000;
+var autoAttackInterval=3000;
 var entityDmgBonus=D(0);
 var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0, tattTsGainMult=0;
 var critClickChance=0, critClickMult=0, dvDpsToClickRatio=0, soulAbsorbBonus=0;
@@ -3954,7 +3987,7 @@ function getMileMult(u){
   return 1+bonus;
 }
 function recalcStats(){
-  clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; tattTsGainMult=0; autoAttackEnabled=false;
+  clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; tattTsGainMult=0;
   critClickChance=0; critClickMult=0; dvDpsToClickRatio=0; soulAbsorbBonus=0;
   REP_UPGRADES.forEach(function(u){
     if(u.level===0) return;
@@ -3967,7 +4000,7 @@ function recalcStats(){
     } else {
       var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
       if(u.type==='click') clickDmgBonus=clickDmgBonus.add(eff);
-      else { totalDps=totalDps.add(eff); if(u.id==='dh') autoAttackEnabled=true; }
+      else { totalDps=totalDps.add(eff); }
     }
   });
   // Apply form bonuses
@@ -4135,96 +4168,126 @@ function hideUpgradeTip(){
 
 function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
 var REP_UPGRADES=[
-  {id:'ss',name:'Spirit Slash',  icon:0,  cost:5,     costScale:1.0666, level:0, type:'click',  perLevel:1,
+  {id:'ss',name:'Spirit Slash',  icon:0,  cost:5,     costScale:1.077, level:0, type:'click',  perLevel:1,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return true;}, milestones:mkMs()},
-  {id:'dh',name:'Deeper Hunger', icon:1,  cost:50,    costScale:1.06, level:0, type:'dps',    perLevel:5,
+  {id:'dh',name:'Deeper Hunger', icon:1,  cost:50,    costScale:1.077, level:0, type:'dps',    perLevel:5,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[0].level>=1;}, milestones:mkMs()},
-  {id:'sr',name:'Soul Resonance',icon:2,  cost:300,   costScale:1.09, level:0, type:'dps',    perLevel:20,
+  {id:'sr',name:'Soul Resonance',icon:2,  cost:300,   costScale:1.077, level:0, type:'dps',    perLevel:20,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[1].level>=1;}, milestones:mkMs()},
-  {id:'sl',name:'Spectral Lure', icon:3,  cost:1000,  costScale:1.07, level:0, type:'dps',    perLevel:75,
+  {id:'sl',name:'Spectral Lure', icon:3,  cost:1000,  costScale:1.077, level:0, type:'dps',    perLevel:75,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[2].level>=1;}, milestones:mkMs()},
-  {id:'dv',name:'Divine Hunger', icon:4,  cost:5000,  costScale:1.07, level:0, type:'dps',    perLevel:333,
+  {id:'dv',name:'Divine Hunger', icon:4,  cost:5000,  costScale:1.077, level:0, type:'dps',    perLevel:333,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[3].level>=1;}, milestones:mkMs()},
-  {id:'vs',name:'Void Sense',    icon:5,  cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
+  {id:'vs',name:'Void Sense',    icon:5,  cost:20000, costScale:1.077, level:0, type:'dps',    perLevel:900,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[4].level>=1;}, milestones:mkMs()},
-  {id:'fm',name:'Feeding Mask',  icon:6,  cost:100000, costScale:1.06, level:0, type:'dps',   perLevel:3500,
+  {id:'fm',name:'Feeding Mask',  icon:6,  cost:100000, costScale:1.077, level:0, type:'dps',   perLevel:3500,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[5].level>=1;}, milestones:mkMs()},
-  {id:'bb',name:'Bitter Bite',   icon:7,  cost:400000, costScale:1.07, level:0, type:'dps',   perLevel:10500,
+  {id:'bb',name:'Bitter Bite',   icon:7,  cost:400000, costScale:1.077, level:0, type:'dps',   perLevel:10500,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[6].level>=1;}, milestones:mkMs()},
-  {id:'as',name:'Angelic Seduction', icon:8, cost:2500000, costScale:1.06, level:0, type:'dps', perLevel:47500,
+  {id:'as',name:'Angelic Seduction', icon:8, cost:2500000, costScale:1.077, level:0, type:'dps', perLevel:47500,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[7].level>=1;}, milestones:mkMs()},
-  {id:'ee',name:'Elemental Ecstasy', icon:9, cost:15000000, costScale:1.06, level:0, type:'dps', perLevel:200000,
+  {id:'ee',name:'Elemental Ecstasy', icon:9, cost:15000000, costScale:1.077, level:0, type:'dps', perLevel:200000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[8].level>=1;}, milestones:mkMs()},
-  {id:'pf',name:'Piercing Fear',    icon:10, cost:100000000, costScale:1.07, level:0, type:'dps', perLevel:950000,
+  {id:'pf',name:'Piercing Fear',    icon:10, cost:100000000, costScale:1.077, level:0, type:'dps', perLevel:950000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[9].level>=1;}, milestones:mkMs()},
-  {id:'cd',name:'Crushing Desire',  icon:11, cost:800000000, costScale:1.08, level:0, type:'dps', perLevel:4000000,
+  {id:'cd',name:'Crushing Desire',  icon:11, cost:800000000, costScale:1.077, level:0, type:'dps', perLevel:4000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[10].level>=1;}, milestones:mkMs()},
-  {id:'cs',name:'Chaotic Strike',   icon:12, cost:6500000000, costScale:1.07, level:0, type:'dps', perLevel:20000000,
+  {id:'cs',name:'Chaotic Strike',   icon:12, cost:6500000000, costScale:1.077, level:0, type:'dps', perLevel:20000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[11].level>=1;}, milestones:mkMs()},
-  {id:'md',name:'Mortal Deception', icon:13, cost:50000000000, costScale:1.06, level:0, type:'dps', perLevel:70000000,
+  {id:'md',name:'Mortal Deception', icon:13, cost:50000000000, costScale:1.077, level:0, type:'dps', perLevel:70000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[12].level>=1;}, milestones:mkMs()},
-  {id:'sg',name:'Sinful Gaze',      icon:14, cost:425000000000, costScale:1.07, level:0, type:'dps', perLevel:450000000,
+  {id:'sg',name:'Sinful Gaze',      icon:14, cost:425000000000, costScale:1.077, level:0, type:'dps', perLevel:450000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[13].level>=1;}, milestones:mkMs()},
-  {id:'ah',name:'Anima Harvest',    icon:15, cost:3800000000000, costScale:1.08, level:0, type:'dps', perLevel:3000000000,
+  {id:'ah',name:'Anima Harvest',    icon:15, cost:3800000000000, costScale:1.077, level:0, type:'dps', perLevel:3000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[14].level>=1;}, milestones:mkMs()},
-  {id:'sk',name:'Searing Spark',    icon:16, cost:35000000000000, costScale:1.07, level:0, type:'dps', perLevel:20000000000,
+  {id:'sk',name:'Searing Spark',    icon:16, cost:35000000000000, costScale:1.077, level:0, type:'dps', perLevel:20000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[15].level>=1;}, milestones:mkMs()},
-  {id:'cp',name:'Corrupt Psyche',   icon:17, cost:330000000000000, costScale:1.06, level:0, type:'dps', perLevel:125000000000,
+  {id:'cp',name:'Corrupt Psyche',   icon:17, cost:330000000000000, costScale:1.077, level:0, type:'dps', perLevel:125000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[16].level>=1;}, milestones:mkMs()},
-  {id:'st',name:'Spirit Target',    icon:18, cost:3e15, costScale:1.07, level:0, type:'dps', perLevel:800000000000,
+  {id:'st',name:'Spirit Target',    icon:18, cost:3e15, costScale:1.077, level:0, type:'dps', perLevel:800000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[17].level>=1;}, milestones:mkMs()},
-  {id:'sb',name:'Soul Blast',       icon:19, cost:25e15, costScale:1.08, level:0, type:'dps', perLevel:5000000000000,
+  {id:'sb',name:'Soul Blast',       icon:19, cost:25e15, costScale:1.077, level:0, type:'dps', perLevel:5000000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[18].level>=1;}, milestones:mkMs()},
-  {id:'dm',name:'Doom',             icon:20, cost:300e15, costScale:1.07, level:0, type:'dps', perLevel:50000000000000,
+  {id:'dm',name:'Doom',             icon:20, cost:300e15, costScale:1.077, level:0, type:'dps', perLevel:50000000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[19].level>=1;}, milestones:mkMs()},
-  {id:'nt',name:'Night Terror',     icon:21, cost:10e18, costScale:1.06, level:0, type:'dps', perLevel:1e15,
+  {id:'nt',name:'Night Terror',     icon:21, cost:10e18, costScale:1.077, level:0, type:'dps', perLevel:1e15,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[20].level>=1;}, milestones:mkMs()},
-  {id:'ir',name:'Infernal Rage',    icon:22, cost:325e18, costScale:1.07, level:0, type:'dps', perLevel:30e15,
+  {id:'ir',name:'Infernal Rage',    icon:22, cost:325e18, costScale:1.077, level:0, type:'dps', perLevel:30e15,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[21].level>=1;}, milestones:mkMs()},
-  {id:'td',name:'Tainted Dreams',   icon:23, cost:15e21, costScale:1.08, level:0, type:'dps', perLevel:950e15,
+  {id:'td',name:'Tainted Dreams',   icon:23, cost:15e21, costScale:1.077, level:0, type:'dps', perLevel:950e15,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[22].level>=1;}, milestones:mkMs()},
-  {id:'mf',name:'Manifestation',    icon:24, cost:4.75e24, costScale:1.07, level:0, type:'dps', perLevel:200e18,
+  {id:'mf',name:'Manifestation',    icon:24, cost:4.75e24, costScale:1.077, level:0, type:'dps', perLevel:200e18,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[23].level>=1;}, milestones:mkMs()},
-  {id:'bs',name:'Brimstone',        icon:25, cost:2e27, costScale:1.06, level:0, type:'dps', perLevel:75e21,
+  {id:'bs',name:'Brimstone',        icon:25, cost:2e27, costScale:1.077, level:0, type:'dps', perLevel:75e21,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[24].level>=1;}, milestones:mkMs()},
-  {id:'ct',name:'Chaos Tide',       icon:26, cost:325e27, costScale:1.07, level:0, type:'dps', perLevel:850e21,
+  {id:'ct',name:'Chaos Tide',       icon:26, cost:1e39, costScale:1.077, level:0, type:'dps', perLevel:1e39,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[25].level>=1;}, milestones:mkMs()},
-  {id:'rn',name:'Ragefire Nova',    icon:27, cost:12e30, costScale:1.08, level:0, type:'dps', perLevel:32e24,
+  {id:'rn',name:'Ragefire Nova',    icon:27, cost:1e54, costScale:1.077, level:0, type:'dps', perLevel:1e43,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[26].level>=1;}, milestones:mkMs()},
-  {id:'ac',name:'Abyssal Call',     icon:28, cost:780e30, costScale:1.07, level:0, type:'dps', perLevel:675e24,
+  {id:'ac',name:'Abyssal Call',     icon:28, cost:1e69, costScale:1.077, level:0, type:'dps', perLevel:1e56,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[27].level>=1;}, milestones:mkMs()},
-  {id:'bf',name:'Balefire',         icon:29, cost:99e33, costScale:1.06, level:0, type:'dps', perLevel:50e27,
+  {id:'bf',name:'Balefire',         icon:29, cost:1e84, costScale:1.077, level:0, type:'dps', perLevel:1e69,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[28].level>=1;}, milestones:mkMs()},
+  {id:'ar',name:'Astral Rend',      icon:30, cost:1e99,  costScale:1.077, level:0, type:'dps', perLevel:1e82,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'pg',name:'Phantom Grasp',    icon:31, cost:1e114, costScale:1.077, level:0, type:'dps', perLevel:1e95,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'np',name:'Nether Pulse',     icon:32, cost:1e129, costScale:1.077, level:0, type:'dps', perLevel:1e108,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'su',name:'Soul Rupture',     icon:33, cost:1e144, costScale:1.077, level:0, type:'dps', perLevel:1e121,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'vm',name:'Void Maw',         icon:34, cost:1e159, costScale:1.077, level:0, type:'dps', perLevel:1e134,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'cw',name:'Celestial Wrath',  icon:35, cost:1e174, costScale:1.077, level:0, type:'dps', perLevel:1e147,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'wt',name:'Wraith Touch',     icon:36, cost:1e189, costScale:1.077, level:0, type:'dps', perLevel:1e160,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'ec',name:'Ethereal Chains',  icon:37, cost:1e204, costScale:1.077, level:0, type:'dps', perLevel:1e173,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'ag',name:'Abyss Surge',      icon:38, cost:1e219, costScale:1.077, level:0, type:'dps', perLevel:1e186,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'sp',name:'Spirit Siphon',    icon:39, cost:1e234, costScale:1.077, level:0, type:'dps', perLevel:1e199,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
 ];
 
 // Convert all upgrade costs to Decimal after definition
@@ -4235,17 +4298,36 @@ REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
 //   2. Preview  — the previous upgrade is affordable (show this one as +1 ahead).
 // Both rules use the current live cost, so a player who left the game running
 // and can now afford a lower upgrade will see it (and one beyond) automatically.
+// Upgrades 30-39 also require a specific unlock condition to be met.
+function _formUltCount(){
+  return ['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine']
+    .filter(function(id){return achievementsEarned.indexOf(id)>=0;}).length;
+}
+var _UNLOCK_CONDS=[
+  function(){return _formUltCount()>=1;},  // 30 Astral Rend
+  function(){return _formUltCount()>=1;},  // 31 Phantom Grasp
+  function(){return rebirthCount>=1;},     // 32 Nether Pulse
+  function(){return rebirthCount>=1;},     // 33 Soul Rupture
+  function(){return minionSlots.length>=1;}, // 34 Void Maw
+  function(){return minionSlots.length>=1;}, // 35 Celestial Wrath
+  function(){return _formUltCount()>=3;},  // 36 Wraith Touch
+  function(){return _formUltCount()>=4;},  // 37 Ethereal Chains
+  function(){return _formUltCount()>=5;},  // 38 Abyss Surge
+  function(){return achievementsEarned.indexOf('form-ult-all')>=0;}, // 39 Spirit Siphon
+];
 REP_UPGRADES.forEach(function(u, idx) {
   if (idx === 0) return; // first upgrade is always visible; keep its existing vis
-  u.vis = (function(i) {
+  var unlockFn = idx >= 30 ? _UNLOCK_CONDS[idx - 30] : null;
+  u.vis = (function(i, ufn) {
     return function() {
+      if (ufn && !ufn()) return false;
       var prev = REP_UPGRADES[i - 1];
       if (prev.level >= 1) return true;           // purchased rule
       if (souls.gte(REP_UPGRADES[i].cost)) return true; // affordable rule
       if (souls.gte(prev.cost)) return true;      // preview (+1) rule
       return false;
     };
-  })(idx);
+  })(idx, unlockFn);
 });
 
 // DV DPS→Click milestone indices and their step multipliers from the previous DPS→Click milestone
@@ -5470,7 +5552,8 @@ function checkRebirthButton(){
   var doomUpgrade=REP_UPGRADES.find(function(u){return u.id==='dm';});
   var canAscend=doomUpgrade&&doomUpgrade.level>=1;
   btn.style.display=canAscend?'block':'none';
-  if(rBtn) rBtn.style.display=(canAscend&&minionUnlocked)?'block':'none';
+  var inUltimateForm=rebirthCount>=7||achievementsEarned.indexOf('form-ult-all')>=0;
+  if(rBtn) rBtn.style.display=(canAscend&&inUltimateForm)?'block':'none';
   if(canAscend&&!_tutShown.ascension){ _tutShown.ascension=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You have grown strong enough to Ascend, if you choose. You will gain Tattered Souls which make you stronger that can be sacrificed to gain power. Own as many of each upgrade as you can. Every 666 purchases gives you 1 Tattered Soul.',document.getElementById('ascend-btn'),null); },400); } }
 }
 
@@ -5656,6 +5739,7 @@ function saveGame(){
     elementStocks:JSON.parse(JSON.stringify(elementStocks)),
     lastElementTick:_lastElementTick,
     redeemedCodes:redeemedCodes.slice(),
+    minionClickerAssignments:minionClickerAssignments.slice(),
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -5747,6 +5831,7 @@ function loadGame(){
   if(data.elementStocks) elementStocks=data.elementStocks;
   if(data.lastElementTick) _lastElementTick=data.lastElementTick;
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
+  if(data.minionClickerAssignments) minionClickerAssignments=data.minionClickerAssignments;
   _offlineSavedAt=data.savedAt||0;
   return true;
 }
@@ -6061,7 +6146,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
       totalUpgradePurchases+=n;
       if(!_tutShown.upgrades200&&totalUpgradePurchases>=200){ _tutShown.upgrades200=true; if(showTutorial){ (function(mult){ setTimeout(function(){ showTutorialTip('200 upgrades gives you a \xd7'+mult+' damage bonus! Every 100 more will give you another boost!',document.getElementById('upgrade-list'),null); },200); })(getPurchMult(totalUpgradePurchases).toString()); } }
       recalcStats();
-      buildUpgrades(); lastRebuildU=Date.now(); dirtyU=false;
+      buildUpgrades(); lastRebuildU=Date.now(); dirtyU=false; renderMinionClickerPlaced();
       updateEntityStatsPanel();
       updateTatteredDisplay();
       document.getElementById('soul-count').textContent=fmt(souls);
@@ -6205,7 +6290,7 @@ function updateEntityStatsPanel(){
   var dMin=entityDmgMin.add(entityDmgBonus).add(clickDmgBonus.floor());
   var dMax=entityDmgMax.add(entityDmgBonus).add(clickDmgBonus.floor());
   var strikeStr=fmt(dMin)+'–'+fmt(dMax);
-  var autoStr=autoAttackEnabled?(fmt(totalDps)+' / s'):'—';
+  var autoStr=totalDps.gt(0)?(fmt(totalDps)+' / s'):'—';
   document.getElementById('es-dmg').textContent=strikeStr;
   document.getElementById('es-auto').textContent=autoStr;
   document.getElementById('es-vamp').textContent=enemyHpDrainPct>0?(+(enemyHpDrainPct*100).toFixed(4))+'% HP/s':'—';
@@ -6897,13 +6982,285 @@ document.getElementById('enemy-canvas').addEventListener('touchstart',function(e
 },{passive:false});
 document.getElementById('reform-btn').addEventListener('click',reform);
 
+// ── MINION CLICKER SYSTEM ─────────────────────────────────────────────────────
+var minionClickerAssignments = [];
+// Each entry: {target:'enemy'|'upgrade'|'buyall', upgradeId:null|string}
+var MINION_CLICKER_MAX_ENEMY = 4;
+var _lastMinionClickTick = 0;
+var _mcDragActive = false;
+var _mcHoverTimers = {};
+
+function getMinionpowerSlots(){
+  return minionSlots.filter(function(m){ return MINION_DATA[m.typeIdx]&&MINION_DATA[m.typeIdx].bonus==='minionpower'; });
+}
+function getMinionpowerCount(){ return getMinionpowerSlots().length; }
+function getMinionpowerAvgLevel(){
+  var slots=getMinionpowerSlots();
+  if(!slots.length) return 0;
+  var sum=slots.reduce(function(s,m){ return s+(m.isElite?MINION_ELITE_LEVEL:m.level); },0);
+  return sum/slots.length;
+}
+function getMinionClickerPool(){
+  return Math.max(0, getMinionpowerCount()-minionClickerAssignments.length);
+}
+function clampMinionClickerAssignments(){
+  var max=getMinionpowerCount();
+  if(minionClickerAssignments.length>max){
+    minionClickerAssignments.splice(max);
+    updateMinionClickerDock();
+    renderMinionClickerPlaced();
+  }
+}
+function recallAllMinionClickers(){
+  minionClickerAssignments=[];
+  updateMinionClickerDock();
+  renderMinionClickerPlaced();
+  saveGame();
+}
+function recallMinionClickerAt(idx){
+  if(idx<0||idx>=minionClickerAssignments.length) return;
+  minionClickerAssignments.splice(idx,1);
+  updateMinionClickerDock();
+  renderMinionClickerPlaced();
+  saveGame();
+}
+function assignMinionClicker(target, upgradeId){
+  if(getMinionClickerPool()<=0) return false;
+  if(target==='enemy'){
+    var enemyCount=minionClickerAssignments.filter(function(a){return a.target==='enemy';}).length;
+    if(enemyCount>=MINION_CLICKER_MAX_ENEMY) return false;
+  }
+  minionClickerAssignments.push({target:target, upgradeId:upgradeId||null});
+  updateMinionClickerDock();
+  renderMinionClickerPlaced();
+  saveGame();
+  return true;
+}
+
+function minionClickerAttackEnemy(){
+  if(!combatActive||enemyDead) return;
+  var avgLvl=getMinionpowerAvgLevel();
+  if(avgLvl<=0) return;
+  var dmg=clickDmgBonus.mul(avgLvl*0.0006435);
+  if(dmg.lte(0)) return;
+  var isCrit=false;
+  if(critClickChance>0&&Math.random()<critClickChance){
+    isCrit=true;
+    dmg=dmg.mul(2+critClickMult);
+  }
+  if(isSpellActive('twinStrikes')) dmg=dmg.mul(2);
+  if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
+  enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
+  enemyHitFlashTime=Date.now();
+  var pp=floatPos('enemy-canvas');
+  spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
+  updateHpBars();
+  if(enemyHp.lte(0)) onEnemyDeath();
+}
+
+function minionClickerBuyUpgrade(upgradeId){
+  var u=REP_UPGRADES.find(function(x){return x.id===upgradeId;});
+  if(!u||!u.vis()) return;
+  var n=(buyQty==='max')?maxAffordableN(u):buyQty;
+  if(n<1) return;
+  var total=calcCostN(u,n);
+  if(!souls.gte(total)) return;
+  souls=souls.sub(total);
+  var c=u.cost;
+  for(var i=0;i<n;i++){ c=c.mul(u.costScale).ceil(); }
+  u.cost=c;
+  u.level+=n;
+  totalUpgradePurchases+=n;
+  recalcStats();
+  dirtyU=true;
+  updateEntityStatsPanel();
+  updateTatteredDisplay();
+  document.getElementById('soul-count').textContent=fmt(souls);
+  checkAchievements();
+  checkRebirthButton();
+  saveGame();
+}
+
+function tickMinionClickers(now){
+  if(!minionClickerAssignments.length) return;
+  if(now-_lastMinionClickTick < 250) return;
+  _lastMinionClickTick=now;
+  minionClickerAssignments.forEach(function(a){
+    if(a.target==='enemy') minionClickerAttackEnemy();
+    else if(a.target==='upgrade') minionClickerBuyUpgrade(a.upgradeId);
+    else if(a.target==='buyall') buyAllAffordable();
+  });
+}
+
+function updateMinionClickerDock(){
+  var dock=document.getElementById('mc-dock');
+  if(!dock) return;
+  var total=getMinionpowerCount();
+  var pool=getMinionClickerPool();
+  if(total===0){ dock.style.display='none'; return; }
+  dock.style.display='flex';
+  var sprite=document.getElementById('mc-dock-sprite');
+  if(sprite) sprite.classList.toggle('mc-empty', pool===0);
+  var counter=document.getElementById('mc-dock-counter');
+  if(counter) counter.textContent=pool+' / '+total;
+}
+
+function renderMinionClickerPlaced(){
+  // Enemy slots
+  var ez=document.getElementById('enemy-mc-zone');
+  if(ez){
+    var hl=ez.querySelector('.mc-drop-hl');
+    ez.innerHTML='';
+    if(hl) ez.appendChild(hl);
+    var enemyAssigned=minionClickerAssignments.filter(function(a){return a.target==='enemy';});
+    enemyAssigned.forEach(function(a,i){
+      var globalIdx=minionClickerAssignments.indexOf(a);
+      var slot=document.createElement('div');
+      slot.className='mc-enemy-slot mc-filled';
+      var icon=document.createElement('div');
+      icon.className='mc-placed-icon';
+      icon.innerHTML='<div class="mc-recall-x">✕</div>';
+      _attachMcRecall(icon, globalIdx);
+      slot.appendChild(icon);
+      ez.appendChild(slot);
+    });
+    // Empty slots up to max
+    for(var i=enemyAssigned.length;i<MINION_CLICKER_MAX_ENEMY;i++){
+      var slot=document.createElement('div');
+      slot.className='mc-enemy-slot';
+      ez.appendChild(slot);
+    }
+    if(hl) ez.appendChild(hl);
+  }
+
+  // BuyAll
+  var baw=document.getElementById('mc-buyall-wrap');
+  if(baw){
+    baw.querySelectorAll('.mc-upg-icon').forEach(function(el){el.remove();});
+    var baIdx=minionClickerAssignments.findIndex(function(a){return a.target==='buyall';});
+    if(baIdx>=0){
+      var icon=document.createElement('div');
+      icon.className='mc-upg-icon';
+      icon.innerHTML='<div class="mc-recall-x">✕</div>';
+      _attachMcRecall(icon, baIdx);
+      baw.appendChild(icon);
+    }
+  }
+
+  // Upgrade cards
+  document.querySelectorAll('.ucard[data-uid]').forEach(function(card){
+    card.querySelectorAll('.mc-upg-icon').forEach(function(el){el.remove();});
+    var uid=card.getAttribute('data-uid');
+    var aIdx=minionClickerAssignments.findIndex(function(a){return a.target==='upgrade'&&a.upgradeId===uid;});
+    if(aIdx>=0){
+      card.style.position='relative';
+      var icon=document.createElement('div');
+      icon.className='mc-upg-icon';
+      icon.innerHTML='<div class="mc-recall-x">✕</div>';
+      _attachMcRecall(icon, aIdx);
+      card.appendChild(icon);
+    }
+  });
+}
+
+function _attachMcRecall(icon, globalIdx){
+  var hoverTimer=null;
+  icon.addEventListener('mouseenter',function(){
+    hoverTimer=setTimeout(function(){ icon.classList.add('mc-show-x'); },3000);
+  });
+  icon.addEventListener('mouseleave',function(){
+    clearTimeout(hoverTimer);
+    icon.classList.remove('mc-show-x');
+  });
+  icon.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(icon.classList.contains('mc-show-x')||icon.querySelector('.mc-recall-x').style.display==='flex'){
+      recallMinionClickerAt(globalIdx);
+    }
+  });
+  // Allow pick-up drag to reassign
+  icon.addEventListener('mousedown',function(e){
+    e.stopPropagation();
+    e.preventDefault();
+    clearTimeout(hoverTimer);
+    icon.classList.remove('mc-show-x');
+    recallMinionClickerAt(globalIdx);
+    // Immediately start drag from dock
+    setTimeout(function(){ startMcDrag(e); },0);
+  });
+}
+
+function startMcDrag(e){
+  if(getMinionClickerPool()<=0) return;
+  _mcDragActive=true;
+  document.body.classList.add('mc-dragging');
+  var ghost=document.getElementById('mc-drag-ghost');
+  ghost.style.display='block';
+  ghost.style.left=(e.clientX-18)+'px';
+  ghost.style.top=(e.clientY-18)+'px';
+}
+
+function initMinionClickerDrag(){
+  var dock=document.getElementById('mc-dock-sprite');
+  if(!dock) return;
+  dock.addEventListener('mousedown',function(e){
+    if(getMinionClickerPool()<=0) return;
+    e.preventDefault();
+    startMcDrag(e);
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!_mcDragActive) return;
+    var ghost=document.getElementById('mc-drag-ghost');
+    ghost.style.left=(e.clientX-18)+'px';
+    ghost.style.top=(e.clientY-18)+'px';
+  });
+  document.addEventListener('mouseup',function(e){
+    if(!_mcDragActive) return;
+    _mcDragActive=false;
+    document.body.classList.remove('mc-dragging');
+    document.getElementById('mc-drag-ghost').style.display='none';
+    // Detect drop target
+    var el=document.elementFromPoint(e.clientX,e.clientY);
+    if(!el) return;
+    // Enemy zone
+    var ez=document.getElementById('enemy-mc-zone');
+    if(ez&&(ez===el||ez.contains(el))){ assignMinionClicker('enemy',null); return; }
+    // BuyAll
+    var baw=document.getElementById('mc-buyall-wrap');
+    if(baw&&(baw===el||baw.contains(el))){
+      var alreadyHasBuyAll=minionClickerAssignments.some(function(a){return a.target==='buyall';});
+      if(!alreadyHasBuyAll) assignMinionClicker('buyall',null);
+      return;
+    }
+    // Upgrade card
+    var card=el.closest('.ucard[data-uid]');
+    if(card){
+      var uid=card.getAttribute('data-uid');
+      var alreadyHasUpg=minionClickerAssignments.some(function(a){return a.target==='upgrade'&&a.upgradeId===uid;});
+      if(!alreadyHasUpg) assignMinionClicker('upgrade',uid);
+      return;
+    }
+  });
+  // Recall all button
+  document.getElementById('mc-dock-recall').addEventListener('click',function(){
+    recallAllMinionClickers();
+  });
+  // Add tooltip to recall button
+  var rcl=document.getElementById('mc-dock-recall');
+  var _rclTimer=null;
+  rcl.addEventListener('mouseenter',function(){
+    _rclTimer=setTimeout(function(){ rcl.title='Recall all minion clickers'; },3000);
+  });
+  rcl.addEventListener('mouseleave',function(){ clearTimeout(_rclTimer); });
+}
+
 // ── GAME LOOP ─────────────────────────────────────────────────────────────────
 function gameLoop(){
   requestAnimationFrame(gameLoop);
   var now=Date.now();
 
   if(combatActive&&!enemyDead){
-    if(autoAttackEnabled&&def()){
+    if(def()){
       var _dt=(now-lastAutoAttack)/1000;
       lastAutoAttack=now;
       var _dpsDmg=totalDps.mul(_dt);
@@ -6934,6 +7291,7 @@ function gameLoop(){
   }
 
   tickElementProduction(now);
+  tickMinionClickers(now);
 
   drawEntityCanvas(now);
   drawPetMinion(now);
@@ -7052,7 +7410,7 @@ function gameLoop(){
   else if(eid==='hv_steven')  drawStevenSprite(ecv,now,enemyDead,_elite);
   else { tickMist(enemyDead); drawMist(ecv,def()?def().color:[200,255,200],enemyDead,1); }
 
-  if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;}
+  if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;renderMinionClickerPlaced();}
   if(now-_lastAutoSave>30000){saveGame();_lastAutoSave=now;}
   // Spell panel UI refresh (every 500ms — updates countdown timers and lit/dim states)
   if(now-_lastSpellUiTick>500){
@@ -7587,6 +7945,9 @@ checkAchievements(true);
 updateMinionTabBtn();
 renderAchievementsTab();
 requestAnimationFrame(gameLoop);
+initMinionClickerDrag();
+updateMinionClickerDock();
+renderMinionClickerPlaced();
 
 document.querySelectorAll('.tab-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
@@ -8393,6 +8754,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 })();
 
 </script>
+<div id="mc-drag-ghost"></div>
 <div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-cost" style="display:none"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
 <div id="upgrade-tooltip"><div class="utt-dps"></div><div class="utt-mult"></div></div>
 <script defer src="/_vercel/insights/script.js"></script>
