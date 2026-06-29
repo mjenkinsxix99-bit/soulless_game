@@ -3887,7 +3887,7 @@ function updateHpBars(){
 }
 
 // ── UPGRADES ──────────────────────────────────────────────────────────────────
-var autoAttackEnabled=false, autoAttackInterval=3000;
+var autoAttackInterval=3000;
 var entityDmgBonus=D(0);
 var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0, tattTsGainMult=0;
 var critClickChance=0, critClickMult=0, dvDpsToClickRatio=0, soulAbsorbBonus=0;
@@ -3954,7 +3954,7 @@ function getMileMult(u){
   return 1+bonus;
 }
 function recalcStats(){
-  clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; tattTsGainMult=0; autoAttackEnabled=false;
+  clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; tattTsGainMult=0;
   critClickChance=0; critClickMult=0; dvDpsToClickRatio=0; soulAbsorbBonus=0;
   REP_UPGRADES.forEach(function(u){
     if(u.level===0) return;
@@ -3967,7 +3967,7 @@ function recalcStats(){
     } else {
       var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
       if(u.type==='click') clickDmgBonus=clickDmgBonus.add(eff);
-      else { totalDps=totalDps.add(eff); if(u.id==='dh') autoAttackEnabled=true; }
+      else { totalDps=totalDps.add(eff); }
     }
   });
   // Apply form bonuses
@@ -6255,7 +6255,7 @@ function updateEntityStatsPanel(){
   var dMin=entityDmgMin.add(entityDmgBonus).add(clickDmgBonus.floor());
   var dMax=entityDmgMax.add(entityDmgBonus).add(clickDmgBonus.floor());
   var strikeStr=fmt(dMin)+'–'+fmt(dMax);
-  var autoStr=autoAttackEnabled?(fmt(totalDps)+' / s'):'—';
+  var autoStr=totalDps.gt(0)?(fmt(totalDps)+' / s'):'—';
   document.getElementById('es-dmg').textContent=strikeStr;
   document.getElementById('es-auto').textContent=autoStr;
   document.getElementById('es-vamp').textContent=enemyHpDrainPct>0?(+(enemyHpDrainPct*100).toFixed(4))+'% HP/s':'—';
@@ -6953,7 +6953,7 @@ function gameLoop(){
   var now=Date.now();
 
   if(combatActive&&!enemyDead){
-    if(autoAttackEnabled&&def()){
+    if(def()){
       var _dt=(now-lastAutoAttack)/1000;
       lastAutoAttack=now;
       var _dpsDmg=totalDps.mul(_dt);
