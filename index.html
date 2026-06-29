@@ -4135,96 +4135,126 @@ function hideUpgradeTip(){
 
 function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
 var REP_UPGRADES=[
-  {id:'ss',name:'Spirit Slash',  icon:0,  cost:5,     costScale:1.0666, level:0, type:'click',  perLevel:1,
+  {id:'ss',name:'Spirit Slash',  icon:0,  cost:5,     costScale:1.077, level:0, type:'click',  perLevel:1,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return true;}, milestones:mkMs()},
-  {id:'dh',name:'Deeper Hunger', icon:1,  cost:50,    costScale:1.06, level:0, type:'dps',    perLevel:5,
+  {id:'dh',name:'Deeper Hunger', icon:1,  cost:50,    costScale:1.077, level:0, type:'dps',    perLevel:5,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[0].level>=1;}, milestones:mkMs()},
-  {id:'sr',name:'Soul Resonance',icon:2,  cost:300,   costScale:1.09, level:0, type:'dps',    perLevel:20,
+  {id:'sr',name:'Soul Resonance',icon:2,  cost:300,   costScale:1.077, level:0, type:'dps',    perLevel:20,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[1].level>=1;}, milestones:mkMs()},
-  {id:'sl',name:'Spectral Lure', icon:3,  cost:1000,  costScale:1.07, level:0, type:'dps',    perLevel:75,
+  {id:'sl',name:'Spectral Lure', icon:3,  cost:1000,  costScale:1.077, level:0, type:'dps',    perLevel:75,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[2].level>=1;}, milestones:mkMs()},
-  {id:'dv',name:'Divine Hunger', icon:4,  cost:5000,  costScale:1.07, level:0, type:'dps',    perLevel:333,
+  {id:'dv',name:'Divine Hunger', icon:4,  cost:5000,  costScale:1.077, level:0, type:'dps',    perLevel:333,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[3].level>=1;}, milestones:mkMs()},
-  {id:'vs',name:'Void Sense',    icon:5,  cost:20000, costScale:1.07, level:0, type:'dps',    perLevel:900,
+  {id:'vs',name:'Void Sense',    icon:5,  cost:20000, costScale:1.077, level:0, type:'dps',    perLevel:900,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[4].level>=1;}, milestones:mkMs()},
-  {id:'fm',name:'Feeding Mask',  icon:6,  cost:100000, costScale:1.06, level:0, type:'dps',   perLevel:3500,
+  {id:'fm',name:'Feeding Mask',  icon:6,  cost:100000, costScale:1.077, level:0, type:'dps',   perLevel:3500,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[5].level>=1;}, milestones:mkMs()},
-  {id:'bb',name:'Bitter Bite',   icon:7,  cost:400000, costScale:1.07, level:0, type:'dps',   perLevel:10500,
+  {id:'bb',name:'Bitter Bite',   icon:7,  cost:400000, costScale:1.077, level:0, type:'dps',   perLevel:10500,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[6].level>=1;}, milestones:mkMs()},
-  {id:'as',name:'Angelic Seduction', icon:8, cost:2500000, costScale:1.06, level:0, type:'dps', perLevel:47500,
+  {id:'as',name:'Angelic Seduction', icon:8, cost:2500000, costScale:1.077, level:0, type:'dps', perLevel:47500,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[7].level>=1;}, milestones:mkMs()},
-  {id:'ee',name:'Elemental Ecstasy', icon:9, cost:15000000, costScale:1.06, level:0, type:'dps', perLevel:200000,
+  {id:'ee',name:'Elemental Ecstasy', icon:9, cost:15000000, costScale:1.077, level:0, type:'dps', perLevel:200000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[8].level>=1;}, milestones:mkMs()},
-  {id:'pf',name:'Piercing Fear',    icon:10, cost:100000000, costScale:1.07, level:0, type:'dps', perLevel:950000,
+  {id:'pf',name:'Piercing Fear',    icon:10, cost:100000000, costScale:1.077, level:0, type:'dps', perLevel:950000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[9].level>=1;}, milestones:mkMs()},
-  {id:'cd',name:'Crushing Desire',  icon:11, cost:800000000, costScale:1.08, level:0, type:'dps', perLevel:4000000,
+  {id:'cd',name:'Crushing Desire',  icon:11, cost:800000000, costScale:1.077, level:0, type:'dps', perLevel:4000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[10].level>=1;}, milestones:mkMs()},
-  {id:'cs',name:'Chaotic Strike',   icon:12, cost:6500000000, costScale:1.07, level:0, type:'dps', perLevel:20000000,
+  {id:'cs',name:'Chaotic Strike',   icon:12, cost:6500000000, costScale:1.077, level:0, type:'dps', perLevel:20000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[11].level>=1;}, milestones:mkMs()},
-  {id:'md',name:'Mortal Deception', icon:13, cost:50000000000, costScale:1.06, level:0, type:'dps', perLevel:70000000,
+  {id:'md',name:'Mortal Deception', icon:13, cost:50000000000, costScale:1.077, level:0, type:'dps', perLevel:70000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[12].level>=1;}, milestones:mkMs()},
-  {id:'sg',name:'Sinful Gaze',      icon:14, cost:425000000000, costScale:1.07, level:0, type:'dps', perLevel:450000000,
+  {id:'sg',name:'Sinful Gaze',      icon:14, cost:425000000000, costScale:1.077, level:0, type:'dps', perLevel:450000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[13].level>=1;}, milestones:mkMs()},
-  {id:'ah',name:'Anima Harvest',    icon:15, cost:3800000000000, costScale:1.08, level:0, type:'dps', perLevel:3000000000,
+  {id:'ah',name:'Anima Harvest',    icon:15, cost:3800000000000, costScale:1.077, level:0, type:'dps', perLevel:3000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[14].level>=1;}, milestones:mkMs()},
-  {id:'sk',name:'Searing Spark',    icon:16, cost:35000000000000, costScale:1.07, level:0, type:'dps', perLevel:20000000000,
+  {id:'sk',name:'Searing Spark',    icon:16, cost:35000000000000, costScale:1.077, level:0, type:'dps', perLevel:20000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[15].level>=1;}, milestones:mkMs()},
-  {id:'cp',name:'Corrupt Psyche',   icon:17, cost:330000000000000, costScale:1.06, level:0, type:'dps', perLevel:125000000000,
+  {id:'cp',name:'Corrupt Psyche',   icon:17, cost:330000000000000, costScale:1.077, level:0, type:'dps', perLevel:125000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[16].level>=1;}, milestones:mkMs()},
-  {id:'st',name:'Spirit Target',    icon:18, cost:3e15, costScale:1.07, level:0, type:'dps', perLevel:800000000000,
+  {id:'st',name:'Spirit Target',    icon:18, cost:3e15, costScale:1.077, level:0, type:'dps', perLevel:800000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[17].level>=1;}, milestones:mkMs()},
-  {id:'sb',name:'Soul Blast',       icon:19, cost:25e15, costScale:1.08, level:0, type:'dps', perLevel:5000000000000,
+  {id:'sb',name:'Soul Blast',       icon:19, cost:25e15, costScale:1.077, level:0, type:'dps', perLevel:5000000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[18].level>=1;}, milestones:mkMs()},
-  {id:'dm',name:'Doom',             icon:20, cost:300e15, costScale:1.07, level:0, type:'dps', perLevel:50000000000000,
+  {id:'dm',name:'Doom',             icon:20, cost:300e15, costScale:1.077, level:0, type:'dps', perLevel:50000000000000,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[19].level>=1;}, milestones:mkMs()},
-  {id:'nt',name:'Night Terror',     icon:21, cost:10e18, costScale:1.06, level:0, type:'dps', perLevel:1e15,
+  {id:'nt',name:'Night Terror',     icon:21, cost:10e18, costScale:1.077, level:0, type:'dps', perLevel:1e15,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[20].level>=1;}, milestones:mkMs()},
-  {id:'ir',name:'Infernal Rage',    icon:22, cost:325e18, costScale:1.07, level:0, type:'dps', perLevel:30e15,
+  {id:'ir',name:'Infernal Rage',    icon:22, cost:325e18, costScale:1.077, level:0, type:'dps', perLevel:30e15,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[21].level>=1;}, milestones:mkMs()},
-  {id:'td',name:'Tainted Dreams',   icon:23, cost:15e21, costScale:1.08, level:0, type:'dps', perLevel:950e15,
+  {id:'td',name:'Tainted Dreams',   icon:23, cost:15e21, costScale:1.077, level:0, type:'dps', perLevel:950e15,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[22].level>=1;}, milestones:mkMs()},
-  {id:'mf',name:'Manifestation',    icon:24, cost:4.75e24, costScale:1.07, level:0, type:'dps', perLevel:200e18,
+  {id:'mf',name:'Manifestation',    icon:24, cost:4.75e24, costScale:1.077, level:0, type:'dps', perLevel:200e18,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[23].level>=1;}, milestones:mkMs()},
-  {id:'bs',name:'Brimstone',        icon:25, cost:2e27, costScale:1.06, level:0, type:'dps', perLevel:75e21,
+  {id:'bs',name:'Brimstone',        icon:25, cost:2e27, costScale:1.077, level:0, type:'dps', perLevel:75e21,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[24].level>=1;}, milestones:mkMs()},
-  {id:'ct',name:'Chaos Tide',       icon:26, cost:325e27, costScale:1.07, level:0, type:'dps', perLevel:850e21,
+  {id:'ct',name:'Chaos Tide',       icon:26, cost:1e39, costScale:1.077, level:0, type:'dps', perLevel:1e39,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[25].level>=1;}, milestones:mkMs()},
-  {id:'rn',name:'Ragefire Nova',    icon:27, cost:12e30, costScale:1.08, level:0, type:'dps', perLevel:32e24,
+  {id:'rn',name:'Ragefire Nova',    icon:27, cost:1e54, costScale:1.077, level:0, type:'dps', perLevel:1e43,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[26].level>=1;}, milestones:mkMs()},
-  {id:'ac',name:'Abyssal Call',     icon:28, cost:780e30, costScale:1.07, level:0, type:'dps', perLevel:675e24,
+  {id:'ac',name:'Abyssal Call',     icon:28, cost:1e69, costScale:1.077, level:0, type:'dps', perLevel:1e56,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[27].level>=1;}, milestones:mkMs()},
-  {id:'bf',name:'Balefire',         icon:29, cost:99e33, costScale:1.06, level:0, type:'dps', perLevel:50e27,
+  {id:'bf',name:'Balefire',         icon:29, cost:1e84, costScale:1.077, level:0, type:'dps', perLevel:1e69,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[28].level>=1;}, milestones:mkMs()},
+  {id:'ar',name:'Astral Rend',      icon:30, cost:1e99,  costScale:1.077, level:0, type:'dps', perLevel:1e82,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'pg',name:'Phantom Grasp',    icon:31, cost:1e114, costScale:1.077, level:0, type:'dps', perLevel:1e95,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'np',name:'Nether Pulse',     icon:32, cost:1e129, costScale:1.077, level:0, type:'dps', perLevel:1e108,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'su',name:'Soul Rupture',     icon:33, cost:1e144, costScale:1.077, level:0, type:'dps', perLevel:1e121,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'vm',name:'Void Maw',         icon:34, cost:1e159, costScale:1.077, level:0, type:'dps', perLevel:1e134,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'cw',name:'Celestial Wrath',  icon:35, cost:1e174, costScale:1.077, level:0, type:'dps', perLevel:1e147,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'wt',name:'Wraith Touch',     icon:36, cost:1e189, costScale:1.077, level:0, type:'dps', perLevel:1e160,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'ec',name:'Ethereal Chains',  icon:37, cost:1e204, costScale:1.077, level:0, type:'dps', perLevel:1e173,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'ag',name:'Abyss Surge',      icon:38, cost:1e219, costScale:1.077, level:0, type:'dps', perLevel:1e186,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
+  {id:'sp',name:'Spirit Siphon',    icon:39, cost:1e234, costScale:1.077, level:0, type:'dps', perLevel:1e199,
+    desc:function(){return upgradeDescStr(this);},
+    vis:function(){return false;}, milestones:mkMs()},
 ];
 
 // Convert all upgrade costs to Decimal after definition
@@ -4235,17 +4265,36 @@ REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
 //   2. Preview  — the previous upgrade is affordable (show this one as +1 ahead).
 // Both rules use the current live cost, so a player who left the game running
 // and can now afford a lower upgrade will see it (and one beyond) automatically.
+// Upgrades 30-39 also require a specific unlock condition to be met.
+function _formUltCount(){
+  return ['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine']
+    .filter(function(id){return achievementsEarned.indexOf(id)>=0;}).length;
+}
+var _UNLOCK_CONDS=[
+  function(){return _formUltCount()>=1;},  // 30 Astral Rend
+  function(){return _formUltCount()>=1;},  // 31 Phantom Grasp
+  function(){return rebirthCount>=1;},     // 32 Nether Pulse
+  function(){return rebirthCount>=1;},     // 33 Soul Rupture
+  function(){return minionSlots.length>=1;}, // 34 Void Maw
+  function(){return minionSlots.length>=1;}, // 35 Celestial Wrath
+  function(){return _formUltCount()>=3;},  // 36 Wraith Touch
+  function(){return _formUltCount()>=4;},  // 37 Ethereal Chains
+  function(){return _formUltCount()>=5;},  // 38 Abyss Surge
+  function(){return achievementsEarned.indexOf('form-ult-all')>=0;}, // 39 Spirit Siphon
+];
 REP_UPGRADES.forEach(function(u, idx) {
   if (idx === 0) return; // first upgrade is always visible; keep its existing vis
-  u.vis = (function(i) {
+  var unlockFn = idx >= 30 ? _UNLOCK_CONDS[idx - 30] : null;
+  u.vis = (function(i, ufn) {
     return function() {
+      if (ufn && !ufn()) return false;
       var prev = REP_UPGRADES[i - 1];
       if (prev.level >= 1) return true;           // purchased rule
       if (souls.gte(REP_UPGRADES[i].cost)) return true; // affordable rule
       if (souls.gte(prev.cost)) return true;      // preview (+1) rule
       return false;
     };
-  })(idx);
+  })(idx, unlockFn);
 });
 
 // DV DPS→Click milestone indices and their step multipliers from the previous DPS→Click milestone
