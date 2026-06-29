@@ -1117,6 +1117,30 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   .mm-cell { height: 41px !important; width: 41px !important; }
   .mm-cell.elite { height: 39px !important; width: 39px !important; }
 }
+/* ── MINION CLICKER ─────────────────────────────────────────────────────────── */
+#mc-dock { position:absolute; bottom:8px; left:8px; z-index:50; display:none; flex-direction:column; align-items:center; gap:3px; }
+#mc-dock-sprite { width:48px; height:48px; background-image:url('artwork/sprites_ui.webp'); background-size:672px 48px; background-position:-624px 0; cursor:grab; image-rendering:pixelated; border:2px solid #9966ff; border-radius:6px; background-color:rgba(20,10,40,0.8); box-shadow:0 0 10px rgba(153,102,255,0.5); }
+#mc-dock-sprite:active { cursor:grabbing; }
+#mc-dock-sprite.mc-empty { opacity:0.4; cursor:default; }
+#mc-dock-counter { font-family:Georgia,serif; font-size:11px; color:#cc99ff; text-align:center; line-height:1.3; }
+#mc-dock-recall { background:#330000; border:1px solid #cc2222; color:#ff4444; border-radius:4px; font-size:10px; padding:2px 6px; cursor:pointer; font-family:Georgia,serif; line-height:1.4; }
+#mc-dock-recall:hover { background:#550000; }
+#mc-drag-ghost { position:fixed; width:36px; height:36px; background-image:url('artwork/sprites_ui.webp'); background-size:504px 36px; background-position:-468px 0; pointer-events:none; z-index:9999; display:none; border:2px solid #9966ff; border-radius:4px; background-color:rgba(20,10,40,0.85); opacity:0.9; image-rendering:pixelated; }
+.mc-drop-hl { position:absolute; inset:0; background:rgba(130,50,255,0.15); border:2px dashed #9966ff; border-radius:4px; pointer-events:none; z-index:15; display:none; }
+body.mc-dragging .mc-drop-hl { display:block; }
+body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
+#enemy-mc-zone { position:absolute; right:-44px; top:50%; transform:translateY(-50%); width:40px; display:flex; flex-direction:column; gap:4px; align-items:center; }
+.mc-enemy-slot { width:32px; height:32px; border:1px dashed #664488; border-radius:4px; display:flex; align-items:center; justify-content:center; position:relative; }
+.mc-enemy-slot.mc-filled { border-color:#9966ff; }
+.mc-placed-icon { width:28px; height:28px; background-image:url('artwork/sprites_ui.webp'); background-size:392px 28px; background-position:-364px 0; image-rendering:pixelated; border-radius:3px; cursor:pointer; position:relative; }
+.mc-placed-icon .mc-recall-x { display:none; position:absolute; inset:0; background:rgba(180,0,0,0.85); border-radius:3px; color:#fff; font-size:14px; font-weight:bold; align-items:center; justify-content:center; line-height:1; }
+.mc-placed-icon:hover .mc-recall-x,
+.mc-placed-icon.mc-show-x .mc-recall-x { display:flex; }
+.mc-upg-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:20; width:28px; height:28px; background-image:url('artwork/sprites_ui.webp'); background-size:392px 28px; background-position:-364px 0; image-rendering:pixelated; border-radius:3px; cursor:pointer; background-color:rgba(20,10,40,0.7); border:1px solid #9966ff; }
+.mc-upg-icon .mc-recall-x { display:none; position:absolute; inset:0; background:rgba(180,0,0,0.85); border-radius:3px; color:#fff; font-size:14px; font-weight:bold; align-items:center; justify-content:center; line-height:1; }
+.mc-upg-icon:hover .mc-recall-x,
+.mc-upg-icon.mc-show-x .mc-recall-x { display:flex; }
+#mc-buyall-wrap { position:relative; display:inline-block; }
 </style>
 </head>
 <body>
@@ -1187,6 +1211,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
         <div class="canvas-wrap" style="position:relative;">
           <canvas id="enemy-canvas" width="330" height="330"></canvas>
           <div id="crown"></div>
+          <div id="enemy-mc-zone"><div class="mc-drop-hl"></div></div>
         </div>
         <div class="cname enemy-label" id="enemy-name-label">Wisper</div>
         <div class="hp-wrap">
@@ -1221,6 +1246,12 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
         <button id="reform-btn">Return</button>
       </div>
       <div id="float-layer"></div>
+      <!-- Minion clicker dock -->
+      <div id="mc-dock">
+        <div id="mc-dock-sprite" title="Drag to place a minion clicker"></div>
+        <div id="mc-dock-counter">0 / 0</div>
+        <button id="mc-dock-recall">✕ Recall All</button>
+      </div>
     </div>
     <div id="buy-selector">
       <div class="buy-label">BUY</div>
@@ -1230,7 +1261,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
       <button class="buy-btn" data-qty="50">50</button>
       <button class="buy-btn" data-qty="100">100</button>
       <button class="buy-btn" data-qty="max">MAX</button>
-      <button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;background:#2a6e2a;border-color:#3d9e3d;color:#ffffff;">BUY ALL AUGS</button>
+      <div id="mc-buyall-wrap"><button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;background:#2a6e2a;border-color:#3d9e3d;color:#ffffff;">BUY ALL AUGS</button><div class="mc-drop-hl"></div></div>
       <div id="spell-panel">
         <div class="spell-divider"></div>
         <div id="invoke-label">mana</div>
@@ -2798,7 +2829,7 @@ function getMinionBonusDesc(bonusType, heldMinion){
     case 'minionxp':   label='minion XP multiplier (stacking)'; break;
     case 'upgradecost':label='reduction to upgrade costs'; break;
     case 'elitetimer': label='seconds to elite timer'; break;
-    case 'minionpower':label='element output multiplier (stacking)'; break;
+    case 'minionpower':label='Your very own minion clicker!'; break;
     case 'spelllength':label='seconds to spell duration'; break;
     default: label='bonus'; break;
   }
@@ -2834,8 +2865,7 @@ function tickElementProduction(nowMs){
   if(elapsed<INTERVAL_MS) return;
   var ticks=Math.floor(elapsed/INTERVAL_MS);
   _lastElementTick+=ticks*INTERVAL_MS;
-  var minionPowerBonus=getMinionTotalBonus('minionpower');
-  var eliteMult=1+minionPowerBonus;
+  var eliteMult=1;
   minionSlots.forEach(function(m){
     var md=MINION_DATA[m.typeIdx];
     if(!md||!md.element) return;
@@ -2874,6 +2904,7 @@ function attemptMinionCapture(typeIdx){
   minionPoints-=cost;
   captureTargetIdx=-1; // deselect after successful capture
   minionSlots.push({typeIdx:typeIdx,level:1,xp:0,isElite:false});
+  updateMinionClickerDock();
   if(discoveredMinions.indexOf(typeIdx)<0) discoveredMinions.push(typeIdx);
   showMinionCaptureNotif(typeIdx);
   renderMinionModal();
@@ -2906,6 +2937,7 @@ function releaseMinion(typeIdx){
   }
   if(slotIdx===-1){ exitReleaseMode(); return; }
   minionSlots.splice(slotIdx,1);
+  clampMinionClickerAssignments();
   var refund=getMinionNextMpCost();
   minionPoints+=refund;
   exitReleaseMode();
@@ -2961,6 +2993,7 @@ function wipeNonEliteMinions(){
     var cv=document.getElementById('pet-canvas');
     if(cv) cv.style.display='none';
   }
+  clampMinionClickerAssignments();
 }
 
 var REALM_NAMES_MM=['Purgatory','Limbo','Underworld','Void','Abyss','Inferno','Pandemonium','Tartarus','Oblivion','Eternity'];
@@ -5706,6 +5739,7 @@ function saveGame(){
     elementStocks:JSON.parse(JSON.stringify(elementStocks)),
     lastElementTick:_lastElementTick,
     redeemedCodes:redeemedCodes.slice(),
+    minionClickerAssignments:minionClickerAssignments.slice(),
     savedAt:Date.now()
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); } catch(e){}
@@ -5797,6 +5831,7 @@ function loadGame(){
   if(data.elementStocks) elementStocks=data.elementStocks;
   if(data.lastElementTick) _lastElementTick=data.lastElementTick;
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
+  if(data.minionClickerAssignments) minionClickerAssignments=data.minionClickerAssignments;
   _offlineSavedAt=data.savedAt||0;
   return true;
 }
@@ -6111,7 +6146,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
       totalUpgradePurchases+=n;
       if(!_tutShown.upgrades200&&totalUpgradePurchases>=200){ _tutShown.upgrades200=true; if(showTutorial){ (function(mult){ setTimeout(function(){ showTutorialTip('200 upgrades gives you a \xd7'+mult+' damage bonus! Every 100 more will give you another boost!',document.getElementById('upgrade-list'),null); },200); })(getPurchMult(totalUpgradePurchases).toString()); } }
       recalcStats();
-      buildUpgrades(); lastRebuildU=Date.now(); dirtyU=false;
+      buildUpgrades(); lastRebuildU=Date.now(); dirtyU=false; renderMinionClickerPlaced();
       updateEntityStatsPanel();
       updateTatteredDisplay();
       document.getElementById('soul-count').textContent=fmt(souls);
@@ -6947,6 +6982,278 @@ document.getElementById('enemy-canvas').addEventListener('touchstart',function(e
 },{passive:false});
 document.getElementById('reform-btn').addEventListener('click',reform);
 
+// ── MINION CLICKER SYSTEM ─────────────────────────────────────────────────────
+var minionClickerAssignments = [];
+// Each entry: {target:'enemy'|'upgrade'|'buyall', upgradeId:null|string}
+var MINION_CLICKER_MAX_ENEMY = 4;
+var _lastMinionClickTick = 0;
+var _mcDragActive = false;
+var _mcHoverTimers = {};
+
+function getMinionpowerSlots(){
+  return minionSlots.filter(function(m){ return MINION_DATA[m.typeIdx]&&MINION_DATA[m.typeIdx].bonus==='minionpower'; });
+}
+function getMinionpowerCount(){ return getMinionpowerSlots().length; }
+function getMinionpowerAvgLevel(){
+  var slots=getMinionpowerSlots();
+  if(!slots.length) return 0;
+  var sum=slots.reduce(function(s,m){ return s+(m.isElite?MINION_ELITE_LEVEL:m.level); },0);
+  return sum/slots.length;
+}
+function getMinionClickerPool(){
+  return Math.max(0, getMinionpowerCount()-minionClickerAssignments.length);
+}
+function clampMinionClickerAssignments(){
+  var max=getMinionpowerCount();
+  if(minionClickerAssignments.length>max){
+    minionClickerAssignments.splice(max);
+    updateMinionClickerDock();
+    renderMinionClickerPlaced();
+  }
+}
+function recallAllMinionClickers(){
+  minionClickerAssignments=[];
+  updateMinionClickerDock();
+  renderMinionClickerPlaced();
+  saveGame();
+}
+function recallMinionClickerAt(idx){
+  if(idx<0||idx>=minionClickerAssignments.length) return;
+  minionClickerAssignments.splice(idx,1);
+  updateMinionClickerDock();
+  renderMinionClickerPlaced();
+  saveGame();
+}
+function assignMinionClicker(target, upgradeId){
+  if(getMinionClickerPool()<=0) return false;
+  if(target==='enemy'){
+    var enemyCount=minionClickerAssignments.filter(function(a){return a.target==='enemy';}).length;
+    if(enemyCount>=MINION_CLICKER_MAX_ENEMY) return false;
+  }
+  minionClickerAssignments.push({target:target, upgradeId:upgradeId||null});
+  updateMinionClickerDock();
+  renderMinionClickerPlaced();
+  saveGame();
+  return true;
+}
+
+function minionClickerAttackEnemy(){
+  if(!combatActive||enemyDead) return;
+  var avgLvl=getMinionpowerAvgLevel();
+  if(avgLvl<=0) return;
+  var dmg=clickDmgBonus.mul(avgLvl*0.0006435);
+  if(dmg.lte(0)) return;
+  var isCrit=false;
+  if(critClickChance>0&&Math.random()<critClickChance){
+    isCrit=true;
+    dmg=dmg.mul(2+critClickMult);
+  }
+  if(isSpellActive('twinStrikes')) dmg=dmg.mul(2);
+  if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
+  enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
+  enemyHitFlashTime=Date.now();
+  var pp=floatPos('enemy-canvas');
+  spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
+  updateHpBars();
+  if(enemyHp.lte(0)) onEnemyDeath();
+}
+
+function minionClickerBuyUpgrade(upgradeId){
+  var u=REP_UPGRADES.find(function(x){return x.id===upgradeId;});
+  if(!u||!u.vis()) return;
+  var n=(buyQty==='max')?maxAffordableN(u):buyQty;
+  if(n<1) return;
+  var total=calcCostN(u,n);
+  if(!souls.gte(total)) return;
+  souls=souls.sub(total);
+  var c=u.cost;
+  for(var i=0;i<n;i++){ c=c.mul(u.costScale).ceil(); }
+  u.cost=c;
+  u.level+=n;
+  totalUpgradePurchases+=n;
+  recalcStats();
+  dirtyU=true;
+  updateEntityStatsPanel();
+  updateTatteredDisplay();
+  document.getElementById('soul-count').textContent=fmt(souls);
+  checkAchievements();
+  checkRebirthButton();
+  saveGame();
+}
+
+function tickMinionClickers(now){
+  if(!minionClickerAssignments.length) return;
+  if(now-_lastMinionClickTick < 250) return;
+  _lastMinionClickTick=now;
+  minionClickerAssignments.forEach(function(a){
+    if(a.target==='enemy') minionClickerAttackEnemy();
+    else if(a.target==='upgrade') minionClickerBuyUpgrade(a.upgradeId);
+    else if(a.target==='buyall') buyAllAffordable();
+  });
+}
+
+function updateMinionClickerDock(){
+  var dock=document.getElementById('mc-dock');
+  if(!dock) return;
+  var total=getMinionpowerCount();
+  var pool=getMinionClickerPool();
+  if(total===0){ dock.style.display='none'; return; }
+  dock.style.display='flex';
+  var sprite=document.getElementById('mc-dock-sprite');
+  if(sprite) sprite.classList.toggle('mc-empty', pool===0);
+  var counter=document.getElementById('mc-dock-counter');
+  if(counter) counter.textContent=pool+' / '+total;
+}
+
+function renderMinionClickerPlaced(){
+  // Enemy slots
+  var ez=document.getElementById('enemy-mc-zone');
+  if(ez){
+    var hl=ez.querySelector('.mc-drop-hl');
+    ez.innerHTML='';
+    if(hl) ez.appendChild(hl);
+    var enemyAssigned=minionClickerAssignments.filter(function(a){return a.target==='enemy';});
+    enemyAssigned.forEach(function(a,i){
+      var globalIdx=minionClickerAssignments.indexOf(a);
+      var slot=document.createElement('div');
+      slot.className='mc-enemy-slot mc-filled';
+      var icon=document.createElement('div');
+      icon.className='mc-placed-icon';
+      icon.innerHTML='<div class="mc-recall-x">✕</div>';
+      _attachMcRecall(icon, globalIdx);
+      slot.appendChild(icon);
+      ez.appendChild(slot);
+    });
+    // Empty slots up to max
+    for(var i=enemyAssigned.length;i<MINION_CLICKER_MAX_ENEMY;i++){
+      var slot=document.createElement('div');
+      slot.className='mc-enemy-slot';
+      ez.appendChild(slot);
+    }
+    if(hl) ez.appendChild(hl);
+  }
+
+  // BuyAll
+  var baw=document.getElementById('mc-buyall-wrap');
+  if(baw){
+    baw.querySelectorAll('.mc-upg-icon').forEach(function(el){el.remove();});
+    var baIdx=minionClickerAssignments.findIndex(function(a){return a.target==='buyall';});
+    if(baIdx>=0){
+      var icon=document.createElement('div');
+      icon.className='mc-upg-icon';
+      icon.innerHTML='<div class="mc-recall-x">✕</div>';
+      _attachMcRecall(icon, baIdx);
+      baw.appendChild(icon);
+    }
+  }
+
+  // Upgrade cards
+  document.querySelectorAll('.ucard[data-uid]').forEach(function(card){
+    card.querySelectorAll('.mc-upg-icon').forEach(function(el){el.remove();});
+    var uid=card.getAttribute('data-uid');
+    var aIdx=minionClickerAssignments.findIndex(function(a){return a.target==='upgrade'&&a.upgradeId===uid;});
+    if(aIdx>=0){
+      card.style.position='relative';
+      var icon=document.createElement('div');
+      icon.className='mc-upg-icon';
+      icon.innerHTML='<div class="mc-recall-x">✕</div>';
+      _attachMcRecall(icon, aIdx);
+      card.appendChild(icon);
+    }
+  });
+}
+
+function _attachMcRecall(icon, globalIdx){
+  var hoverTimer=null;
+  icon.addEventListener('mouseenter',function(){
+    hoverTimer=setTimeout(function(){ icon.classList.add('mc-show-x'); },3000);
+  });
+  icon.addEventListener('mouseleave',function(){
+    clearTimeout(hoverTimer);
+    icon.classList.remove('mc-show-x');
+  });
+  icon.addEventListener('click',function(e){
+    e.stopPropagation();
+    if(icon.classList.contains('mc-show-x')||icon.querySelector('.mc-recall-x').style.display==='flex'){
+      recallMinionClickerAt(globalIdx);
+    }
+  });
+  // Allow pick-up drag to reassign
+  icon.addEventListener('mousedown',function(e){
+    e.stopPropagation();
+    e.preventDefault();
+    clearTimeout(hoverTimer);
+    icon.classList.remove('mc-show-x');
+    recallMinionClickerAt(globalIdx);
+    // Immediately start drag from dock
+    setTimeout(function(){ startMcDrag(e); },0);
+  });
+}
+
+function startMcDrag(e){
+  if(getMinionClickerPool()<=0) return;
+  _mcDragActive=true;
+  document.body.classList.add('mc-dragging');
+  var ghost=document.getElementById('mc-drag-ghost');
+  ghost.style.display='block';
+  ghost.style.left=(e.clientX-18)+'px';
+  ghost.style.top=(e.clientY-18)+'px';
+}
+
+function initMinionClickerDrag(){
+  var dock=document.getElementById('mc-dock-sprite');
+  if(!dock) return;
+  dock.addEventListener('mousedown',function(e){
+    if(getMinionClickerPool()<=0) return;
+    e.preventDefault();
+    startMcDrag(e);
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!_mcDragActive) return;
+    var ghost=document.getElementById('mc-drag-ghost');
+    ghost.style.left=(e.clientX-18)+'px';
+    ghost.style.top=(e.clientY-18)+'px';
+  });
+  document.addEventListener('mouseup',function(e){
+    if(!_mcDragActive) return;
+    _mcDragActive=false;
+    document.body.classList.remove('mc-dragging');
+    document.getElementById('mc-drag-ghost').style.display='none';
+    // Detect drop target
+    var el=document.elementFromPoint(e.clientX,e.clientY);
+    if(!el) return;
+    // Enemy zone
+    var ez=document.getElementById('enemy-mc-zone');
+    if(ez&&(ez===el||ez.contains(el))){ assignMinionClicker('enemy',null); return; }
+    // BuyAll
+    var baw=document.getElementById('mc-buyall-wrap');
+    if(baw&&(baw===el||baw.contains(el))){
+      var alreadyHasBuyAll=minionClickerAssignments.some(function(a){return a.target==='buyall';});
+      if(!alreadyHasBuyAll) assignMinionClicker('buyall',null);
+      return;
+    }
+    // Upgrade card
+    var card=el.closest('.ucard[data-uid]');
+    if(card){
+      var uid=card.getAttribute('data-uid');
+      var alreadyHasUpg=minionClickerAssignments.some(function(a){return a.target==='upgrade'&&a.upgradeId===uid;});
+      if(!alreadyHasUpg) assignMinionClicker('upgrade',uid);
+      return;
+    }
+  });
+  // Recall all button
+  document.getElementById('mc-dock-recall').addEventListener('click',function(){
+    recallAllMinionClickers();
+  });
+  // Add tooltip to recall button
+  var rcl=document.getElementById('mc-dock-recall');
+  var _rclTimer=null;
+  rcl.addEventListener('mouseenter',function(){
+    _rclTimer=setTimeout(function(){ rcl.title='Recall all minion clickers'; },3000);
+  });
+  rcl.addEventListener('mouseleave',function(){ clearTimeout(_rclTimer); });
+}
+
 // ── GAME LOOP ─────────────────────────────────────────────────────────────────
 function gameLoop(){
   requestAnimationFrame(gameLoop);
@@ -6984,6 +7291,7 @@ function gameLoop(){
   }
 
   tickElementProduction(now);
+  tickMinionClickers(now);
 
   drawEntityCanvas(now);
   drawPetMinion(now);
@@ -7102,7 +7410,7 @@ function gameLoop(){
   else if(eid==='hv_steven')  drawStevenSprite(ecv,now,enemyDead,_elite);
   else { tickMist(enemyDead); drawMist(ecv,def()?def().color:[200,255,200],enemyDead,1); }
 
-  if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;}
+  if(dirtyU&&now-lastRebuildU>600){buildUpgrades();dirtyU=false;lastRebuildU=now;renderMinionClickerPlaced();}
   if(now-_lastAutoSave>30000){saveGame();_lastAutoSave=now;}
   // Spell panel UI refresh (every 500ms — updates countdown timers and lit/dim states)
   if(now-_lastSpellUiTick>500){
@@ -7637,6 +7945,9 @@ checkAchievements(true);
 updateMinionTabBtn();
 renderAchievementsTab();
 requestAnimationFrame(gameLoop);
+initMinionClickerDrag();
+updateMinionClickerDock();
+renderMinionClickerPlaced();
 
 document.querySelectorAll('.tab-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
@@ -8443,6 +8754,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 })();
 
 </script>
+<div id="mc-drag-ghost"></div>
 <div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-cost" style="display:none"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
 <div id="upgrade-tooltip"><div class="utt-dps"></div><div class="utt-mult"></div></div>
 <script defer src="/_vercel/insights/script.js"></script>
