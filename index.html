@@ -5934,8 +5934,8 @@ function applyOfflineProgress(savedAt){
   try{ localStorage.setItem(OFFLINE_APPLIED_KEY, String(Date.now())); } catch(e){}
   saveGame();
 
-  // Animate XP bar fill + count-up over 3 seconds, then auto-close
-  var ANIM_MS = 3000, steps = 80, step = 0;
+  // Animate XP bar fill + count-up: 5s under 3h, 8s over 3h; offline capped at 6h
+  var ANIM_MS = elapsed > 10800 ? 8000 : 5000, steps = 80, step = 0;
   var interval = setInterval(function(){
     step++;
     var pct = Math.min(100, (step / steps) * 100);
