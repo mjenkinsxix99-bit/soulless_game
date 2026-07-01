@@ -4837,7 +4837,7 @@ function renderSpellPanel(){
     var imgSrc=SPELL_IMGS[imgKey]||'';
     var keyNum=SPELLS.indexOf(spell)+1;
     btn.innerHTML=
-      '<img src="'+imgSrc+'" alt="'+spell.name+'" style="width:36px;height:36px;image-rendering:pixelated;display:block;opacity:'+(owned?'1':'0.5')+';">'+
+      '<img src="'+imgSrc+'" alt="'+spell.name+'" style="width:36px;height:36px;image-rendering:pixelated;display:block;">'+
       '<span style="position:absolute;bottom:1px;right:3px;font-size:8px;color:#554477;font-family:monospace;line-height:1;">'+keyNum+'</span>';
     btn.setAttribute('data-spell',spell.id);
     var remaining='';
