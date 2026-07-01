@@ -808,7 +808,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   opacity:0; animation:none; }
 .left-tab-btn:hover .tab-tip,
 .tab-btn:hover .tab-tip,
-.mm-nav:hover .tab-tip { animation:tabtip-in 0.15s forwards; animation-delay:3s; }
+.mm-nav:hover .tab-tip,
+.mm-pet-btn:hover .tab-tip { animation:tabtip-in 0.15s forwards; animation-delay:3s; }
+.mm-pet-btn .tab-tip { white-space:normal; width:180px; text-transform:none; letter-spacing:0; font-size:11px; left:0; transform:none; }
 @keyframes tabtip-in { to { opacity:1; } }
 /* Tattered-souls counter tooltip */
 #ts-counter-tip { display:none; position:fixed; z-index:1200; background:#06041a; border:1px solid #d4a843;
@@ -3075,6 +3077,9 @@ function renderMinionModal(){
       // Pet button (top-left of card)
       (function(petIdx, owned){
         var petBtn=document.createElement('button');
+        var petTip=document.createElement('span');
+        petTip.className='tab-tip';
+        petTip.textContent='A minion selected as your pet joins you on the battlefield, gaining 2x XP!';
         if(!owned){
           petBtn.className='mm-pet-btn mm-pet-btn-disabled';
           petBtn.textContent='Pet';
@@ -3087,6 +3092,8 @@ function renderMinionModal(){
             setPetMinion(petIdx);
           });
         }
+        petBtn.style.position='relative';
+        petBtn.appendChild(petTip);
         card.appendChild(petBtn);
       })(idx, !!heldMinion);
 
