@@ -606,6 +606,22 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #promo-msg { font-size: 12px; margin-top: 6px; min-height: 1.4em; letter-spacing: 0.3px; }
 #promo-msg.ok { color: #55bb66; }
 #promo-msg.err { color: #bb4444; }
+#version-row { display:flex; align-items:center; justify-content:space-between; margin-top:16px; }
+#version-label { font-size:13px; color:#d4a843; letter-spacing:1px; font-family:Georgia,serif; }
+#changelog-btn { padding:5px 12px; background:transparent; border:1px solid #d4a843; color:#d4a843; font-family:Georgia,serif; font-size:12px; letter-spacing:1px; cursor:pointer; border-radius:4px; transition:box-shadow 0.2s; }
+#changelog-btn:hover { box-shadow:0 0 8px rgba(212,168,67,0.5); }
+/* Changelog modal */
+#changelog-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:10003; align-items:center; justify-content:center; }
+#changelog-modal.open { display:flex; }
+#changelog-box { background:#0a0a18; border:1px solid #d4a843; border-radius:10px; padding:30px 36px; max-width:560px; width:92%; max-height:82vh; display:flex; flex-direction:column; }
+#changelog-title { font-size:20px; color:#d4a843; letter-spacing:3px; text-align:center; margin-bottom:4px; font-family:Georgia,serif; }
+#changelog-version { font-size:15px; color:#d4a843; letter-spacing:2px; text-align:center; margin-bottom:18px; font-family:Georgia,serif; }
+#changelog-body { overflow-y:auto; flex:1; font-family:Georgia,serif; font-size:13px; color:#e8e0ff; line-height:1.7; text-align:left; }
+#changelog-body h3 { color:#d4a843; font-size:13px; letter-spacing:1px; margin:14px 0 4px; border-bottom:1px solid #2a2040; padding-bottom:3px; }
+#changelog-body ul { margin:0 0 6px 16px; padding:0; }
+#changelog-body li { margin-bottom:3px; color:#e0d8f8; }
+#changelog-close { margin-top:18px; padding:8px 24px; background:transparent; border:1px solid #d4a843; color:#d4a843; font-family:Georgia,serif; font-size:13px; letter-spacing:1px; cursor:pointer; border-radius:4px; align-self:center; transition:box-shadow 0.2s; }
+#changelog-close:hover { box-shadow:0 0 10px rgba(212,168,67,0.5); }
 .stat-row { display: flex; justify-content: space-between; font-size: 15px; color: #776699; padding: 3px 0; border-bottom: 1px solid #0f0f1e; }
 .stat-row .sv { color: #7766aa; }
 .stat-row .sv.good { color: #88aa88; }
@@ -1872,9 +1888,77 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       <button id="promo-btn">Redeem</button>
     </div>
     <div id="promo-msg"></div>
+    <div id="version-row">
+      <span id="version-label">version 1.60</span>
+      <button id="changelog-btn">Changelog</button>
+    </div>
     <button id="hard-reset-btn">Hard Reset</button>
     <br>
     <button id="settings-close">Close</button>
+  </div>
+</div>
+
+<div id="changelog-modal">
+  <div id="changelog-box">
+    <div id="changelog-title">Soulless Changelog</div>
+    <div id="changelog-version">v 1.60</div>
+    <div id="changelog-body">
+      <h3>Mana</h3>
+      <ul>
+        <li>Audited mana gain and cap — confirmed nothing was blocking either.</li>
+        <li>Brightened mana bar text so it's legible.</li>
+        <li>Converted mana bar from vertical to horizontal layout.</li>
+      </ul>
+      <h3>Reincarnate</h3>
+      <ul>
+        <li>Non-elite minions now refund their exact MP cost on reincarnate.</li>
+        <li>Reincarnate modal now shows how much MP will be refunded before confirming.</li>
+        <li>Added reincarnate info line detailing what is kept, lost, and refunded.</li>
+      </ul>
+      <h3>MP Cost System — Realm Tier Pricing</h3>
+      <ul>
+        <li>Replaced old scaling cost curve with flat per-realm pricing: 1, 2, 3, 4, 5, 8, 13, 21, 34, 55.</li>
+        <li>Releasing a minion refunds the exact tier cost for that minion's realm.</li>
+      </ul>
+      <h3>Pet Minion — 2x XP</h3>
+      <ul>
+        <li>Any minion selected as your Pet now earns 2x XP.</li>
+        <li>Added a 3-second hover tooltip on the Pet button explaining the bonus.</li>
+      </ul>
+      <h3>Minion Cards</h3>
+      <ul>
+        <li>Minion sprites are dimmed when a minion has been captured before but is not currently held this reincarnation.</li>
+      </ul>
+      <h3>Tattered Shop</h3>
+      <ul>
+        <li>Updated shop header text: "666 Upgrades = 1 TS. Every TS gives +6.66% increase to DPS. Bounties on Elites on floor 150+ = Bonus TS!"</li>
+        <li>Spell purchase nodes now display pixel art sprites instead of text glyphs.</li>
+      </ul>
+      <h3>Spell Panel</h3>
+      <ul>
+        <li>All 9 spells are always visible; unpurchased spells show a locked padlock with a tooltip directing players to the Sacrifice tab.</li>
+        <li>Spell panel and mana bar repositioned to anchor to the left edge of the game, spanning into the battlefield area.</li>
+        <li>Each spell button displays its pixel art sprite at full opacity regardless of lock state.</li>
+        <li>Keyboard shortcuts 1–9 cast the corresponding spell.</li>
+        <li>Key number shown in the corner of each spell button and in the tooltip.</li>
+      </ul>
+      <h3>Settings</h3>
+      <ul>
+        <li>Settings cog moved into the buy quantity selector column, below the Buy All Augs button.</li>
+      </ul>
+      <h3>Loading Screen</h3>
+      <ul>
+        <li>Added a yellow animated progress bar on every page load while the game initializes.</li>
+      </ul>
+      <h3>Offline Progress</h3>
+      <ul>
+        <li>New full-screen catchup screen: time away label, purple XP-style fill bar (5s under 3h, 8s over 3h), live souls counter, and efficiency note.</li>
+        <li>Offline progress now also triggers when returning to a hidden tab — not only on full page reloads.</li>
+        <li>Replaced rough DPS estimate with a real kill-cycle simulation using actual enemy HP, your DPS, and average spawn delay for accurate offline rewards.</li>
+        <li>Maximum 6 hours of offline time awarded at 50% efficiency.</li>
+      </ul>
+    </div>
+    <button id="changelog-close">Close</button>
   </div>
 </div>
 
@@ -7602,6 +7686,16 @@ document.getElementById('settings-btn').addEventListener('click',function(){
 
 document.getElementById('settings-close').addEventListener('click',function(){
   document.getElementById('settings-modal').classList.remove('open');
+});
+
+document.getElementById('changelog-btn').addEventListener('click',function(){
+  document.getElementById('changelog-modal').classList.add('open');
+});
+document.getElementById('changelog-close').addEventListener('click',function(){
+  document.getElementById('changelog-modal').classList.remove('open');
+});
+document.getElementById('changelog-modal').addEventListener('click',function(e){
+  if(e.target===this) this.classList.remove('open');
 });
 
 document.getElementById('settings-modal').addEventListener('click',function(e){
