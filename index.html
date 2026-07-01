@@ -2965,7 +2965,8 @@ function addMinionXp(){
   var _mXpMult=1+getMinionTotalBonus('minionxp');
   minionSlots.forEach(function(m){
     if(m.isElite) return;
-    m.xp+=_mXpMult;
+    var xpGain=_mXpMult*(m.typeIdx===petMinionIdx?2:1);
+    m.xp+=xpGain;
     var needed=getMinionXpForLevel(m.level);
     while(m.xp>=needed&&m.level<MINION_ELITE_LEVEL){
       m.xp-=needed;
