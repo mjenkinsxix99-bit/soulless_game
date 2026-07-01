@@ -24,7 +24,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #souls-display .num { font-size: 33px; color: #ffffff; font-weight: bold; text-shadow: 0 0 8px rgba(200,180,255,0.9), 0 0 18px rgba(160,120,255,0.5); }
 #souls-display .lbl { font-size: 14px; color: #c0b0f0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 6px rgba(150,120,240,0.4); }
 #stage-desc { font-size: 13px; color: #7766aa; font-style: italic; text-align: center; }
-#main { display: flex; flex: 1; overflow: hidden; }
+#main { display: flex; flex: 1; overflow: hidden; position:relative; }
 #left, #right { width: 300px; flex-shrink: 0; padding: 16px 14px; background: #08080e; overflow-y: auto; }
 #left { width: 370px; border-right: 1px solid #1e1845; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 0; background: #000; position: relative; overflow: hidden; }
 #right { border-left: 1px solid #1e1845; width: 415px; }
@@ -127,9 +127,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #reform-btn:hover { background: rgba(102,85,170,0.15); }
 #realm-label { position: absolute; top: 12px; left: 14px; font-size: 18px; font-weight: bold; color: #eeddff; letter-spacing: 3px; text-transform: uppercase; z-index: 3; }
 /* Ascend (Rebirth) button */
-#ascend-btn { display: none; position: absolute; top: 460px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #cc0000; border: 2px solid #d4a843; color: #2a0a4a; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
+#ascend-btn { display: none; position: absolute; top: 410px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #cc0000; border: 2px solid #d4a843; color: #2a0a4a; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
 #ascend-btn:hover { background: #ee0000; box-shadow: 0 0 14px rgba(212,168,67,0.6); }
-#reincarnate-btn { display: none; position: absolute; top: 505px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #1a5c1a; border: 2px solid #44cc44; color: #ccffcc; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
+#reincarnate-btn { display: none; position: absolute; top: 452px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #1a5c1a; border: 2px solid #44cc44; color: #ccffcc; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
 #reincarnate-btn:hover { background: #226622; box-shadow: 0 0 14px rgba(68,204,68,0.6); }
 #reincarnate-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; align-items: center; justify-content: center; }
 #reincarnate-modal.open { display: flex; }
@@ -664,11 +664,11 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .buy-btn.active { background:#1a1200; border-color:#d4a843; color:#ffd700; box-shadow:0 0 10px rgba(212,168,67,0.9),0 0 22px rgba(212,168,67,0.45); text-shadow:0 0 8px rgba(255,215,0,0.85); }
 
 /* ── SPELL PANEL ─────────────────────────────────────────────────────────── */
-/* Spells live in the left panel, below the entity canvas (~372px) */
-#spell-panel { position:absolute; top:378px; left:0; right:0; display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:center; gap:5px; padding:6px 10px; z-index:3; }
+/* Spells span left+battlefield panels, anchored to #main (position:relative) */
+#spell-panel { position:absolute; top:500px; left:0; right:473px; display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; justify-content:center; gap:5px; padding:6px 10px; z-index:10; pointer-events:auto; }
 .spell-divider { display:none; }
-/* Mana bar: horizontal strip, positioned below left-panel background bottom (tune top value) */
-#mana-bar-wrap { position:absolute; top:560px; left:0; right:0; display:flex; align-items:center; justify-content:center; gap:8px; z-index:3; }
+/* Mana bar: below spell panel */
+#mana-bar-wrap { position:absolute; top:552px; left:0; right:473px; display:flex; align-items:center; justify-content:center; gap:8px; z-index:10; pointer-events:auto; }
 #invoke-label { font-size:8px; color:#7a99cc; letter-spacing:2px; text-transform:uppercase; }
 #invoke-bar-outer { width:180px; height:10px; background:#04030f; border:1px solid #1a1a3a; border-radius:4px; overflow:hidden; position:relative; }
 #invoke-bar-fill { position:absolute; top:0; left:0; bottom:0; width:0%; background:linear-gradient(to right,#1a3399,#66aaff); transition:width 0.3s ease; border-radius:3px; }
@@ -1184,12 +1184,6 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
               <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
               <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
             </div>
-            <div id="spell-panel"></div>
-            <div id="mana-bar-wrap">
-              <span id="invoke-label">mana</span>
-              <div id="invoke-bar-outer"><div id="invoke-bar-fill"></div></div>
-              <span id="invoke-num">0 / 100</span>
-            </div>
             <button id="ascend-btn">✦ ASCEND ✦</button>
             <button id="reincarnate-btn">✦ REINCARNATE ✦</button>
           </div>
@@ -1197,6 +1191,13 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
         <div id="ltab-soul-shop" class="left-tab-pane"></div>
         <div id="ltab-minions" class="left-tab-pane"></div>
       </div>
+    </div>
+    <!-- Spell panel + mana bar live here so they can span left+battlefield panels -->
+    <div id="spell-panel"></div>
+    <div id="mana-bar-wrap">
+      <span id="invoke-label">mana</span>
+      <div id="invoke-bar-outer"><div id="invoke-bar-fill"></div></div>
+      <span id="invoke-num">0 / 100</span>
     </div>
     <div id="battlefield">
       <canvas id="bg-canvas"></canvas>
@@ -7441,7 +7442,7 @@ function gameLoop(){
   // Spell panel UI refresh (every 500ms — updates countdown timers and lit/dim states)
   if(now-_lastSpellUiTick>500){
     var _sp=document.getElementById('spell-panel');
-    if(_sp&&_sp.classList.contains('visible')) renderSpellPanel();
+    if(_sp) renderSpellPanel();
     _lastSpellUiTick=now;
   }
   // Spirit Slash soul-prompt: show global arrow when 5+ souls and not yet purchased
@@ -8720,9 +8721,6 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     var bgLeft = document.getElementById('realm-bg-img-left');
     if (bgLeft && mainEl) mainEl.insertBefore(bgLeft, mainEl.firstChild);
 
-    // 2. Spell panel: move into battlefield so it can sit on the right edge
-    var spellPanel = document.getElementById('spell-panel');
-    if (spellPanel && battlefield) battlefield.appendChild(spellPanel);
 
     // 3. Minimap: move to its own grid row between buy bar and right panel
     var minimapPanel = document.getElementById('minimap-panel');
