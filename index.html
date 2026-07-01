@@ -300,12 +300,21 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #ewt-ok:hover { background:#993333; }
 
 /* Offline progress modal */
-#offline-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 19999; align-items: center; justify-content: center; pointer-events: all; }
-#offline-modal.open { display: flex; }
-#offline-box { background: #07070f; border: 1px solid #3a1a55; border-radius: 10px; padding: 38px 42px; max-width: 420px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(100,40,180,0.35); }
-#offline-lore { font-size: 17px; color: #9977bb; font-style: italic; line-height: 1.7; letter-spacing: 0.6px; margin-bottom: 24px; }
-#offline-souls-gained { font-size: 26px; color: #c47c2a; font-weight: bold; letter-spacing: 1px; min-height: 1.2em; }
-#offline-time-away { font-size: 13px; color: #554466; margin-top: 10px; letter-spacing: 0.4px; }
+/* ── LOADING BAR (refresh) ─────────────────────────────────────────────── */
+#loading-bar-overlay { position:fixed; inset:0; background:#000; z-index:99998; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+#loading-bar-overlay.hidden { display:none; }
+#loading-bar-label { font-family:Georgia,serif; font-size:13px; color:#bbaa44; letter-spacing:3px; text-transform:uppercase; }
+#loading-bar-track { width:340px; height:8px; background:#1a1600; border:1px solid #443800; border-radius:4px; overflow:hidden; }
+#loading-bar-fill { height:100%; width:0%; background:linear-gradient(to right,#aa8800,#ffe066); border-radius:3px; animation:loadingFill 1.2s ease-out forwards; }
+@keyframes loadingFill { 0%{width:0%} 70%{width:85%} 100%{width:100%} }
+/* ── OFFLINE CATCHUP SCREEN ────────────────────────────────────────────── */
+#offline-modal { display:none; position:fixed; inset:0; background:rgba(2,0,12,0.97); z-index:19999; flex-direction:column; align-items:center; justify-content:center; gap:18px; pointer-events:all; }
+#offline-modal.open { display:flex; }
+#offline-time-away { font-family:Georgia,serif; font-size:15px; color:#aa88dd; letter-spacing:2px; text-transform:uppercase; }
+#offline-xp-track { width:480px; max-width:88vw; height:22px; background:#0c0018; border:1px solid #5522aa; border-radius:11px; overflow:hidden; position:relative; box-shadow:0 0 18px rgba(120,40,220,0.4); }
+#offline-xp-fill { height:100%; width:0%; background:linear-gradient(to right,#5500cc,#cc44ff,#ee88ff); border-radius:11px; transition:none; box-shadow:0 0 12px rgba(180,80,255,0.7); }
+#offline-souls-gained { font-family:Georgia,serif; font-size:28px; color:#ddaaff; font-weight:bold; letter-spacing:1px; min-height:1.4em; text-shadow:0 0 18px rgba(180,80,255,0.6); }
+#offline-box { display:none; }
 
 /* Rebirth confirmation modal */
 #rebirth-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; align-items: center; justify-content: center; }
@@ -1375,12 +1384,16 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
   </div>
 </div>
 
+<div id="loading-bar-overlay">
+  <div id="loading-bar-label">Loading…</div>
+  <div id="loading-bar-track"><div id="loading-bar-fill"></div></div>
+</div>
+
 <div id="offline-modal">
-  <div id="offline-box">
-    <div id="offline-lore">You have consumed souls in your absence.<br>Feeding your hunger.</div>
-    <div id="offline-souls-gained"></div>
-    <div id="offline-time-away"></div>
-  </div>
+  <div id="offline-time-away"></div>
+  <div id="offline-xp-track"><div id="offline-xp-fill"></div></div>
+  <div id="offline-souls-gained"></div>
+  <div id="offline-box"></div>
 </div>
 
 <div id="rebirth-modal">
@@ -5912,17 +5925,21 @@ function applyOfflineProgress(savedAt){
   var modal = document.getElementById('offline-modal');
   var soulsEl = document.getElementById('offline-souls-gained');
   var timeEl = document.getElementById('offline-time-away');
+  var xpFill = document.getElementById('offline-xp-fill');
   timeEl.textContent = 'Away for ' + timeStr;
-  soulsEl.textContent = '';
+  soulsEl.textContent = '+0 souls';
+  if(xpFill) xpFill.style.width = '0%';
   modal.classList.add('open');
 
   try{ localStorage.setItem(OFFLINE_APPLIED_KEY, String(Date.now())); } catch(e){}
   saveGame();
 
-  // Count-up animation over 1.6 seconds then auto-close
-  var steps = 40, step = 0;
+  // Animate XP bar fill + count-up over 3 seconds, then auto-close
+  var ANIM_MS = 3000, steps = 80, step = 0;
   var interval = setInterval(function(){
     step++;
+    var pct = Math.min(100, (step / steps) * 100);
+    if(xpFill) xpFill.style.width = pct + '%';
     var shown = gained.mul(step).div(steps).floor();
     soulsEl.textContent = '+' + fmt(shown) + ' souls';
     if(step >= steps){
@@ -5930,9 +5947,9 @@ function applyOfflineProgress(savedAt){
       setTimeout(function(){
         modal.classList.remove('open');
         document.getElementById('soul-count').textContent = fmt(souls);
-      }, 600);
+      }, 800);
     }
-  }, 40);
+  }, ANIM_MS / steps);
 }
 
 // ── UPGRADE ICONS ─────────────────────────────────────────────────────────────
@@ -7986,6 +8003,11 @@ checkAchievements(true);
 updateMinionTabBtn();
 renderAchievementsTab();
 requestAnimationFrame(gameLoop);
+// Dismiss loading bar once game loop is ready
+(function(){
+  var _lo = document.getElementById('loading-bar-overlay');
+  if(_lo) setTimeout(function(){ _lo.classList.add('hidden'); }, 1300);
+})();
 initMinionClickerDrag();
 updateMinionClickerDock();
 renderMinionClickerPlaced();
