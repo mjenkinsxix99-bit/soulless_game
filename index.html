@@ -554,7 +554,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #intro-btn:hover { background:#e0e0e0; border-color:#e0e0e0; color:#000000; }
 
 /* Settings button */
-#settings-btn { position: fixed; bottom: 18px; left: 18px; width: 44px; height: 44px; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
+#settings-btn { width: 40px; height: 40px; flex-shrink: 0; background: linear-gradient(135deg, #2a2000, #120e00); border: 2px solid #d4a843; border-radius: 50%; color: #d4a843; font-size: 22px; cursor: pointer; z-index: 500; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(212,168,67,0.5); transition: box-shadow 0.2s, background 0.2s; line-height: 1; }
 #settings-btn:hover { background: linear-gradient(135deg, #3a2c00, #1e1800); box-shadow: 0 0 20px rgba(212,168,67,0.8); }
 
 /* Settings modal */
@@ -1258,6 +1258,8 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       <button class="buy-btn" data-qty="100">100</button>
       <button class="buy-btn" data-qty="max">MAX</button>
       <div id="mc-buyall-wrap"><button class="buy-btn" data-qty="all" style="font-size:9px;letter-spacing:0.5px;background:#2a6e2a;border-color:#3d9e3d;color:#ffffff;">BUY ALL AUGS</button><div class="mc-drop-hl"></div></div>
+      <div style="height:100px;"></div>
+      <button id="settings-btn">⚙</button>
     </div>
     <div id="right">
       <div id="damage-summary">
@@ -1821,8 +1823,6 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     </div>
   </div>
 </div>
-
-<button id="settings-btn">⚙</button>
 
 <div id="settings-modal">
   <div id="settings-box">
