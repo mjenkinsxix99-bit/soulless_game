@@ -1409,7 +1409,8 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
 <div id="reincarnate-modal">
   <div id="reincarnate-box">
     <div id="reincarnate-lore">Sacrifice is giving up something good for something better.<br>You have gained much, but to lead others must follow.<br>Are you prepared to take the next step?</div>
-    <div class="reincarnate-info">You will gain <strong id="reincarnate-mp-gain" style="color:#44cc44">0</strong> Minion Points to turn enemies into friends. Maxed level Minions become Elite and stay with you.</div>
+    <div class="reincarnate-info">You will gain <strong id="reincarnate-mp-gain" style="color:#44cc44">0</strong> Minion Points to turn enemies into friends. Maxed level 777 Minions become Elite and stay with you.</div>
+    <div class="reincarnate-info" id="reincarnate-refund-line" style="display:none"><span class="reincarnate-keep">You will be refunded <strong id="reincarnate-mp-refund">0</strong> MP for your non-Elite minions.</span></div>
     <div class="reincarnate-info"><span class="reincarnate-loss">You will lose all progress, souls, upgrades and Tattered Souls.</span></div>
     <div class="reincarnate-info"><span class="reincarnate-keep">You will keep all Honors and this form's bonus.</span></div>
     <div id="reincarnate-zero-warning" style="display:none;margin-bottom:14px;"><span style="color:#ff4444;font-family:Georgia,serif;font-size:15px;font-weight:bold;letter-spacing:1px;">⚠ WARNING!</span> <span style="color:#ffd700;font-family:Georgia,serif;font-size:14px;">Reincarnating now will give 0 MP. Are you sure?</span></div>
@@ -2788,6 +2789,7 @@ var MINION_DATA=[
 
 // ── MINION XP / COST HELPERS ─────────────────────────────────────────────────
 var MINION_ELITE_LEVEL=777;
+var MINION_REALM_COSTS=[1,2,3,4,5,8,13,21,34,55];
 var MINION_XP_BASE=10;
 var MINION_XP_GROWTH=1.0133;
 
@@ -2874,11 +2876,15 @@ function tickElementProduction(nowMs){
   });
 }
 
-function getMinionNextMpCost(){
-  var eliteCount=minionSlots.filter(function(m){return m.isElite;}).length;
-  var n=Math.max(minionSlots.length,eliteCount);
-  if(n===0) return 0; // first minion free
-  return Math.floor(Math.pow(n,1.33));
+function getMinionCostForType(typeIdx){
+  if(minionSlots.length===0) return 0; // first ever capture free
+  return MINION_REALM_COSTS[Math.floor(typeIdx/10)]||1;
+}
+
+function calcNonEliteMpRefund(){
+  var refund=0;
+  minionSlots.forEach(function(m){ if(!m.isElite) refund+=getMinionCostForType(m.typeIdx); });
+  return refund;
 }
 
 function checkMinionUnlock(){
@@ -2898,7 +2904,7 @@ function updateMinionTabBtn(){
 function attemptMinionCapture(typeIdx){
   if(!minionUnlocked) return;
   if(captureTargetIdx!==typeIdx) return;
-  var cost=getMinionNextMpCost();
+  var cost=getMinionCostForType(typeIdx);
   if(minionPoints<cost) return;
   if(Math.random()>0.07) return;
   minionPoints-=cost;
@@ -2936,9 +2942,9 @@ function releaseMinion(typeIdx){
     if(minionSlots[i].typeIdx===typeIdx){ slotIdx=i; break; }
   }
   if(slotIdx===-1){ exitReleaseMode(); return; }
+  var refund=getMinionCostForType(minionSlots[slotIdx].typeIdx);
   minionSlots.splice(slotIdx,1);
   clampMinionClickerAssignments();
-  var refund=getMinionNextMpCost();
   minionPoints+=refund;
   exitReleaseMode();
   saveGame();
@@ -2987,13 +2993,8 @@ function showMinionCaptureNotif(typeIdx){
 }
 
 function wipeNonEliteMinions(){
-  var refund=0;
-  for(var i=minionSlots.length-1;i>=0;i--){
-    if(!minionSlots[i].isElite){
-      minionSlots.splice(i,1);
-      refund+=getMinionNextMpCost();
-    }
-  }
+  var refund=calcNonEliteMpRefund();
+  minionSlots=minionSlots.filter(function(m){return m.isElite;});
   if(refund>0) minionPoints+=refund;
   var petStillHeld=minionSlots.some(function(m){return m.typeIdx===petMinionIdx;});
   if(!petStillHeld){
@@ -3035,7 +3036,7 @@ function renderMinionModal(){
   var ctEl=document.getElementById('mm-ct-display');
   if(ctEl){
     if(captureTargetIdx>=0&&captureTargetIdx<ENEMY_TYPES.length){
-      var nextCost=getMinionNextMpCost();
+      var nextCost=getMinionCostForType(captureTargetIdx);
       ctEl.textContent='Target: '+ENEMY_TYPES[captureTargetIdx].name+' ('+nextCost+' MP, 7% chance)';
     } else {
       ctEl.textContent='No capture target set';
@@ -3147,7 +3148,7 @@ function renderMinionModal(){
           captureTargetIdx=captureIdx;
           var ctE=document.getElementById('mm-ct-display');
           if(ctE){
-            var nc=getMinionNextMpCost();
+            var nc=getMinionCostForType(captureIdx);
             ctE.textContent='Target: '+ENEMY_TYPES[captureIdx].name+' ('+nc+' MP, 7% chance)';
           }
           document.querySelectorAll('.mm-card').forEach(function(c){c.classList.remove('mm-card-targeted');});
@@ -5514,6 +5515,12 @@ function openReincarnateModal(){
   document.getElementById('reincarnate-mp-gain').textContent=mp.toLocaleString();
   document.getElementById('reincarnate-mp-confirm').textContent=mp.toLocaleString();
   document.getElementById('reincarnate-zero-warning').style.display=mp===0?'block':'none';
+  var refund=calcNonEliteMpRefund();
+  var refundLine=document.getElementById('reincarnate-refund-line');
+  if(refundLine){
+    refundLine.style.display=refund>0?'block':'none';
+    document.getElementById('reincarnate-mp-refund').textContent=refund.toLocaleString();
+  }
   document.getElementById('reincarnate-modal').classList.add('open');
 }
 
