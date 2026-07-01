@@ -5905,11 +5905,23 @@ function applyOfflineProgress(savedAt){
   var elapsed = Math.min((Date.now() - ref) / 1000, OFFLINE_CAP_SECONDS);
   if(elapsed < 30) return;
 
-  // souls/sec = DPS / 5 * OFFLINE_EFFICIENCY, matching kill-reward math at reduced offline rate
+  // Simulate real kill cycles: TTK = enemyMaxHp / DPS, plus average spawn delay
   var soulMult = 1;
   if(rebirthForm==='androgynous') soulMult *= (1 + 0.10 * formBonusMult);
   if(ascension3Path==='mystic')   soulMult *= 1.05;
-  var soulsPerSecond = totalDps.div(5).mul(soulMult).mul(OFFLINE_EFFICIENCY);
+
+  var hp = enemyMaxHp.gt(0) ? enemyMaxHp : floorHp(curLevel, curFloor);
+  var reward = enemySoulReward.gt(0) ? enemySoulReward : floorSouls(curLevel, curFloor);
+  var dps = totalDps.gt(0) ? totalDps : D(1);
+
+  // Time to kill one enemy (seconds), minimum one game tick (50ms)
+  var ttkSecs = Math.max(0.05, hp.div(dps).toNumber());
+  // Average spawn delay observed in active play (~600ms covers the 400–1200ms range)
+  var spawnDelaySecs = 0.6;
+  var killCycleSecs = ttkSecs + spawnDelaySecs;
+  var killsPerSec = 1 / killCycleSecs;
+
+  var soulsPerSecond = reward.mul(killsPerSec).mul(soulMult).mul(OFFLINE_EFFICIENCY);
   var gained = soulsPerSecond.mul(elapsed).floor();
   if(gained.lte(0)) return;
 
