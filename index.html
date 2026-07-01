@@ -8012,6 +8012,25 @@ initMinionClickerDrag();
 updateMinionClickerDock();
 renderMinionClickerPlaced();
 
+// Apply offline progress when tab comes back into view after being hidden
+(function(){
+  var _hiddenAt = 0;
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){
+      _hiddenAt = Date.now();
+      saveGame();
+      try{ localStorage.setItem(OFFLINE_TS_KEY, String(_hiddenAt)); } catch(e){}
+    } else {
+      if(_hiddenAt && (Date.now() - _hiddenAt) > 30000){
+        // Clear the 60s guard so applyOfflineProgress won't skip
+        try{ localStorage.removeItem(OFFLINE_APPLIED_KEY); } catch(e){}
+        applyOfflineProgress(0); // OFFLINE_TS_KEY was just written, ref comes from there
+      }
+      _hiddenAt = 0;
+    }
+  });
+})();
+
 document.querySelectorAll('.tab-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
     var tab=btn.getAttribute('data-tab');
