@@ -2986,7 +2986,14 @@ function showMinionCaptureNotif(typeIdx){
 }
 
 function wipeNonEliteMinions(){
-  minionSlots=minionSlots.filter(function(m){return m.isElite;});
+  var refund=0;
+  for(var i=minionSlots.length-1;i>=0;i--){
+    if(!minionSlots[i].isElite){
+      minionSlots.splice(i,1);
+      refund+=getMinionNextMpCost();
+    }
+  }
+  if(refund>0) minionPoints+=refund;
   var petStillHeld=minionSlots.some(function(m){return m.typeIdx===petMinionIdx;});
   if(!petStillHeld){
     petMinionIdx=-1;
