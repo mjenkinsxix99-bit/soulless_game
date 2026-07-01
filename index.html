@@ -7928,6 +7928,11 @@ buildMinimap();
 checkRebirthButton();
 updateTatteredDisplay();
 updateTatteredBtn();
+// ── DEV: force all spells visible and mana bar active for layout testing ──
+var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
+_sIds.forEach(function(id){ soulShopOwned[id]=1; });
+mana=66; manaMax=100;
+// ── END DEV ───────────────────────────────────────────────────────────────
 updateManaBar();
 renderSpellPanel();
 updateVolumeSlider();
