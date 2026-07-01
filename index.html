@@ -3123,6 +3123,7 @@ function renderMinionModal(){
       cv.width=256; cv.height=256;
       cv.setAttribute('data-ei', String(idx));
       if(!discovered) cv.style.filter='brightness(0)';
+      else if(!heldMinion) cv.style.filter='brightness(0.4)';
       card.appendChild(cv);
 
       // Element
