@@ -7933,6 +7933,15 @@ updateTatteredBtn();
 var _sIds=['spell-flurry','spell-critStrike','spell-twinBlades','spell-twinSouls','spell-ruleOf3','spell-twinStrikes','spell-powerOf3','spell-manaHungry','spell-invokePower'];
 _sIds.forEach(function(id){ soulShopOwned[id]=1; });
 mana=66; manaMax=100;
+// Force ascend/reincarnate visible for layout testing
+(function(){
+  var _ab=document.getElementById('ascend-btn');
+  var _rb=document.getElementById('reincarnate-btn');
+  if(_ab) _ab.style.display='block';
+  if(_rb) _rb.style.display='block';
+  var _origCRB=checkRebirthButton;
+  checkRebirthButton=function(){ _origCRB(); if(_ab) _ab.style.display='block'; if(_rb) _rb.style.display='block'; };
+})();
 // ── END DEV ───────────────────────────────────────────────────────────────
 updateManaBar();
 renderSpellPanel();
