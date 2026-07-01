@@ -800,8 +800,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tm-edge { stroke:#1e1440; stroke-width:1.5; fill:none; }
 .tm-edge.active { stroke:#aa44ff; stroke-width:2.5; filter:drop-shadow(0 0 5px rgba(170,60,255,0.75)); }
 /* global floating tooltip (position:fixed, avoids overflow clip) */
-#tatt-tooltip { display:none; position:fixed; width:220px; background:#06041a; border:1px solid #3344aa; border-radius:8px; padding:12px 14px; z-index:1100; pointer-events:none; box-shadow:0 6px 28px rgba(0,0,40,0.9); }
-#tatt-tooltip.show { display:block; }
+#tatt-tooltip,#hover-tooltip { display:none; position:fixed; width:220px; background:#06041a; border:1px solid #3344aa; border-radius:8px; padding:12px 14px; z-index:1100; pointer-events:none; box-shadow:0 6px 28px rgba(0,0,40,0.9); }
+#tatt-tooltip.show,#hover-tooltip.show { display:block; }
+#hover-tooltip-title { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; margin-bottom:5px; }
+#hover-tooltip-body { font-size:12px; color:#c8c0e8; line-height:1.5; }
 #tatt-tt-name { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; margin-bottom:5px; }
 #tatt-tt-cost { font-size:11px; color:#d4a843; margin-bottom:5px; }
 #tatt-tt-desc { font-size:12px; color:#c8c0e8; line-height:1.5; }
@@ -840,8 +842,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .left-tab-btn:hover .tab-tip,
 .tab-btn:hover .tab-tip,
 .mm-nav:hover .tab-tip,
-.mm-pet-btn:hover .tab-tip { animation:tabtip-in 0.15s forwards; animation-delay:3s; }
-.mm-pet-btn .tab-tip { white-space:normal; width:180px; text-transform:none; letter-spacing:0; font-size:11px; left:0; transform:none; background:#0a0818; border-color:#d4a843; color:#ffe599; z-index:999; }
 @keyframes tabtip-in { to { opacity:1; } }
 /* Tattered-souls counter tooltip */
 #ts-counter-tip { display:none; position:fixed; z-index:1200; background:#06041a; border:1px solid #d4a843;
@@ -1356,6 +1356,10 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
   <div id="tatt-tt-desc"></div>
   <div id="tatt-tt-req"></div>
   <div id="tatt-tt-status"></div>
+</div>
+<div id="hover-tooltip">
+  <div id="hover-tooltip-title"></div>
+  <div id="hover-tooltip-body"></div>
 </div>
 <div id="respec-confirm">
   <div id="respec-confirm-title">Respec?</div>
@@ -3164,9 +3168,6 @@ function renderMinionModal(){
       // Pet button (top-left of card)
       (function(petIdx, owned){
         var petBtn=document.createElement('button');
-        var petTip=document.createElement('span');
-        petTip.className='tab-tip';
-        petTip.textContent='A minion selected as your pet joins you on the battlefield, gaining 2x XP!';
         if(!owned){
           petBtn.className='mm-pet-btn mm-pet-btn-disabled';
           petBtn.textContent='Pet';
@@ -3179,7 +3180,9 @@ function renderMinionModal(){
             setPetMinion(petIdx);
           });
         }
-        petBtn.appendChild(petTip);
+        petBtn.addEventListener('mouseenter',function(e){ showHoverTooltip('Pet Minion','A minion selected as your pet joins you on the battlefield, gaining 2x XP!',e.clientX,e.clientY); });
+        petBtn.addEventListener('mousemove',function(e){ posHoverTooltip(e.clientX,e.clientY); });
+        petBtn.addEventListener('mouseleave',hideHoverTooltip);
         card.appendChild(petBtn);
       })(idx, !!heldMinion);
 
@@ -5372,6 +5375,27 @@ function renderTatteredGrid(){
     })(node,state);
     grid.appendChild(el);
   });
+}
+
+function showHoverTooltip(title,body,cx,cy){
+  var tt=document.getElementById('hover-tooltip');
+  if(!tt) return;
+  document.getElementById('hover-tooltip-title').textContent=title;
+  document.getElementById('hover-tooltip-body').textContent=body;
+  tt.classList.add('show');
+  posHoverTooltip(cx,cy);
+}
+function posHoverTooltip(cx,cy){
+  var tt=document.getElementById('hover-tooltip');
+  if(!tt||!tt.classList.contains('show')) return;
+  var w=220, h=tt.offsetHeight||80;
+  var left=Math.min(cx+14, window.innerWidth-w-8);
+  var top=Math.max(8, cy-h/2);
+  tt.style.left=left+'px'; tt.style.top=top+'px';
+}
+function hideHoverTooltip(){
+  var tt=document.getElementById('hover-tooltip');
+  if(tt) tt.classList.remove('show');
 }
 
 function showTattTooltip(node,state,cx,cy){
