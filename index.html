@@ -175,6 +175,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card { border:1px solid #1e1040; border-radius:8px; padding:8px 6px; text-align:center; background:#100828; cursor:pointer; transition:border-color 0.2s,background 0.2s,box-shadow 0.2s; display:flex; flex-direction:column; align-items:center; gap:4px; position:relative; }
 .mm-card:hover { border-color:#4433aa; background:#0a0520; }
 .mm-card-targeted { border-color:#9966ff !important; background:#0d0520 !important; box-shadow:0 0 10px rgba(150,80,255,0.4); }
+.mm-card-nomp { opacity:0.45; cursor:not-allowed; }
+.mm-card-nomp:hover { border-color:#1e1040; background:#100828; }
 .mm-card-discovered { border-color:#2a1a5a; }
 .mm-card-elite { border-color:#3a2800; }
 .mm-card-elite.mm-card-discovered { border-color:#d4a843; box-shadow:0 0 8px rgba(212,168,67,0.25); }
@@ -2996,6 +2998,14 @@ function getMinionCostForType(typeIdx){
   return MINION_REALM_COSTS[Math.floor(typeIdx/10)]||1;
 }
 
+function captureReservedMp(){
+  return captureTargets.reduce(function(s,t){ return s+getMinionCostForType(t); },0);
+}
+function clampCaptureTargets(){
+  // Drop the most recent selections until the reserved total fits the MP budget
+  while(captureTargets.length&&captureReservedMp()>minionPoints) captureTargets.pop();
+}
+
 function calcNonEliteMpRefund(){
   var refund=0;
   minionSlots.forEach(function(m){ if(!m.isElite) refund+=getMinionCostForType(m.typeIdx); });
@@ -3018,13 +3028,16 @@ function updateMinionTabBtn(){
 
 function attemptMinionCapture(typeIdx){
   if(!minionUnlocked) return;
-  if(captureTargetIdx!==typeIdx) return;
+  if(captureTargets.indexOf(typeIdx)<0) return;
   var cost=getMinionCostForType(typeIdx);
   if(minionPoints<cost) return;
   if(Math.random()>0.07) return;
   minionPoints-=cost;
-  captureTargetIdx=-1; // deselect after successful capture
+  captureTargets.splice(captureTargets.indexOf(typeIdx),1); // deselect after successful capture
   minionSlots.push({typeIdx:typeIdx,level:1,xp:0,isElite:false});
+  // MP shrank (and the free-first-capture discount may have ended) — drop any
+  // remaining selections the budget no longer covers
+  clampCaptureTargets();
   updateMinionClickerDock();
   if(discoveredMinions.indexOf(typeIdx)<0) discoveredMinions.push(typeIdx);
   showMinionCaptureNotif(typeIdx);
@@ -3148,16 +3161,6 @@ function renderMinionModal(){
   var slotsEl=document.getElementById('mm-slots-val');
   if(slotsEl) slotsEl.textContent=minionSlots.length;
 
-  var ctEl=document.getElementById('mm-ct-display');
-  if(ctEl){
-    if(captureTargetIdx>=0&&captureTargetIdx<ENEMY_TYPES.length){
-      var nextCost=getMinionCostForType(captureTargetIdx);
-      ctEl.textContent='Target: '+ENEMY_TYPES[captureTargetIdx].name+' ('+nextCost+' MP, 7% chance)';
-    } else {
-      ctEl.textContent='No capture target set';
-    }
-  }
-
   var body=document.getElementById('mm-body');
   if(!body) return;
   body.innerHTML='';
@@ -3186,6 +3189,7 @@ function renderMinionModal(){
       var card=document.createElement('div');
       var isEliteType=et.isElite;
       card.className='mm-card'+(isEliteType?' mm-card-elite':'')+(discovered?' mm-card-discovered':'');
+      card.setAttribute('data-ei', String(idx));
 
       // Pet button (top-left of card)
       (function(petIdx, owned){
@@ -3256,7 +3260,7 @@ function renderMinionModal(){
       bonusEl.textContent=getMinionBonusDesc(md.bonus||'souls', heldMinion);
       card.appendChild(bonusEl);
 
-      // Click = release (if in release mode and held) or set as capture target
+      // Click = release (if in release mode and held) or toggle as capture target
       (function(captureIdx, cardEl, heldMinionRef){
         cardEl.addEventListener('click',function(){
           if(releaseMode){
@@ -3264,23 +3268,44 @@ function renderMinionModal(){
             else exitReleaseMode();
             return;
           }
-          captureTargetIdx=captureIdx;
-          var ctE=document.getElementById('mm-ct-display');
-          if(ctE){
-            var nc=getMinionCostForType(captureIdx);
-            ctE.textContent='Target: '+ENEMY_TYPES[captureIdx].name+' ('+nc+' MP, 7% chance)';
+          var sel=captureTargets.indexOf(captureIdx);
+          if(sel>=0){
+            captureTargets.splice(sel,1);
+          } else {
+            // Selectable only while the remaining MP budget covers its cost
+            if(getMinionCostForType(captureIdx)>minionPoints-captureReservedMp()) return;
+            captureTargets.push(captureIdx);
           }
-          document.querySelectorAll('.mm-card').forEach(function(c){c.classList.remove('mm-card-targeted');});
-          cardEl.classList.add('mm-card-targeted');
+          updateCaptureSelectionUI();
         });
       })(idx, card, heldMinion);
-
-      if(captureTargetIdx===idx) card.classList.add('mm-card-targeted');
 
       grid.appendChild(card);
     }
     section.appendChild(grid);
     body.appendChild(section);
+  }
+  updateCaptureSelectionUI();
+}
+
+// Refresh target highlights, budget-locked cards, and the header line in place
+// (no modal rebuild, so the scroll position survives selection clicks)
+function updateCaptureSelectionUI(){
+  var remaining=minionPoints-captureReservedMp();
+  document.querySelectorAll('.mm-card').forEach(function(c){
+    var idx=parseInt(c.getAttribute('data-ei'),10);
+    if(isNaN(idx)) return;
+    var sel=captureTargets.indexOf(idx)>=0;
+    c.classList.toggle('mm-card-targeted',sel);
+    c.classList.toggle('mm-card-nomp',!sel&&getMinionCostForType(idx)>remaining);
+  });
+  var ctEl=document.getElementById('mm-ct-display');
+  if(ctEl){
+    if(captureTargets.length){
+      ctEl.textContent='Targets: '+captureTargets.length+' — '+captureReservedMp()+' MP reserved (7% chance each)';
+    } else {
+      ctEl.textContent='No capture target set';
+    }
   }
 }
 
@@ -3422,7 +3447,7 @@ var currentAscensionKills=0;
 var eliteBountyTSEarned=0;
 var minionPoints=0;
 var redeemedCodes=[];
-var captureTargetIdx=-1;
+var captureTargets=[]; // typeIdx list; total cost is capped by available MP
 var releaseMode=false;
 var petMinionIdx=-1;
 var minionSlots=[];
@@ -5852,7 +5877,7 @@ function doRebirthReset(chosenForm){
   });
 
   // Apply rebirth
-  captureTargetIdx=-1;
+  captureTargets=[];
   releaseMode=false;
   if(chosenForm === null){
     rebirthCount = 0;
@@ -5977,7 +6002,7 @@ function saveGame(){
     minionPoints:minionPoints,
     minionSlots:minionSlots.slice(),
     minionUnlocked:minionUnlocked,
-    captureTargetIdx:captureTargetIdx,
+    captureTargets:captureTargets.slice(),
     petMinionIdx:petMinionIdx,
     discoveredMinions:discoveredMinions.slice(),
     elementStocks:JSON.parse(JSON.stringify(elementStocks)),
@@ -6081,7 +6106,9 @@ function loadGame(){
   if(data.minionPoints!==undefined) minionPoints=data.minionPoints;
   if(data.minionSlots) minionSlots=data.minionSlots;
   if(data.minionUnlocked) minionUnlocked=data.minionUnlocked;
-  if(data.captureTargetIdx!==undefined) captureTargetIdx=data.captureTargetIdx;
+  if(data.captureTargets) captureTargets=data.captureTargets;
+  else if(data.captureTargetIdx!==undefined&&data.captureTargetIdx>=0) captureTargets=[data.captureTargetIdx];
+  clampCaptureTargets(); // older saves could target beyond the MP budget
   if(data.petMinionIdx!==undefined){ petMinionIdx=data.petMinionIdx; var _pc=document.getElementById('pet-canvas'); if(_pc) _pc.style.display=petMinionIdx>=0?'block':'none'; }
   if(data.discoveredMinions) discoveredMinions=data.discoveredMinions;
   if(data.elementStocks) elementStocks=data.elementStocks;
