@@ -3971,6 +3971,7 @@ function onEnemyDeath(){
         enemyPool=[((curRealm-1) % REALM_NAMES.length)*LEVELS_PER_REALM];
         minimapNewFloor=false;
         updateHighestFloor();
+        checkAchievements(); // Realm Walker honors key off highestRealm, set just above
         buildMinimap();
         updateProgressLabel();
         bgmPlay(curRealm);
@@ -5801,6 +5802,21 @@ function openRebirthModal(){
   document.getElementById('rebirth-modal').classList.add('open');
 }
 
+// The old evolve modal that granted identity traits was retired, but the
+// Identity honors still key off its trait tokens. The modern ascension
+// choices are the equivalents — record them under the old token names.
+var FORM_TRAIT_TOKENS={masculine:'male',feminine:'female',androgynous:'unbound',feline:'cat',canine:'dog',equine:'horse'};
+function recordAscensionTraits(){
+  function grant(t){ if(t&&traitChoicesEver.indexOf(t)<0) traitChoicesEver.push(t); }
+  grant(FORM_TRAIT_TOKENS[rebirthForm]);
+  [ascension3Path,ascension4Path,ascension5Path].forEach(function(p){
+    if(p==='holy') grant('halo');
+    else if(p==='shadow') grant('horns');
+    else if(p==='mystic') grant('witchhat');
+  });
+  if(ascension6Path) grant('weapon');
+}
+
 function doRebirthReset(chosenForm){
   // Gain tattered souls using the chosen form's bonus
   var gain=calcTatteredSoulsGain(chosenForm);
@@ -5842,12 +5858,14 @@ function doRebirthReset(chosenForm){
     wipeNonEliteMinions();
   } else {
     rebirthCount++;
+    ascendCount++;
     hasEverAscended=true;
     soulShopOwned['auto-progress']=1;
     hasEverHadAutoProgress=true;
     applyPostAscensionUpgrades();
   }
   rebirthForm=chosenForm;
+  if(chosenForm!==null) recordAscensionTraits();
 
   // Reload entity image as chosen form image
   _rebirthEntityOverride=chosenForm;
@@ -5856,6 +5874,9 @@ function doRebirthReset(chosenForm){
   updateTatteredDisplay();
   updateTraitsRow();
   checkRebirthButton();
+  // Ascension is when rebirthCount/ascendCount/trait honors can complete —
+  // check now so their banners fire at the moment of ascension, not next kill
+  checkAchievements();
   dirtyU=true;
   document.getElementById('soul-count').textContent=fmt(souls);
   var _np=FORM_NAMEPLATES[chosenForm];
@@ -6022,6 +6043,9 @@ function loadGame(){
   tatteredSouls=data.tatteredSouls||0;
   totalTSSacrificed=data.totalTSSacrificed||0;
   rebirthCount=data.rebirthCount||0;
+  // Older saves never tracked ascensions (the counter lived in a retired
+  // modal), so seed it with the current cycle's count as a floor.
+  if(ascendCount<rebirthCount) ascendCount=rebirthCount;
   rebirthForm=data.rebirthForm||null;
   formBonusMult=data.formBonusMult||1.0;
   ascension3Path=data.ascension3Path||null;
@@ -8249,6 +8273,9 @@ if(!_hadSave && showIntro){
   }
 }
 spawnEnemy();
+// Backfill trait tokens from the loaded form/path choices, then silently
+// catch up any honors whose conditions were already met by this save.
+recordAscensionTraits();
 checkAchievements(true);
 updateMinionTabBtn();
 renderAchievementsTab();
