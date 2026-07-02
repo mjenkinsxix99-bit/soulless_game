@@ -8125,6 +8125,10 @@ recalcStats();
 applyOfflineProgress(_offlineSavedAt);
 updateHpBars();
 updateEntityStatsPanel();
+// The load/init path never refreshes the souls counter, so a loaded save
+// showed "0" until the first kill/click updated it. Sync it to the loaded
+// (and any offline-adjusted) total immediately.
+document.getElementById('soul-count').textContent=fmt(souls);
 updateTraitsRow();
 buildMinimap();
 checkRebirthButton();
