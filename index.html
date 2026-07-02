@@ -2157,8 +2157,9 @@ var enemyDeathTime    = 0;
 var enemyHitFlashTime = 0;
 var attackFlashTime   = 0;
 var hitFlashTime      = 0;
-// Combat Animation setting: when off, the enemy/entity squish-and-pop and the
-// flying soul-drop coins are suppressed. Damage, souls, and mana are unaffected.
+// Combat Animation setting: when off, the click-hit squish on the entity and
+// enemy and the flying soul-drop coins are suppressed. The enemy death
+// animation, damage, souls, and mana are all unaffected.
 var combatAnim        = true;
 
 // Sparkle pool
@@ -2412,7 +2413,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   }
 
   // Death pop then deflate: brief burst then squish to nothing
-  if (dead && combatAnim) {
+  if (dead) {
     if (deathAge <= 70) {
       var popT = deathAge / 70;
       var popScale = 1 + Math.sin(popT * Math.PI) * 0.2;
@@ -2491,7 +2492,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   ctx.shadowBlur = 0;
 
   // Bubble pop on death — small circles in enemy colour
-  if (dead && combatAnim) {
+  if (dead) {
     if (deathParticlesKey !== enemyDeathTime) {
       deathParticlesKey = enemyDeathTime;
       deathParticles = [];
