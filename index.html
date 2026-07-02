@@ -4588,7 +4588,6 @@ var ACHIEVEMENTS=[
   {id:'form-halo',     cat:'Identity',        name:'The Fallen Halo',         desc:'Light that no longer protects',               check:function(){return traitChoicesEver.indexOf('halo')>=0;}},
   {id:'form-tail',     cat:'Identity',        name:'A New Appendage',         desc:'Something follows you now',                   check:function(){return traitChoicesEver.indexOf('tail')>=0;}},
   {id:'form-weapon',   cat:'Identity',        name:'Armed',                   desc:'A tool of ending',                            check:function(){return traitChoicesEver.indexOf('weapon')>=0;}},
-  {id:'form-ultimate',        cat:'Identity',  name:'Ascendant',               desc:'Reach the ultimate form',                                                          check:function(){return stage>=3;}},
   // Form ultimate completions — each rewards the first-ascension form bonus permanently
   {id:'form-ult-masculine',  cat:'Identity',  name:'Pinnacle of Strength',    desc:'Complete the Masculine form\'s final ascension. Grants +10% DPS permanently.',     check:function(){return rebirthForm==='masculine'&&rebirthCount>=7;}},
   {id:'form-ult-feminine',   cat:'Identity',  name:'Pinnacle of Grace',       desc:'Complete the Feminine form\'s final ascension. Grants +10% Tattered Souls permanently.', check:function(){return rebirthForm==='feminine'&&rebirthCount>=7;}},
@@ -5814,6 +5813,8 @@ function recordAscensionTraits(){
     else if(p==='shadow') grant('horns');
     else if(p==='mystic') grant('witchhat');
   });
+  if(ascension4Path) grant('wings');                                       // every 4th-ascension evolution grants wings
+  if(ascension5Path==='shadow'||ascension5Path==='mystic') grant('tail');  // shadow/mystic on the 5th grow a tail
   if(ascension6Path) grant('weapon');
 }
 
@@ -6038,6 +6039,9 @@ function loadGame(){
   eliteKillsTotal=data.eliteKillsTotal||0;
   highestGlobalFloorEver=data.highestGlobalFloorEver||0;
   achievementsEarned=data.achievementsEarned||[];
+  // Drop earned ids for honors that no longer exist (e.g. removed 'form-ultimate')
+  // so the honors count can't exceed the list total.
+  achievementsEarned=achievementsEarned.filter(function(id){return ACHIEVEMENTS.some(function(a){return a.id===id;});});
   traitChoicesEver=data.traitChoicesEver||[];
   namedEliteFirstKills=data.namedEliteFirstKills||[];
   tatteredSouls=data.tatteredSouls||0;
