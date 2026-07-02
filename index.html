@@ -594,9 +594,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1540; }
 .settings-row:last-of-type { border-bottom: none; }
 .settings-label { font-size: 15px; color: #9988bb; letter-spacing: 1px; }
-#intro-toggle, #tutorial-toggle { padding: 11px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
-#intro-toggle:hover, #tutorial-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
-#intro-toggle.muted, #tutorial-toggle.muted { border-color: #554477; color: #554477; }
+#intro-toggle, #tutorial-toggle, #combat-anim-toggle { padding: 11px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
+#intro-toggle:hover, #tutorial-toggle:hover, #combat-anim-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
+#intro-toggle.muted, #tutorial-toggle.muted, #combat-anim-toggle.muted { border-color: #554477; color: #554477; }
 #volume-slider { -webkit-appearance:none; appearance:none; width:130px; height:4px; border-radius:2px; background:linear-gradient(to right,#7755cc 0%,#7755cc var(--vp,70%),#2a1f44 var(--vp,70%),#2a1f44 100%); outline:none; cursor:pointer; vertical-align:middle; }
 #volume-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:14px; height:14px; border-radius:50%; background:#9977ee; border:2px solid #c0a8ff; cursor:pointer; }
 #volume-slider::-moz-range-thumb { width:14px; height:14px; border-radius:50%; background:#9977ee; border:2px solid #c0a8ff; cursor:pointer; }
@@ -1910,6 +1910,10 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       <span class="settings-label">Show Tutorial</span>
       <button id="tutorial-toggle">On</button>
     </div>
+    <div class="settings-row">
+      <span class="settings-label">Combat Animation</span>
+      <button id="combat-anim-toggle">On</button>
+    </div>
     <div id="hard-reset-confirm">
       <p>This will wipe ALL progress. Are you certain?</p>
       <button id="hard-reset-yes">Wipe Everything</button>
@@ -2153,6 +2157,9 @@ var enemyDeathTime    = 0;
 var enemyHitFlashTime = 0;
 var attackFlashTime   = 0;
 var hitFlashTime      = 0;
+// Combat Animation setting: when off, the enemy/entity squish-and-pop and the
+// flying soul-drop coins are suppressed. Damage, souls, and mana are unaffected.
+var combatAnim        = true;
 
 // Sparkle pool
 var entitySparkles = [];
@@ -2405,7 +2412,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   }
 
   // Death pop then deflate: brief burst then squish to nothing
-  if (dead) {
+  if (dead && combatAnim) {
     if (deathAge <= 70) {
       var popT = deathAge / 70;
       var popScale = 1 + Math.sin(popT * Math.PI) * 0.2;
@@ -2484,7 +2491,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   ctx.shadowBlur = 0;
 
   // Bubble pop on death — small circles in enemy colour
-  if (dead) {
+  if (dead && combatAnim) {
     if (deathParticlesKey !== enemyDeathTime) {
       deathParticlesKey = enemyDeathTime;
       deathParticles = [];
@@ -3610,6 +3617,9 @@ function spawnSoulCoins(){
     mana=Math.min(manaMax,mana+_mg);
     updateManaBar();
   }
+  // Everything below is the flying soul-coin animation only — mana above still
+  // accrues, and the actual soul reward is granted in onEnemyDeath regardless.
+  if(!combatAnim) return;
   var d=def(); if(!d) return;
   var ec=d.color; var r=ec[0],g=ec[1],b=ec[2]; var cs=r+','+g+','+b;
   var lr=Math.min(r+90,255), lg=Math.min(g+90,255), lb=Math.min(b+90,255);
@@ -3938,7 +3948,7 @@ function updateEnemyDefeatsPanel(){
 function entityAttack(isAuto, isSpell){
   if(!combatActive||enemyDead) return;
   if(!isAuto && !isSpell){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
-  if(!isAuto) attackFlashTime=Date.now();
+  if(!isAuto && combatAnim) attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
   var hi=entityDmgMax.add(entityDmgBonus).add(bonus);
@@ -3956,7 +3966,7 @@ function entityAttack(isAuto, isSpell){
   // Spell: Invoke Power — multiply all damage by (1 + stacks × 0.0666)
   if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
-  enemyHitFlashTime=Date.now();
+  if(combatAnim) enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
   spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
@@ -5987,7 +5997,8 @@ function saveSettings(){
   try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify({
     soundVolume:soundVolume,
     showTutorial:showTutorial,
-    showIntro:showIntro
+    showIntro:showIntro,
+    combatAnim:combatAnim
   })); } catch(e){}
 }
 
@@ -6000,6 +6011,7 @@ function loadSettings(){
     else if(d.soundMuted!==undefined) soundVolume=d.soundMuted?0:0.7; // migrate old saves
     if(d.showTutorial!==undefined) showTutorial=d.showTutorial;
     if(d.showIntro!==undefined) showIntro=d.showIntro;
+    if(d.combatAnim!==undefined) combatAnim=d.combatAnim;
   } catch(e){}
 }
 var _lastAutoSave=0;
@@ -6041,6 +6053,7 @@ function saveGame(){
     soundVolume:soundVolume,
     showIntro:showIntro,
     showTutorial:showTutorial,
+    combatAnim:combatAnim,
     tutShown:_tutShown,
     frontierWins:_frontierWins,
     minionPoints:minionPoints,
@@ -6146,6 +6159,7 @@ function loadGame(){
   else if(data.soundMuted!==undefined) soundVolume=data.soundMuted?0:0.7;
   showIntro=(data.showIntro!==undefined)?data.showIntro:true;
   showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
+  if(data.combatAnim!==undefined) combatAnim=data.combatAnim;
   if(data.tutShown) _tutShown=Object.assign(_tutShown,data.tutShown);
   _frontierWins=data.frontierWins||0;
   if(data.minionPoints!==undefined) minionPoints=data.minionPoints;
@@ -7403,7 +7417,7 @@ function minionClickerAttackEnemy(){
   if(isSpellActive('twinStrikes')) dmg=dmg.mul(2);
   if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
-  enemyHitFlashTime=Date.now();
+  if(combatAnim) enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
   spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
@@ -8278,10 +8292,15 @@ function showIntroSequence(onDone) {
 function syncIntroToggleUI(){
   var introToggle = document.getElementById('intro-toggle');
   var tutorialToggle = document.getElementById('tutorial-toggle');
+  var combatToggle = document.getElementById('combat-anim-toggle');
   introToggle.textContent = showIntro ? 'On' : 'Off';
   introToggle.classList.toggle('muted', !showIntro);
   tutorialToggle.textContent = showTutorial ? 'On' : 'Off';
   tutorialToggle.classList.toggle('muted', !showTutorial);
+  if(combatToggle){
+    combatToggle.textContent = combatAnim ? 'On' : 'Off';
+    combatToggle.classList.toggle('muted', !combatAnim);
+  }
 }
 
 document.getElementById('intro-toggle').addEventListener('click', function(){
@@ -8292,6 +8311,12 @@ document.getElementById('intro-toggle').addEventListener('click', function(){
 
 document.getElementById('tutorial-toggle').addEventListener('click', function(){
   showTutorial = !showTutorial;
+  syncIntroToggleUI();
+  saveGame(); saveSettings();
+});
+
+document.getElementById('combat-anim-toggle').addEventListener('click', function(){
+  combatAnim = !combatAnim;
   syncIntroToggleUI();
   saveGame(); saveSettings();
 });
