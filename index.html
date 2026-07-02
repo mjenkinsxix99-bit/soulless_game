@@ -2387,6 +2387,11 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   var W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
   if (!sheetLoaded) return;
+  // Compendium portraits reuse this enemy draw, but they aren't in combat —
+  // the hit squish/flash reads the shared enemyHitFlashTime, so without this
+  // guard every visible card would squish on each strike (a Flurry storm made
+  // all 100 pulse at once). The battlefield enemy and pet still animate.
+  var isPortrait = canvas.classList && canvas.classList.contains('mm-card-canvas');
   var sd = (spriteDims||VOID_SPRITE_DIMS)[spriteIdx];
   var _cw = cellW||VOID_SPRITE_CELL_W;
 
@@ -2411,7 +2416,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   // Hit squish: stretch wide, squish tall
   var scaleX = 1, scaleY = 1;
   var hitAge = t - enemyHitFlashTime;
-  if (!dead && hitAge < 300) {
+  if (!dead && hitAge < 300 && !isPortrait) {
     var hprog = hitAge / 300;
     scaleX = 1 + Math.sin(hprog * Math.PI) * 0.14;
     scaleY = 1 - Math.sin(hprog * Math.PI) * 0.18;
@@ -2481,7 +2486,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   }
 
   // White flash on hit
-  if (!dead && hitAge < 220) {
+  if (!dead && hitAge < 220 && !isPortrait) {
     var hf = 1 - hitAge / 220;
     ctx.filter = 'brightness(' + (1 + hf * 5) + ') saturate(' + (1 - hf * 0.8) + ')';
   } else if (elite && !dead) {
