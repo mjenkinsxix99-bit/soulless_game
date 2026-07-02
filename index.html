@@ -4019,7 +4019,10 @@ function onEnemyDeath(){
   buildMinimap();
   updateProgressLabel();
   updateHighestFloor(); checkAchievements();
-  saveGame();
+  // Elite kills are rare progress milestones — persist those immediately.
+  // Regular kills can stream in several times a second with clicker minions
+  // assigned to the enemy, so batch their saves.
+  if(isEliteFight()) saveGame(); else throttledSave();
 }
 
 function onEliteDpsCheckFail(){
@@ -7304,47 +7307,55 @@ function minionClickerAttackEnemy(){
   if(enemyHp.lte(0)) onEnemyDeath();
 }
 
+// Performs the purchase only; recalc/UI/save run once per tick in
+// tickMinionClickers so several assigned clickers don't repeat the whole
+// chain every 250ms. Returns true if anything was bought.
 function minionClickerBuyUpgrade(upgradeId){
   var u=REP_UPGRADES.find(function(x){return x.id===upgradeId;});
-  if(!u||!u.vis()) return;
+  if(!u||!u.vis()) return false;
   var n=(buyQty==='max')?maxAffordableN(u):buyQty;
-  if(n<1) return;
+  if(n<1) return false;
   var total=calcCostN(u,n);
-  if(!souls.gte(total)) return;
+  if(!souls.gte(total)) return false;
   souls=souls.sub(total);
   var c=u.cost;
   for(var i=0;i<n;i++){ c=c.mul(u.costScale).ceil(); }
   u.cost=c;
   u.level+=n;
   totalUpgradePurchases+=n;
-  recalcStats();
-  dirtyU=true;
-  updateEntityStatsPanel();
-  updateTatteredDisplay();
-  document.getElementById('soul-count').textContent=fmt(souls);
-  checkAchievements();
-  checkRebirthButton();
-  mcThrottledSave();
+  return true;
 }
 
-// Clicker minions buy every 250ms; a full saveGame per purchase floods
-// localStorage and stutters the frame. Persist their progress at most every 5s
-// (the 30s autosave and manual-action saves still run as before).
-var _lastMcAutoSave=0;
-function mcThrottledSave(){
+// High-frequency automated events (clicker purchases every 250ms, kill streaks)
+// each wrote a full save, flooding localStorage and stuttering the frame.
+// Batch them to one save per 5s — the 30s autosave, manual-action saves, and
+// the save-on-tab-hide handler still write immediately.
+var _lastThrottledSave=0;
+function throttledSave(){
   var n=Date.now();
-  if(n-_lastMcAutoSave>=5000){ _lastMcAutoSave=n; saveGame(); }
+  if(n-_lastThrottledSave>=5000){ _lastThrottledSave=n; saveGame(); }
 }
 
 function tickMinionClickers(now){
   if(!minionClickerAssignments.length) return;
   if(now-_lastMinionClickTick < 250) return;
   _lastMinionClickTick=now;
+  var bought=false;
   minionClickerAssignments.forEach(function(a){
     if(a.target==='enemy') minionClickerAttackEnemy();
-    else if(a.target==='upgrade') minionClickerBuyUpgrade(a.upgradeId);
+    else if(a.target==='upgrade'){ if(minionClickerBuyUpgrade(a.upgradeId)) bought=true; }
     else if(a.target==='buyall') buyAllAffordable(true);
   });
+  if(bought){
+    recalcStats();
+    dirtyU=true;
+    updateEntityStatsPanel();
+    updateTatteredDisplay();
+    document.getElementById('soul-count').textContent=fmt(souls);
+    checkAchievements();
+    checkRebirthButton();
+    throttledSave();
+  }
 }
 
 function updateMinionClickerDock(){
@@ -8510,7 +8521,7 @@ function buyAllAffordable(auto){
     document.getElementById('soul-count').textContent=fmt(souls);
     checkAchievements();
     checkRebirthButton();
-    if(auto) mcThrottledSave(); else saveGame();
+    if(auto) throttledSave(); else saveGame();
   }
 }
 
