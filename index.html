@@ -5859,6 +5859,9 @@ var _rebirthEntityOverride=null;
 // ── SAVE / LOAD ───────────────────────────────────────────────────────────────
 var SAVE_KEY='formless_save_v2';
 var SETTINGS_KEY='formless_settings_v1';
+// When we're about to reload for an import or hard reset, freeze saving so the
+// autosave loop / visibilitychange handler can't overwrite the write we just made.
+var _suppressSave=false;
 
 function saveSettings(){
   try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify({
@@ -5882,6 +5885,7 @@ function loadSettings(){
 var _lastAutoSave=0;
 
 function saveGame(){
+  if(_suppressSave) return;
   var data={
     souls:souls.toString(), totalSouls:totalSouls.toString(),
     stage:stage, traits:traits,
@@ -7781,6 +7785,9 @@ document.getElementById('hard-reset-no').addEventListener('click',function(){
 });
 
 document.getElementById('hard-reset-yes').addEventListener('click',function(){
+  // Freeze saving so the autosave loop / visibilitychange handler can't
+  // rewrite the save as the page reloads.
+  _suppressSave=true;
   deleteSave();
   location.reload();
 });
@@ -7813,7 +7820,12 @@ document.getElementById('import-save-file').addEventListener('change',function(e
         msg.textContent='Invalid save file.';
         return;
       }
+      // Freeze saving before writing: the autosave loop and the visibilitychange
+      // "save on hide" handler would otherwise fire as the page reloads and
+      // overwrite the imported save with the current (in-memory) game state.
+      _suppressSave=true;
       try{ localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(e){
+        _suppressSave=false;
         msg.style.color='#883333';
         msg.textContent='Could not write save.';
         return;
