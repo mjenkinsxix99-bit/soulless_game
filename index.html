@@ -7789,6 +7789,9 @@ document.getElementById('hard-reset-yes').addEventListener('click',function(){
   // rewrite the save as the page reloads.
   _suppressSave=true;
   deleteSave();
+  // Also clear the offline-timer keys so the fresh game doesn't get phantom
+  // away-time gain from the pre-reset timestamp.
+  try{ localStorage.removeItem(OFFLINE_TS_KEY); localStorage.removeItem(OFFLINE_APPLIED_KEY); }catch(e){}
   location.reload();
 });
 
@@ -7830,6 +7833,13 @@ document.getElementById('import-save-file').addEventListener('change',function(e
         msg.textContent='Could not write save.';
         return;
       }
+      // Base away-time on the imported save's own timestamp (not this device's
+      // clock), and clear the recent-apply guard so offline gain is granted for
+      // the gap since the save was created.
+      try{
+        if(data.savedAt) localStorage.setItem(OFFLINE_TS_KEY, String(data.savedAt));
+        localStorage.removeItem(OFFLINE_APPLIED_KEY);
+      }catch(e){}
       msg.style.color='#556644';
       msg.textContent='Save imported. Reloading…';
       setTimeout(function(){ location.reload(); }, 900);
@@ -8191,6 +8201,9 @@ renderMinionClickerPlaced();
   var _hiddenAt = 0;
   document.addEventListener('visibilitychange', function(){
     if(document.hidden){
+      // When reloading for an import/hard reset, don't touch the save or the
+      // offline timestamp — the import intentionally set them for the reload.
+      if(_suppressSave) return;
       _hiddenAt = Date.now();
       saveGame();
       try{ localStorage.setItem(OFFLINE_TS_KEY, String(_hiddenAt)); } catch(e){}
