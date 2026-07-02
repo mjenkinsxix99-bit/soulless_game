@@ -163,9 +163,21 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #mm-header-right { display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
 #mm-mp-display { font-size:14px; color:#bb77ff; font-family:Georgia,serif; }
 #mm-ct-display { font-size:11px; color:#664488; font-style:italic; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-#mm-release-btn { background:#cc0000; border:2px solid #ff2222; color:#000; font-size:12px; font-weight:bold; padding:3px 10px; border-radius:4px; cursor:pointer; letter-spacing:1px; font-family:Georgia,serif; transition:all 0.2s; }
-#mm-release-btn:hover { background:#ff2222; }
-#mm-release-btn.active { background:#ff4444; border-color:#ffaaaa; box-shadow:0 0 8px rgba(255,80,80,0.7); }
+#mm-release-btn { background:#000; border:2px solid #cc0000; color:#ff2222; font-size:12px; font-weight:bold; padding:3px 10px; border-radius:4px; cursor:pointer; letter-spacing:1px; font-family:Georgia,serif; transition:all 0.2s; }
+#mm-release-btn:hover { background:#1a0404; border-color:#ff2222; }
+#mm-release-btn.active { background:#cc0000; border-color:#ff2222; color:#000; box-shadow:0 0 8px rgba(255,80,80,0.7); }
+#mm-release-btn.active:hover { background:#ff2222; }
+#release-confirm-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:950; align-items:center; justify-content:center; }
+#release-confirm-modal.open { display:flex; }
+#release-confirm-box { background:#0a0a18; border:2px solid #cc0000; border-radius:10px; padding:24px 30px; max-width:420px; width:90%; text-align:center; font-family:Georgia,serif; }
+#release-confirm-text { font-size:15px; color:#ffaaaa; line-height:1.5; margin-bottom:14px; }
+#release-confirm-dns { font-size:12px; color:#886688; margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:6px; }
+#release-confirm-dns label { cursor:pointer; }
+#release-confirm-btns { display:flex; gap:12px; justify-content:center; }
+#release-confirm-yes { background:#cc0000; border:2px solid #ff2222; color:#000; font-weight:bold; padding:6px 18px; border-radius:4px; cursor:pointer; font-family:Georgia,serif; letter-spacing:1px; }
+#release-confirm-yes:hover { background:#ff2222; }
+#release-confirm-no { background:transparent; border:1px solid #554477; color:#9988cc; padding:6px 18px; border-radius:4px; cursor:pointer; font-family:Georgia,serif; letter-spacing:1px; }
+#release-confirm-no:hover { border-color:#8870cc; color:#c4b5fd; }
 #mm-close-btn { width:32px; height:32px; background:#880000; border:2px solid #cc0000; color:#000; font-size:18px; border-radius:5px; cursor:pointer; line-height:1; transition:all 0.2s; font-weight:bold; }
 #mm-close-btn:hover { background:#cc0000; border-color:#ff2222; }
 #mm-body { flex:1; overflow-y:auto; padding:16px 20px; }
@@ -1851,6 +1863,20 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
   <div id="mm-body"></div>
 </div>
 
+<!-- Release Minion confirmation -->
+<div id="release-confirm-modal">
+  <div id="release-confirm-box">
+    <div id="release-confirm-text"></div>
+    <div id="release-confirm-dns">
+      <input type="checkbox" id="release-dns-chk"><label for="release-dns-chk">Do not show again</label>
+    </div>
+    <div id="release-confirm-btns">
+      <button id="release-confirm-yes">Release</button>
+      <button id="release-confirm-no">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Minion Capture Notification -->
 <div id="minion-capture-modal">
   <div id="mcm-name"></div>
@@ -3051,31 +3077,40 @@ function enterReleaseMode(){
     showTutorialTip('Releasing a minion will reset its level, return it to the wild, and refund the MP cost of that minion.',document.getElementById('mm-release-btn'),null);
   }
   releaseMode=true;
-  var btn=document.getElementById('mm-release-btn');
-  if(btn) btn.classList.add('active');
-  var ctEl=document.getElementById('mm-ct-display');
-  if(ctEl) ctEl.textContent='Click a captured minion to release it';
+  updateCaptureSelectionUI();
 }
 
 function exitReleaseMode(){
   releaseMode=false;
-  var btn=document.getElementById('mm-release-btn');
-  if(btn) btn.classList.remove('active');
   renderMinionModal();
 }
 
+// Release stays in release mode so several minions can be freed in a row;
+// only the Release Minion button toggles the mode off.
 function releaseMinion(typeIdx){
   var slotIdx=-1;
   for(var i=0;i<minionSlots.length;i++){
     if(minionSlots[i].typeIdx===typeIdx){ slotIdx=i; break; }
   }
-  if(slotIdx===-1){ exitReleaseMode(); return; }
+  if(slotIdx===-1) return;
   var refund=getMinionCostForType(minionSlots[slotIdx].typeIdx);
   minionSlots.splice(slotIdx,1);
   clampMinionClickerAssignments();
   minionPoints+=refund;
-  exitReleaseMode();
+  renderMinionModal();
   saveGame();
+}
+
+// Confirmation popup (skippable via "do not show again")
+var releaseConfirmSuppressed=false;
+var _pendingReleaseIdx=-1;
+function requestReleaseMinion(typeIdx){
+  if(releaseConfirmSuppressed){ releaseMinion(typeIdx); return; }
+  _pendingReleaseIdx=typeIdx;
+  var et=ENEMY_TYPES[typeIdx];
+  document.getElementById('release-confirm-text').textContent='Release '+(et?et.name:'this minion')+' back into the world? MP will be refunded and XP lost.';
+  document.getElementById('release-dns-chk').checked=false;
+  document.getElementById('release-confirm-modal').classList.add('open');
 }
 
 function setPetMinion(typeIdx){
@@ -3264,9 +3299,8 @@ function renderMinionModal(){
       (function(captureIdx, cardEl, heldMinionRef){
         cardEl.addEventListener('click',function(){
           if(releaseMode){
-            if(heldMinionRef) releaseMinion(captureIdx);
-            else exitReleaseMode();
-            return;
+            if(heldMinionRef) requestReleaseMinion(captureIdx);
+            return; // empty cards do nothing; the button toggles the mode off
           }
           var sel=captureTargets.indexOf(captureIdx);
           if(sel>=0){
@@ -3297,11 +3331,16 @@ function updateCaptureSelectionUI(){
     if(isNaN(idx)) return;
     var sel=captureTargets.indexOf(idx)>=0;
     c.classList.toggle('mm-card-targeted',sel);
-    c.classList.toggle('mm-card-nomp',!sel&&getMinionCostForType(idx)>remaining);
+    // Budget dimming only applies while picking capture targets
+    c.classList.toggle('mm-card-nomp',!releaseMode&&!sel&&getMinionCostForType(idx)>remaining);
   });
+  var btn=document.getElementById('mm-release-btn');
+  if(btn) btn.classList.toggle('active',releaseMode);
   var ctEl=document.getElementById('mm-ct-display');
   if(ctEl){
-    if(captureTargets.length){
+    if(releaseMode){
+      ctEl.textContent='Click captured minions to release them';
+    } else if(captureTargets.length){
       ctEl.textContent='Targets: '+captureTargets.length+' — '+captureReservedMp()+' MP reserved (7% chance each)';
     } else {
       ctEl.textContent='No capture target set';
@@ -6003,6 +6042,7 @@ function saveGame(){
     minionSlots:minionSlots.slice(),
     minionUnlocked:minionUnlocked,
     captureTargets:captureTargets.slice(),
+    releaseConfirmSuppressed:releaseConfirmSuppressed,
     petMinionIdx:petMinionIdx,
     discoveredMinions:discoveredMinions.slice(),
     elementStocks:JSON.parse(JSON.stringify(elementStocks)),
@@ -6109,6 +6149,7 @@ function loadGame(){
   if(data.captureTargets) captureTargets=data.captureTargets;
   else if(data.captureTargetIdx!==undefined&&data.captureTargetIdx>=0) captureTargets=[data.captureTargetIdx];
   clampCaptureTargets(); // older saves could target beyond the MP budget
+  if(data.releaseConfirmSuppressed) releaseConfirmSuppressed=true;
   if(data.petMinionIdx!==undefined){ petMinionIdx=data.petMinionIdx; var _pc=document.getElementById('pet-canvas'); if(_pc) _pc.style.display=petMinionIdx>=0?'block':'none'; }
   if(data.discoveredMinions) discoveredMinions=data.discoveredMinions;
   if(data.elementStocks) elementStocks=data.elementStocks;
@@ -8405,7 +8446,22 @@ document.querySelectorAll('.left-tab-btn').forEach(function(btn){
 // ── TATTERED MODAL EVENTS ─────────────────────────────────────────────────────
 document.getElementById('tm-close-btn').addEventListener('click', closeTatteredModal);
 document.getElementById('mm-close-btn').addEventListener('click', closeMinionModal);
-document.getElementById('mm-release-btn').addEventListener('click', function(){ if(!releaseMode) enterReleaseMode(); });
+document.getElementById('mm-release-btn').addEventListener('click', function(){
+  if(releaseMode) exitReleaseMode(); else enterReleaseMode();
+});
+document.getElementById('release-confirm-yes').addEventListener('click', function(){
+  if(document.getElementById('release-dns-chk').checked) releaseConfirmSuppressed=true;
+  document.getElementById('release-confirm-modal').classList.remove('open');
+  if(_pendingReleaseIdx>=0) releaseMinion(_pendingReleaseIdx);
+  _pendingReleaseIdx=-1;
+});
+document.getElementById('release-confirm-no').addEventListener('click', function(){
+  document.getElementById('release-confirm-modal').classList.remove('open');
+  _pendingReleaseIdx=-1;
+});
+document.getElementById('release-confirm-modal').addEventListener('click', function(e){
+  if(e.target===this){ this.classList.remove('open'); _pendingReleaseIdx=-1; }
+});
 document.getElementById('reincarnate-btn').addEventListener('click', openReincarnateModal);
 document.getElementById('reincarnate-cancel-btn').addEventListener('click', function(){
   document.getElementById('reincarnate-modal').classList.remove('open');
