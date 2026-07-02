@@ -5863,6 +5863,16 @@ var SETTINGS_KEY='formless_settings_v1';
 // autosave loop / visibilitychange handler can't overwrite the write we just made.
 var _suppressSave=false;
 
+// break_infinity stores numbers as mantissa×10^exp, so re-expanding a whole
+// number can surface a tiny float tail (e.g. "852546.0000000001"). Souls are
+// always whole, so round to a clean value when within safe-integer range;
+// leave huge numbers (where the tail is invisible) as their normal string.
+function wholeStr(dec){
+  var n=dec.toNumber();
+  if(isFinite(n)&&Math.abs(n)<1e15) return String(Math.round(n));
+  return dec.toString();
+}
+
 function saveSettings(){
   try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify({
     soundVolume:soundVolume,
@@ -5887,7 +5897,7 @@ var _lastAutoSave=0;
 function saveGame(){
   if(_suppressSave) return;
   var data={
-    souls:souls.toString(), totalSouls:totalSouls.toString(),
+    souls:wholeStr(souls), totalSouls:wholeStr(totalSouls),
     stage:stage, traits:traits,
     curRealm:curRealm, curLevel:curLevel, curFloor:curFloor, floorWins:floorWins,
     highestRealm:highestRealm, highestLevel:highestLevel, highestFloor:highestFloor,
@@ -5947,10 +5957,15 @@ function loadGame(){
   var data;
   try{ data=JSON.parse(raw); } catch(e){ return false; }
   if(!data) return false;
+  try{
   souls=D(data.souls||0);
   totalSouls=D(data.totalSouls||0);
   stage=data.stage||0;
   if(data.traits) traits=data.traits;
+  // Older saves may lack fields on the traits object; normalize so downstream
+  // code (e.g. updateTraitsRow) never trips over a missing array/property.
+  if(!traits||typeof traits!=='object') traits={sex:null,adds:[],aff:null,outfit:null};
+  if(!Array.isArray(traits.adds)) traits.adds=[];
   curRealm=data.curRealm||1;
   curLevel=data.curLevel||1;
   curFloor=data.curFloor||1;
@@ -6028,6 +6043,13 @@ function loadGame(){
   if(data.minionClickerAssignments) minionClickerAssignments=data.minionClickerAssignments;
   _offlineSavedAt=data.savedAt||0;
   return true;
+  }catch(e){
+    // A field from an older or partially-corrupt save threw mid-load. Keep the
+    // fields that did load rather than reporting "no save" — otherwise a fresh
+    // save would overwrite the file on the next tick and lose it entirely.
+    try{ console.warn('loadGame: partial load —', e); }catch(_){}
+    return true;
+  }
 }
 
 function deleteSave(){
@@ -6583,7 +6605,7 @@ function updateTraitsRow(){
   function pill(t){return '<span class="trait-pill">'+t+'</span>';}
   if(traits.sex)tr.innerHTML+=pill(traits.sex);
   if(traits.aff)tr.innerHTML+=pill(traits.aff);
-  traits.adds.forEach(function(a){tr.innerHTML+=pill(a);});
+  (traits.adds||[]).forEach(function(a){tr.innerHTML+=pill(a);});
   if(traits.outfit)tr.innerHTML+=pill(traits.outfit);
   var np=(stage===0&&rebirthForm&&FORM_NAMEPLATES[rebirthForm])?FORM_NAMEPLATES[rebirthForm]:null;
   document.getElementById('stage-desc').textContent=np?np.desc:SDESCS[stage];
