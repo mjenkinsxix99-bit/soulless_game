@@ -4174,16 +4174,21 @@ var DV_MS_EFFECTS=[
   '+0.666% of Total DPS as Strike Damage',
 ];
 
-var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
-function getMsThresh(i){
-  var t=MS_THRESH[i];
+// Augment system: each augment is a ×2 (compounding) damage multiplier.
+// Most upgrades get 4 augments; Spirit Slash gets 5. Unlock levels below.
+var AUG_THRESH_DEFAULT=[10,25,75,150];
+var AUG_THRESH_SS=[10,25,50,75,150];
+var AUG_MULT=2; // each purchased augment doubles the upgrade's output (compounding)
+function augThreshFor(u){ return u.id==='ss'?AUG_THRESH_SS:AUG_THRESH_DEFAULT; }
+function getMsThresh(u,i){
+  var arr=(u&&u.augThresh)||augThreshFor(u);
+  var t=arr[i];
+  if(t===undefined) return Infinity;
   if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*(1-0.10*getFormMult())));
   else if(achievementsEarned.indexOf('form-ult-equine')>=0) t=Math.max(1,Math.floor(t*0.90));
   if(ascension4Path==='mystic') t=Math.max(1,Math.floor(t*0.95));
   return t;
 }
-var MS_MULT=[1.777,1.777,1.666,1.777,1.777,1.777,1.666,1.777,1.777,1.999];
-var MS_MULT_LABELS=['+77.7%','+77.7%','+66.6%','+77.7%','+77.7%','+77.7%','+66.6%','+77.7%','+77.7%','+99.9%'];
 var MS_LABELS=['Augment I','Augment II','Augment III','Augment IV','Augment V','Augment VI','Augment VII','Augment VIII','Augment IX','Augment X'];
 var MS_COLORS=['#ffffff','#f8f0e0','#f5e6c0','#f0d888','#e8cc55','#e0bb30','#d8aa18','#cf9a08','#c88a00','#d4a843'];
 var MS_LIT_BG=['rgba(255,255,255,0.35)','rgba(248,240,224,0.35)','rgba(245,230,192,0.35)','rgba(240,216,136,0.35)','rgba(232,204,85,0.35)','rgba(224,187,48,0.35)','rgba(216,170,24,0.35)','rgba(207,154,8,0.35)','rgba(200,138,0,0.35)','rgba(212,168,67,0.38)'];
@@ -4209,9 +4214,10 @@ function getPurchMult(level){
   return D(13).pow(regularMults).mul(D(999).pow(thousandMults));
 }
 function getMileMult(u){
-  var bonus=0;
-  for(var i=0;i<10;i++){ if(u.milestones[i]) bonus+=(MS_MULT[i]-1); }
-  return 1+bonus;
+  // Compounding: every purchased augment multiplies output by AUG_MULT (×2).
+  var count=0, n=u.milestones?u.milestones.length:0;
+  for(var i=0;i<n;i++){ if(u.milestones[i]) count++; }
+  return Math.pow(AUG_MULT, count);
 }
 function recalcStats(){
   clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; tattTsGainMult=0;
@@ -4241,15 +4247,9 @@ function recalcStats(){
   if(ascension5Path==='mystic') clickDmgBonus=clickDmgBonus.mul(1.05);
   if(ascension6Path==='steel') totalDps=totalDps.mul(1.10);
   autoAttackInterval=3000;
-  // Apply Divine Hunger milestone support effects
-  var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
-  if(dv){
-    [0,1,3,4,6,7,9].forEach(function(mi){ if(dv.milestones[mi]) dvDpsToClickRatio+=0.00666; });
-    if(dv.milestones[2]) critClickChance+=0.0666;
-    if(dv.milestones[5]) critClickMult+=3.33;
-    if(dv.milestones[8]) soulAbsorbBonus+=0.222;
-    if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
-  }
+  // (Divine Hunger's old special augment effects — crit chance/mult, souls
+  // absorbed, DPS→strike — were removed when augments became flat ×2 damage.
+  // Those effects are slated for redistribution elsewhere.)
   // Tattered Shop stat node bonuses
   var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
     'blade-dps':0.333,'souls-dps-1':0.333,'souls-dps-2':0.333,'rule-dps-1':0.333,'rule-dps-2':0.333,
@@ -4294,16 +4294,11 @@ var _msTip=null;
 function showMsTip(evt,u,i){
   var tip=document.getElementById('ms-tooltip');
   if(!tip) return;
-  var lit=u.milestones[i], avail=u.level>=getMsThresh(i);
+  var lit=u.milestones[i], avail=u.level>=getMsThresh(u,i);
   tip.querySelector('.mst-title').textContent=MS_LABELS[i];
-  tip.querySelector('.mst-req').textContent='Requires '+getMsThresh(i)+' purchases';
-  if(u.id==='dv'){
-    tip.querySelector('.mst-eff').textContent=DV_MS_EFFECTS[i];
-  } else {
-    var multLabel=MS_MULT_LABELS[i];
-    var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
-    tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
-  }
+  tip.querySelector('.mst-req').textContent='Requires '+getMsThresh(u,i)+' purchases';
+  var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
+  tip.querySelector('.mst-eff').textContent='×2 '+typeLabel+' (compounding)';
   var costEl=tip.querySelector('.mst-cost');
   if(costEl){
     if(!lit && avail){
@@ -4393,7 +4388,8 @@ function hideUpgradeTip(){
   var tip=document.getElementById('upgrade-tooltip'); if(tip) tip.style.display='none';
 }
 
-function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
+function mkMs(){ return [false,false,false,false]; } // default 4 augments; sized per-upgrade below
+function mkAugs(u){ return (u.augThresh||augThreshFor(u)).map(function(){return false;}); }
 var REP_UPGRADES=[
   {id:'ss',name:'Spirit Slash',  icon:0,  cost:5,     costScale:1.077, level:0, type:'click',  perLevel:1,
     desc:function(){return upgradeDescStr(this);},
@@ -4520,6 +4516,10 @@ var REP_UPGRADES=[
 // Convert all upgrade costs to Decimal after definition
 REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
 
+// Assign per-upgrade augment thresholds and correctly-sized milestone arrays
+// (Spirit Slash gets 5 augments, every other upgrade gets 4).
+REP_UPGRADES.forEach(function(u){ u.augThresh=augThreshFor(u); u.milestones=mkAugs(u); });
+
 // Post-ascension values for late-tier upgrades: big cost + proportional DPS jump
 var POST_ASCENSION_UPGRADES = {
   'ct': {baseCost:1e39,  perLevel:2.5e36},
@@ -4583,8 +4583,9 @@ var DV_DPS_MS_STEP=[12,100,1000,10000,100000,1000000];
 // This ties each milestone price to the upgrade economy at the moment it becomes available.
 function calcMilestoneCosts(u){
   var costs=[];
-  for(var i=0;i<10;i++){
-    var thresh=MS_THRESH[i];
+  var arr=u.augThresh||augThreshFor(u);
+  for(var i=0;i<arr.length;i++){
+    var thresh=arr[i];
     var c=u._baseCost.mul(D(u.costScale).pow(thresh));
     var total=D(0);
     for(var j=0;j<10;j++){ total=total.add(c); c=c.mul(u.costScale).ceil(); }
@@ -4632,14 +4633,14 @@ var ACHIEVEMENTS=[
   {id:'souls-1b',      cat:'Soul Drinker',    name:'Billion Soul March',      desc:'Collect 1,000,000,000 souls',                 check:function(){return totalSouls.gte(D('1e9'));}},
   {id:'souls-1t',      cat:'Soul Drinker',    name:'Unfathomable Greed',      desc:'Collect 1,000,000,000,000 souls',             check:function(){return totalSouls.gte(D('1e12'));}},
   // Augments
-  {id:'mile-25',       cat:'Augment Seeker',name:'Augment Seeker',            desc:'Activate 25 augments',                        check:function(){return totalMilestonePurchases>=25;}},
-  {id:'mile-50',       cat:'Augment Seeker',name:'Power Hungry',              desc:'Activate 50 augments',                        check:function(){return totalMilestonePurchases>=50;}},
-  {id:'mile-100',      cat:'Augment Seeker',name:'Centenary of Might',        desc:'Activate 100 augments',                       check:function(){return totalMilestonePurchases>=100;}},
-  {id:'mile-250',      cat:'Augment Seeker',name:'Quarter Thousand Stars',    desc:'Activate 250 augments',                       check:function(){return totalMilestonePurchases>=250;}},
-  {id:'mile-500',      cat:'Augment Seeker',name:'Five Hundred Lights',       desc:'Activate 500 augments',                       check:function(){return totalMilestonePurchases>=500;}},
-  {id:'mile-1k',       cat:'Augment Seeker',name:'Thousand Augments',         desc:'Activate 1,000 augments',                     check:function(){return totalMilestonePurchases>=1000;}},
-  {id:'mile-2k',       cat:'Augment Seeker',name:'Beyond Reckoning',          desc:'Activate 2,000 augments',                     check:function(){return totalMilestonePurchases>=2000;}},
-  {id:'mile-3k',       cat:'Augment Seeker',name:'The Unyielding Path',       desc:'Activate 3,000 augments',                     check:function(){return totalMilestonePurchases>=3000;}},
+  {id:'mile-25',       cat:'Augment Seeker',name:'Augment Seeker',            desc:'Activate 10 augments',                        check:function(){return totalMilestonePurchases>=10;}},
+  {id:'mile-50',       cat:'Augment Seeker',name:'Power Hungry',              desc:'Activate 25 augments',                        check:function(){return totalMilestonePurchases>=25;}},
+  {id:'mile-100',      cat:'Augment Seeker',name:'Growing Arsenal',          desc:'Activate 40 augments',                        check:function(){return totalMilestonePurchases>=40;}},
+  {id:'mile-250',      cat:'Augment Seeker',name:'Ever Sharper',             desc:'Activate 60 augments',                        check:function(){return totalMilestonePurchases>=60;}},
+  {id:'mile-500',      cat:'Augment Seeker',name:'Relentless Refinement',    desc:'Activate 80 augments',                        check:function(){return totalMilestonePurchases>=80;}},
+  {id:'mile-1k',       cat:'Augment Seeker',name:'Centenary of Might',        desc:'Activate 100 augments',                       check:function(){return totalMilestonePurchases>=100;}},
+  {id:'mile-2k',       cat:'Augment Seeker',name:'Beyond Reckoning',          desc:'Activate 113 augments',                       check:function(){return totalMilestonePurchases>=113;}},
+  {id:'mile-3k',       cat:'Augment Seeker',name:'The Unyielding Path',       desc:'Activate 120 augments',                       check:function(){return totalMilestonePurchases>=120;}},
   // Realm Walker — one per realm cleared
   {id:'realm-void',        cat:'Realm Walker',name:'Beyond the Void',         desc:'Clear the Void realm',                        check:function(){return highestRealm>=2;}},
   {id:'realm-underworld',  cat:'Realm Walker',name:'Out of the Underworld',   desc:'Clear the Underworld realm',                  check:function(){return highestRealm>=3;}},
@@ -5815,7 +5816,7 @@ function doReincarnate(){
   REP_UPGRADES.forEach(function(u){
     u.level=0;
     u.cost=D(u._baseCost||u.cost);
-    u.milestones=mkMs();
+    u.milestones=mkAugs(u);
   });
 
   // Wipe TS and tattered shop (but keep auto-progress)
@@ -5943,7 +5944,7 @@ function doRebirthReset(chosenForm){
   REP_UPGRADES.forEach(function(u){
     u.level=0;
     u.cost=D(u._baseCost||u.cost); // reset cost — stored during init
-    u.milestones=mkMs();
+    u.milestones=mkAugs(u);
   });
 
   // Apply rebirth
@@ -6127,7 +6128,15 @@ function loadGame(){
       var c=u._baseCost;
       for(var i=0;i<u.level;i++) c=c.mul(u.costScale).ceil();
       u.cost=c;
-      if(saved.milestones) u.milestones=saved.milestones.slice();
+      if(saved.milestones){
+        // Augments were redesigned (10 additive → 4/5 compounding). Coerce any
+        // saved array to the upgrade's current augment count so old saves can't
+        // over- or under-count purchased augments.
+        var want=u.augThresh.length;
+        var m=saved.milestones.slice(0,want);
+        while(m.length<want) m.push(false);
+        u.milestones=m;
+      }
     });
   }
   // Rebuild enemy pool from defeatedElites
@@ -6437,10 +6446,10 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   d.setAttribute('data-uid', u.id);
 
   var msRowHtml='<div class="ms-row">';
-  for(var i=0;i<10;i++){
+  for(var i=0;i<u.milestones.length;i++){
     var lit=u.milestones[i];
     var prevLit=i===0||u.milestones[i-1];
-    var threshMet=u.level>=getMsThresh(i);
+    var threshMet=u.level>=getMsThresh(u,i);
     var visible=lit||(i===0&&threshMet)||prevLit;
     if(!visible){ msRowHtml+='<div class="ms-box" data-mi="'+i+'" style="visibility:hidden"></div>'; continue; }
     var avail=!lit&&threshMet&&prevLit;
@@ -6472,7 +6481,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
     box.addEventListener('click',function(e){
       e.stopPropagation();
       if(u.milestones[mi]) return;
-      if(u.level>=getMsThresh(mi)){
+      if(u.level>=getMsThresh(u,mi)){
         var msCost=u.milestoneCosts[mi];
         if(!souls.gte(msCost)) return;
         souls=souls.sub(msCost);
@@ -6558,7 +6567,7 @@ function patchMilestoneRow(card, u){
       box.innerHTML='';
     }
     var prevLit=i===0||u.milestones[i-1];
-    var threshMet=u.level>=getMsThresh(i);
+    var threshMet=u.level>=getMsThresh(u,i);
     var visible=lit||(i===0&&threshMet)||prevLit;
     if(!visible){
       box.style.cssText='visibility:hidden';
@@ -8672,8 +8681,8 @@ function buyAllAffordable(auto){
   // Build a flat list of all purchasable augments (threshold met, not yet bought, can afford)
   var augments=[];
   REP_UPGRADES.forEach(function(u){
-    for(var mi=0;mi<10;mi++){
-      if(!u.milestones[mi]&&u.level>=getMsThresh(mi)){
+    for(var mi=0;mi<u.milestones.length;mi++){
+      if(!u.milestones[mi]&&u.level>=getMsThresh(u,mi)){
         augments.push({u:u,mi:mi,cost:u.milestoneCosts[mi]});
       }
     }
