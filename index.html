@@ -4174,12 +4174,42 @@ var DV_MS_EFFECTS=[
   '+0.666% of Total DPS as Strike Damage',
 ];
 
-// Augment system: each augment is a ×2 (compounding) damage multiplier.
-// Most upgrades get 4 augments; Spirit Slash gets 5. Unlock levels below.
+// Augment system: most augments are a ×2 (compounding) damage multiplier
+// ('mult'), but some upgrades carry a special-effect augment in one slot.
+// Default upgrades get 4 augments; Spirit Slash and the special upgrades get 5.
 var AUG_THRESH_DEFAULT=[10,25,75,150];
-var AUG_THRESH_SS=[10,25,50,75,150];
-var AUG_MULT=2; // each purchased augment doubles the upgrade's output (compounding)
-function augThreshFor(u){ return u.id==='ss'?AUG_THRESH_SS:AUG_THRESH_DEFAULT; }
+var AUG_THRESH_FIVE=[10,25,50,75,150];
+var AUG_MULT=2; // each purchased 'mult' augment doubles the upgrade's output (compounding)
+// Special augments redistributed from the old Divine Hunger set. Each entry is a
+// per-slot effect list; 'mult' = normal ×2, others apply a global support effect.
+// Effect values: dps2strike +0.666% of Total DPS as Strike, critchance +6.66%,
+// critmult +3.33×, soulsabsorb +22.2%.
+var AUG_SPECIAL={
+  dh:['mult','mult','mult','dps2strike','mult'],
+  sl:['mult','mult','mult','mult','dps2strike'],
+  dv:['mult','mult','mult','soulsabsorb','mult'],
+  bb:['mult','mult','mult','dps2strike','mult'],
+  ee:['mult','mult','mult','mult','critchance'],
+  cs:['mult','mult','mult','dps2strike','mult'],
+  sg:['mult','mult','mult','mult','dps2strike'],
+  sk:['mult','mult','mult','mult','critmult'],
+  st:['mult','mult','mult','dps2strike','mult'],
+  dm:['mult','mult','mult','mult','dps2strike']
+};
+function augThreshFor(u){ return (u.id==='ss'||AUG_SPECIAL[u.id])?AUG_THRESH_FIVE:AUG_THRESH_DEFAULT; }
+function augEffectsFor(u){
+  if(AUG_SPECIAL[u.id]) return AUG_SPECIAL[u.id].slice();
+  return augThreshFor(u).map(function(){return 'mult';});
+}
+function augEffectLabel(u,i){
+  var eff=u.augEffects?u.augEffects[i]:'mult';
+  if(eff==='dps2strike') return '+0.666% of Total DPS as Strike Damage';
+  if(eff==='critchance') return '+6.66% Critical Strike Chance';
+  if(eff==='critmult')   return '+3.33× Critical Strike Damage';
+  if(eff==='soulsabsorb')return '+22.2% Souls Absorbed';
+  var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
+  return '×2 '+typeLabel+' (compounding)';
+}
 function getMsThresh(u,i){
   var arr=(u&&u.augThresh)||augThreshFor(u);
   var t=arr[i];
@@ -4214,9 +4244,10 @@ function getPurchMult(level){
   return D(13).pow(regularMults).mul(D(999).pow(thousandMults));
 }
 function getMileMult(u){
-  // Compounding: every purchased augment multiplies output by AUG_MULT (×2).
+  // Compounding: every purchased 'mult' augment multiplies output by AUG_MULT
+  // (×2). Special-effect augments don't add to this multiplier.
   var count=0, n=u.milestones?u.milestones.length:0;
-  for(var i=0;i<n;i++){ if(u.milestones[i]) count++; }
+  for(var i=0;i<n;i++){ if(u.milestones[i] && (!u.augEffects||u.augEffects[i]==='mult')) count++; }
   return Math.pow(AUG_MULT, count);
 }
 function recalcStats(){
@@ -4247,9 +4278,21 @@ function recalcStats(){
   if(ascension5Path==='mystic') clickDmgBonus=clickDmgBonus.mul(1.05);
   if(ascension6Path==='steel') totalDps=totalDps.mul(1.10);
   autoAttackInterval=3000;
-  // (Divine Hunger's old special augment effects — crit chance/mult, souls
-  // absorbed, DPS→strike — were removed when augments became flat ×2 damage.
-  // Those effects are slated for redistribution elsewhere.)
+  // Special-effect augments (redistributed across upgrades). Tally every lit
+  // non-'mult' augment and apply its support effect. DPS→strike conversion uses
+  // the DPS accumulated so far (base + form/ascension bonuses).
+  REP_UPGRADES.forEach(function(u){
+    if(!u.augEffects) return;
+    for(var i=0;i<u.milestones.length;i++){
+      if(!u.milestones[i]) continue;
+      var eff=u.augEffects[i];
+      if(eff==='dps2strike') dvDpsToClickRatio+=0.00666;
+      else if(eff==='critchance') critClickChance+=0.0666;
+      else if(eff==='critmult') critClickMult+=3.33;
+      else if(eff==='soulsabsorb') soulAbsorbBonus+=0.222;
+    }
+  });
+  if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
   // Tattered Shop stat node bonuses
   var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
     'blade-dps':0.333,'souls-dps-1':0.333,'souls-dps-2':0.333,'rule-dps-1':0.333,'rule-dps-2':0.333,
@@ -4297,8 +4340,7 @@ function showMsTip(evt,u,i){
   var lit=u.milestones[i], avail=u.level>=getMsThresh(u,i);
   tip.querySelector('.mst-title').textContent=MS_LABELS[i];
   tip.querySelector('.mst-req').textContent='Requires '+getMsThresh(u,i)+' purchases';
-  var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
-  tip.querySelector('.mst-eff').textContent='×2 '+typeLabel+' (compounding)';
+  tip.querySelector('.mst-eff').textContent=augEffectLabel(u,i);
   var costEl=tip.querySelector('.mst-cost');
   if(costEl){
     if(!lit && avail){
@@ -4516,9 +4558,9 @@ var REP_UPGRADES=[
 // Convert all upgrade costs to Decimal after definition
 REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
 
-// Assign per-upgrade augment thresholds and correctly-sized milestone arrays
-// (Spirit Slash gets 5 augments, every other upgrade gets 4).
-REP_UPGRADES.forEach(function(u){ u.augThresh=augThreshFor(u); u.milestones=mkAugs(u); });
+// Assign per-upgrade augment thresholds, per-slot effects, and correctly-sized
+// milestone arrays (Spirit Slash + special upgrades get 5, others get 4).
+REP_UPGRADES.forEach(function(u){ u.augThresh=augThreshFor(u); u.augEffects=augEffectsFor(u); u.milestones=mkAugs(u); });
 
 // Post-ascension values for late-tier upgrades: big cost + proportional DPS jump
 var POST_ASCENSION_UPGRADES = {
