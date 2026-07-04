@@ -720,6 +720,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #invoke-bar-fill.invoke-full { background:linear-gradient(to right,#2255cc,#aaccff); box-shadow:0 0 6px rgba(100,170,255,0.6); }
 #invoke-num { font-size:9px; color:#7a99cc; white-space:nowrap; }
 .spell-btn { width:44px; height:44px; border-radius:7px; border:1px solid #1a1535; background:#05040e; cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center; font-size:19px; line-height:1; flex-shrink:0; transition:border-color 0.2s,box-shadow 0.2s,opacity 0.2s; overflow:visible; }
+/* Owned/unlocked spells (any state except locked) get a white button fill */
+.spell-btn:not(.spell-locked) { background:#ffffff; }
 .spell-btn.spell-lit { border-color:#3355aa; box-shadow:0 0 7px rgba(50,90,200,0.3); opacity:1; }
 .spell-btn.spell-dim { border-color:#141230; opacity:0.35; cursor:default; }
 .spell-btn.spell-locked { border-color:#221a44; opacity:0.35; cursor:default; filter:grayscale(1); }
@@ -763,7 +765,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tm-node.type-center.state-affordable .tm-node-ring { border-color:#8855cc; background:#0f0628; box-shadow:0 0 12px rgba(120,70,220,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
 /* spell nodes — red theme */
 .tm-node.type-spell .tm-node-ring { width:62px; height:62px; border-color:#771818; background:#120608; }
-.tm-node.type-spell.state-purchased .tm-node-ring { border-color:#ff3333; background:#200a08; box-shadow:0 0 12px rgba(255,60,60,0.55),0 0 28px rgba(200,40,40,0.25); }
+.tm-node.type-spell.state-purchased .tm-node-ring { border-color:#ff3333; background:#ffffff; box-shadow:0 0 12px rgba(255,60,60,0.55),0 0 28px rgba(200,40,40,0.25); }
 .tm-node.type-spell.state-affordable .tm-node-ring { border-color:#cc2222; background:#180808; box-shadow:0 0 8px rgba(200,40,40,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
 .tm-node.type-spell.state-locked .tm-node-ring { border-color:#3a1010; opacity:0.5; cursor:default; }
 /* upgrade nodes */
@@ -803,7 +805,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tm-node-icon { font-size:16px; line-height:1; pointer-events:none; }
 .tm-node.type-center .tm-node-icon { font-size:18px; }
 .tm-node-name { font-size:8px; color:#cc5555; letter-spacing:1px; text-align:center; margin-top:2px; pointer-events:none; max-width:54px; line-height:1.2; }
-.tm-node.type-spell .tm-node-name { max-width:56px; font-size:7.5px; }
+.tm-node.type-spell .tm-node-name { display:none; } /* spell names live in the hover tooltip */
 .tm-node.type-center .tm-node-name { color:#aa88ee; max-width:60px; }
 .tm-node.type-spell.state-purchased .tm-node-name { color:#ff4444; }
 .tm-node.type-spell.state-affordable .tm-node-name { color:#ee3333; }
@@ -5516,7 +5518,7 @@ function renderTatteredGrid(){
       if(spImgSrc){
         var spImg=document.createElement('img');
         spImg.src=spImgSrc;
-        spImg.style.cssText='width:32px;height:32px;image-rendering:pixelated;display:block;position:relative;top:5px;';
+        spImg.style.cssText='width:32px;height:32px;image-rendering:pixelated;display:block;';
         if(state==='locked') spImg.style.opacity='0.35';
         icon.appendChild(spImg);
       } else { icon.textContent=node.icon; }
