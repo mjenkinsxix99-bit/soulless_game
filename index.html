@@ -3068,6 +3068,14 @@ function calcNonEliteMpRefund(){
   return refund;
 }
 
+// Base 7% capture chance, +1% for each earned "Minions Released" honor.
+var MINION_RELEASE_HONOR_IDS=['minion-released-1','minion-released-10','minion-released-25','minion-released-50','minion-released-100'];
+function getMinionCatchChance(){
+  var bonus=0;
+  for(var i=0;i<MINION_RELEASE_HONOR_IDS.length;i++){ if(achievementsEarned.indexOf(MINION_RELEASE_HONOR_IDS[i])>=0) bonus+=0.01; }
+  return 0.07+bonus;
+}
+
 function checkMinionUnlock(){
   if(minionUnlocked) return;
   var formUlts=['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-canine','form-ult-feline','form-ult-equine'];
@@ -3087,7 +3095,7 @@ function attemptMinionCapture(typeIdx){
   if(captureTargets.indexOf(typeIdx)<0) return;
   var cost=getMinionCostForType(typeIdx);
   if(minionPoints<cost) return;
-  if(Math.random()>0.07) return;
+  if(Math.random()>getMinionCatchChance()) return;
   minionPoints-=cost;
   captureTargets.splice(captureTargets.indexOf(typeIdx),1); // deselect after successful capture
   minionSlots.push({typeIdx:typeIdx,level:1,xp:0,isElite:false});
@@ -3097,6 +3105,7 @@ function attemptMinionCapture(typeIdx){
   updateMinionClickerDock();
   if(discoveredMinions.indexOf(typeIdx)<0) discoveredMinions.push(typeIdx);
   showMinionCaptureNotif(typeIdx);
+  checkAchievements(); // "minions at once" / elite-held honors
   renderMinionModal();
   saveGame();
 }
@@ -3125,8 +3134,10 @@ function releaseMinion(typeIdx){
   if(slotIdx===-1) return;
   var refund=getMinionCostForType(minionSlots[slotIdx].typeIdx);
   minionSlots.splice(slotIdx,1);
+  minionsReleasedTotal++;
   clampMinionClickerAssignments();
   minionPoints+=refund;
+  checkAchievements(); // "minions released" honors (each grants +1% capture chance)
   renderMinionModal();
   saveGame();
 }
@@ -3371,7 +3382,7 @@ function updateCaptureSelectionUI(){
     if(releaseMode){
       ctEl.textContent='Click captured minions to release them';
     } else if(captureTargets.length){
-      ctEl.textContent='Targets: '+captureTargets.length+' — '+captureReservedMp()+' MP reserved (7% chance each)';
+      ctEl.textContent='Targets: '+captureTargets.length+' — '+captureReservedMp()+' MP reserved ('+(getMinionCatchChance()*100).toFixed(0)+'% chance each)';
     } else {
       ctEl.textContent='No capture target set';
     }
@@ -3521,6 +3532,8 @@ var releaseMode=false;
 var petMinionIdx=-1;
 var minionSlots=[];
 var minionUnlocked=false;
+var minionsReleasedTotal=0;   // lifetime minions released back to the wild
+var minionsSacrificedTotal=0; // lifetime minions sacrificed (mechanic not yet in game)
 var discoveredMinions=[];
 var elementStocks={earth:0,stone:0,metal:0,wood:0,plant:0,water:0,fire:0,research:0,holy:0,dark:0};
 var _lastElementTick=0;
@@ -4867,6 +4880,30 @@ var ACHIEVEMENTS=[
   {id:'elite-first-pete',      cat:'Elite Prey', name:'Gate Unguarded',          desc:'Defeat the Pete elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(97)>=0;}},
   {id:'elite-first-sara',      cat:'Elite Prey', name:'Radiance Dimmed',         desc:'Defeat the Sara elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(98)>=0;}},
   {id:'elite-first-steven',    cat:'Elite Prey', name:'Commander Fallen',        desc:'Defeat the Steven elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(99)>=0;}},
+  // Minions held at once
+  {id:'minion-1',    cat:'Minion Tamer', name:'First Familiar',      desc:'Capture your first minion',       check:function(){return minionSlots.length>=1;}},
+  {id:'minion-10',   cat:'Minion Tamer', name:'Growing Menagerie',   desc:'Hold 10 minions at once',         check:function(){return minionSlots.length>=10;}},
+  {id:'minion-25',   cat:'Minion Tamer', name:'Swarm Keeper',        desc:'Hold 25 minions at once',         check:function(){return minionSlots.length>=25;}},
+  {id:'minion-50',   cat:'Minion Tamer', name:'Legion Master',       desc:'Hold 50 minions at once',         check:function(){return minionSlots.length>=50;}},
+  {id:'minion-100',  cat:'Minion Tamer', name:'Master of a Hundred', desc:'Hold 100 minions at once',        check:function(){return minionSlots.length>=100;}},
+  // Elite minions held at once
+  {id:'elite-minion-1',   cat:'Elite Tamer', name:'First Ascended',        desc:'Hold your first Elite minion',         check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=1;}},
+  {id:'elite-minion-10',  cat:'Elite Tamer', name:'Ten Ascended',          desc:'Hold 10 Elite minions at once',        check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=10;}},
+  {id:'elite-minion-25',  cat:'Elite Tamer', name:'Elite Cohort',          desc:'Hold 25 Elite minions at once',        check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=25;}},
+  {id:'elite-minion-50',  cat:'Elite Tamer', name:'Elite Legion',          desc:'Hold 50 Elite minions at once',        check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=50;}},
+  {id:'elite-minion-100', cat:'Elite Tamer', name:'A Hundred Ascended',    desc:'Hold 100 Elite minions at once',       check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=100;}},
+  // Minions released — each honor grants +1% capture chance
+  {id:'minion-released-1',   cat:'Minion Liberator', name:'Set One Free',      desc:'Release a minion. +1% capture chance.',           check:function(){return minionsReleasedTotal>=1;}},
+  {id:'minion-released-10',  cat:'Minion Liberator', name:'Merciful Hand',     desc:'Release 10 minions. +1% capture chance.',         check:function(){return minionsReleasedTotal>=10;}},
+  {id:'minion-released-25',  cat:'Minion Liberator', name:'Open Cages',        desc:'Release 25 minions. +1% capture chance.',         check:function(){return minionsReleasedTotal>=25;}},
+  {id:'minion-released-50',  cat:'Minion Liberator', name:'Great Liberation',  desc:'Release 50 minions. +1% capture chance.',         check:function(){return minionsReleasedTotal>=50;}},
+  {id:'minion-released-100', cat:'Minion Liberator', name:'Freedom for All',   desc:'Release 100 minions. +1% capture chance.',        check:function(){return minionsReleasedTotal>=100;}},
+  // Minions sacrificed — mechanic not yet in game (unearnable for now)
+  {id:'minion-sacrificed-1',   cat:'Minion Sacrifice', name:'First Offering',    desc:'Sacrifice a minion',        check:function(){return minionsSacrificedTotal>=1;}},
+  {id:'minion-sacrificed-10',  cat:'Minion Sacrifice', name:'Ten Offerings',     desc:'Sacrifice 10 minions',      check:function(){return minionsSacrificedTotal>=10;}},
+  {id:'minion-sacrificed-25',  cat:'Minion Sacrifice', name:'Bloodletting',      desc:'Sacrifice 25 minions',      check:function(){return minionsSacrificedTotal>=25;}},
+  {id:'minion-sacrificed-50',  cat:'Minion Sacrifice', name:'Rite of Ruin',      desc:'Sacrifice 50 minions',      check:function(){return minionsSacrificedTotal>=50;}},
+  {id:'minion-sacrificed-100', cat:'Minion Sacrifice', name:'Hundred Souls Given',desc:'Sacrifice 100 minions',     check:function(){return minionsSacrificedTotal>=100;}},
 ];
 
 function allSixFormsComplete(){
@@ -6138,6 +6175,8 @@ function saveGame(){
     minionPoints:minionPoints,
     minionSlots:minionSlots.slice(),
     minionUnlocked:minionUnlocked,
+    minionsReleasedTotal:minionsReleasedTotal,
+    minionsSacrificedTotal:minionsSacrificedTotal,
     captureTargets:captureTargets.slice(),
     releaseConfirmSuppressed:releaseConfirmSuppressed,
     petMinionIdx:petMinionIdx,
@@ -6253,6 +6292,8 @@ function loadGame(){
   if(data.minionPoints!==undefined) minionPoints=data.minionPoints;
   if(data.minionSlots) minionSlots=data.minionSlots;
   if(data.minionUnlocked) minionUnlocked=data.minionUnlocked;
+  minionsReleasedTotal=data.minionsReleasedTotal||0;
+  minionsSacrificedTotal=data.minionsSacrificedTotal||0;
   if(data.captureTargets) captureTargets=data.captureTargets;
   else if(data.captureTargetIdx!==undefined&&data.captureTargetIdx>=0) captureTargets=[data.captureTargetIdx];
   clampCaptureTargets(); // older saves could target beyond the MP budget
