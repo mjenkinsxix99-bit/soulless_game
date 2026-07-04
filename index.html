@@ -4213,13 +4213,25 @@ function augEffectLabel(u,i){
   return '×2 '+typeLabel+' (compounding)';
 }
 function getMsThresh(u,i){
+  // Augment ownership thresholds are FIXED — no bonus changes them. The
+  // "-% Augment cost" bonuses discount the soul cost instead (see augCost).
   var arr=(u&&u.augThresh)||augThreshFor(u);
   var t=arr[i];
-  if(t===undefined) return Infinity;
-  if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*(1-0.10*getFormMult())));
-  else if(achievementsEarned.indexOf('form-ult-equine')>=0) t=Math.max(1,Math.floor(t*0.90));
-  if(ascension4Path==='mystic') t=Math.max(1,Math.floor(t*0.95));
-  return t;
+  return t===undefined?Infinity:t;
+}
+// "-% Augment cost" bonuses (Equine form, ascension-4 Mystic path) reduce the
+// SOUL cost to activate an augment once its ownership threshold is met.
+function augCostMult(){
+  var m=1;
+  if(rebirthForm==='equine') m*=(1-0.10*getFormMult());
+  else if(achievementsEarned.indexOf('form-ult-equine')>=0) m*=0.90;
+  if(ascension4Path==='mystic') m*=0.95;
+  return Math.max(0.1,m);
+}
+function augCost(u,i){
+  var base=u.milestoneCosts[i];
+  var m=augCostMult();
+  return m>=1?base:base.mul(m).ceil();
 }
 var MS_LABELS=['Augment I','Augment II','Augment III','Augment IV','Augment V','Augment VI','Augment VII','Augment VIII','Augment IX','Augment X'];
 // Augment box colors by slot: 1 purple, 2 red, 3 green, 4 gold, 5 white.
@@ -4349,7 +4361,7 @@ function showMsTip(evt,u,i){
   var costEl=tip.querySelector('.mst-cost');
   if(costEl){
     if(!lit && avail){
-      var msCost=u.milestoneCosts[i];
+      var msCost=augCost(u,i);
       var canAfford=souls.gte(msCost);
       costEl.textContent='Cost: '+fmt(msCost)+' souls';
       costEl.style.color=canAfford?'#88ddaa':'#dd6666';
@@ -6529,7 +6541,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
       e.stopPropagation();
       if(u.milestones[mi]) return;
       if(u.level>=getMsThresh(u,mi)){
-        var msCost=u.milestoneCosts[mi];
+        var msCost=augCost(u,mi);
         if(!souls.gte(msCost)) return;
         souls=souls.sub(msCost);
         document.getElementById('soul-count').textContent=fmt(souls);
@@ -8730,7 +8742,7 @@ function buyAllAffordable(auto){
   REP_UPGRADES.forEach(function(u){
     for(var mi=0;mi<u.milestones.length;mi++){
       if(!u.milestones[mi]&&u.level>=getMsThresh(u,mi)){
-        augments.push({u:u,mi:mi,cost:u.milestoneCosts[mi]});
+        augments.push({u:u,mi:mi,cost:augCost(u,mi)});
       }
     }
   });
