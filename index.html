@@ -17,6 +17,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 @media (orientation: portrait) and (max-width: 900px) { #rotate-overlay { display: flex; } }
 #touch-hint-toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: rgba(9,9,15,0.92); border: 1px solid #3a2e6e; border-radius: 8px; padding: 10px 18px; color: #d0c4ff; font-family: Georgia,serif; font-size: 13px; letter-spacing: 1px; text-align: center; pointer-events: none; opacity: 0; transition: opacity 0.5s; z-index: 9999; white-space: nowrap; }
 #touch-hint-toast.show { opacity: 1; }
+#realm-toast { position: fixed; top: 96px; left: 50%; transform: translateX(-50%); background: rgba(9,8,0,0.92); border: 1px solid #d4a843; border-radius: 8px; padding: 9px 22px; color: #ffd700; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; text-align: center; pointer-events: none; opacity: 0; transition: opacity 0.6s; z-index: 9999; white-space: nowrap; text-shadow: 0 0 10px rgba(255,215,0,0.7); box-shadow: 0 0 16px rgba(212,168,67,0.35); }
+#realm-toast.show { opacity: 1; }
 #topbar { display: flex; align-items: center; gap: 20px; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; position: relative; }
 .title { font-size: 27px; letter-spacing: 4px; color: #d0c4ff; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
 #souls-display { text-align: center; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
@@ -1191,6 +1193,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
   <p>ROTATE YOUR DEVICE<br>TO PLAY SOULLESS</p>
 </div>
 <div id="touch-hint-toast">Long-press nodes &amp; icons to view details</div>
+<div id="realm-toast"></div>
 <div id="game">
   <div id="topbar">
     <div class="title">SOULLESS</div>
@@ -1951,6 +1954,29 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
   <div id="changelog-box">
     <div id="changelog-title">Soulless Changelog</div>
     <div id="changelog-body">
+      <div class="changelog-version-header">v 1.64</div>
+      <h3>Floor &amp; Realm Progression</h3>
+      <ul>
+        <li>Removed the delay between floors when auto-progressing.</li>
+        <li>Elite → next-level and elite respawn delays reduced.</li>
+        <li>Removed the "Realm complete" banner and its 2.5s pause.</li>
+        <li>Fixed auto-progress hanging on the boundary elite when re-crossing an already-completed realm barrier.</li>
+      </ul>
+      <h3>Striker Honors</h3>
+      <ul>
+        <li>Click achievements now count all strike sources: manual clicks, Flurry spell strikes, and each minion clicker.</li>
+        <li>New strike tiers added: 10, 100, 666, and 5,000.</li>
+        <li>Strike achievements now grant a starting-souls bonus, applied on every new life.</li>
+      </ul>
+      <h3>Spells</h3>
+      <ul>
+        <li>Invoke Power button no longer keeps flashing after use.</li>
+        <li>Fixed spell tooltips blinking on the panel's refresh.</li>
+      </ul>
+      <h3>UI</h3>
+      <ul>
+        <li>Tabs now open at the top of their content; the Upgrades tab remembers your scroll position when you leave and return.</li>
+      </ul>
       <div class="changelog-version-header">v 1.63</div>
       <h3>Performance — Minion Clickers</h3>
       <ul>
@@ -3601,6 +3627,15 @@ function bgmStop(){
   if(_bgmAudio){ _bgmAudio.pause(); _bgmAudio=null; }
   _bgmRealm=-1;
 }
+var _realmToastTimer=null;
+function showRealmToast(clearedRealm){
+  var t=document.getElementById('realm-toast');
+  if(!t) return;
+  t.textContent='Cleared Realm '+clearedRealm;
+  t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
+  clearTimeout(_realmToastTimer);
+  _realmToastTimer=setTimeout(function(){ t.classList.remove('show'); },2600);
+}
 var eliteKillsTotal=0;
 var highestGlobalFloorEver=0;
 var achievementsEarned=[];
@@ -4003,10 +4038,20 @@ function updateEnemyDefeatsPanel(){
 }
 
 // ── COMBAT ────────────────────────────────────────────────────────────────────
-// isSpell: true when called by Flurry (skips click counter)
+// Register one strike toward the click counter & Striker achievements. Counts
+// every non-auto strike source: manual clicks, Flurry spell strikes, and minion
+// clicker strikes (each assigned clicker counts separately — see
+// minionClickerAttackEnemy). Passive DPS is not a click and is excluded.
+function registerClick(){
+  totalClicks++;
+  var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString();
+  checkAchievements();
+}
+// isAuto: passive strike, excluded from the click counter. isSpell (Flurry) now
+// counts as a click, so only isAuto is gated out here.
 function entityAttack(isAuto, isSpell){
   if(!combatActive||enemyDead) return;
-  if(!isAuto && !isSpell){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
+  if(!isAuto){ registerClick(); }
   if(!isAuto && combatAnim) attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
@@ -4103,7 +4148,6 @@ function onEnemyDeath(){
 
     if(curLevel>=LEVELS_PER_REALM&&curRealm===highestRealm){
       updateHighestFloor(); checkAchievements();
-      document.getElementById('click-hint').textContent='Realm '+curRealm+' complete! Advancing to Realm '+(curRealm+1)+'…';
       setTimeout(function(){
         curRealm++;
         if(curRealm>highestRealm) highestRealm=curRealm;
@@ -4119,14 +4163,19 @@ function onEnemyDeath(){
         bgmPlay(curRealm);
         saveGame();
         spawnEnemy();
-      }, 2500);
+        showRealmToast(curRealm-1);
+      }, 0);
       return;
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
     if(autoProgressEnabled&&curLevel<LEVELS_PER_REALM){
-      (function(nl){ setTimeout(function(){ navigateTo(nl,1); },1200); })(curLevel+1);
+      (function(nl){ setTimeout(function(){ navigateTo(nl,1); },400); })(curLevel+1);
+    } else if(autoProgressEnabled&&curLevel>=LEVELS_PER_REALM&&curRealm<highestRealm){
+      // Re-cleared the final elite of an already-completed realm — cross the
+      // realm barrier into the next realm without disturbing frontier progress.
+      (function(nr){ setTimeout(function(){ navigateTo(1,1,nr); },400); })(curRealm+1);
     } else {
-      setTimeout(spawnEnemy,1200);
+      setTimeout(spawnEnemy,400);
     }
 
   } else {
@@ -4148,8 +4197,8 @@ function onEnemyDeath(){
       }
     }
     if(autoProgressEnabled&&floorWins>=WINS_PER_FLOOR){
-      // Auto-advance to the next floor
-      (function(nl,nf){ setTimeout(function(){ navigateTo(nl,nf); },400); })(curLevel,curFloor+1);
+      // Auto-advance to the next floor (no delay)
+      (function(nl,nf){ setTimeout(function(){ navigateTo(nl,nf); },0); })(curLevel,curFloor+1);
     } else {
       // Stay on current floor until player clicks next room
       setTimeout(spawnEnemy,100);
@@ -4703,14 +4752,19 @@ function updateHighestFloor(){
 }
 
 var ACHIEVEMENTS=[
-  // Clicks
-  {id:'click-1k',      cat:'Striker',         name:'First Blood',             desc:'Strike 1,000 times',                          check:function(){return totalClicks>=1000;},      threshold:1000},
-  {id:'click-10k',     cat:'Striker',         name:'Unrelenting',             desc:'Strike 10,000 times',                         check:function(){return totalClicks>=10000;},     threshold:10000},
-  {id:'click-50k',     cat:'Striker',         name:'The Hungry Dark',         desc:'Strike 50,000 times',                         check:function(){return totalClicks>=50000;},     threshold:50000},
-  {id:'click-100k',    cat:'Striker',         name:'Ten Thousand Fists',      desc:'Strike 100,000 times',                        check:function(){return totalClicks>=100000;},    threshold:100000},
-  {id:'click-250k',    cat:'Striker',         name:'Endless Violence',        desc:'Strike 250,000 times',                        check:function(){return totalClicks>=250000;},    threshold:250000},
-  {id:'click-500k',    cat:'Striker',         name:'Half a Million Strikes',  desc:'Strike 500,000 times',                        check:function(){return totalClicks>=500000;},    threshold:500000},
-  {id:'click-1m',      cat:'Striker',         name:'A Million Graves',        desc:'Strike 1,000,000 times',                      check:function(){return totalClicks>=1000000;},   threshold:1000000},
+  // Clicks — each (past 10) grants a starting-souls bonus applied on every soft
+  // reset (ascension/descent/reincarnate). startSouls = souls to begin each life with.
+  {id:'click-10',      cat:'Striker',         name:'First Strike',            desc:'Strike 10 times',                                                check:function(){return totalClicks>=10;},        threshold:10},
+  {id:'click-100',     cat:'Striker',         name:'Bloodied Knuckles',       desc:'Strike 100 times — Start each life with 10 souls',               check:function(){return totalClicks>=100;},       threshold:100,     startSouls:10},
+  {id:'click-666',     cat:'Striker',         name:'Number of the Beast',     desc:'Strike 666 times — Start each life with 100 souls',              check:function(){return totalClicks>=666;},       threshold:666,     startSouls:100},
+  {id:'click-1k',      cat:'Striker',         name:'First Blood',             desc:'Strike 1,000 times — Start each life with 1,000 souls',          check:function(){return totalClicks>=1000;},      threshold:1000,    startSouls:1000},
+  {id:'click-5k',      cat:'Striker',         name:'Ceaseless Assault',       desc:'Strike 5,000 times — Start each life with 10,000 souls',         check:function(){return totalClicks>=5000;},      threshold:5000,    startSouls:10000},
+  {id:'click-10k',     cat:'Striker',         name:'Unrelenting',             desc:'Strike 10,000 times — Start each life with 1,000,000 souls',     check:function(){return totalClicks>=10000;},     threshold:10000,   startSouls:1000000},
+  {id:'click-50k',     cat:'Striker',         name:'The Hungry Dark',         desc:'Strike 50,000 times — Start each life with 2,500,000 souls',     check:function(){return totalClicks>=50000;},     threshold:50000,   startSouls:2500000},
+  {id:'click-100k',    cat:'Striker',         name:'Ten Thousand Fists',      desc:'Strike 100,000 times — Start each life with 5,000,000 souls',    check:function(){return totalClicks>=100000;},    threshold:100000,  startSouls:5000000},
+  {id:'click-250k',    cat:'Striker',         name:'Endless Violence',        desc:'Strike 250,000 times — Start each life with 10,000,000 souls',   check:function(){return totalClicks>=250000;},    threshold:250000,  startSouls:10000000},
+  {id:'click-500k',    cat:'Striker',         name:'Half a Million Strikes',  desc:'Strike 500,000 times — Start each life with 20,000,000 souls',   check:function(){return totalClicks>=500000;},    threshold:500000,  startSouls:20000000},
+  {id:'click-1m',      cat:'Striker',         name:'A Million Graves',        desc:'Strike 1,000,000 times — Start each life with 50,000,000 souls', check:function(){return totalClicks>=1000000;},   threshold:1000000, startSouls:50000000},
   // Upgrade purchases
   {id:'upg-100',       cat:'Scholar of Power',name:'Hungry for Power',        desc:'Purchase 100 upgrades',                       check:function(){return totalUpgradePurchases>=100;}},
   {id:'upg-250',       cat:'Scholar of Power',name:'The Habit of Growth',     desc:'Purchase 250 upgrades',                       check:function(){return totalUpgradePurchases>=250;}},
@@ -4943,6 +4997,20 @@ function getFormMult(){
   return m;
 }
 
+// Highest "start with souls" reward among earned Striker achievements. Granted on
+// every soft reset (ascension, descent, reincarnate). A hard reset wipes earned
+// achievements entirely, so the bonus is naturally 0 afterward.
+function startingSoulBonus(){
+  var best=D(0);
+  ACHIEVEMENTS.forEach(function(a){
+    if(a.startSouls&&achievementsEarned.indexOf(a.id)>=0){
+      var v=D(a.startSouls);
+      if(v.gt(best)) best=v;
+    }
+  });
+  return best;
+}
+
 function checkAchievements(silent){
   ACHIEVEMENTS.forEach(function(a){
     if(achievementsEarned.indexOf(a.id)<0&&a.check()){
@@ -5059,7 +5127,7 @@ var SPELL_IMGS = {
   'locked': 'data:image/webp;base64,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',
 };
 
-var APP_VERSION = '1.63';
+var APP_VERSION = '1.64';
 
 // ── SOUL SHOP ─────────────────────────────────────────────────────────────────
 // ── SPELLS ────────────────────────────────────────────────────────────────────
@@ -5152,28 +5220,62 @@ function updateManaBar(){
 function renderSpellPanel(){
   var panel=document.getElementById('spell-panel');
   if(!panel) return;
-  panel.querySelectorAll('.spell-btn').forEach(function(b){b.remove();});
-  SPELLS.forEach(function(spell){
+  // Build the button DOM once, then update in place on later calls. The panel
+  // refreshes every 500ms; rebuilding the buttons each time destroyed the node
+  // under the cursor, which reset the CSS :hover tooltip and made it blink.
+  var existing=panel.querySelectorAll('.spell-btn');
+  var build=existing.length!==SPELLS.length;
+  if(build){ existing.forEach(function(b){b.remove();}); }
+  SPELLS.forEach(function(spell,idx){
     var owned=soulShopOwned[spell.tsId]>=1;
     var isActive=isSpellActive(spell.id);
     var isInvoke=spell.id==='invokePower';
     var canCast=owned&&mana>=spell.manaCost&&(isInvoke?invokePowerStacks<10:!isActive);
-    var btn=document.createElement('button');
-    var cls='spell-btn';
-    if(!owned) cls+=' spell-locked';
-    else if(isActive||(isInvoke&&invokePowerStacks>0)) cls+=' spell-active-glow';
-    else if(canCast) cls+=' spell-lit';
-    else cls+=' spell-dim';
-    btn.className=cls;
-    btn.setAttribute('data-spell',spell.id);
+    var keyNum=idx+1;
     // Sprite image — locked state shows lock icon
     var imgKey=!owned?'locked':spell.id;
     var imgSrc=SPELL_IMGS[imgKey]||'';
-    var keyNum=SPELLS.indexOf(spell)+1;
-    btn.innerHTML=
-      '<img src="'+imgSrc+'" alt="'+spell.name+'" style="width:36px;height:36px;image-rendering:pixelated;display:block;">'+
-      '<span style="position:absolute;bottom:1px;right:3px;font-size:8px;color:#554477;font-family:monospace;line-height:1;">'+keyNum+'</span>';
-    btn.setAttribute('data-spell',spell.id);
+
+    var btn;
+    if(build){
+      btn=document.createElement('button');
+      btn.setAttribute('data-spell',spell.id);
+      btn.innerHTML=
+        '<img class="spell-img" alt="'+spell.name+'" style="width:36px;height:36px;image-rendering:pixelated;display:block;">'+
+        '<span style="position:absolute;bottom:1px;right:3px;font-size:8px;color:#554477;font-family:monospace;line-height:1;">'+keyNum+'</span>'+
+        '<div class="spell-tt">'+
+          '<div class="spell-tt-name">['+keyNum+'] '+spell.name+'</div>'+
+          '<div class="spell-tt-cost">'+spell.manaCost+' Mana</div>'+
+          '<div class="spell-tt-desc">'+spell.desc+'</div>'+
+          '<div class="spell-tt-dyn"></div>'+
+        '</div>';
+      // castSpell self-guards (mana/stacks/active), so the handler can be attached once.
+      btn.addEventListener('click',function(){castSpell(spell.id);});
+      (function(b){
+        var _slpt;
+        b.addEventListener('touchstart',function(){ _slpt=setTimeout(function(){ b.classList.add('spell-tt-open'); },500); },{passive:true});
+        b.addEventListener('touchend',function(){ clearTimeout(_slpt); b.classList.remove('spell-tt-open'); });
+        b.addEventListener('touchmove',function(){ clearTimeout(_slpt); });
+      })(btn);
+      panel.appendChild(btn);
+    } else {
+      btn=existing[idx];
+    }
+
+    // ── Dynamic state (updated every call, in place) ──
+    var cls='spell-btn';
+    if(!owned) cls+=' spell-locked';
+    // Invoke Power is a single-use, stackable buff (not a timed active spell), so it
+    // must not keep flashing after use — just show lit when castable / dim otherwise.
+    else if(isActive) cls+=' spell-active-glow';
+    else if(canCast) cls+=' spell-lit';
+    else cls+=' spell-dim';
+    if(btn.classList.contains('spell-tt-open')) cls+=' spell-tt-open'; // preserve touch-open
+    if(btn.className!==cls) btn.className=cls;
+
+    var img=btn.querySelector('.spell-img');
+    if(img&&img.getAttribute('src')!==imgSrc) img.setAttribute('src',imgSrc);
+
     var remaining='';
     if(isActive&&!isInvoke){
       var secs=Math.max(0,((spellEndTimes[spell.id]||0)-Date.now())/1000);
@@ -5181,21 +5283,9 @@ function renderSpellPanel(){
     }
     var stacksLine=isInvoke&&invokePowerStacks>0?'<div class="spell-tt-stacks">Stacks: '+invokePowerStacks+' / 10</div>':'';
     var lockedLine=!owned?'<div class="spell-tt-status" style="color:#775599;">Locked — purchase in the Sacrifice tab</div>':'';
-    btn.innerHTML+=
-      '<div class="spell-tt">'+
-        '<div class="spell-tt-name">['+keyNum+'] '+spell.name+'</div>'+
-        '<div class="spell-tt-cost">'+spell.manaCost+' Mana</div>'+
-        '<div class="spell-tt-desc">'+spell.desc+'</div>'+
-        remaining+stacksLine+lockedLine+
-      '</div>';
-    if(canCast){
-      btn.addEventListener('click',function(){castSpell(spell.id);});
-    }
-    var _slpt;
-    btn.addEventListener('touchstart',function(){ _slpt=setTimeout(function(){ btn.classList.add('spell-tt-open'); },500); },{passive:true});
-    btn.addEventListener('touchend',function(){ clearTimeout(_slpt); btn.classList.remove('spell-tt-open'); });
-    btn.addEventListener('touchmove',function(){ clearTimeout(_slpt); });
-    panel.appendChild(btn);
+    var dyn=btn.querySelector('.spell-tt-dyn');
+    var dynHtml=remaining+stacksLine+lockedLine;
+    if(dyn&&dyn.innerHTML!==dynHtml) dyn.innerHTML=dynHtml;
   });
 }
 
@@ -5924,7 +6014,8 @@ function doReincarnate(){
   minionPoints+=mp;
 
   // Full reset — same as ascension but also wipes TS and soulShop (except auto-progress)
-  souls=D(0); totalSouls=D(0);
+  var _startBonus=startingSoulBonus(); // Striker achievement reward — persists across soft resets
+  souls=_startBonus; totalSouls=_startBonus;
   curRealm=1; curLevel=1; curFloor=1; floorWins=0;
   highestRealm=1; highestLevel=1; highestFloor=1;
   highestGlobalFloorEver=0;
@@ -6049,7 +6140,8 @@ function doRebirthReset(chosenForm){
   tatteredSouls+=gain;
 
   // Reset all progress
-  souls=D(0); totalSouls=D(0);
+  var _startBonus=startingSoulBonus(); // Striker achievement reward — persists across soft resets
+  souls=_startBonus; totalSouls=_startBonus;
   curRealm=1; curLevel=1; curFloor=1; floorWins=0;
   highestRealm=1; highestLevel=1; highestFloor=1;
   highestGlobalFloorEver=0;
@@ -7568,6 +7660,7 @@ function minionClickerAttackEnemy(){
   if(avgLvl<=0) return;
   var dmg=clickDmgBonus.mul(avgLvl*0.0006435);
   if(dmg.lte(0)) return;
+  registerClick(); // each minion clicker strike counts toward Striker achievements
   var isCrit=false;
   if(critClickChance>0&&Math.random()<critClickChance){
     isCrit=true;
@@ -8607,15 +8700,25 @@ renderMinionClickerPlaced();
   setInterval(checkVersion, 5 * 60 * 1000); // then every 5 minutes
 })();
 
+// All panes share one scroll container. Remember each tab's scroll offset so
+// returning to a tab (e.g. Upgrades) lands where the player left off. Honors is
+// the exception — it always opens at the top.
+var _tabScrollPos={};
 document.querySelectorAll('.tab-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
     var tab=btn.getAttribute('data-tab');
+    var _tca=document.getElementById('tab-content-area');
+    // Save the outgoing tab's scroll position before switching.
+    var prevBtn=document.querySelector('.tab-btn.active');
+    if(_tca&&prevBtn){ _tabScrollPos[prevBtn.getAttribute('data-tab')]=_tca.scrollTop; }
     document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
     document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
     if(tab==='honors'){ renderAchievementsTab(); _achievementsTabDirty=false; }
     if(tab==='stats'){ updateEntityStatsPanel(); }
+    // Restore the tab's remembered scroll (Honors always opens at the top).
+    if(_tca){ _tca.scrollTop=(tab==='honors')?0:(_tabScrollPos[tab]||0); }
   });
 });
 
