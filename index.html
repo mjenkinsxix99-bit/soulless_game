@@ -5940,6 +5940,7 @@ function doReincarnate(){
   rebirthCount=0;
 
   recalcStats();
+  mana=manaMax; // start each run with a full mana bar (recalcStats set the cap)
   updateTatteredDisplay();
   updateTraitsRow();
   checkRebirthButton();
@@ -6081,6 +6082,7 @@ function doRebirthReset(chosenForm){
   _rebirthEntityOverride=chosenForm;
 
   recalcStats();
+  mana=manaMax; // start each run with a full mana bar (recalcStats set the cap)
   updateTatteredDisplay();
   updateTraitsRow();
   checkRebirthButton();
