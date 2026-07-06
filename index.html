@@ -4236,7 +4236,7 @@ function augEffectLabel(u,i){
   if(eff==='critmult')   return '+3.33× Critical Strike Damage';
   if(eff==='soulsabsorb')return '+22.2% Souls Absorbed';
   var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
-  return '×2 '+typeLabel+' (compounding)';
+  return '×2 '+typeLabel;
 }
 function getMsThresh(u,i){
   // Augment ownership thresholds are FIXED — no bonus changes them. The
