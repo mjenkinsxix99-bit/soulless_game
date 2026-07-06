@@ -4271,6 +4271,9 @@ var DV_MS_EFFECTS=[
 // Default upgrades get 4 augments; Spirit Slash and the special upgrades get 5.
 var AUG_THRESH_DEFAULT=[10,25,75,150];
 var AUG_THRESH_FIVE=[10,25,50,75,150];
+// Brimstone test: keeps the default four augments and adds a fifth at 175 owned
+// carrying the special 'allupgdps' effect (×1.333 to all upgrade DPS).
+var AUG_THRESH_BS=[10,25,75,150,175];
 var AUG_MULT=2; // each purchased 'mult' augment doubles the upgrade's output (compounding)
 // Special augments redistributed from the old Divine Hunger set. Each entry is a
 // per-slot effect list; 'mult' = normal ×2, others apply a global support effect.
@@ -4288,8 +4291,12 @@ var AUG_SPECIAL={
   st:['mult','mult','mult','dps2strike','mult'],
   dm:['mult','mult','mult','mult','dps2strike']
 };
-function augThreshFor(u){ return (u.id==='ss'||AUG_SPECIAL[u.id])?AUG_THRESH_FIVE:AUG_THRESH_DEFAULT; }
+function augThreshFor(u){
+  if(u.id==='bs') return AUG_THRESH_BS;
+  return (u.id==='ss'||AUG_SPECIAL[u.id])?AUG_THRESH_FIVE:AUG_THRESH_DEFAULT;
+}
 function augEffectsFor(u){
+  if(u.id==='bs') return ['mult','mult','mult','mult','allupgdps'];
   if(AUG_SPECIAL[u.id]) return AUG_SPECIAL[u.id].slice();
   return augThreshFor(u).map(function(){return 'mult';});
 }
@@ -4299,6 +4306,7 @@ function augEffectLabel(u,i){
   if(eff==='critchance') return '+6.66% Critical Strike Chance';
   if(eff==='critmult')   return '+3.33× Critical Strike Damage';
   if(eff==='soulsabsorb')return '+22.2% Souls Absorbed';
+  if(eff==='allupgdps')  return '×1.333 All Upgrade DPS';
   var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
   return '×2 '+typeLabel;
 }
@@ -4388,6 +4396,7 @@ function recalcStats(){
   // Special-effect augments (redistributed across upgrades). Tally every lit
   // non-'mult' augment and apply its support effect. DPS→strike conversion uses
   // the DPS accumulated so far (base + form/ascension bonuses).
+  var _allUpgDps=0;
   REP_UPGRADES.forEach(function(u){
     if(!u.augEffects) return;
     for(var i=0;i<u.milestones.length;i++){
@@ -4397,8 +4406,11 @@ function recalcStats(){
       else if(eff==='critchance') critClickChance+=0.0666;
       else if(eff==='critmult') critClickMult+=3.33;
       else if(eff==='soulsabsorb') soulAbsorbBonus+=0.222;
+      else if(eff==='allupgdps') _allUpgDps++;
     }
   });
+  // ×1.333 to all upgrade DPS per lit 'allupgdps' augment (Brimstone slot 5).
+  if(_allUpgDps>0) totalDps=totalDps.mul(D(1.333).pow(_allUpgDps));
   if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
   // Tattered Shop stat node bonuses
   var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
