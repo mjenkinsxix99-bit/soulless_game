@@ -5178,13 +5178,49 @@ function updateManaBar(){
 function renderSpellPanel(){
   var panel=document.getElementById('spell-panel');
   if(!panel) return;
-  panel.querySelectorAll('.spell-btn').forEach(function(b){b.remove();});
-  SPELLS.forEach(function(spell){
+  // Build the button DOM once, then update in place on later calls. The panel
+  // refreshes every 500ms; rebuilding the buttons each time destroyed the node
+  // under the cursor, which reset the CSS :hover tooltip and made it blink.
+  var existing=panel.querySelectorAll('.spell-btn');
+  var build=existing.length!==SPELLS.length;
+  if(build){ existing.forEach(function(b){b.remove();}); }
+  SPELLS.forEach(function(spell,idx){
     var owned=soulShopOwned[spell.tsId]>=1;
     var isActive=isSpellActive(spell.id);
     var isInvoke=spell.id==='invokePower';
     var canCast=owned&&mana>=spell.manaCost&&(isInvoke?invokePowerStacks<10:!isActive);
-    var btn=document.createElement('button');
+    var keyNum=idx+1;
+    // Sprite image — locked state shows lock icon
+    var imgKey=!owned?'locked':spell.id;
+    var imgSrc=SPELL_IMGS[imgKey]||'';
+
+    var btn;
+    if(build){
+      btn=document.createElement('button');
+      btn.setAttribute('data-spell',spell.id);
+      btn.innerHTML=
+        '<img class="spell-img" alt="'+spell.name+'" style="width:36px;height:36px;image-rendering:pixelated;display:block;">'+
+        '<span style="position:absolute;bottom:1px;right:3px;font-size:8px;color:#554477;font-family:monospace;line-height:1;">'+keyNum+'</span>'+
+        '<div class="spell-tt">'+
+          '<div class="spell-tt-name">['+keyNum+'] '+spell.name+'</div>'+
+          '<div class="spell-tt-cost">'+spell.manaCost+' Mana</div>'+
+          '<div class="spell-tt-desc">'+spell.desc+'</div>'+
+          '<div class="spell-tt-dyn"></div>'+
+        '</div>';
+      // castSpell self-guards (mana/stacks/active), so the handler can be attached once.
+      btn.addEventListener('click',function(){castSpell(spell.id);});
+      (function(b){
+        var _slpt;
+        b.addEventListener('touchstart',function(){ _slpt=setTimeout(function(){ b.classList.add('spell-tt-open'); },500); },{passive:true});
+        b.addEventListener('touchend',function(){ clearTimeout(_slpt); b.classList.remove('spell-tt-open'); });
+        b.addEventListener('touchmove',function(){ clearTimeout(_slpt); });
+      })(btn);
+      panel.appendChild(btn);
+    } else {
+      btn=existing[idx];
+    }
+
+    // ── Dynamic state (updated every call, in place) ──
     var cls='spell-btn';
     if(!owned) cls+=' spell-locked';
     // Invoke Power is a single-use, stackable buff (not a timed active spell), so it
@@ -5192,16 +5228,12 @@ function renderSpellPanel(){
     else if(isActive) cls+=' spell-active-glow';
     else if(canCast) cls+=' spell-lit';
     else cls+=' spell-dim';
-    btn.className=cls;
-    btn.setAttribute('data-spell',spell.id);
-    // Sprite image — locked state shows lock icon
-    var imgKey=!owned?'locked':spell.id;
-    var imgSrc=SPELL_IMGS[imgKey]||'';
-    var keyNum=SPELLS.indexOf(spell)+1;
-    btn.innerHTML=
-      '<img src="'+imgSrc+'" alt="'+spell.name+'" style="width:36px;height:36px;image-rendering:pixelated;display:block;">'+
-      '<span style="position:absolute;bottom:1px;right:3px;font-size:8px;color:#554477;font-family:monospace;line-height:1;">'+keyNum+'</span>';
-    btn.setAttribute('data-spell',spell.id);
+    if(btn.classList.contains('spell-tt-open')) cls+=' spell-tt-open'; // preserve touch-open
+    if(btn.className!==cls) btn.className=cls;
+
+    var img=btn.querySelector('.spell-img');
+    if(img&&img.getAttribute('src')!==imgSrc) img.setAttribute('src',imgSrc);
+
     var remaining='';
     if(isActive&&!isInvoke){
       var secs=Math.max(0,((spellEndTimes[spell.id]||0)-Date.now())/1000);
@@ -5209,21 +5241,9 @@ function renderSpellPanel(){
     }
     var stacksLine=isInvoke&&invokePowerStacks>0?'<div class="spell-tt-stacks">Stacks: '+invokePowerStacks+' / 10</div>':'';
     var lockedLine=!owned?'<div class="spell-tt-status" style="color:#775599;">Locked — purchase in the Sacrifice tab</div>':'';
-    btn.innerHTML+=
-      '<div class="spell-tt">'+
-        '<div class="spell-tt-name">['+keyNum+'] '+spell.name+'</div>'+
-        '<div class="spell-tt-cost">'+spell.manaCost+' Mana</div>'+
-        '<div class="spell-tt-desc">'+spell.desc+'</div>'+
-        remaining+stacksLine+lockedLine+
-      '</div>';
-    if(canCast){
-      btn.addEventListener('click',function(){castSpell(spell.id);});
-    }
-    var _slpt;
-    btn.addEventListener('touchstart',function(){ _slpt=setTimeout(function(){ btn.classList.add('spell-tt-open'); },500); },{passive:true});
-    btn.addEventListener('touchend',function(){ clearTimeout(_slpt); btn.classList.remove('spell-tt-open'); });
-    btn.addEventListener('touchmove',function(){ clearTimeout(_slpt); });
-    panel.appendChild(btn);
+    var dyn=btn.querySelector('.spell-tt-dyn');
+    var dynHtml=remaining+stacksLine+lockedLine;
+    if(dyn&&dyn.innerHTML!==dynHtml) dyn.innerHTML=dynHtml;
   });
 }
 
