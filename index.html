@@ -4126,7 +4126,7 @@ function onEnemyDeath(){
     if(autoProgressEnabled&&curLevel<LEVELS_PER_REALM){
       (function(nl){ setTimeout(function(){ navigateTo(nl,1); },400); })(curLevel+1);
     } else {
-      setTimeout(spawnEnemy,1200);
+      setTimeout(spawnEnemy,400);
     }
 
   } else {
