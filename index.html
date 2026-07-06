@@ -5187,7 +5187,9 @@ function renderSpellPanel(){
     var btn=document.createElement('button');
     var cls='spell-btn';
     if(!owned) cls+=' spell-locked';
-    else if(isActive||(isInvoke&&invokePowerStacks>0)) cls+=' spell-active-glow';
+    // Invoke Power is a single-use, stackable buff (not a timed active spell), so it
+    // must not keep flashing after use — just show lit when castable / dim otherwise.
+    else if(isActive) cls+=' spell-active-glow';
     else if(canCast) cls+=' spell-lit';
     else cls+=' spell-dim';
     btn.className=cls;
