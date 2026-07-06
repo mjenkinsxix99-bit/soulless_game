@@ -4124,7 +4124,7 @@ function onEnemyDeath(){
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
     if(autoProgressEnabled&&curLevel<LEVELS_PER_REALM){
-      (function(nl){ setTimeout(function(){ navigateTo(nl,1); },1200); })(curLevel+1);
+      (function(nl){ setTimeout(function(){ navigateTo(nl,1); },400); })(curLevel+1);
     } else {
       setTimeout(spawnEnemy,1200);
     }
@@ -4148,8 +4148,8 @@ function onEnemyDeath(){
       }
     }
     if(autoProgressEnabled&&floorWins>=WINS_PER_FLOOR){
-      // Auto-advance to the next floor
-      (function(nl,nf){ setTimeout(function(){ navigateTo(nl,nf); },400); })(curLevel,curFloor+1);
+      // Auto-advance to the next floor (no delay)
+      (function(nl,nf){ setTimeout(function(){ navigateTo(nl,nf); },0); })(curLevel,curFloor+1);
     } else {
       // Stay on current floor until player clicks next room
       setTimeout(spawnEnemy,100);
