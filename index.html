@@ -187,8 +187,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card { border:1px solid #1e1040; border-radius:8px; padding:8px 6px; text-align:center; background:#100828; cursor:pointer; transition:border-color 0.2s,background 0.2s,box-shadow 0.2s; display:flex; flex-direction:column; align-items:center; gap:4px; position:relative; }
 .mm-card:hover { border-color:#4433aa; background:#0a0520; }
 .mm-card-targeted { border-color:#9966ff !important; background:#0d0520 !important; box-shadow:0 0 10px rgba(150,80,255,0.4); }
-.mm-card-nomp { opacity:0.45; cursor:not-allowed; }
-.mm-card-nomp:hover { border-color:#1e1040; background:#100828; }
 .mm-card-discovered { border-color:#2a1a5a; }
 .mm-card-elite { border-color:#3a2800; }
 .mm-card-elite.mm-card-discovered { border-color:#d4a843; box-shadow:0 0 8px rgba(212,168,67,0.25); }
@@ -3348,7 +3346,7 @@ function renderMinionModal(){
             captureTargets.splice(sel,1);
           } else {
             // Selectable only while the remaining MP budget covers its cost
-            if(getMinionCostForType(captureIdx)>minionPoints-captureReservedMp()) return;
+            if(getMinionCostForType(captureIdx)>minionPoints-captureReservedMp()){ showCaptureMsg("Can't afford that right now."); return; }
             captureTargets.push(captureIdx);
           }
           updateCaptureSelectionUI();
@@ -3363,17 +3361,26 @@ function renderMinionModal(){
   updateCaptureSelectionUI();
 }
 
-// Refresh target highlights, budget-locked cards, and the header line in place
+// Brief header message (e.g. can't afford), auto-reverts to the normal status line
+var _captureMsgTimer=null;
+function showCaptureMsg(msg){
+  var ctEl=document.getElementById('mm-ct-display');
+  if(!ctEl) return;
+  ctEl.textContent=msg;
+  clearTimeout(_captureMsgTimer);
+  _captureMsgTimer=setTimeout(updateCaptureSelectionUI,1600);
+}
+
+// Refresh target highlights and the header line in place
 // (no modal rebuild, so the scroll position survives selection clicks)
 function updateCaptureSelectionUI(){
-  var remaining=minionPoints-captureReservedMp();
   document.querySelectorAll('.mm-card').forEach(function(c){
     var idx=parseInt(c.getAttribute('data-ei'),10);
     if(isNaN(idx)) return;
-    var sel=captureTargets.indexOf(idx)>=0;
-    c.classList.toggle('mm-card-targeted',sel);
-    // Budget dimming only applies while picking capture targets
-    c.classList.toggle('mm-card-nomp',!releaseMode&&!sel&&getMinionCostForType(idx)>remaining);
+    // Card brightness is driven purely by ownership (see renderMinionModal):
+    // never-had = silhouette, held = bright, had-but-lost = dimmed. MP must NOT
+    // affect it — only the targeted highlight is toggled here.
+    c.classList.toggle('mm-card-targeted',captureTargets.indexOf(idx)>=0);
   });
   var btn=document.getElementById('mm-release-btn');
   if(btn) btn.classList.toggle('active',releaseMode);
