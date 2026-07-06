@@ -8677,18 +8677,25 @@ renderMinionClickerPlaced();
   setInterval(checkVersion, 5 * 60 * 1000); // then every 5 minutes
 })();
 
+// All panes share one scroll container. Remember each tab's scroll offset so
+// returning to a tab (e.g. Upgrades) lands where the player left off. Honors is
+// the exception — it always opens at the top.
+var _tabScrollPos={};
 document.querySelectorAll('.tab-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
     var tab=btn.getAttribute('data-tab');
+    var _tca=document.getElementById('tab-content-area');
+    // Save the outgoing tab's scroll position before switching.
+    var prevBtn=document.querySelector('.tab-btn.active');
+    if(_tca&&prevBtn){ _tabScrollPos[prevBtn.getAttribute('data-tab')]=_tca.scrollTop; }
     document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
     document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
-    // All panes share one scroll container; reset to the top so a tab always
-    // opens at the top rather than inheriting the previous tab's scroll offset.
-    var _tca=document.getElementById('tab-content-area'); if(_tca) _tca.scrollTop=0;
     if(tab==='honors'){ renderAchievementsTab(); _achievementsTabDirty=false; }
     if(tab==='stats'){ updateEntityStatsPanel(); }
+    // Restore the tab's remembered scroll (Honors always opens at the top).
+    if(_tca){ _tca.scrollTop=(tab==='honors')?0:(_tabScrollPos[tab]||0); }
   });
 });
 
