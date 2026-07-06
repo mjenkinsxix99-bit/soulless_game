@@ -4137,6 +4137,10 @@ function onEnemyDeath(){
     // Stay on elite floor — respawn for farming; click minimap to advance
     if(autoProgressEnabled&&curLevel<LEVELS_PER_REALM){
       (function(nl){ setTimeout(function(){ navigateTo(nl,1); },400); })(curLevel+1);
+    } else if(autoProgressEnabled&&curLevel>=LEVELS_PER_REALM&&curRealm<highestRealm){
+      // Re-cleared the final elite of an already-completed realm — cross the
+      // realm barrier into the next realm without disturbing frontier progress.
+      (function(nr){ setTimeout(function(){ navigateTo(1,1,nr); },400); })(curRealm+1);
     } else {
       setTimeout(spawnEnemy,400);
     }
