@@ -4103,7 +4103,6 @@ function onEnemyDeath(){
 
     if(curLevel>=LEVELS_PER_REALM&&curRealm===highestRealm){
       updateHighestFloor(); checkAchievements();
-      document.getElementById('click-hint').textContent='Realm '+curRealm+' complete! Advancing to Realm '+(curRealm+1)+'…';
       setTimeout(function(){
         curRealm++;
         if(curRealm>highestRealm) highestRealm=curRealm;
@@ -4119,7 +4118,7 @@ function onEnemyDeath(){
         bgmPlay(curRealm);
         saveGame();
         spawnEnemy();
-      }, 2500);
+      }, 0);
       return;
     }
     // Stay on elite floor — respawn for farming; click minimap to advance
