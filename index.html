@@ -4015,10 +4015,20 @@ function updateEnemyDefeatsPanel(){
 }
 
 // ── COMBAT ────────────────────────────────────────────────────────────────────
-// isSpell: true when called by Flurry (skips click counter)
+// Register one strike toward the click counter & Striker achievements. Counts
+// every non-auto strike source: manual clicks, Flurry spell strikes, and minion
+// clicker strikes (each assigned clicker counts separately — see
+// minionClickerAttackEnemy). Passive DPS is not a click and is excluded.
+function registerClick(){
+  totalClicks++;
+  var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString();
+  checkAchievements();
+}
+// isAuto: passive strike, excluded from the click counter. isSpell (Flurry) now
+// counts as a click, so only isAuto is gated out here.
 function entityAttack(isAuto, isSpell){
   if(!combatActive||enemyDead) return;
-  if(!isAuto && !isSpell){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
+  if(!isAuto){ registerClick(); }
   if(!isAuto && combatAnim) attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
@@ -7584,6 +7594,7 @@ function minionClickerAttackEnemy(){
   if(avgLvl<=0) return;
   var dmg=clickDmgBonus.mul(avgLvl*0.0006435);
   if(dmg.lte(0)) return;
+  registerClick(); // each minion clicker strike counts toward Striker achievements
   var isCrit=false;
   if(critClickChance>0&&Math.random()<critClickChance){
     isCrit=true;
