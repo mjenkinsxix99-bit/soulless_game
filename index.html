@@ -188,6 +188,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card:hover { border-color:#4433aa; background:#0a0520; }
 .mm-card-targeted { border-color:#9966ff !important; background:#0d0520 !important; box-shadow:0 0 10px rgba(150,80,255,0.4); }
 .mm-card-discovered { border-color:#2a1a5a; }
+#capture-msg-float { position:fixed; z-index:10000; transform:translate(-50%,-150%); background:rgba(28,8,14,0.96); border:1px solid #cc2222; color:#ff6666; font-family:Georgia,serif; font-size:12px; letter-spacing:0.5px; padding:5px 11px; border-radius:5px; pointer-events:none; white-space:nowrap; opacity:0; transition:opacity 0.15s ease; box-shadow:0 0 10px rgba(200,40,40,0.4); }
+#capture-msg-float.show { opacity:1; }
 .mm-card-elite { border-color:#3a2800; }
 .mm-card-elite.mm-card-discovered { border-color:#d4a843; box-shadow:0 0 8px rgba(212,168,67,0.25); }
 .mm-card-elite:hover { border-color:#e8c050; box-shadow:0 0 14px rgba(212,168,67,0.4); }
@@ -3336,7 +3338,7 @@ function renderMinionModal(){
 
       // Click = release (if in release mode and held) or toggle as capture target
       (function(captureIdx, cardEl, heldMinionRef){
-        cardEl.addEventListener('click',function(){
+        cardEl.addEventListener('click',function(e){
           if(releaseMode){
             if(heldMinionRef) requestReleaseMinion(captureIdx);
             return; // empty cards do nothing; the button toggles the mode off
@@ -3346,7 +3348,7 @@ function renderMinionModal(){
             captureTargets.splice(sel,1);
           } else {
             // Selectable only while the remaining MP budget covers its cost
-            if(getMinionCostForType(captureIdx)>minionPoints-captureReservedMp()){ showCaptureMsg("Can't afford that right now."); return; }
+            if(getMinionCostForType(captureIdx)>minionPoints-captureReservedMp()){ showCaptureMsg("Can't afford that right now.",e.clientX,e.clientY); return; }
             captureTargets.push(captureIdx);
           }
           updateCaptureSelectionUI();
@@ -3361,14 +3363,18 @@ function renderMinionModal(){
   updateCaptureSelectionUI();
 }
 
-// Brief header message (e.g. can't afford), auto-reverts to the normal status line
+// Brief floating message at the cursor (e.g. can't afford), fades out
 var _captureMsgTimer=null;
-function showCaptureMsg(msg){
-  var ctEl=document.getElementById('mm-ct-display');
-  if(!ctEl) return;
-  ctEl.textContent=msg;
+function showCaptureMsg(msg,x,y){
+  var el=document.getElementById('capture-msg-float');
+  if(!el){ el=document.createElement('div'); el.id='capture-msg-float'; document.body.appendChild(el); }
+  el.textContent=msg;
+  el.style.left=x+'px';
+  el.style.top=y+'px';
+  // reflow so the fade-in restarts even on rapid repeat clicks
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   clearTimeout(_captureMsgTimer);
-  _captureMsgTimer=setTimeout(updateCaptureSelectionUI,1600);
+  _captureMsgTimer=setTimeout(function(){ el.classList.remove('show'); },1300);
 }
 
 // Refresh target highlights and the header line in place
