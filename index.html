@@ -4729,14 +4729,19 @@ function updateHighestFloor(){
 }
 
 var ACHIEVEMENTS=[
-  // Clicks
-  {id:'click-1k',      cat:'Striker',         name:'First Blood',             desc:'Strike 1,000 times',                          check:function(){return totalClicks>=1000;},      threshold:1000},
-  {id:'click-10k',     cat:'Striker',         name:'Unrelenting',             desc:'Strike 10,000 times',                         check:function(){return totalClicks>=10000;},     threshold:10000},
-  {id:'click-50k',     cat:'Striker',         name:'The Hungry Dark',         desc:'Strike 50,000 times',                         check:function(){return totalClicks>=50000;},     threshold:50000},
-  {id:'click-100k',    cat:'Striker',         name:'Ten Thousand Fists',      desc:'Strike 100,000 times',                        check:function(){return totalClicks>=100000;},    threshold:100000},
-  {id:'click-250k',    cat:'Striker',         name:'Endless Violence',        desc:'Strike 250,000 times',                        check:function(){return totalClicks>=250000;},    threshold:250000},
-  {id:'click-500k',    cat:'Striker',         name:'Half a Million Strikes',  desc:'Strike 500,000 times',                        check:function(){return totalClicks>=500000;},    threshold:500000},
-  {id:'click-1m',      cat:'Striker',         name:'A Million Graves',        desc:'Strike 1,000,000 times',                      check:function(){return totalClicks>=1000000;},   threshold:1000000},
+  // Clicks — each (past 10) grants a starting-souls bonus applied on every soft
+  // reset (ascension/descent/reincarnate). startSouls = souls to begin each life with.
+  {id:'click-10',      cat:'Striker',         name:'First Strike',            desc:'Strike 10 times',                                                check:function(){return totalClicks>=10;},        threshold:10},
+  {id:'click-100',     cat:'Striker',         name:'Bloodied Knuckles',       desc:'Strike 100 times — Start each life with 10 souls',               check:function(){return totalClicks>=100;},       threshold:100,     startSouls:10},
+  {id:'click-666',     cat:'Striker',         name:'Number of the Beast',     desc:'Strike 666 times — Start each life with 100 souls',              check:function(){return totalClicks>=666;},       threshold:666,     startSouls:100},
+  {id:'click-1k',      cat:'Striker',         name:'First Blood',             desc:'Strike 1,000 times — Start each life with 1,000 souls',          check:function(){return totalClicks>=1000;},      threshold:1000,    startSouls:1000},
+  {id:'click-5k',      cat:'Striker',         name:'Ceaseless Assault',       desc:'Strike 5,000 times — Start each life with 10,000 souls',         check:function(){return totalClicks>=5000;},      threshold:5000,    startSouls:10000},
+  {id:'click-10k',     cat:'Striker',         name:'Unrelenting',             desc:'Strike 10,000 times — Start each life with 1,000,000 souls',     check:function(){return totalClicks>=10000;},     threshold:10000,   startSouls:1000000},
+  {id:'click-50k',     cat:'Striker',         name:'The Hungry Dark',         desc:'Strike 50,000 times — Start each life with 2,500,000 souls',     check:function(){return totalClicks>=50000;},     threshold:50000,   startSouls:2500000},
+  {id:'click-100k',    cat:'Striker',         name:'Ten Thousand Fists',      desc:'Strike 100,000 times — Start each life with 5,000,000 souls',    check:function(){return totalClicks>=100000;},    threshold:100000,  startSouls:5000000},
+  {id:'click-250k',    cat:'Striker',         name:'Endless Violence',        desc:'Strike 250,000 times — Start each life with 10,000,000 souls',   check:function(){return totalClicks>=250000;},    threshold:250000,  startSouls:10000000},
+  {id:'click-500k',    cat:'Striker',         name:'Half a Million Strikes',  desc:'Strike 500,000 times — Start each life with 20,000,000 souls',   check:function(){return totalClicks>=500000;},    threshold:500000,  startSouls:20000000},
+  {id:'click-1m',      cat:'Striker',         name:'A Million Graves',        desc:'Strike 1,000,000 times — Start each life with 50,000,000 souls', check:function(){return totalClicks>=1000000;},   threshold:1000000, startSouls:50000000},
   // Upgrade purchases
   {id:'upg-100',       cat:'Scholar of Power',name:'Hungry for Power',        desc:'Purchase 100 upgrades',                       check:function(){return totalUpgradePurchases>=100;}},
   {id:'upg-250',       cat:'Scholar of Power',name:'The Habit of Growth',     desc:'Purchase 250 upgrades',                       check:function(){return totalUpgradePurchases>=250;}},
@@ -4967,6 +4972,20 @@ function getFormMult(){
   var m=formBonusMult;
   if(rebirthForm!==null&&allSixFormsComplete()) m*=2;
   return m;
+}
+
+// Highest "start with souls" reward among earned Striker achievements. Granted on
+// every soft reset (ascension, descent, reincarnate). A hard reset wipes earned
+// achievements entirely, so the bonus is naturally 0 afterward.
+function startingSoulBonus(){
+  var best=D(0);
+  ACHIEVEMENTS.forEach(function(a){
+    if(a.startSouls&&achievementsEarned.indexOf(a.id)>=0){
+      var v=D(a.startSouls);
+      if(v.gt(best)) best=v;
+    }
+  });
+  return best;
 }
 
 function checkAchievements(silent){
@@ -5972,7 +5991,8 @@ function doReincarnate(){
   minionPoints+=mp;
 
   // Full reset — same as ascension but also wipes TS and soulShop (except auto-progress)
-  souls=D(0); totalSouls=D(0);
+  var _startBonus=startingSoulBonus(); // Striker achievement reward — persists across soft resets
+  souls=_startBonus; totalSouls=_startBonus;
   curRealm=1; curLevel=1; curFloor=1; floorWins=0;
   highestRealm=1; highestLevel=1; highestFloor=1;
   highestGlobalFloorEver=0;
@@ -6097,7 +6117,8 @@ function doRebirthReset(chosenForm){
   tatteredSouls+=gain;
 
   // Reset all progress
-  souls=D(0); totalSouls=D(0);
+  var _startBonus=startingSoulBonus(); // Striker achievement reward — persists across soft resets
+  souls=_startBonus; totalSouls=_startBonus;
   curRealm=1; curLevel=1; curFloor=1; floorWins=0;
   highestRealm=1; highestLevel=1; highestFloor=1;
   highestGlobalFloorEver=0;
