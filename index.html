@@ -8663,6 +8663,9 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
+    // All panes share one scroll container; reset to the top so a tab always
+    // opens at the top rather than inheriting the previous tab's scroll offset.
+    var _tca=document.getElementById('tab-content-area'); if(_tca) _tca.scrollTop=0;
     if(tab==='honors'){ renderAchievementsTab(); _achievementsTabDirty=false; }
     if(tab==='stats'){ updateEntityStatsPanel(); }
   });
