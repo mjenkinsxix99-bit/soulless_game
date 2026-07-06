@@ -6,6 +6,10 @@
 - ALWAYS create a new branch at the start of each session before making any changes.
 - ALWAYS open a pull request to GitHub after pushing a branch, without waiting to be asked.
 
+## Changelog
+
+- Do NOT write changelog entries (or bump the version for them) until the user explicitly says to.
+
 ## Left Panel Background
 
 - The left panel background transform is permanently locked at `translateX(0px) translateY(-400px)` with `scale` driven by `REALM_BG_LEFT_SCALE` (all realms `1.15`).

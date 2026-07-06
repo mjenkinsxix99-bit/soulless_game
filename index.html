@@ -163,9 +163,21 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #mm-header-right { display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
 #mm-mp-display { font-size:14px; color:#bb77ff; font-family:Georgia,serif; }
 #mm-ct-display { font-size:11px; color:#664488; font-style:italic; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-#mm-release-btn { background:#cc0000; border:2px solid #ff2222; color:#000; font-size:12px; font-weight:bold; padding:3px 10px; border-radius:4px; cursor:pointer; letter-spacing:1px; font-family:Georgia,serif; transition:all 0.2s; }
-#mm-release-btn:hover { background:#ff2222; }
-#mm-release-btn.active { background:#ff4444; border-color:#ffaaaa; box-shadow:0 0 8px rgba(255,80,80,0.7); }
+#mm-release-btn { background:#000; border:2px solid #cc0000; color:#ff2222; font-size:12px; font-weight:bold; padding:3px 10px; border-radius:4px; cursor:pointer; letter-spacing:1px; font-family:Georgia,serif; transition:all 0.2s; }
+#mm-release-btn:hover { background:#1a0404; border-color:#ff2222; }
+#mm-release-btn.active { background:#cc0000; border-color:#ff2222; color:#000; box-shadow:0 0 8px rgba(255,80,80,0.7); }
+#mm-release-btn.active:hover { background:#ff2222; }
+#release-confirm-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:950; align-items:center; justify-content:center; }
+#release-confirm-modal.open { display:flex; }
+#release-confirm-box { background:#0a0a18; border:2px solid #cc0000; border-radius:10px; padding:24px 30px; max-width:420px; width:90%; text-align:center; font-family:Georgia,serif; }
+#release-confirm-text { font-size:15px; color:#ffaaaa; line-height:1.5; margin-bottom:14px; }
+#release-confirm-dns { font-size:12px; color:#886688; margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:6px; }
+#release-confirm-dns label { cursor:pointer; }
+#release-confirm-btns { display:flex; gap:12px; justify-content:center; }
+#release-confirm-yes { background:#cc0000; border:2px solid #ff2222; color:#000; font-weight:bold; padding:6px 18px; border-radius:4px; cursor:pointer; font-family:Georgia,serif; letter-spacing:1px; }
+#release-confirm-yes:hover { background:#ff2222; }
+#release-confirm-no { background:transparent; border:1px solid #554477; color:#9988cc; padding:6px 18px; border-radius:4px; cursor:pointer; font-family:Georgia,serif; letter-spacing:1px; }
+#release-confirm-no:hover { border-color:#8870cc; color:#c4b5fd; }
 #mm-close-btn { width:32px; height:32px; background:#880000; border:2px solid #cc0000; color:#000; font-size:18px; border-radius:5px; cursor:pointer; line-height:1; transition:all 0.2s; font-weight:bold; }
 #mm-close-btn:hover { background:#cc0000; border-color:#ff2222; }
 #mm-body { flex:1; overflow-y:auto; padding:16px 20px; }
@@ -176,6 +188,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card:hover { border-color:#4433aa; background:#0a0520; }
 .mm-card-targeted { border-color:#9966ff !important; background:#0d0520 !important; box-shadow:0 0 10px rgba(150,80,255,0.4); }
 .mm-card-discovered { border-color:#2a1a5a; }
+#capture-msg-float { position:fixed; z-index:10000; transform:translate(-50%,-150%); background:rgba(28,8,14,0.96); border:1px solid #cc2222; color:#ff6666; font-family:Georgia,serif; font-size:12px; letter-spacing:0.5px; padding:5px 11px; border-radius:5px; pointer-events:none; white-space:nowrap; opacity:0; transition:opacity 0.15s ease; box-shadow:0 0 10px rgba(200,40,40,0.4); }
+#capture-msg-float.show { opacity:1; }
 .mm-card-elite { border-color:#3a2800; }
 .mm-card-elite.mm-card-discovered { border-color:#d4a843; box-shadow:0 0 8px rgba(212,168,67,0.25); }
 .mm-card-elite:hover { border-color:#e8c050; box-shadow:0 0 14px rgba(212,168,67,0.4); }
@@ -580,9 +594,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1540; }
 .settings-row:last-of-type { border-bottom: none; }
 .settings-label { font-size: 15px; color: #9988bb; letter-spacing: 1px; }
-#intro-toggle, #tutorial-toggle { padding: 11px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
-#intro-toggle:hover, #tutorial-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
-#intro-toggle.muted, #tutorial-toggle.muted { border-color: #554477; color: #554477; }
+#intro-toggle, #tutorial-toggle, #combat-anim-toggle, #soul-drop-toggle { padding: 11px 18px; background: transparent; border: 1px solid #4433aa; color: #9988bb; font-family: Georgia,serif; font-size: 13px; cursor: pointer; border-radius: 4px; letter-spacing: 1px; min-width: 80px; transition: border-color 0.2s, color 0.2s; }
+#intro-toggle:hover, #tutorial-toggle:hover, #combat-anim-toggle:hover, #soul-drop-toggle:hover { border-color: #6655cc; color: #c0b0ff; }
+#intro-toggle.muted, #tutorial-toggle.muted, #combat-anim-toggle.muted, #soul-drop-toggle.muted { border-color: #554477; color: #554477; }
 #volume-slider { -webkit-appearance:none; appearance:none; width:130px; height:4px; border-radius:2px; background:linear-gradient(to right,#7755cc 0%,#7755cc var(--vp,70%),#2a1f44 var(--vp,70%),#2a1f44 100%); outline:none; cursor:pointer; vertical-align:middle; }
 #volume-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:14px; height:14px; border-radius:50%; background:#9977ee; border:2px solid #c0a8ff; cursor:pointer; }
 #volume-slider::-moz-range-thumb { width:14px; height:14px; border-radius:50%; background:#9977ee; border:2px solid #c0a8ff; cursor:pointer; }
@@ -706,9 +720,11 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #invoke-bar-fill.invoke-full { background:linear-gradient(to right,#2255cc,#aaccff); box-shadow:0 0 6px rgba(100,170,255,0.6); }
 #invoke-num { font-size:9px; color:#7a99cc; white-space:nowrap; }
 .spell-btn { width:44px; height:44px; border-radius:7px; border:1px solid #1a1535; background:#05040e; cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center; font-size:19px; line-height:1; flex-shrink:0; transition:border-color 0.2s,box-shadow 0.2s,opacity 0.2s; overflow:visible; }
+/* Owned/unlocked spells (any state except locked) get a white button fill */
+.spell-btn:not(.spell-locked) { background:#ffffff; }
 .spell-btn.spell-lit { border-color:#3355aa; box-shadow:0 0 7px rgba(50,90,200,0.3); opacity:1; }
-.spell-btn.spell-dim { border-color:#141230; opacity:0.35; cursor:default; }
-.spell-btn.spell-locked { border-color:#221a44; opacity:0.35; cursor:default; filter:grayscale(1); }
+.spell-btn.spell-dim { border-color:#141230; opacity:0.6; cursor:default; } /* owned but not enough mana — only slightly dimmed */
+.spell-btn.spell-locked { border-color:#221a44; cursor:default; } /* padlock already signals locked — no dimming */
 .spell-btn.spell-active-glow { border-color:#7799ee; box-shadow:0 0 12px rgba(90,140,255,0.7),0 0 26px rgba(70,120,255,0.35); animation:spellGlow 1s ease-in-out infinite; }
 @keyframes spellGlow { 0%,100%{box-shadow:0 0 10px rgba(90,140,255,0.6),0 0 22px rgba(70,120,255,0.3);} 50%{box-shadow:0 0 18px rgba(120,170,255,0.9),0 0 38px rgba(100,160,255,0.5);} }
 /* Tooltip opens upward from spell buttons */
@@ -749,7 +765,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tm-node.type-center.state-affordable .tm-node-ring { border-color:#8855cc; background:#0f0628; box-shadow:0 0 12px rgba(120,70,220,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
 /* spell nodes — red theme */
 .tm-node.type-spell .tm-node-ring { width:62px; height:62px; border-color:#771818; background:#120608; }
-.tm-node.type-spell.state-purchased .tm-node-ring { border-color:#ff3333; background:#200a08; box-shadow:0 0 12px rgba(255,60,60,0.55),0 0 28px rgba(200,40,40,0.25); }
+.tm-node.type-spell.state-purchased .tm-node-ring { border-color:#ff3333; background:#ffffff; box-shadow:0 0 12px rgba(255,60,60,0.55),0 0 28px rgba(200,40,40,0.25); }
 .tm-node.type-spell.state-affordable .tm-node-ring { border-color:#cc2222; background:#180808; box-shadow:0 0 8px rgba(200,40,40,0.4); animation:nodeAffordPulse 2s ease-in-out infinite; }
 .tm-node.type-spell.state-locked .tm-node-ring { border-color:#3a1010; opacity:0.5; cursor:default; }
 /* upgrade nodes */
@@ -789,7 +805,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tm-node-icon { font-size:16px; line-height:1; pointer-events:none; }
 .tm-node.type-center .tm-node-icon { font-size:18px; }
 .tm-node-name { font-size:8px; color:#cc5555; letter-spacing:1px; text-align:center; margin-top:2px; pointer-events:none; max-width:54px; line-height:1.2; }
-.tm-node.type-spell .tm-node-name { max-width:56px; font-size:7.5px; }
+.tm-node.type-spell .tm-node-name { display:none; } /* spell names live in the hover tooltip */
 .tm-node.type-center .tm-node-name { color:#aa88ee; max-width:60px; }
 .tm-node.type-spell.state-purchased .tm-node-name { color:#ff4444; }
 .tm-node.type-spell.state-affordable .tm-node-name { color:#ee3333; }
@@ -1849,6 +1865,20 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
   <div id="mm-body"></div>
 </div>
 
+<!-- Release Minion confirmation -->
+<div id="release-confirm-modal">
+  <div id="release-confirm-box">
+    <div id="release-confirm-text"></div>
+    <div id="release-confirm-dns">
+      <input type="checkbox" id="release-dns-chk"><label for="release-dns-chk">Do not show again</label>
+    </div>
+    <div id="release-confirm-btns">
+      <button id="release-confirm-yes">Release</button>
+      <button id="release-confirm-no">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Minion Capture Notification -->
 <div id="minion-capture-modal">
   <div id="mcm-name"></div>
@@ -1882,6 +1912,14 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       <span class="settings-label">Show Tutorial</span>
       <button id="tutorial-toggle">On</button>
     </div>
+    <div class="settings-row">
+      <span class="settings-label">Combat Animation</span>
+      <button id="combat-anim-toggle">On</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Soul Drop</span>
+      <button id="soul-drop-toggle">On</button>
+    </div>
     <div id="hard-reset-confirm">
       <p>This will wipe ALL progress. Are you certain?</p>
       <button id="hard-reset-yes">Wipe Everything</button>
@@ -1900,7 +1938,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     </div>
     <div id="promo-msg"></div>
     <div id="version-row">
-      <span id="version-label">version 1.62</span>
+      <span id="version-label">version 1.63</span>
       <button id="changelog-btn">Changelog</button>
     </div>
     <button id="hard-reset-btn">Hard Reset</button>
@@ -1913,6 +1951,40 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
   <div id="changelog-box">
     <div id="changelog-title">Soulless Changelog</div>
     <div id="changelog-body">
+      <div class="changelog-version-header">v 1.63</div>
+      <h3>Performance — Minion Clickers</h3>
+      <ul>
+        <li>Fixed heavy lag while minion clickers were active.</li>
+      </ul>
+      <h3>Honors</h3>
+      <ul>
+        <li>Fixed achievements not being rewarded.</li>
+      </ul>
+      <h3>Minions</h3>
+      <ul>
+        <li>Multiple minions can now be selected for capture, up to MP available.</li>
+        <li>Multiple minions can now be released with the Release Minion button, refunding MP.</li>
+        <li>Fixed minion portrait joining combat animation when not included.</li>
+        <li>20 new achievements</li>
+        <li>Fixed minion card brightness</li>
+      </ul>
+      <h3>Settings</h3>
+      <ul>
+        <li>Settings menu added toggles for animation, one for soul drop, one for attack flash.</li>
+      </ul>
+      <h3>Augments</h3>
+      <ul>
+        <li>Reworked to compounding ×2; 4 augments per upgrade at new unlock levels to keep upgrades relevant when affordable.</li>
+        <li>Redistributed the special effects</li>
+        <li>Recolored augment slots (purple / red / green / gold / white)</li>
+      </ul>
+      <h3>Spells</h3>
+      <ul>
+        <li>Owned spell buttons and purchased spell nodes now have a white background; spell node name labels removed</li>
+        <li>Spells dimmed when not enough mana</li>
+        <li>Full mana bar after ascension</li>
+      </ul>
+      <p style="margin-top:14px;font-style:italic;color:#c8a84b;font-size:12px;">Special thanks to u/Forward_Plantain2026, u/SummitSummit, and to Tiffany W.</p>
       <div class="changelog-version-header">v 1.62</div>
       <h3>Hotfix — Save / Load</h3>
       <ul>
@@ -2111,6 +2183,11 @@ var enemyDeathTime    = 0;
 var enemyHitFlashTime = 0;
 var attackFlashTime   = 0;
 var hitFlashTime      = 0;
+// Two independent visual toggles. combatAnim: click-hit squish on the entity
+// and enemy. soulDropAnim: the flying soul-drop coins. Both leave the enemy
+// death animation, damage, souls, and mana untouched.
+var combatAnim        = true;
+var soulDropAnim      = true;
 
 // Sparkle pool
 var entitySparkles = [];
@@ -2332,6 +2409,11 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   var W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
   if (!sheetLoaded) return;
+  // Compendium portraits reuse this enemy draw, but they aren't in combat —
+  // the hit squish/flash reads the shared enemyHitFlashTime, so without this
+  // guard every visible card would squish on each strike (a Flurry storm made
+  // all 100 pulse at once). The battlefield enemy and pet still animate.
+  var isPortrait = canvas.classList && canvas.classList.contains('mm-card-canvas');
   var sd = (spriteDims||VOID_SPRITE_DIMS)[spriteIdx];
   var _cw = cellW||VOID_SPRITE_CELL_W;
 
@@ -2356,7 +2438,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   // Hit squish: stretch wide, squish tall
   var scaleX = 1, scaleY = 1;
   var hitAge = t - enemyHitFlashTime;
-  if (!dead && hitAge < 300) {
+  if (!dead && hitAge < 300 && !isPortrait) {
     var hprog = hitAge / 300;
     scaleX = 1 + Math.sin(hprog * Math.PI) * 0.14;
     scaleY = 1 - Math.sin(hprog * Math.PI) * 0.18;
@@ -2426,7 +2508,7 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   }
 
   // White flash on hit
-  if (!dead && hitAge < 220) {
+  if (!dead && hitAge < 220 && !isPortrait) {
     var hf = 1 - hitAge / 220;
     ctx.filter = 'brightness(' + (1 + hf * 5) + ') saturate(' + (1 - hf * 0.8) + ')';
   } else if (elite && !dead) {
@@ -2987,10 +3069,26 @@ function getMinionCostForType(typeIdx){
   return MINION_REALM_COSTS[Math.floor(typeIdx/10)]||1;
 }
 
+function captureReservedMp(){
+  return captureTargets.reduce(function(s,t){ return s+getMinionCostForType(t); },0);
+}
+function clampCaptureTargets(){
+  // Drop the most recent selections until the reserved total fits the MP budget
+  while(captureTargets.length&&captureReservedMp()>minionPoints) captureTargets.pop();
+}
+
 function calcNonEliteMpRefund(){
   var refund=0;
   minionSlots.forEach(function(m){ if(!m.isElite) refund+=getMinionCostForType(m.typeIdx); });
   return refund;
+}
+
+// Base 7% capture chance, +1% for each earned "Minions Released" honor.
+var MINION_RELEASE_HONOR_IDS=['minion-released-1','minion-released-10','minion-released-25','minion-released-50','minion-released-100'];
+function getMinionCatchChance(){
+  var bonus=0;
+  for(var i=0;i<MINION_RELEASE_HONOR_IDS.length;i++){ if(achievementsEarned.indexOf(MINION_RELEASE_HONOR_IDS[i])>=0) bonus+=0.01; }
+  return 0.07+bonus;
 }
 
 function checkMinionUnlock(){
@@ -3009,16 +3107,20 @@ function updateMinionTabBtn(){
 
 function attemptMinionCapture(typeIdx){
   if(!minionUnlocked) return;
-  if(captureTargetIdx!==typeIdx) return;
+  if(captureTargets.indexOf(typeIdx)<0) return;
   var cost=getMinionCostForType(typeIdx);
   if(minionPoints<cost) return;
-  if(Math.random()>0.07) return;
+  if(Math.random()>getMinionCatchChance()) return;
   minionPoints-=cost;
-  captureTargetIdx=-1; // deselect after successful capture
+  captureTargets.splice(captureTargets.indexOf(typeIdx),1); // deselect after successful capture
   minionSlots.push({typeIdx:typeIdx,level:1,xp:0,isElite:false});
+  // MP shrank (and the free-first-capture discount may have ended) — drop any
+  // remaining selections the budget no longer covers
+  clampCaptureTargets();
   updateMinionClickerDock();
   if(discoveredMinions.indexOf(typeIdx)<0) discoveredMinions.push(typeIdx);
   showMinionCaptureNotif(typeIdx);
+  checkAchievements(); // "minions at once" / elite-held honors
   renderMinionModal();
   saveGame();
 }
@@ -3029,31 +3131,42 @@ function enterReleaseMode(){
     showTutorialTip('Releasing a minion will reset its level, return it to the wild, and refund the MP cost of that minion.',document.getElementById('mm-release-btn'),null);
   }
   releaseMode=true;
-  var btn=document.getElementById('mm-release-btn');
-  if(btn) btn.classList.add('active');
-  var ctEl=document.getElementById('mm-ct-display');
-  if(ctEl) ctEl.textContent='Click a captured minion to release it';
+  updateCaptureSelectionUI();
 }
 
 function exitReleaseMode(){
   releaseMode=false;
-  var btn=document.getElementById('mm-release-btn');
-  if(btn) btn.classList.remove('active');
   renderMinionModal();
 }
 
+// Release stays in release mode so several minions can be freed in a row;
+// only the Release Minion button toggles the mode off.
 function releaseMinion(typeIdx){
   var slotIdx=-1;
   for(var i=0;i<minionSlots.length;i++){
     if(minionSlots[i].typeIdx===typeIdx){ slotIdx=i; break; }
   }
-  if(slotIdx===-1){ exitReleaseMode(); return; }
+  if(slotIdx===-1) return;
   var refund=getMinionCostForType(minionSlots[slotIdx].typeIdx);
   minionSlots.splice(slotIdx,1);
+  minionsReleasedTotal++;
   clampMinionClickerAssignments();
   minionPoints+=refund;
-  exitReleaseMode();
+  checkAchievements(); // "minions released" honors (each grants +1% capture chance)
+  renderMinionModal();
   saveGame();
+}
+
+// Confirmation popup (skippable via "do not show again")
+var releaseConfirmSuppressed=false;
+var _pendingReleaseIdx=-1;
+function requestReleaseMinion(typeIdx){
+  if(releaseConfirmSuppressed){ releaseMinion(typeIdx); return; }
+  _pendingReleaseIdx=typeIdx;
+  var et=ENEMY_TYPES[typeIdx];
+  document.getElementById('release-confirm-text').textContent='Release '+(et?et.name:'this minion')+' back into the world? MP will be refunded and XP lost.';
+  document.getElementById('release-dns-chk').checked=false;
+  document.getElementById('release-confirm-modal').classList.add('open');
 }
 
 function setPetMinion(typeIdx){
@@ -3139,16 +3252,6 @@ function renderMinionModal(){
   var slotsEl=document.getElementById('mm-slots-val');
   if(slotsEl) slotsEl.textContent=minionSlots.length;
 
-  var ctEl=document.getElementById('mm-ct-display');
-  if(ctEl){
-    if(captureTargetIdx>=0&&captureTargetIdx<ENEMY_TYPES.length){
-      var nextCost=getMinionCostForType(captureTargetIdx);
-      ctEl.textContent='Target: '+ENEMY_TYPES[captureTargetIdx].name+' ('+nextCost+' MP, 7% chance)';
-    } else {
-      ctEl.textContent='No capture target set';
-    }
-  }
-
   var body=document.getElementById('mm-body');
   if(!body) return;
   body.innerHTML='';
@@ -3177,6 +3280,7 @@ function renderMinionModal(){
       var card=document.createElement('div');
       var isEliteType=et.isElite;
       card.className='mm-card'+(isEliteType?' mm-card-elite':'')+(discovered?' mm-card-discovered':'');
+      card.setAttribute('data-ei', String(idx));
 
       // Pet button (top-left of card)
       (function(petIdx, owned){
@@ -3247,31 +3351,69 @@ function renderMinionModal(){
       bonusEl.textContent=getMinionBonusDesc(md.bonus||'souls', heldMinion);
       card.appendChild(bonusEl);
 
-      // Click = release (if in release mode and held) or set as capture target
+      // Click = release (if in release mode and held) or toggle as capture target
       (function(captureIdx, cardEl, heldMinionRef){
-        cardEl.addEventListener('click',function(){
+        cardEl.addEventListener('click',function(e){
           if(releaseMode){
-            if(heldMinionRef) releaseMinion(captureIdx);
-            else exitReleaseMode();
-            return;
+            if(heldMinionRef) requestReleaseMinion(captureIdx);
+            return; // empty cards do nothing; the button toggles the mode off
           }
-          captureTargetIdx=captureIdx;
-          var ctE=document.getElementById('mm-ct-display');
-          if(ctE){
-            var nc=getMinionCostForType(captureIdx);
-            ctE.textContent='Target: '+ENEMY_TYPES[captureIdx].name+' ('+nc+' MP, 7% chance)';
+          var sel=captureTargets.indexOf(captureIdx);
+          if(sel>=0){
+            captureTargets.splice(sel,1);
+          } else {
+            // Selectable only while the remaining MP budget covers its cost
+            if(getMinionCostForType(captureIdx)>minionPoints-captureReservedMp()){ showCaptureMsg("Can't afford that right now.",e.clientX,e.clientY); return; }
+            captureTargets.push(captureIdx);
           }
-          document.querySelectorAll('.mm-card').forEach(function(c){c.classList.remove('mm-card-targeted');});
-          cardEl.classList.add('mm-card-targeted');
+          updateCaptureSelectionUI();
         });
       })(idx, card, heldMinion);
-
-      if(captureTargetIdx===idx) card.classList.add('mm-card-targeted');
 
       grid.appendChild(card);
     }
     section.appendChild(grid);
     body.appendChild(section);
+  }
+  updateCaptureSelectionUI();
+}
+
+// Brief floating message at the cursor (e.g. can't afford), fades out
+var _captureMsgTimer=null;
+function showCaptureMsg(msg,x,y){
+  var el=document.getElementById('capture-msg-float');
+  if(!el){ el=document.createElement('div'); el.id='capture-msg-float'; document.body.appendChild(el); }
+  el.textContent=msg;
+  el.style.left=x+'px';
+  el.style.top=y+'px';
+  // reflow so the fade-in restarts even on rapid repeat clicks
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  clearTimeout(_captureMsgTimer);
+  _captureMsgTimer=setTimeout(function(){ el.classList.remove('show'); },1300);
+}
+
+// Refresh target highlights and the header line in place
+// (no modal rebuild, so the scroll position survives selection clicks)
+function updateCaptureSelectionUI(){
+  document.querySelectorAll('.mm-card').forEach(function(c){
+    var idx=parseInt(c.getAttribute('data-ei'),10);
+    if(isNaN(idx)) return;
+    // Card brightness is driven purely by ownership (see renderMinionModal):
+    // never-had = silhouette, held = bright, had-but-lost = dimmed. MP must NOT
+    // affect it — only the targeted highlight is toggled here.
+    c.classList.toggle('mm-card-targeted',captureTargets.indexOf(idx)>=0);
+  });
+  var btn=document.getElementById('mm-release-btn');
+  if(btn) btn.classList.toggle('active',releaseMode);
+  var ctEl=document.getElementById('mm-ct-display');
+  if(ctEl){
+    if(releaseMode){
+      ctEl.textContent='Click captured minions to release them';
+    } else if(captureTargets.length){
+      ctEl.textContent='Targets: '+captureTargets.length+' — '+captureReservedMp()+' MP reserved ('+(getMinionCatchChance()*100).toFixed(0)+'% chance each)';
+    } else {
+      ctEl.textContent='No capture target set';
+    }
   }
 }
 
@@ -3413,11 +3555,13 @@ var currentAscensionKills=0;
 var eliteBountyTSEarned=0;
 var minionPoints=0;
 var redeemedCodes=[];
-var captureTargetIdx=-1;
+var captureTargets=[]; // typeIdx list; total cost is capped by available MP
 var releaseMode=false;
 var petMinionIdx=-1;
 var minionSlots=[];
 var minionUnlocked=false;
+var minionsReleasedTotal=0;   // lifetime minions released back to the wild
+var minionsSacrificedTotal=0; // lifetime minions sacrificed (mechanic not yet in game)
 var discoveredMinions=[];
 var elementStocks={earth:0,stone:0,metal:0,wood:0,plant:0,water:0,fire:0,research:0,holy:0,dark:0};
 var _lastElementTick=0;
@@ -3532,6 +3676,9 @@ function spawnSoulCoins(){
     mana=Math.min(manaMax,mana+_mg);
     updateManaBar();
   }
+  // Everything below is the flying soul-coin animation only — mana above still
+  // accrues, and the actual soul reward is granted in onEnemyDeath regardless.
+  if(!soulDropAnim) return;
   var d=def(); if(!d) return;
   var ec=d.color; var r=ec[0],g=ec[1],b=ec[2]; var cs=r+','+g+','+b;
   var lr=Math.min(r+90,255), lg=Math.min(g+90,255), lb=Math.min(b+90,255);
@@ -3860,7 +4007,7 @@ function updateEnemyDefeatsPanel(){
 function entityAttack(isAuto, isSpell){
   if(!combatActive||enemyDead) return;
   if(!isAuto && !isSpell){ totalClicks++; var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString(); checkAchievements(); }
-  if(!isAuto) attackFlashTime=Date.now();
+  if(!isAuto && combatAnim) attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
   var hi=entityDmgMax.add(entityDmgBonus).add(bonus);
@@ -3878,7 +4025,7 @@ function entityAttack(isAuto, isSpell){
   // Spell: Invoke Power — multiply all damage by (1 + stacks × 0.0666)
   if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
-  enemyHitFlashTime=Date.now();
+  if(combatAnim) enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
   spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
@@ -3966,6 +4113,7 @@ function onEnemyDeath(){
         enemyPool=[((curRealm-1) % REALM_NAMES.length)*LEVELS_PER_REALM];
         minimapNewFloor=false;
         updateHighestFloor();
+        checkAchievements(); // Realm Walker honors key off highestRealm, set just above
         buildMinimap();
         updateProgressLabel();
         bgmPlay(curRealm);
@@ -4012,7 +4160,10 @@ function onEnemyDeath(){
   buildMinimap();
   updateProgressLabel();
   updateHighestFloor(); checkAchievements();
-  saveGame();
+  // Elite kills are rare progress milestones — persist those immediately.
+  // Regular kills can stream in several times a second with clicker minions
+  // assigned to the enemy, so batch their saves.
+  if(isEliteFight()) saveGame(); else throttledSave();
 }
 
 function onEliteDpsCheckFail(){
@@ -4066,31 +4217,81 @@ var DV_MS_EFFECTS=[
   '+0.666% of Total DPS as Strike Damage',
 ];
 
-var MS_THRESH=[10,20,35,50,65,80,100,130,167,199];
-function getMsThresh(i){
-  var t=MS_THRESH[i];
-  if(rebirthForm==='equine') t=Math.max(1,Math.floor(t*(1-0.10*getFormMult())));
-  else if(achievementsEarned.indexOf('form-ult-equine')>=0) t=Math.max(1,Math.floor(t*0.90));
-  if(ascension4Path==='mystic') t=Math.max(1,Math.floor(t*0.95));
-  return t;
+// Augment system: most augments are a ×2 (compounding) damage multiplier
+// ('mult'), but some upgrades carry a special-effect augment in one slot.
+// Default upgrades get 4 augments; Spirit Slash and the special upgrades get 5.
+var AUG_THRESH_DEFAULT=[10,25,75,150];
+var AUG_THRESH_FIVE=[10,25,50,75,150];
+var AUG_MULT=2; // each purchased 'mult' augment doubles the upgrade's output (compounding)
+// Special augments redistributed from the old Divine Hunger set. Each entry is a
+// per-slot effect list; 'mult' = normal ×2, others apply a global support effect.
+// Effect values: dps2strike +0.666% of Total DPS as Strike, critchance +6.66%,
+// critmult +3.33×, soulsabsorb +22.2%.
+var AUG_SPECIAL={
+  dh:['mult','mult','mult','dps2strike','mult'],
+  sl:['mult','mult','mult','mult','dps2strike'],
+  dv:['mult','mult','mult','soulsabsorb','mult'],
+  bb:['mult','mult','mult','dps2strike','mult'],
+  ee:['mult','mult','mult','mult','critchance'],
+  cs:['mult','mult','mult','dps2strike','mult'],
+  sg:['mult','mult','mult','mult','dps2strike'],
+  sk:['mult','mult','mult','mult','critmult'],
+  st:['mult','mult','mult','dps2strike','mult'],
+  dm:['mult','mult','mult','mult','dps2strike']
+};
+function augThreshFor(u){ return (u.id==='ss'||AUG_SPECIAL[u.id])?AUG_THRESH_FIVE:AUG_THRESH_DEFAULT; }
+function augEffectsFor(u){
+  if(AUG_SPECIAL[u.id]) return AUG_SPECIAL[u.id].slice();
+  return augThreshFor(u).map(function(){return 'mult';});
 }
-var MS_MULT=[1.777,1.777,1.666,1.777,1.777,1.777,1.666,1.777,1.777,1.999];
-var MS_MULT_LABELS=['+77.7%','+77.7%','+66.6%','+77.7%','+77.7%','+77.7%','+66.6%','+77.7%','+77.7%','+99.9%'];
+function augEffectLabel(u,i){
+  var eff=u.augEffects?u.augEffects[i]:'mult';
+  if(eff==='dps2strike') return '+0.666% of Total DPS as Strike Damage';
+  if(eff==='critchance') return '+6.66% Critical Strike Chance';
+  if(eff==='critmult')   return '+3.33× Critical Strike Damage';
+  if(eff==='soulsabsorb')return '+22.2% Souls Absorbed';
+  var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
+  return '×2 '+typeLabel;
+}
+function getMsThresh(u,i){
+  // Augment ownership thresholds are FIXED — no bonus changes them. The
+  // "-% Augment cost" bonuses discount the soul cost instead (see augCost).
+  var arr=(u&&u.augThresh)||augThreshFor(u);
+  var t=arr[i];
+  return t===undefined?Infinity:t;
+}
+// "-% Augment cost" bonuses (Equine form, ascension-4 Mystic path) reduce the
+// SOUL cost to activate an augment once its ownership threshold is met.
+function augCostMult(){
+  var m=1;
+  if(rebirthForm==='equine') m*=(1-0.10*getFormMult());
+  else if(achievementsEarned.indexOf('form-ult-equine')>=0) m*=0.90;
+  if(ascension4Path==='mystic') m*=0.95;
+  return Math.max(0.1,m);
+}
+function augCost(u,i){
+  var base=u.milestoneCosts[i];
+  var m=augCostMult();
+  return m>=1?base:base.mul(m).ceil();
+}
 var MS_LABELS=['Augment I','Augment II','Augment III','Augment IV','Augment V','Augment VI','Augment VII','Augment VIII','Augment IX','Augment X'];
-var MS_COLORS=['#ffffff','#f8f0e0','#f5e6c0','#f0d888','#e8cc55','#e0bb30','#d8aa18','#cf9a08','#c88a00','#d4a843'];
-var MS_LIT_BG=['rgba(255,255,255,0.35)','rgba(248,240,224,0.35)','rgba(245,230,192,0.35)','rgba(240,216,136,0.35)','rgba(232,204,85,0.35)','rgba(224,187,48,0.35)','rgba(216,170,24,0.35)','rgba(207,154,8,0.35)','rgba(200,138,0,0.35)','rgba(212,168,67,0.38)'];
-var MS_GLOW=['rgba(255,255,255,0.8)','rgba(248,240,224,0.8)','rgba(245,230,192,0.8)','rgba(240,216,136,0.8)','rgba(232,204,85,0.8)','rgba(224,187,48,0.8)','rgba(216,170,24,0.8)','rgba(207,154,8,0.8)','rgba(200,138,0,0.8)','rgba(255,215,0,0.95)'];
+// Augment box colors by slot: 1 purple, 2 red, 3 green, 4 gold, 5 white.
+// (Slots 6-10 unused now — capped at 5 augments — but kept white for safety.)
+var MS_COLORS=['#9944ff','#ff3333','#33cc55','#ffcc33','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#ffffff'];
+var MS_LIT_BG=['rgba(153,68,255,0.35)','rgba(255,51,51,0.35)','rgba(51,204,85,0.35)','rgba(255,204,51,0.35)','rgba(255,255,255,0.35)','rgba(255,255,255,0.35)','rgba(255,255,255,0.35)','rgba(255,255,255,0.35)','rgba(255,255,255,0.35)','rgba(255,255,255,0.35)'];
+var MS_GLOW=['rgba(153,68,255,0.9)','rgba(255,51,51,0.9)','rgba(51,204,85,0.9)','rgba(255,204,51,0.9)','rgba(255,255,255,0.95)','rgba(255,255,255,0.95)','rgba(255,255,255,0.95)','rgba(255,255,255,0.95)','rgba(255,255,255,0.95)','rgba(255,255,255,0.95)'];
+// Filters tint the (light) sunburst star toward each slot color.
 var MS_STAR_FILTER=[
-  'brightness(2.2)',
-  'brightness(2.0) sepia(0.15)',
-  'brightness(1.9) sepia(0.3) saturate(1.5)',
-  'brightness(1.8) sepia(0.5) saturate(2)',
-  'brightness(1.8) sepia(0.7) saturate(2.5)',
-  'brightness(1.8) sepia(0.85) saturate(3)',
-  'brightness(1.9) sepia(1) saturate(3)',
-  'brightness(1.9) sepia(1) saturate(3.5) hue-rotate(-5deg)',
-  'brightness(2.0) sepia(1) saturate(4) hue-rotate(-15deg)',
-  'brightness(2.2) sepia(1) saturate(5) hue-rotate(-25deg)'
+  'brightness(1.5) sepia(1) saturate(6) hue-rotate(230deg)', // purple
+  'brightness(1.6) sepia(1) saturate(7) hue-rotate(-35deg)', // red
+  'brightness(1.5) sepia(1) saturate(5) hue-rotate(75deg)',  // green
+  'brightness(1.9) sepia(1) saturate(4) hue-rotate(5deg)',   // gold
+  'brightness(2.4) saturate(0)',                             // white
+  'brightness(2.4) saturate(0)',
+  'brightness(2.4) saturate(0)',
+  'brightness(2.4) saturate(0)',
+  'brightness(2.4) saturate(0)',
+  'brightness(2.4) saturate(0)'
 ];
 
 function getPurchMult(level){
@@ -4101,9 +4302,11 @@ function getPurchMult(level){
   return D(13).pow(regularMults).mul(D(999).pow(thousandMults));
 }
 function getMileMult(u){
-  var bonus=0;
-  for(var i=0;i<10;i++){ if(u.milestones[i]) bonus+=(MS_MULT[i]-1); }
-  return 1+bonus;
+  // Compounding: every purchased 'mult' augment multiplies output by AUG_MULT
+  // (×2). Special-effect augments don't add to this multiplier.
+  var count=0, n=u.milestones?u.milestones.length:0;
+  for(var i=0;i<n;i++){ if(u.milestones[i] && (!u.augEffects||u.augEffects[i]==='mult')) count++; }
+  return Math.pow(AUG_MULT, count);
 }
 function recalcStats(){
   clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; tattTsGainMult=0;
@@ -4133,15 +4336,21 @@ function recalcStats(){
   if(ascension5Path==='mystic') clickDmgBonus=clickDmgBonus.mul(1.05);
   if(ascension6Path==='steel') totalDps=totalDps.mul(1.10);
   autoAttackInterval=3000;
-  // Apply Divine Hunger milestone support effects
-  var dv=REP_UPGRADES.filter(function(u){return u.id==='dv';})[0];
-  if(dv){
-    [0,1,3,4,6,7,9].forEach(function(mi){ if(dv.milestones[mi]) dvDpsToClickRatio+=0.00666; });
-    if(dv.milestones[2]) critClickChance+=0.0666;
-    if(dv.milestones[5]) critClickMult+=3.33;
-    if(dv.milestones[8]) soulAbsorbBonus+=0.222;
-    if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
-  }
+  // Special-effect augments (redistributed across upgrades). Tally every lit
+  // non-'mult' augment and apply its support effect. DPS→strike conversion uses
+  // the DPS accumulated so far (base + form/ascension bonuses).
+  REP_UPGRADES.forEach(function(u){
+    if(!u.augEffects) return;
+    for(var i=0;i<u.milestones.length;i++){
+      if(!u.milestones[i]) continue;
+      var eff=u.augEffects[i];
+      if(eff==='dps2strike') dvDpsToClickRatio+=0.00666;
+      else if(eff==='critchance') critClickChance+=0.0666;
+      else if(eff==='critmult') critClickMult+=3.33;
+      else if(eff==='soulsabsorb') soulAbsorbBonus+=0.222;
+    }
+  });
+  if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
   // Tattered Shop stat node bonuses
   var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
     'blade-dps':0.333,'souls-dps-1':0.333,'souls-dps-2':0.333,'rule-dps-1':0.333,'rule-dps-2':0.333,
@@ -4186,20 +4395,14 @@ var _msTip=null;
 function showMsTip(evt,u,i){
   var tip=document.getElementById('ms-tooltip');
   if(!tip) return;
-  var lit=u.milestones[i], avail=u.level>=getMsThresh(i);
+  var lit=u.milestones[i], avail=u.level>=getMsThresh(u,i);
   tip.querySelector('.mst-title').textContent=MS_LABELS[i];
-  tip.querySelector('.mst-req').textContent='Requires '+getMsThresh(i)+' purchases';
-  if(u.id==='dv'){
-    tip.querySelector('.mst-eff').textContent=DV_MS_EFFECTS[i];
-  } else {
-    var multLabel=MS_MULT_LABELS[i];
-    var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
-    tip.querySelector('.mst-eff').textContent=multLabel+' '+typeLabel+' Multiplier';
-  }
+  tip.querySelector('.mst-req').textContent='Requires '+getMsThresh(u,i)+' purchases';
+  tip.querySelector('.mst-eff').textContent=augEffectLabel(u,i);
   var costEl=tip.querySelector('.mst-cost');
   if(costEl){
     if(!lit && avail){
-      var msCost=u.milestoneCosts[i];
+      var msCost=augCost(u,i);
       var canAfford=souls.gte(msCost);
       costEl.textContent='Cost: '+fmt(msCost)+' souls';
       costEl.style.color=canAfford?'#88ddaa':'#dd6666';
@@ -4285,7 +4488,8 @@ function hideUpgradeTip(){
   var tip=document.getElementById('upgrade-tooltip'); if(tip) tip.style.display='none';
 }
 
-function mkMs(){ return [false,false,false,false,false,false,false,false,false,false]; }
+function mkMs(){ return [false,false,false,false]; } // default 4 augments; sized per-upgrade below
+function mkAugs(u){ return (u.augThresh||augThreshFor(u)).map(function(){return false;}); }
 var REP_UPGRADES=[
   {id:'ss',name:'Spirit Slash',  icon:0,  cost:5,     costScale:1.077, level:0, type:'click',  perLevel:1,
     desc:function(){return upgradeDescStr(this);},
@@ -4412,6 +4616,10 @@ var REP_UPGRADES=[
 // Convert all upgrade costs to Decimal after definition
 REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
 
+// Assign per-upgrade augment thresholds, per-slot effects, and correctly-sized
+// milestone arrays (Spirit Slash + special upgrades get 5, others get 4).
+REP_UPGRADES.forEach(function(u){ u.augThresh=augThreshFor(u); u.augEffects=augEffectsFor(u); u.milestones=mkAugs(u); });
+
 // Post-ascension values for late-tier upgrades: big cost + proportional DPS jump
 var POST_ASCENSION_UPGRADES = {
   'ct': {baseCost:1e39,  perLevel:2.5e36},
@@ -4475,8 +4683,9 @@ var DV_DPS_MS_STEP=[12,100,1000,10000,100000,1000000];
 // This ties each milestone price to the upgrade economy at the moment it becomes available.
 function calcMilestoneCosts(u){
   var costs=[];
-  for(var i=0;i<10;i++){
-    var thresh=MS_THRESH[i];
+  var arr=u.augThresh||augThreshFor(u);
+  for(var i=0;i<arr.length;i++){
+    var thresh=arr[i];
     var c=u._baseCost.mul(D(u.costScale).pow(thresh));
     var total=D(0);
     for(var j=0;j<10;j++){ total=total.add(c); c=c.mul(u.costScale).ceil(); }
@@ -4524,14 +4733,14 @@ var ACHIEVEMENTS=[
   {id:'souls-1b',      cat:'Soul Drinker',    name:'Billion Soul March',      desc:'Collect 1,000,000,000 souls',                 check:function(){return totalSouls.gte(D('1e9'));}},
   {id:'souls-1t',      cat:'Soul Drinker',    name:'Unfathomable Greed',      desc:'Collect 1,000,000,000,000 souls',             check:function(){return totalSouls.gte(D('1e12'));}},
   // Augments
-  {id:'mile-25',       cat:'Augment Seeker',name:'Augment Seeker',            desc:'Activate 25 augments',                        check:function(){return totalMilestonePurchases>=25;}},
-  {id:'mile-50',       cat:'Augment Seeker',name:'Power Hungry',              desc:'Activate 50 augments',                        check:function(){return totalMilestonePurchases>=50;}},
-  {id:'mile-100',      cat:'Augment Seeker',name:'Centenary of Might',        desc:'Activate 100 augments',                       check:function(){return totalMilestonePurchases>=100;}},
-  {id:'mile-250',      cat:'Augment Seeker',name:'Quarter Thousand Stars',    desc:'Activate 250 augments',                       check:function(){return totalMilestonePurchases>=250;}},
-  {id:'mile-500',      cat:'Augment Seeker',name:'Five Hundred Lights',       desc:'Activate 500 augments',                       check:function(){return totalMilestonePurchases>=500;}},
-  {id:'mile-1k',       cat:'Augment Seeker',name:'Thousand Augments',         desc:'Activate 1,000 augments',                     check:function(){return totalMilestonePurchases>=1000;}},
-  {id:'mile-2k',       cat:'Augment Seeker',name:'Beyond Reckoning',          desc:'Activate 2,000 augments',                     check:function(){return totalMilestonePurchases>=2000;}},
-  {id:'mile-3k',       cat:'Augment Seeker',name:'The Unyielding Path',       desc:'Activate 3,000 augments',                     check:function(){return totalMilestonePurchases>=3000;}},
+  {id:'mile-25',       cat:'Augment Seeker',name:'Augment Seeker',            desc:'Activate 10 augments',                        check:function(){return totalMilestonePurchases>=10;}},
+  {id:'mile-50',       cat:'Augment Seeker',name:'Power Hungry',              desc:'Activate 25 augments',                        check:function(){return totalMilestonePurchases>=25;}},
+  {id:'mile-100',      cat:'Augment Seeker',name:'Growing Arsenal',          desc:'Activate 40 augments',                        check:function(){return totalMilestonePurchases>=40;}},
+  {id:'mile-250',      cat:'Augment Seeker',name:'Ever Sharper',             desc:'Activate 60 augments',                        check:function(){return totalMilestonePurchases>=60;}},
+  {id:'mile-500',      cat:'Augment Seeker',name:'Relentless Refinement',    desc:'Activate 80 augments',                        check:function(){return totalMilestonePurchases>=80;}},
+  {id:'mile-1k',       cat:'Augment Seeker',name:'Centenary of Might',        desc:'Activate 100 augments',                       check:function(){return totalMilestonePurchases>=100;}},
+  {id:'mile-2k',       cat:'Augment Seeker',name:'Beyond Reckoning',          desc:'Activate 113 augments',                       check:function(){return totalMilestonePurchases>=113;}},
+  {id:'mile-3k',       cat:'Augment Seeker',name:'The Unyielding Path',       desc:'Activate 120 augments',                       check:function(){return totalMilestonePurchases>=120;}},
   // Realm Walker — one per realm cleared
   {id:'realm-void',        cat:'Realm Walker',name:'Beyond the Void',         desc:'Clear the Void realm',                        check:function(){return highestRealm>=2;}},
   {id:'realm-underworld',  cat:'Realm Walker',name:'Out of the Underworld',   desc:'Clear the Underworld realm',                  check:function(){return highestRealm>=3;}},
@@ -4579,7 +4788,6 @@ var ACHIEVEMENTS=[
   {id:'form-halo',     cat:'Identity',        name:'The Fallen Halo',         desc:'Light that no longer protects',               check:function(){return traitChoicesEver.indexOf('halo')>=0;}},
   {id:'form-tail',     cat:'Identity',        name:'A New Appendage',         desc:'Something follows you now',                   check:function(){return traitChoicesEver.indexOf('tail')>=0;}},
   {id:'form-weapon',   cat:'Identity',        name:'Armed',                   desc:'A tool of ending',                            check:function(){return traitChoicesEver.indexOf('weapon')>=0;}},
-  {id:'form-ultimate',        cat:'Identity',  name:'Ascendant',               desc:'Reach the ultimate form',                                                          check:function(){return stage>=3;}},
   // Form ultimate completions — each rewards the first-ascension form bonus permanently
   {id:'form-ult-masculine',  cat:'Identity',  name:'Pinnacle of Strength',    desc:'Complete the Masculine form\'s final ascension. Grants +10% DPS permanently.',     check:function(){return rebirthForm==='masculine'&&rebirthCount>=7;}},
   {id:'form-ult-feminine',   cat:'Identity',  name:'Pinnacle of Grace',       desc:'Complete the Feminine form\'s final ascension. Grants +10% Tattered Souls permanently.', check:function(){return rebirthForm==='feminine'&&rebirthCount>=7;}},
@@ -4700,6 +4908,30 @@ var ACHIEVEMENTS=[
   {id:'elite-first-pete',      cat:'Elite Prey', name:'Gate Unguarded',          desc:'Defeat the Pete elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(97)>=0;}},
   {id:'elite-first-sara',      cat:'Elite Prey', name:'Radiance Dimmed',         desc:'Defeat the Sara elite for the first time',               check:function(){return namedEliteFirstKills.indexOf(98)>=0;}},
   {id:'elite-first-steven',    cat:'Elite Prey', name:'Commander Fallen',        desc:'Defeat the Steven elite for the first time',             check:function(){return namedEliteFirstKills.indexOf(99)>=0;}},
+  // Minions held at once
+  {id:'minion-1',    cat:'Minion Tamer', name:'First Familiar',      desc:'Capture your first minion',       check:function(){return minionSlots.length>=1;}},
+  {id:'minion-10',   cat:'Minion Tamer', name:'Growing Menagerie',   desc:'Hold 10 minions at once',         check:function(){return minionSlots.length>=10;}},
+  {id:'minion-25',   cat:'Minion Tamer', name:'Swarm Keeper',        desc:'Hold 25 minions at once',         check:function(){return minionSlots.length>=25;}},
+  {id:'minion-50',   cat:'Minion Tamer', name:'Legion Master',       desc:'Hold 50 minions at once',         check:function(){return minionSlots.length>=50;}},
+  {id:'minion-100',  cat:'Minion Tamer', name:'Master of a Hundred', desc:'Hold 100 minions at once',        check:function(){return minionSlots.length>=100;}},
+  // Elite minions held at once
+  {id:'elite-minion-1',   cat:'Elite Tamer', name:'First Ascended',        desc:'Hold your first Elite minion',         check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=1;}},
+  {id:'elite-minion-10',  cat:'Elite Tamer', name:'Ten Ascended',          desc:'Hold 10 Elite minions at once',        check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=10;}},
+  {id:'elite-minion-25',  cat:'Elite Tamer', name:'Elite Cohort',          desc:'Hold 25 Elite minions at once',        check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=25;}},
+  {id:'elite-minion-50',  cat:'Elite Tamer', name:'Elite Legion',          desc:'Hold 50 Elite minions at once',        check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=50;}},
+  {id:'elite-minion-100', cat:'Elite Tamer', name:'A Hundred Ascended',    desc:'Hold 100 Elite minions at once',       check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=100;}},
+  // Minions released — each honor grants +1% capture chance
+  {id:'minion-released-1',   cat:'Minion Liberator', name:'Set One Free',      desc:'Release a minion. +1% capture chance.',           check:function(){return minionsReleasedTotal>=1;}},
+  {id:'minion-released-10',  cat:'Minion Liberator', name:'Merciful Hand',     desc:'Release 10 minions. +1% capture chance.',         check:function(){return minionsReleasedTotal>=10;}},
+  {id:'minion-released-25',  cat:'Minion Liberator', name:'Open Cages',        desc:'Release 25 minions. +1% capture chance.',         check:function(){return minionsReleasedTotal>=25;}},
+  {id:'minion-released-50',  cat:'Minion Liberator', name:'Great Liberation',  desc:'Release 50 minions. +1% capture chance.',         check:function(){return minionsReleasedTotal>=50;}},
+  {id:'minion-released-100', cat:'Minion Liberator', name:'Freedom for All',   desc:'Release 100 minions. +1% capture chance.',        check:function(){return minionsReleasedTotal>=100;}},
+  // Minions sacrificed — mechanic not yet in game (unearnable for now)
+  {id:'minion-sacrificed-1',   cat:'Minion Sacrifice', name:'First Offering',    desc:'Sacrifice a minion',        check:function(){return minionsSacrificedTotal>=1;}},
+  {id:'minion-sacrificed-10',  cat:'Minion Sacrifice', name:'Ten Offerings',     desc:'Sacrifice 10 minions',      check:function(){return minionsSacrificedTotal>=10;}},
+  {id:'minion-sacrificed-25',  cat:'Minion Sacrifice', name:'Bloodletting',      desc:'Sacrifice 25 minions',      check:function(){return minionsSacrificedTotal>=25;}},
+  {id:'minion-sacrificed-50',  cat:'Minion Sacrifice', name:'Rite of Ruin',      desc:'Sacrifice 50 minions',      check:function(){return minionsSacrificedTotal>=50;}},
+  {id:'minion-sacrificed-100', cat:'Minion Sacrifice', name:'Hundred Souls Given',desc:'Sacrifice 100 minions',     check:function(){return minionsSacrificedTotal>=100;}},
 ];
 
 function allSixFormsComplete(){
@@ -4827,7 +5059,7 @@ var SPELL_IMGS = {
   'locked': 'data:image/webp;base64,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',
 };
 
-var APP_VERSION = '1.62';
+var APP_VERSION = '1.63';
 
 // ── SOUL SHOP ─────────────────────────────────────────────────────────────────
 // ── SPELLS ────────────────────────────────────────────────────────────────────
@@ -5363,7 +5595,7 @@ function renderTatteredGrid(){
       if(spImgSrc){
         var spImg=document.createElement('img');
         spImg.src=spImgSrc;
-        spImg.style.cssText='width:32px;height:32px;image-rendering:pixelated;display:block;position:relative;top:5px;';
+        spImg.style.cssText='width:32px;height:32px;image-rendering:pixelated;display:block;';
         if(state==='locked') spImg.style.opacity='0.35';
         icon.appendChild(spImg);
       } else { icon.textContent=node.icon; }
@@ -5708,7 +5940,7 @@ function doReincarnate(){
   REP_UPGRADES.forEach(function(u){
     u.level=0;
     u.cost=D(u._baseCost||u.cost);
-    u.milestones=mkMs();
+    u.milestones=mkAugs(u);
   });
 
   // Wipe TS and tattered shop (but keep auto-progress)
@@ -5723,6 +5955,7 @@ function doReincarnate(){
   rebirthCount=0;
 
   recalcStats();
+  mana=manaMax; // start each run with a full mana bar (recalcStats set the cap)
   updateTatteredDisplay();
   updateTraitsRow();
   checkRebirthButton();
@@ -5793,6 +6026,23 @@ function openRebirthModal(){
   document.getElementById('rebirth-modal').classList.add('open');
 }
 
+// The old evolve modal that granted identity traits was retired, but the
+// Identity honors still key off its trait tokens. The modern ascension
+// choices are the equivalents — record them under the old token names.
+var FORM_TRAIT_TOKENS={masculine:'male',feminine:'female',androgynous:'unbound',feline:'cat',canine:'dog',equine:'horse'};
+function recordAscensionTraits(){
+  function grant(t){ if(t&&traitChoicesEver.indexOf(t)<0) traitChoicesEver.push(t); }
+  grant(FORM_TRAIT_TOKENS[rebirthForm]);
+  [ascension3Path,ascension4Path,ascension5Path].forEach(function(p){
+    if(p==='holy') grant('halo');
+    else if(p==='shadow') grant('horns');
+    else if(p==='mystic') grant('witchhat');
+  });
+  if(ascension4Path) grant('wings');                                       // every 4th-ascension evolution grants wings
+  if(ascension5Path==='shadow'||ascension5Path==='mystic') grant('tail');  // shadow/mystic on the 5th grow a tail
+  if(ascension6Path) grant('weapon');
+}
+
 function doRebirthReset(chosenForm){
   // Gain tattered souls using the chosen form's bonus
   var gain=calcTatteredSoulsGain(chosenForm);
@@ -5819,11 +6069,11 @@ function doRebirthReset(chosenForm){
   REP_UPGRADES.forEach(function(u){
     u.level=0;
     u.cost=D(u._baseCost||u.cost); // reset cost — stored during init
-    u.milestones=mkMs();
+    u.milestones=mkAugs(u);
   });
 
   // Apply rebirth
-  captureTargetIdx=-1;
+  captureTargets=[];
   releaseMode=false;
   if(chosenForm === null){
     rebirthCount = 0;
@@ -5834,20 +6084,26 @@ function doRebirthReset(chosenForm){
     wipeNonEliteMinions();
   } else {
     rebirthCount++;
+    ascendCount++;
     hasEverAscended=true;
     soulShopOwned['auto-progress']=1;
     hasEverHadAutoProgress=true;
     applyPostAscensionUpgrades();
   }
   rebirthForm=chosenForm;
+  if(chosenForm!==null) recordAscensionTraits();
 
   // Reload entity image as chosen form image
   _rebirthEntityOverride=chosenForm;
 
   recalcStats();
+  mana=manaMax; // start each run with a full mana bar (recalcStats set the cap)
   updateTatteredDisplay();
   updateTraitsRow();
   checkRebirthButton();
+  // Ascension is when rebirthCount/ascendCount/trait honors can complete —
+  // check now so their banners fire at the moment of ascension, not next kill
+  checkAchievements();
   dirtyU=true;
   document.getElementById('soul-count').textContent=fmt(souls);
   var _np=FORM_NAMEPLATES[chosenForm];
@@ -5884,7 +6140,9 @@ function saveSettings(){
   try{ localStorage.setItem(SETTINGS_KEY,JSON.stringify({
     soundVolume:soundVolume,
     showTutorial:showTutorial,
-    showIntro:showIntro
+    showIntro:showIntro,
+    combatAnim:combatAnim,
+    soulDropAnim:soulDropAnim
   })); } catch(e){}
 }
 
@@ -5897,6 +6155,8 @@ function loadSettings(){
     else if(d.soundMuted!==undefined) soundVolume=d.soundMuted?0:0.7; // migrate old saves
     if(d.showTutorial!==undefined) showTutorial=d.showTutorial;
     if(d.showIntro!==undefined) showIntro=d.showIntro;
+    if(d.combatAnim!==undefined) combatAnim=d.combatAnim;
+    if(d.soulDropAnim!==undefined) soulDropAnim=d.soulDropAnim;
   } catch(e){}
 }
 var _lastAutoSave=0;
@@ -5938,12 +6198,17 @@ function saveGame(){
     soundVolume:soundVolume,
     showIntro:showIntro,
     showTutorial:showTutorial,
+    combatAnim:combatAnim,
+    soulDropAnim:soulDropAnim,
     tutShown:_tutShown,
     frontierWins:_frontierWins,
     minionPoints:minionPoints,
     minionSlots:minionSlots.slice(),
     minionUnlocked:minionUnlocked,
-    captureTargetIdx:captureTargetIdx,
+    minionsReleasedTotal:minionsReleasedTotal,
+    minionsSacrificedTotal:minionsSacrificedTotal,
+    captureTargets:captureTargets.slice(),
+    releaseConfirmSuppressed:releaseConfirmSuppressed,
     petMinionIdx:petMinionIdx,
     discoveredMinions:discoveredMinions.slice(),
     elementStocks:JSON.parse(JSON.stringify(elementStocks)),
@@ -5991,7 +6256,15 @@ function loadGame(){
       var c=u._baseCost;
       for(var i=0;i<u.level;i++) c=c.mul(u.costScale).ceil();
       u.cost=c;
-      if(saved.milestones) u.milestones=saved.milestones.slice();
+      if(saved.milestones){
+        // Augments were redesigned (10 additive → 4/5 compounding). Coerce any
+        // saved array to the upgrade's current augment count so old saves can't
+        // over- or under-count purchased augments.
+        var want=u.augThresh.length;
+        var m=saved.milestones.slice(0,want);
+        while(m.length<want) m.push(false);
+        u.milestones=m;
+      }
     });
   }
   // Rebuild enemy pool from defeatedElites
@@ -6009,11 +6282,17 @@ function loadGame(){
   eliteKillsTotal=data.eliteKillsTotal||0;
   highestGlobalFloorEver=data.highestGlobalFloorEver||0;
   achievementsEarned=data.achievementsEarned||[];
+  // Drop earned ids for honors that no longer exist (e.g. removed 'form-ultimate')
+  // so the honors count can't exceed the list total.
+  achievementsEarned=achievementsEarned.filter(function(id){return ACHIEVEMENTS.some(function(a){return a.id===id;});});
   traitChoicesEver=data.traitChoicesEver||[];
   namedEliteFirstKills=data.namedEliteFirstKills||[];
   tatteredSouls=data.tatteredSouls||0;
   totalTSSacrificed=data.totalTSSacrificed||0;
   rebirthCount=data.rebirthCount||0;
+  // Older saves never tracked ascensions (the counter lived in a retired
+  // modal), so seed it with the current cycle's count as a floor.
+  if(ascendCount<rebirthCount) ascendCount=rebirthCount;
   rebirthForm=data.rebirthForm||null;
   formBonusMult=data.formBonusMult||1.0;
   ascension3Path=data.ascension3Path||null;
@@ -6036,12 +6315,19 @@ function loadGame(){
   else if(data.soundMuted!==undefined) soundVolume=data.soundMuted?0:0.7;
   showIntro=(data.showIntro!==undefined)?data.showIntro:true;
   showTutorial=(data.showTutorial!==undefined)?data.showTutorial:true;
+  if(data.combatAnim!==undefined) combatAnim=data.combatAnim;
+  if(data.soulDropAnim!==undefined) soulDropAnim=data.soulDropAnim;
   if(data.tutShown) _tutShown=Object.assign(_tutShown,data.tutShown);
   _frontierWins=data.frontierWins||0;
   if(data.minionPoints!==undefined) minionPoints=data.minionPoints;
   if(data.minionSlots) minionSlots=data.minionSlots;
   if(data.minionUnlocked) minionUnlocked=data.minionUnlocked;
-  if(data.captureTargetIdx!==undefined) captureTargetIdx=data.captureTargetIdx;
+  minionsReleasedTotal=data.minionsReleasedTotal||0;
+  minionsSacrificedTotal=data.minionsSacrificedTotal||0;
+  if(data.captureTargets) captureTargets=data.captureTargets;
+  else if(data.captureTargetIdx!==undefined&&data.captureTargetIdx>=0) captureTargets=[data.captureTargetIdx];
+  clampCaptureTargets(); // older saves could target beyond the MP budget
+  if(data.releaseConfirmSuppressed) releaseConfirmSuppressed=true;
   if(data.petMinionIdx!==undefined){ petMinionIdx=data.petMinionIdx; var _pc=document.getElementById('pet-canvas'); if(_pc) _pc.style.display=petMinionIdx>=0?'block':'none'; }
   if(data.discoveredMinions) discoveredMinions=data.discoveredMinions;
   if(data.elementStocks) elementStocks=data.elementStocks;
@@ -6290,10 +6576,10 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   d.setAttribute('data-uid', u.id);
 
   var msRowHtml='<div class="ms-row">';
-  for(var i=0;i<10;i++){
+  for(var i=0;i<u.milestones.length;i++){
     var lit=u.milestones[i];
     var prevLit=i===0||u.milestones[i-1];
-    var threshMet=u.level>=getMsThresh(i);
+    var threshMet=u.level>=getMsThresh(u,i);
     var visible=lit||(i===0&&threshMet)||prevLit;
     if(!visible){ msRowHtml+='<div class="ms-box" data-mi="'+i+'" style="visibility:hidden"></div>'; continue; }
     var avail=!lit&&threshMet&&prevLit;
@@ -6325,8 +6611,8 @@ function createUpgradeCard(u, can, bought, actualN, cost){
     box.addEventListener('click',function(e){
       e.stopPropagation();
       if(u.milestones[mi]) return;
-      if(u.level>=getMsThresh(mi)){
-        var msCost=u.milestoneCosts[mi];
+      if(u.level>=getMsThresh(u,mi)){
+        var msCost=augCost(u,mi);
         if(!souls.gte(msCost)) return;
         souls=souls.sub(msCost);
         document.getElementById('soul-count').textContent=fmt(souls);
@@ -6411,7 +6697,7 @@ function patchMilestoneRow(card, u){
       box.innerHTML='';
     }
     var prevLit=i===0||u.milestones[i-1];
-    var threshMet=u.level>=getMsThresh(i);
+    var threshMet=u.level>=getMsThresh(u,i);
     var visible=lit||(i===0&&threshMet)||prevLit;
     if(!visible){
       box.style.cssText='visibility:hidden';
@@ -7290,45 +7576,62 @@ function minionClickerAttackEnemy(){
   if(isSpellActive('twinStrikes')) dmg=dmg.mul(2);
   if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
-  enemyHitFlashTime=Date.now();
+  if(combatAnim) enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
   spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
   if(enemyHp.lte(0)) onEnemyDeath();
 }
 
+// Performs the purchase only; recalc/UI/save run once per tick in
+// tickMinionClickers so several assigned clickers don't repeat the whole
+// chain every 250ms. Returns true if anything was bought.
 function minionClickerBuyUpgrade(upgradeId){
   var u=REP_UPGRADES.find(function(x){return x.id===upgradeId;});
-  if(!u||!u.vis()) return;
+  if(!u||!u.vis()) return false;
   var n=(buyQty==='max')?maxAffordableN(u):buyQty;
-  if(n<1) return;
+  if(n<1) return false;
   var total=calcCostN(u,n);
-  if(!souls.gte(total)) return;
+  if(!souls.gte(total)) return false;
   souls=souls.sub(total);
   var c=u.cost;
   for(var i=0;i<n;i++){ c=c.mul(u.costScale).ceil(); }
   u.cost=c;
   u.level+=n;
   totalUpgradePurchases+=n;
-  recalcStats();
-  dirtyU=true;
-  updateEntityStatsPanel();
-  updateTatteredDisplay();
-  document.getElementById('soul-count').textContent=fmt(souls);
-  checkAchievements();
-  checkRebirthButton();
-  saveGame();
+  return true;
+}
+
+// High-frequency automated events (clicker purchases every 250ms, kill streaks)
+// each wrote a full save, flooding localStorage and stuttering the frame.
+// Batch them to one save per 5s — the 30s autosave, manual-action saves, and
+// the save-on-tab-hide handler still write immediately.
+var _lastThrottledSave=0;
+function throttledSave(){
+  var n=Date.now();
+  if(n-_lastThrottledSave>=5000){ _lastThrottledSave=n; saveGame(); }
 }
 
 function tickMinionClickers(now){
   if(!minionClickerAssignments.length) return;
   if(now-_lastMinionClickTick < 250) return;
   _lastMinionClickTick=now;
+  var bought=false;
   minionClickerAssignments.forEach(function(a){
     if(a.target==='enemy') minionClickerAttackEnemy();
-    else if(a.target==='upgrade') minionClickerBuyUpgrade(a.upgradeId);
-    else if(a.target==='buyall') buyAllAffordable();
+    else if(a.target==='upgrade'){ if(minionClickerBuyUpgrade(a.upgradeId)) bought=true; }
+    else if(a.target==='buyall') buyAllAffordable(true);
   });
+  if(bought){
+    recalcStats();
+    dirtyU=true;
+    updateEntityStatsPanel();
+    updateTatteredDisplay();
+    document.getElementById('soul-count').textContent=fmt(souls);
+    checkAchievements();
+    checkRebirthButton();
+    throttledSave();
+  }
 }
 
 function updateMinionClickerDock(){
@@ -7711,20 +8014,32 @@ var MINION_DRAW_FNS = (function(){
 })();
 
 var _minionModalAnimId = null;
+var _lastMinionCardDraw = 0;
 function _animateMinionCards() {
   if (!document.getElementById('minion-modal').classList.contains('open')) {
     _minionModalAnimId = null;
     return;
   }
   var now = Date.now();
-  document.querySelectorAll('.mm-card-canvas').forEach(function(cv) {
-    var idx = parseInt(cv.getAttribute('data-ei'), 10);
-    if (isNaN(idx)) return;
-    var et = ENEMY_TYPES[idx];
-    if (!et) return;
-    var fn = MINION_DRAW_FNS[et.id];
-    if (fn) fn(cv, now, false, et.isElite);
-  });
+  // Repainting all 100 card canvases every frame tanks the whole game loop,
+  // so cap card redraws at ~30fps and only animate cards inside the scroll view.
+  if (now - _lastMinionCardDraw >= 33) {
+    _lastMinionCardDraw = now;
+    var view = document.getElementById('mm-body').getBoundingClientRect();
+    document.querySelectorAll('.mm-card-canvas').forEach(function(cv) {
+      var idx = parseInt(cv.getAttribute('data-ei'), 10);
+      if (isNaN(idx)) return;
+      var et = ENEMY_TYPES[idx];
+      if (!et) return;
+      var undiscovered = discoveredMinions.indexOf(idx) < 0;
+      // Undiscovered cards show a static black silhouette — one draw is enough
+      if (undiscovered && cv._mmDrawn) return;
+      var r = cv.getBoundingClientRect();
+      if (r.bottom < view.top || r.top > view.bottom) return;
+      var fn = MINION_DRAW_FNS[et.id];
+      if (fn) { fn(cv, now, false, et.isElite); cv._mmDrawn = true; }
+    });
+  }
   _minionModalAnimId = requestAnimationFrame(_animateMinionCards);
 }
 
@@ -8136,10 +8451,20 @@ function showIntroSequence(onDone) {
 function syncIntroToggleUI(){
   var introToggle = document.getElementById('intro-toggle');
   var tutorialToggle = document.getElementById('tutorial-toggle');
+  var combatToggle = document.getElementById('combat-anim-toggle');
+  var soulDropToggle = document.getElementById('soul-drop-toggle');
   introToggle.textContent = showIntro ? 'On' : 'Off';
   introToggle.classList.toggle('muted', !showIntro);
   tutorialToggle.textContent = showTutorial ? 'On' : 'Off';
   tutorialToggle.classList.toggle('muted', !showTutorial);
+  if(combatToggle){
+    combatToggle.textContent = combatAnim ? 'On' : 'Off';
+    combatToggle.classList.toggle('muted', !combatAnim);
+  }
+  if(soulDropToggle){
+    soulDropToggle.textContent = soulDropAnim ? 'On' : 'Off';
+    soulDropToggle.classList.toggle('muted', !soulDropAnim);
+  }
 }
 
 document.getElementById('intro-toggle').addEventListener('click', function(){
@@ -8150,6 +8475,18 @@ document.getElementById('intro-toggle').addEventListener('click', function(){
 
 document.getElementById('tutorial-toggle').addEventListener('click', function(){
   showTutorial = !showTutorial;
+  syncIntroToggleUI();
+  saveGame(); saveSettings();
+});
+
+document.getElementById('combat-anim-toggle').addEventListener('click', function(){
+  combatAnim = !combatAnim;
+  syncIntroToggleUI();
+  saveGame(); saveSettings();
+});
+
+document.getElementById('soul-drop-toggle').addEventListener('click', function(){
+  soulDropAnim = !soulDropAnim;
   syncIntroToggleUI();
   saveGame(); saveSettings();
 });
@@ -8212,6 +8549,9 @@ if(!_hadSave && showIntro){
   }
 }
 spawnEnemy();
+// Backfill trait tokens from the loaded form/path choices, then silently
+// catch up any honors whose conditions were already met by this save.
+recordAscensionTraits();
 checkAchievements(true);
 updateMinionTabBtn();
 renderAchievementsTab();
@@ -8306,7 +8646,22 @@ document.querySelectorAll('.left-tab-btn').forEach(function(btn){
 // ── TATTERED MODAL EVENTS ─────────────────────────────────────────────────────
 document.getElementById('tm-close-btn').addEventListener('click', closeTatteredModal);
 document.getElementById('mm-close-btn').addEventListener('click', closeMinionModal);
-document.getElementById('mm-release-btn').addEventListener('click', function(){ if(!releaseMode) enterReleaseMode(); });
+document.getElementById('mm-release-btn').addEventListener('click', function(){
+  if(releaseMode) exitReleaseMode(); else enterReleaseMode();
+});
+document.getElementById('release-confirm-yes').addEventListener('click', function(){
+  if(document.getElementById('release-dns-chk').checked) releaseConfirmSuppressed=true;
+  document.getElementById('release-confirm-modal').classList.remove('open');
+  if(_pendingReleaseIdx>=0) releaseMinion(_pendingReleaseIdx);
+  _pendingReleaseIdx=-1;
+});
+document.getElementById('release-confirm-no').addEventListener('click', function(){
+  document.getElementById('release-confirm-modal').classList.remove('open');
+  _pendingReleaseIdx=-1;
+});
+document.getElementById('release-confirm-modal').addEventListener('click', function(e){
+  if(e.target===this){ this.classList.remove('open'); _pendingReleaseIdx=-1; }
+});
 document.getElementById('reincarnate-btn').addEventListener('click', openReincarnateModal);
 document.getElementById('reincarnate-cancel-btn').addEventListener('click', function(){
   document.getElementById('reincarnate-modal').classList.remove('open');
@@ -8449,15 +8804,16 @@ document.getElementById('tattered-modal').addEventListener('click',function(e){
   document.addEventListener('click',function(e){ if(!disp.contains(e.target)) hideTip(); });
 })();
 
-function buyAllAffordable(){
+// auto=true when driven by a clicker minion every 250ms — throttle the save
+function buyAllAffordable(auto){
   var changed=false;
 
   // Build a flat list of all purchasable augments (threshold met, not yet bought, can afford)
   var augments=[];
   REP_UPGRADES.forEach(function(u){
-    for(var mi=0;mi<10;mi++){
-      if(!u.milestones[mi]&&u.level>=getMsThresh(mi)){
-        augments.push({u:u,mi:mi,cost:u.milestoneCosts[mi]});
+    for(var mi=0;mi<u.milestones.length;mi++){
+      if(!u.milestones[mi]&&u.level>=getMsThresh(u,mi)){
+        augments.push({u:u,mi:mi,cost:augCost(u,mi)});
       }
     }
   });
@@ -8481,7 +8837,7 @@ function buyAllAffordable(){
     document.getElementById('soul-count').textContent=fmt(souls);
     checkAchievements();
     checkRebirthButton();
-    saveGame();
+    if(auto) throttledSave(); else saveGame();
   }
 }
 
