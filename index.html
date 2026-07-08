@@ -4067,8 +4067,8 @@ function entityAttack(isAuto, isSpell){
   }
   // Spell: Twin Strikes — strike damage ×2 for non-auto attacks
   if(!isAuto && isSpellActive('twinStrikes')) dmg=dmg.mul(2);
-  // Spell: Invoke Power — multiply all damage by (1 + stacks × 0.0666)
-  if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
+  // Invoke Power is baked into totalDps/clickDmgBonus by recalcStats — do NOT
+  // re-apply it here (bonus already carries it).
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
   if(combatAnim) enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
@@ -4474,6 +4474,16 @@ function recalcStats(){
   if(_mDps>0){ totalDps=totalDps.mul(1+_mDps); clickDmgBonus=clickDmgBonus.mul(1+_mDps); }
   var _mSlash=getMinionTotalBonus('slash');
   if(_mSlash>0) clickDmgBonus=clickDmgBonus.mul(1+_mSlash);
+  // Invoke Power — persistent stackable buff that endures the ascension. Folded
+  // into the final DPS and strike totals so the stat panel reflects it. (It was
+  // previously applied only at combat time, so casting it never moved the DPS
+  // readout and looked like it did nothing.) The combat-damage paths therefore
+  // must NOT re-apply it — totalDps/clickDmgBonus already carry it.
+  if(invokePowerStacks>0){
+    var invMult=1+invokePowerStacks*0.0666;
+    totalDps=totalDps.mul(invMult);
+    clickDmgBonus=clickDmgBonus.mul(invMult);
+  }
 }
 
 var _msTip=null;
@@ -5266,6 +5276,10 @@ function castSpell(id){
 
   if(p3) spellEndTimes['powerOf3']=0; // consume Power of 3 after modifying another spell
 
+  // Invoke Power feeds totalDps/clickDmgBonus via recalcStats, so recompute and
+  // refresh the stat panel immediately — otherwise the DPS readout wouldn't move
+  // until the next incidental recalc, making the cast look like it did nothing.
+  if(id==='invokePower'){ recalcStats(); updateEntityStatsPanel(); }
   updateManaBar();
   renderSpellPanel();
   saveGame();
@@ -7741,7 +7755,7 @@ function minionClickerAttackEnemy(){
     dmg=dmg.mul(2+critClickMult);
   }
   if(isSpellActive('twinStrikes')) dmg=dmg.mul(2);
-  if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
+  // Invoke Power already baked into clickDmgBonus (see recalcStats) — no re-apply.
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
   if(combatAnim) enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
@@ -7974,7 +7988,7 @@ function gameLoop(){
       lastAutoAttack=now;
       var _dpsDmg=totalDps.mul(_dt);
       if(isSpellActive('twinBlades')) _dpsDmg=_dpsDmg.mul(2);
-      if(invokePowerStacks>0) _dpsDmg=_dpsDmg.mul(1+invokePowerStacks*0.0666);
+      // Invoke Power already baked into totalDps by recalcStats — no re-apply.
       if(_dpsDmg.gt(0)){
         enemyHp=Decimal.max(D(0),enemyHp.sub(_dpsDmg));
         updateHpBars();
