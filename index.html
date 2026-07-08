@@ -67,7 +67,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #upgrade-tooltip .utt-mult { color:#d4a843; font-size:12px; margin-top:2px; }
 /* Flex layout: icon left, content right */
 .ucard-flex { display: flex; gap: 10px; align-items: flex-start; }
-.ucard-icon { width: 52px; height: 52px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; }
+.ucard-icon { width: 60px; height: 60px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; background-image:url('artwork/sprites_upgrades.webp'); background-size:2400px 60px; background-repeat:no-repeat; }
 .ucard-body { flex: 1; min-width: 0; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
@@ -722,10 +722,12 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #invoke-bar-fill.invoke-full { background:linear-gradient(to right,#2255cc,#aaccff); box-shadow:0 0 6px rgba(100,170,255,0.6); }
 #invoke-num { font-size:9px; color:#7a99cc; white-space:nowrap; }
 .spell-btn { width:44px; height:44px; border-radius:7px; border:1px solid #1a1535; background:#05040e; cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center; font-size:19px; line-height:1; flex-shrink:0; transition:border-color 0.2s,box-shadow 0.2s,opacity 0.2s; overflow:visible; }
-/* Owned/unlocked spells (any state except locked) get a white button fill */
-.spell-btn:not(.spell-locked) { background:#ffffff; }
+/* Owned/unlocked spells use the same cream fill as the upgrade cards */
+.spell-btn:not(.spell-locked) { background:#f0e8b8; }
 .spell-btn.spell-lit { border-color:#3355aa; box-shadow:0 0 7px rgba(50,90,200,0.3); opacity:1; }
-.spell-btn.spell-dim { border-color:#141230; opacity:0.6; cursor:default; } /* owned but not enough mana — only slightly dimmed */
+.spell-btn.spell-dim { border-color:#8a7a55; background:rgba(240,232,184,0.5); cursor:default; } /* owned but not enough mana — dim the face, NOT the tooltip */
+/* Fade the icon/badges but exclude the tooltip, so element opacity doesn't cascade into it (the tooltip must stay fully opaque like every other spell). */
+.spell-btn.spell-dim > *:not(.spell-tt) { opacity:0.6; }
 .spell-btn.spell-locked { border-color:#221a44; cursor:default; } /* padlock already signals locked — no dimming */
 .spell-btn.spell-active-glow { border-color:#7799ee; box-shadow:0 0 12px rgba(90,140,255,0.7),0 0 26px rgba(70,120,255,0.35); animation:spellGlow 1s ease-in-out infinite; }
 @keyframes spellGlow { 0%,100%{box-shadow:0 0 10px rgba(90,140,255,0.6),0 0 22px rgba(70,120,255,0.3);} 50%{box-shadow:0 0 18px rgba(120,170,255,0.9),0 0 38px rgba(100,160,255,0.5);} }
@@ -1117,7 +1119,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   .ucard .ud { font-size: 13px !important; }
   .ucard .uc { font-size: 13px !important; }
   .ucard .uowned { font-size: 13px !important; }
-  .ucard-icon { width: 52px !important; height: 52px !important; }
+  .ucard-icon { width: 60px !important; height: 60px !important; }
 
   /* Right panel: scrollable */
   #right {
@@ -1954,6 +1956,34 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
   <div id="changelog-box">
     <div id="changelog-title">Soulless Changelog</div>
     <div id="changelog-body">
+      <div class="changelog-version-header">v 1.65</div>
+      <h3>Augments</h3>
+      <ul>
+        <li>Brimstone gains a 5th augment slot at 175 owned: ×1.333 to all upgrade DPS (applied to each upgrade individually).</li>
+      </ul>
+      <h3>Upgrades — Late-Game Rebalance</h3>
+      <ul>
+        <li>Chaos Tide through Spirit Siphon have been rebalanced for a smooth power curve. Buying Chaos Tide no longer triggers a sudden DPS explosion that vaults you hundreds of floors.</li>
+        <li>Your existing progress is preserved: upgrades you already own keep the exact DPS they had — nothing is lost or suddenly changed on login. Only new purchases follow the rebalanced curve.</li>
+      </ul>
+      <h3>Spells — Invoke Power</h3>
+      <ul>
+        <li>Invoke Power's bonus now works properly, showing the change in DPS.</li>
+        <li>Retuned: now caps at 5 stacks and grants +15.54% per stack (+77.7% at max), replacing the old +6.66% over 10 stacks.</li>
+        <li>Added a stack counter to the top-left of the spell button.</li>
+        <li>Invoke Power stacks now properly survive Ascensions, but not Reincarnations.</li>
+      </ul>
+      <h3>Artwork</h3>
+      <ul>
+        <li>Added icons for the late-game upgrades, previously blank.</li>
+      </ul>
+      <h3>UI</h3>
+      <ul>
+        <li>Larger upgrade icons.</li>
+        <li>Larger spell-button and Sacrifice-grid node images.</li>
+        <li>Larger number-key badges on the spell buttons.</li>
+        <li>Spells properly cast on numerical keyboard inputs.</li>
+      </ul>
       <div class="changelog-version-header">v 1.64</div>
       <h3>Floor &amp; Realm Progression</h3>
       <ul>
@@ -2255,6 +2285,11 @@ if(!useAscSheet && !activeLoaded) return;
   var iw = useAscSheet ? MALE_ASC_CELL : activeImg.naturalWidth;
   var ih = useAscSheet ? MALE_ASC_CELL : activeImg.naturalHeight;
   var drawH = Math.min(H * 0.9, H - 10);
+  // Enlarge every entity image beyond the base stages by 20px: Ether (not an
+  // ascension sheet) and the six base forms (grid pos 0, rebirthCount <= 1) stay
+  // at base size; flesh and every later ascension-path stage (rebirthCount >= 2)
+  // are drawn a bit larger.
+  if (useAscSheet && rebirthCount >= 2) drawH += 20;
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
 
@@ -4067,8 +4102,8 @@ function entityAttack(isAuto, isSpell){
   }
   // Spell: Twin Strikes — strike damage ×2 for non-auto attacks
   if(!isAuto && isSpellActive('twinStrikes')) dmg=dmg.mul(2);
-  // Spell: Invoke Power — multiply all damage by (1 + stacks × 0.0666)
-  if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
+  // Invoke Power is baked into totalDps/clickDmgBonus by recalcStats — do NOT
+  // re-apply it here (bonus already carries it).
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
   if(combatAnim) enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
@@ -4271,6 +4306,9 @@ var DV_MS_EFFECTS=[
 // Default upgrades get 4 augments; Spirit Slash and the special upgrades get 5.
 var AUG_THRESH_DEFAULT=[10,25,75,150];
 var AUG_THRESH_FIVE=[10,25,50,75,150];
+// Brimstone test: keeps the default four augments and adds a fifth at 175 owned
+// carrying the special 'allupgdps' effect (×1.333 to all upgrade DPS).
+var AUG_THRESH_BS=[10,25,75,150,175];
 var AUG_MULT=2; // each purchased 'mult' augment doubles the upgrade's output (compounding)
 // Special augments redistributed from the old Divine Hunger set. Each entry is a
 // per-slot effect list; 'mult' = normal ×2, others apply a global support effect.
@@ -4288,8 +4326,12 @@ var AUG_SPECIAL={
   st:['mult','mult','mult','dps2strike','mult'],
   dm:['mult','mult','mult','mult','dps2strike']
 };
-function augThreshFor(u){ return (u.id==='ss'||AUG_SPECIAL[u.id])?AUG_THRESH_FIVE:AUG_THRESH_DEFAULT; }
+function augThreshFor(u){
+  if(u.id==='bs') return AUG_THRESH_BS;
+  return (u.id==='ss'||AUG_SPECIAL[u.id])?AUG_THRESH_FIVE:AUG_THRESH_DEFAULT;
+}
 function augEffectsFor(u){
+  if(u.id==='bs') return ['mult','mult','mult','mult','allupgdps'];
   if(AUG_SPECIAL[u.id]) return AUG_SPECIAL[u.id].slice();
   return augThreshFor(u).map(function(){return 'mult';});
 }
@@ -4299,6 +4341,7 @@ function augEffectLabel(u,i){
   if(eff==='critchance') return '+6.66% Critical Strike Chance';
   if(eff==='critmult')   return '+3.33× Critical Strike Damage';
   if(eff==='soulsabsorb')return '+22.2% Souls Absorbed';
+  if(eff==='allupgdps')  return '×1.333 All Upgrade DPS';
   var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
   return '×2 '+typeLabel;
 }
@@ -4357,9 +4400,32 @@ function getMileMult(u){
   for(var i=0;i<n;i++){ if(u.milestones[i] && (!u.augEffects||u.augEffects[i]==='mult')) count++; }
   return Math.pow(AUG_MULT, count);
 }
+function upgradeBaseOutput(u){
+  // level × perLevel, but honoring the blended grandfather: levels bought before a
+  // balance change keep their old per-level DPS; levels bought after use the current
+  // perLevel. grandfatherLevel/PerLevel are set only for migrated saves (see
+  // applyBalanceV2Migration); otherwise this is just level × perLevel.
+  var gfL=u.grandfatherLevel||0;
+  if(gfL>0 && u.grandfatherPerLevel){
+    if(gfL>u.level) gfL=u.level;            // safety: never grandfather beyond owned
+    var newL=u.level-gfL;
+    return u.grandfatherPerLevel.mul(gfL).add(D(u.perLevel).mul(newL));
+  }
+  return D(u.level).mul(u.perLevel);
+}
 function recalcStats(){
   clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; tattTsGainMult=0;
   critClickChance=0; critClickMult=0; dvDpsToClickRatio=0; soulAbsorbBonus=0;
+  // ×1.333 per lit 'allupgdps' augment (Brimstone slot 5). Applied to EACH DPS
+  // upgrade's output individually below — not as a single global total multiplier.
+  var _allUpgDps=0;
+  REP_UPGRADES.forEach(function(u){
+    if(!u.augEffects) return;
+    for(var i=0;i<u.milestones.length;i++){
+      if(u.milestones[i] && u.augEffects[i]==='allupgdps') _allUpgDps++;
+    }
+  });
+  var allUpgDpsMult=_allUpgDps>0?D(1.333).pow(_allUpgDps):null;
   REP_UPGRADES.forEach(function(u){
     if(u.level===0) return;
     // DV milestones have unique effects — don't apply generic multiplier to drain
@@ -4369,9 +4435,13 @@ function recalcStats(){
     if(u.type==='drain'){
       enemyHpDrainPct+=u.level*u.perLevel*mm;
     } else {
-      var eff=D(u.level).mul(u.perLevel).mul(mm).mul(pm);
+      var eff=upgradeBaseOutput(u).mul(mm).mul(pm);
       if(u.type==='click') clickDmgBonus=clickDmgBonus.add(eff);
-      else { totalDps=totalDps.add(eff); }
+      else {
+        // 'allupgdps' boosts each individual upgrade's DPS (not Strike/drain)
+        if(allUpgDpsMult) eff=eff.mul(allUpgDpsMult);
+        totalDps=totalDps.add(eff);
+      }
     }
   });
   // Apply form bonuses
@@ -4388,6 +4458,7 @@ function recalcStats(){
   // Special-effect augments (redistributed across upgrades). Tally every lit
   // non-'mult' augment and apply its support effect. DPS→strike conversion uses
   // the DPS accumulated so far (base + form/ascension bonuses).
+  // ('allupgdps' is applied per-upgrade in the DPS loop above, not here.)
   REP_UPGRADES.forEach(function(u){
     if(!u.augEffects) return;
     for(var i=0;i<u.milestones.length;i++){
@@ -4438,6 +4509,16 @@ function recalcStats(){
   if(_mDps>0){ totalDps=totalDps.mul(1+_mDps); clickDmgBonus=clickDmgBonus.mul(1+_mDps); }
   var _mSlash=getMinionTotalBonus('slash');
   if(_mSlash>0) clickDmgBonus=clickDmgBonus.mul(1+_mSlash);
+  // Invoke Power — persistent stackable buff that endures the ascension. Folded
+  // into the final DPS and strike totals so the stat panel reflects it. (It was
+  // previously applied only at combat time, so casting it never moved the DPS
+  // readout and looked like it did nothing.) The combat-damage paths therefore
+  // must NOT re-apply it — totalDps/clickDmgBonus already carry it.
+  if(invokePowerStacks>0){
+    var invMult=1+invokePowerStacks*0.1554;
+    totalDps=totalDps.mul(invMult);
+    clickDmgBonus=clickDmgBonus.mul(invMult);
+  }
 }
 
 var _msTip=null;
@@ -4618,46 +4699,46 @@ var REP_UPGRADES=[
   {id:'bs',name:'Brimstone',        icon:25, cost:2e27, costScale:1.077, level:0, type:'dps', perLevel:75e21,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[24].level>=1;}, milestones:mkMs()},
-  {id:'ct',name:'Chaos Tide',       icon:26, cost:325e27, costScale:1.077, level:0, type:'dps', perLevel:850e21,
+  {id:'ct',name:'Chaos Tide',       icon:26, cost:5.5484e37, costScale:1.077, level:0, type:'dps', perLevel:2.0795e29,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[25].level>=1;}, milestones:mkMs()},
-  {id:'rn',name:'Ragefire Nova',    icon:27, cost:12e30, costScale:1.077, level:0, type:'dps', perLevel:32e24,
+  {id:'rn',name:'Ragefire Nova',    icon:27, cost:1.5393e48, costScale:1.077, level:0, type:'dps', perLevel:5.7656e35,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[26].level>=1;}, milestones:mkMs()},
-  {id:'ac',name:'Abyssal Call',     icon:28, cost:780e30, costScale:1.077, level:0, type:'dps', perLevel:675e24,
+  {id:'ac',name:'Abyssal Call',     icon:28, cost:4.2702e58, costScale:1.077, level:0, type:'dps', perLevel:1.5986e42,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[27].level>=1;}, milestones:mkMs()},
-  {id:'bf',name:'Balefire',         icon:29, cost:99e33, costScale:1.077, level:0, type:'dps', perLevel:50e27,
+  {id:'bf',name:'Balefire',         icon:29, cost:1.1847e69, costScale:1.077, level:0, type:'dps', perLevel:4.4324e48,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[28].level>=1;}, milestones:mkMs()},
-  {id:'ar',name:'Astral Rend',      icon:30, cost:1e99,  costScale:1.077, level:0, type:'dps', perLevel:1e82,
+  {id:'ar',name:'Astral Rend',      icon:30, cost:3.2865e79,  costScale:1.077, level:0, type:'dps', perLevel:1.2289e55,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
-  {id:'pg',name:'Phantom Grasp',    icon:31, cost:1e114, costScale:1.077, level:0, type:'dps', perLevel:1e95,
+  {id:'pg',name:'Phantom Grasp',    icon:31, cost:9.1175e89, costScale:1.077, level:0, type:'dps', perLevel:3.4074e61,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
-  {id:'np',name:'Nether Pulse',     icon:32, cost:1e129, costScale:1.077, level:0, type:'dps', perLevel:1e108,
+  {id:'np',name:'Nether Pulse',     icon:32, cost:2.5294e100, costScale:1.077, level:0, type:'dps', perLevel:9.4475e67,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
-  {id:'su',name:'Soul Rupture',     icon:33, cost:1e144, costScale:1.077, level:0, type:'dps', perLevel:1e121,
+  {id:'su',name:'Soul Rupture',     icon:33, cost:7.0171e110, costScale:1.077, level:0, type:'dps', perLevel:2.6194e74,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
-  {id:'vm',name:'Void Maw',         icon:34, cost:1e159, costScale:1.077, level:0, type:'dps', perLevel:1e134,
+  {id:'vm',name:'Void Maw',         icon:34, cost:1.9467e121, costScale:1.077, level:0, type:'dps', perLevel:7.2628e80,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
-  {id:'cw',name:'Celestial Wrath',  icon:35, cost:1e174, costScale:1.077, level:0, type:'dps', perLevel:1e147,
+  {id:'cw',name:'Celestial Wrath',  icon:35, cost:5.4005e131, costScale:1.077, level:0, type:'dps', perLevel:2.0137e87,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
-  {id:'wt',name:'Wraith Touch',     icon:36, cost:1e189, costScale:1.077, level:0, type:'dps', perLevel:1e160,
+  {id:'wt',name:'Wraith Touch',     icon:36, cost:1.4982e142, costScale:1.077, level:0, type:'dps', perLevel:5.5833e93,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
-  {id:'ec',name:'Ethereal Chains',  icon:37, cost:1e204, costScale:1.077, level:0, type:'dps', perLevel:1e173,
+  {id:'ec',name:'Ethereal Chains',  icon:37, cost:4.1564e152, costScale:1.077, level:0, type:'dps', perLevel:1.5480e100,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
-  {id:'ag',name:'Abyss Surge',      icon:38, cost:1e219, costScale:1.077, level:0, type:'dps', perLevel:1e186,
+  {id:'ag',name:'Abyss Surge',      icon:38, cost:1.1531e163, costScale:1.077, level:0, type:'dps', perLevel:4.2922e106,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
-  {id:'sp',name:'Spirit Siphon',    icon:39, cost:1e234, costScale:1.077, level:0, type:'dps', perLevel:1e199,
+  {id:'sp',name:'Spirit Siphon',    icon:39, cost:3.1989e173, costScale:1.077, level:0, type:'dps', perLevel:1.1901e113,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return false;}, milestones:mkMs()},
 ];
@@ -4669,13 +4750,43 @@ REP_UPGRADES.forEach(function(u){ u.cost=D(u.cost); u._baseCost=u.cost; });
 // milestone arrays (Spirit Slash + special upgrades get 5, others get 4).
 REP_UPGRADES.forEach(function(u){ u.augThresh=augThreshFor(u); u.augEffects=augEffectsFor(u); u.milestones=mkAugs(u); });
 
-// Post-ascension values for late-tier upgrades: big cost + proportional DPS jump
+// Post-ascension values for late-tier upgrades. These now MATCH each upgrade's
+// base value: the old post-ascension override multiplied efficiency ~1000x and
+// caused the "buy Chaos Tide, explode hundreds of floors" cliff. The rebalanced
+// ladder is a single smooth curve, so post-ascension no longer differs from base.
+// (Kept as a no-op override so the ascension code path is unchanged; existing
+// owners' old power is preserved via the blended-grandfather migration below.)
 var POST_ASCENSION_UPGRADES = {
-  'ct': {baseCost:1e39,  perLevel:2.5e36},
-  'rn': {baseCost:1e54,  perLevel:2.5e51},
-  'ac': {baseCost:1e69,  perLevel:2.5e66},
-  'bf': {baseCost:1e84,  perLevel:2.5e81},
+  'ct': {baseCost:5.5484e37, perLevel:2.0795e29},
+  'rn': {baseCost:1.5393e48, perLevel:5.7656e35},
+  'ac': {baseCost:4.2702e58, perLevel:1.5986e42},
+  'bf': {baseCost:1.1847e69, perLevel:4.4324e48},
 };
+// ── BALANCE MIGRATION (v2: the smooth ct→sp ladder) ───────────────────────────
+// Saves from before this rebalance are stamped balanceVersion<2. For any affected
+// upgrade a player already owns, we snapshot the level they had and the per-level
+// DPS it produced under the OLD numbers, so recalcStats keeps those already-bought
+// levels at their old value (login DPS is unchanged) while new purchases use the
+// rebalanced perLevel. Post-ascension owners keep the big old value; pre-ascension
+// owners keep the small old value — neither is nerfed OR buffed on login.
+var CUR_BALANCE_VERSION = 2;
+var BALANCE_V2_OLD = {
+  ct:{pre:'8.5e23',  post:'2.5e36'},
+  rn:{pre:'3.2e25',  post:'2.5e51'},
+  ac:{pre:'6.75e26', post:'2.5e66'},
+  bf:{pre:'5e28',    post:'2.5e81'},
+  ar:{pre:'1e82'},  pg:{pre:'1e95'},  np:{pre:'1e108'}, su:{pre:'1e121'},
+  vm:{pre:'1e134'}, cw:{pre:'1e147'}, wt:{pre:'1e160'}, ec:{pre:'1e173'},
+  ag:{pre:'1e186'}, sp:{pre:'1e199'},
+};
+function applyBalanceV2Migration(){
+  REP_UPGRADES.forEach(function(u){
+    var old=BALANCE_V2_OLD[u.id];
+    if(!old || u.level<=0) return;
+    u.grandfatherLevel=u.level;
+    u.grandfatherPerLevel=D((old.post&&hasEverAscended)?old.post:old.pre);
+  });
+}
 function applyPostAscensionUpgrades(){
   REP_UPGRADES.forEach(function(u){
     var pa=POST_ASCENSION_UPGRADES[u.id];
@@ -5127,7 +5238,7 @@ var SPELL_IMGS = {
   'locked': 'data:image/webp;base64,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',
 };
 
-var APP_VERSION = '1.64';
+var APP_VERSION = '1.65';
 
 // ── SOUL SHOP ─────────────────────────────────────────────────────────────────
 // ── SPELLS ────────────────────────────────────────────────────────────────────
@@ -5158,7 +5269,7 @@ var SPELLS = [
     desc:'Mana regeneration is increased by 33.3% for 33.3s.' },
   { id:'invokePower', tsId:'spell-invokePower',  icon:'★', manaCost:666, duration:0,
     name:'Invoke Power',
-    desc:'Multiplies DPS and Strike damage by (1 + 0.0666 × stacks). Stackable up to 10×. Endures this Ascension.' },
+    desc:'Multiplies DPS and Strike damage by (1 + 0.1554 × stacks). Stackable up to 5× (+77.7% at max). Stacks endure Ascensions.' },
 ];
 
 function isSpellActive(id){
@@ -5170,7 +5281,7 @@ function castSpell(id){
   var spell=SPELLS.filter(function(s){return s.id===id;})[0];
   if(!spell) return;
   if(id==='invokePower'){
-    if(invokePowerStacks>=10||mana<spell.manaCost) return;
+    if(invokePowerStacks>=5||mana<spell.manaCost) return;
   } else {
     if(mana<spell.manaCost) return;
     if(id!=='powerOf3'&&isSpellActive(id)) return; // no re-cast while active
@@ -5192,7 +5303,7 @@ function castSpell(id){
     }, Math.floor(1000/7));
   } else if(id==='invokePower'){
     var add=p3?3:1;
-    invokePowerStacks=Math.min(10,invokePowerStacks+add);
+    invokePowerStacks=Math.min(5,invokePowerStacks+add);
   } else {
     spellEndTimes[id]=Date.now()+spell.duration*durMult+getMinionTotalBonus('spelllength')*1000;
     if(id==='powerOf3') {/* just set timer, don't consume itself */}
@@ -5200,6 +5311,10 @@ function castSpell(id){
 
   if(p3) spellEndTimes['powerOf3']=0; // consume Power of 3 after modifying another spell
 
+  // Invoke Power feeds totalDps/clickDmgBonus via recalcStats, so recompute and
+  // refresh the stat panel immediately — otherwise the DPS readout wouldn't move
+  // until the next incidental recalc, making the cast look like it did nothing.
+  if(id==='invokePower'){ recalcStats(); updateEntityStatsPanel(); }
   updateManaBar();
   renderSpellPanel();
   saveGame();
@@ -5230,7 +5345,7 @@ function renderSpellPanel(){
     var owned=soulShopOwned[spell.tsId]>=1;
     var isActive=isSpellActive(spell.id);
     var isInvoke=spell.id==='invokePower';
-    var canCast=owned&&mana>=spell.manaCost&&(isInvoke?invokePowerStacks<10:!isActive);
+    var canCast=owned&&mana>=spell.manaCost&&(isInvoke?invokePowerStacks<5:!isActive);
     var keyNum=idx+1;
     // Sprite image — locked state shows lock icon
     var imgKey=!owned?'locked':spell.id;
@@ -5241,8 +5356,9 @@ function renderSpellPanel(){
       btn=document.createElement('button');
       btn.setAttribute('data-spell',spell.id);
       btn.innerHTML=
-        '<img class="spell-img" alt="'+spell.name+'" style="width:36px;height:36px;image-rendering:pixelated;display:block;">'+
-        '<span style="position:absolute;bottom:1px;right:3px;font-size:8px;color:#554477;font-family:monospace;line-height:1;">'+keyNum+'</span>'+
+        '<img class="spell-img" alt="'+spell.name+'" style="width:44px;height:44px;image-rendering:pixelated;display:block;">'+
+        '<span style="position:absolute;bottom:0;right:3px;font-size:16px;font-weight:bold;color:#ffbb44;font-family:monospace;line-height:1;z-index:3;text-shadow:1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,0 0 3px #000;">'+keyNum+'</span>'+
+        '<span class="spell-stacks" style="position:absolute;top:1px;left:3px;font-size:10px;color:#ffbb44;font-family:monospace;font-weight:bold;line-height:1;text-shadow:0 0 3px #000,0 0 2px #000;display:none;"></span>'+
         '<div class="spell-tt">'+
           '<div class="spell-tt-name">['+keyNum+'] '+spell.name+'</div>'+
           '<div class="spell-tt-cost">'+spell.manaCost+' Mana</div>'+
@@ -5276,12 +5392,24 @@ function renderSpellPanel(){
     var img=btn.querySelector('.spell-img');
     if(img&&img.getAttribute('src')!==imgSrc) img.setAttribute('src',imgSrc);
 
+    // Invoke Power stack counter (top-left corner) — only shown when stacked.
+    var stackBadge=btn.querySelector('.spell-stacks');
+    if(stackBadge){
+      if(isInvoke&&invokePowerStacks>0){
+        var st=String(invokePowerStacks);
+        if(stackBadge.textContent!==st) stackBadge.textContent=st;
+        if(stackBadge.style.display!=='block') stackBadge.style.display='block';
+      } else if(stackBadge.style.display!=='none'){
+        stackBadge.style.display='none';
+      }
+    }
+
     var remaining='';
     if(isActive&&!isInvoke){
       var secs=Math.max(0,((spellEndTimes[spell.id]||0)-Date.now())/1000);
       remaining='<div class="spell-tt-status">Active — '+secs.toFixed(1)+'s remaining</div>';
     }
-    var stacksLine=isInvoke&&invokePowerStacks>0?'<div class="spell-tt-stacks">Stacks: '+invokePowerStacks+' / 10</div>':'';
+    var stacksLine=isInvoke&&invokePowerStacks>0?'<div class="spell-tt-stacks">Stacks: '+invokePowerStacks+' / 5</div>':'';
     var lockedLine=!owned?'<div class="spell-tt-status" style="color:#775599;">Locked — purchase in the Sacrifice tab</div>':'';
     var dyn=btn.querySelector('.spell-tt-dyn');
     var dynHtml=remaining+stacksLine+lockedLine;
@@ -5325,7 +5453,7 @@ var TATTERED_NODES = [
     desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3s.',
     x:186,  y:-255, requires:[] },
   { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:200,
-    desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.0666 × stacks), stackable 10×. Persists this Ascension.',
+    desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.1554 × stacks), stackable 5×. Stacks endure Ascensions.',
     x:300,  y:97,  requires:[] },
   // Stat nodes clustered around Flurry of Strikes (0, -300) — pentacle, point toward center
   { id:'flurry-dps-1',    type:'dps',    name:'DPS +9%',        icon:'', cost:1,
@@ -5685,7 +5813,7 @@ function renderTatteredGrid(){
       if(spImgSrc){
         var spImg=document.createElement('img');
         spImg.src=spImgSrc;
-        spImg.style.cssText='width:32px;height:32px;image-rendering:pixelated;display:block;';
+        spImg.style.cssText='width:40px;height:40px;image-rendering:pixelated;display:block;';
         if(state==='locked') spImg.style.opacity='0.35';
         icon.appendChild(spImg);
       } else { icon.textContent=node.icon; }
@@ -6151,8 +6279,11 @@ function doRebirthReset(chosenForm){
   totalUpgradePurchases=0; totalMilestonePurchases=0;
   currentAscensionKills=0; eliteBountyTSEarned=0;
 
-  // Reset mana & spell state
-  mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0;
+  // Reset mana & spell state. Invoke Power stacks ENDURE through ascension
+  // (chosenForm is a form) but are wiped by a descent (chosenForm===null).
+  // Reincarnation and hard reset clear them via their own paths.
+  mana=100; completedFloorsThisAscension=[];
+  if(chosenForm===null) invokePowerStacks=0;
   for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
 
@@ -6262,7 +6393,8 @@ function saveGame(){
     highestRealm:highestRealm, highestLevel:highestLevel, highestFloor:highestFloor,
     defeatedElites:defeatedElites,
     firstKillDone:firstKillDone, killCounts:killCounts,
-    upgrades:REP_UPGRADES.map(function(u){return{id:u.id,level:u.level,cost:u.cost.toString(),milestones:u.milestones.slice()};}),
+    balanceVersion:CUR_BALANCE_VERSION,
+    upgrades:REP_UPGRADES.map(function(u){return{id:u.id,level:u.level,cost:u.cost.toString(),milestones:u.milestones.slice(),gfL:u.grandfatherLevel||0,gfP:u.grandfatherPerLevel?u.grandfatherPerLevel.toString():null};}),
     totalClicks:totalClicks, totalUpgradePurchases:totalUpgradePurchases,
     totalMilestonePurchases:totalMilestonePurchases, ascendCount:ascendCount,
     currentAscensionKills:currentAscensionKills, eliteKillsTotal:eliteKillsTotal, eliteBountyTSEarned:eliteBountyTSEarned,
@@ -6348,6 +6480,9 @@ function loadGame(){
       var c=u._baseCost;
       for(var i=0;i<u.level;i++) c=c.mul(u.costScale).ceil();
       u.cost=c;
+      // Blended-grandfather snapshot (present on balanceVersion>=2 saves).
+      u.grandfatherLevel=saved.gfL||0;
+      u.grandfatherPerLevel=saved.gfP?D(saved.gfP):null;
       if(saved.milestones){
         // Augments were redesigned (10 additive → 4/5 compounding). Coerce any
         // saved array to the upgrade's current augment count so old saves can't
@@ -6393,13 +6528,17 @@ function loadGame(){
   ascension6Path=data.ascension6Path||null;
   if(data.hasEverAscended) hasEverAscended=data.hasEverAscended;
   if(hasEverAscended) applyPostAscensionUpgrades();
+  // One-time rebalance migration: snapshot old per-level DPS for already-owned
+  // ct→sp so the smooth ladder doesn't change any current player's login DPS.
+  // Runs after hasEverAscended is known (picks pre- vs post-ascension old value).
+  if((data.balanceVersion||0)<2) applyBalanceV2Migration();
   if(data.hasEverHadAutoProgress) hasEverHadAutoProgress=data.hasEverHadAutoProgress;
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
   if(hasEverAscended||hasEverHadAutoProgress) soulShopOwned['auto-progress']=1;
   if(soulShopOwned['auto-progress']>=1) hasEverHadAutoProgress=true;
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
-  invokePowerStacks=data.invokePowerStacks||0;
+  invokePowerStacks=Math.min(5,data.invokePowerStacks||0); // clamp to the 5-stack cap
   if(data.completedFloorsThisAscension) completedFloorsThisAscension=data.completedFloorsThisAscension;
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
@@ -6693,8 +6832,8 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   var descHtml='<div class="ud">'+u.desc()+'</div>';
   var buyPrefix=(actualN>1)?'<span class="ubuy">×'+actualN+'</span>':'';
   var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
-  var iconOffset = -(u.icon * 52);
-  var iconHtml = '<img class="ucard-icon" src="artwork/sprites_upgrades.webp" style="object-fit:none;object-position:'+iconOffset+'px 0;width:52px;height:52px;" alt="">';
+  var iconOffset = -(u.icon * 60); // 60px display cell (52px sprite scaled up +8px)
+  var iconHtml = '<div class="ucard-icon" style="background-position:'+iconOffset+'px 0;"></div>';
   d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+costHtml+'</div></div>'+msRowHtml;
 
   // Milestone box events — listeners live for the lifetime of the card element
@@ -7667,7 +7806,7 @@ function minionClickerAttackEnemy(){
     dmg=dmg.mul(2+critClickMult);
   }
   if(isSpellActive('twinStrikes')) dmg=dmg.mul(2);
-  if(invokePowerStacks>0) dmg=dmg.mul(1+invokePowerStacks*0.0666);
+  // Invoke Power already baked into clickDmgBonus (see recalcStats) — no re-apply.
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
   if(combatAnim) enemyHitFlashTime=Date.now();
   var pp=floatPos('enemy-canvas');
@@ -7900,7 +8039,7 @@ function gameLoop(){
       lastAutoAttack=now;
       var _dpsDmg=totalDps.mul(_dt);
       if(isSpellActive('twinBlades')) _dpsDmg=_dpsDmg.mul(2);
-      if(invokePowerStacks>0) _dpsDmg=_dpsDmg.mul(1+invokePowerStacks*0.0666);
+      // Invoke Power already baked into totalDps by recalcStats — no re-apply.
       if(_dpsDmg.gt(0)){
         enemyHp=Decimal.max(D(0),enemyHp.sub(_dpsDmg));
         updateHpBars();
@@ -8815,7 +8954,7 @@ document.addEventListener('keydown',function(e){
     if(!spell) return;
     var owned=soulShopOwned[spell.tsId]>=1;
     var isInvoke=spell.id==='invokePower';
-    var canCast=owned&&mana>=spell.manaCost&&(isInvoke?invokePowerStacks<10:!isSpellActive(spell.id));
+    var canCast=owned&&mana>=spell.manaCost&&(isInvoke?invokePowerStacks<5:!isSpellActive(spell.id));
     if(canCast) castSpell(spell.id);
   }
 });
