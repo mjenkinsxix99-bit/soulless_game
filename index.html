@@ -1464,6 +1464,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
   <div id="reincarnate-box">
     <div id="reincarnate-lore">Sacrifice is giving up something good for something better.<br>You have gained much, but to lead others must follow.<br>Are you prepared to take the next step?</div>
     <div class="reincarnate-info">You will gain <strong id="reincarnate-mp-gain" style="color:#44cc44">0</strong> Minion Points to turn enemies into friends. Maxed level 777 Minions become Elite and stay with you.</div>
+    <div class="reincarnate-info" style="font-size:13px;color:#8a7fa0;" id="reincarnate-ts-line"></div>
     <div class="reincarnate-info" id="reincarnate-refund-line" style="display:none"><span class="reincarnate-keep">You will be refunded <strong id="reincarnate-mp-refund">0</strong> MP for your non-Elite minions.</span></div>
     <div class="reincarnate-info"><span class="reincarnate-loss">You will lose all progress, souls, upgrades and Tattered Souls.</span></div>
     <div class="reincarnate-info"><span class="reincarnate-keep">You will keep all Honors and this form's bonus.</span></div>
@@ -6126,6 +6127,18 @@ function openReincarnateModal(){
   document.getElementById('reincarnate-mp-gain').textContent=mp.toLocaleString();
   document.getElementById('reincarnate-mp-confirm').textContent=mp.toLocaleString();
   document.getElementById('reincarnate-zero-warning').style.display=mp===0?'block':'none';
+  // Show the Tattered Souls being sacrificed this life so the pending-ascension
+  // TS is visibly counted — it feeds the same 666-TS→1-MP tally even when it
+  // isn't enough on its own to complete another Minion Point.
+  var pendingTS=calcTatteredSoulsGain(rebirthForm);
+  var cycleTS=tatteredSouls+tatteredUpgradesSpent+pendingTS;
+  var tsLine=document.getElementById('reincarnate-ts-line');
+  if(tsLine){
+    var msg='Sacrificing <strong style="color:#c47c2a">'+cycleTS.toLocaleString()+'</strong> Tattered Souls';
+    if(pendingTS>0) msg+=' (including <strong style="color:#c47c2a">'+pendingTS.toLocaleString()+'</strong> from this life’s pending Ascension)';
+    msg+=' — <strong style="color:#c47c2a">'+calcTSToNextMP().toLocaleString()+'</strong> more until your next Minion Point.';
+    tsLine.innerHTML=msg;
+  }
   var refund=calcNonEliteMpRefund();
   var refundLine=document.getElementById('reincarnate-refund-line');
   if(refundLine){
