@@ -67,7 +67,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #upgrade-tooltip .utt-mult { color:#d4a843; font-size:12px; margin-top:2px; }
 /* Flex layout: icon left, content right */
 .ucard-flex { display: flex; gap: 10px; align-items: flex-start; }
-.ucard-icon { width: 52px; height: 52px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; }
+.ucard-icon { width: 60px; height: 60px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; background-image:url('artwork/sprites_upgrades.webp'); background-size:2400px 60px; background-repeat:no-repeat; }
 .ucard-body { flex: 1; min-width: 0; }
 #battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
@@ -1117,7 +1117,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   .ucard .ud { font-size: 13px !important; }
   .ucard .uc { font-size: 13px !important; }
   .ucard .uowned { font-size: 13px !important; }
-  .ucard-icon { width: 52px !important; height: 52px !important; }
+  .ucard-icon { width: 60px !important; height: 60px !important; }
 
   /* Right panel: scrollable */
   #right {
@@ -2255,6 +2255,11 @@ if(!useAscSheet && !activeLoaded) return;
   var iw = useAscSheet ? MALE_ASC_CELL : activeImg.naturalWidth;
   var ih = useAscSheet ? MALE_ASC_CELL : activeImg.naturalHeight;
   var drawH = Math.min(H * 0.9, H - 10);
+  // Enlarge every entity image beyond the base stages by 20px: Ether (not an
+  // ascension sheet) and the six base forms (grid pos 0, rebirthCount <= 1) stay
+  // at base size; flesh and every later ascension-path stage (rebirthCount >= 2)
+  // are drawn a bit larger.
+  if (useAscSheet && rebirthCount >= 2) drawH += 20;
   var drawW = drawH * (iw / ih);
   var dx = (W - drawW) / 2;
 
@@ -5321,7 +5326,7 @@ function renderSpellPanel(){
       btn=document.createElement('button');
       btn.setAttribute('data-spell',spell.id);
       btn.innerHTML=
-        '<img class="spell-img" alt="'+spell.name+'" style="width:36px;height:36px;image-rendering:pixelated;display:block;">'+
+        '<img class="spell-img" alt="'+spell.name+'" style="width:44px;height:44px;image-rendering:pixelated;display:block;">'+
         '<span style="position:absolute;bottom:1px;right:3px;font-size:8px;color:#554477;font-family:monospace;line-height:1;">'+keyNum+'</span>'+
         '<span class="spell-stacks" style="position:absolute;top:1px;left:3px;font-size:10px;color:#ffbb44;font-family:monospace;font-weight:bold;line-height:1;text-shadow:0 0 3px #000,0 0 2px #000;display:none;"></span>'+
         '<div class="spell-tt">'+
@@ -5778,7 +5783,7 @@ function renderTatteredGrid(){
       if(spImgSrc){
         var spImg=document.createElement('img');
         spImg.src=spImgSrc;
-        spImg.style.cssText='width:32px;height:32px;image-rendering:pixelated;display:block;';
+        spImg.style.cssText='width:40px;height:40px;image-rendering:pixelated;display:block;';
         if(state==='locked') spImg.style.opacity='0.35';
         icon.appendChild(spImg);
       } else { icon.textContent=node.icon; }
@@ -6794,8 +6799,8 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   var descHtml='<div class="ud">'+u.desc()+'</div>';
   var buyPrefix=(actualN>1)?'<span class="ubuy">×'+actualN+'</span>':'';
   var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
-  var iconOffset = -(u.icon * 52);
-  var iconHtml = '<img class="ucard-icon" src="artwork/sprites_upgrades.webp" style="object-fit:none;object-position:'+iconOffset+'px 0;width:52px;height:52px;" alt="">';
+  var iconOffset = -(u.icon * 60); // 60px display cell (52px sprite scaled up +8px)
+  var iconHtml = '<div class="ucard-icon" style="background-position:'+iconOffset+'px 0;"></div>';
   d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+costHtml+'</div></div>'+msRowHtml;
 
   // Milestone box events — listeners live for the lifetime of the card element
