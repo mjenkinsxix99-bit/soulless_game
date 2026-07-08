@@ -5264,7 +5264,7 @@ var SPELLS = [
     desc:'Mana regeneration is increased by 33.3% for 33.3s.' },
   { id:'invokePower', tsId:'spell-invokePower',  icon:'★', manaCost:666, duration:0,
     name:'Invoke Power',
-    desc:'Multiplies DPS and Strike damage by (1 + 0.1554 × stacks). Stackable up to 5× (+77.7% at max). Endures this Ascension.' },
+    desc:'Multiplies DPS and Strike damage by (1 + 0.1554 × stacks). Stackable up to 5× (+77.7% at max). Stacks endure Ascensions.' },
 ];
 
 function isSpellActive(id){
@@ -5448,7 +5448,7 @@ var TATTERED_NODES = [
     desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3s.',
     x:186,  y:-255, requires:[] },
   { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:200,
-    desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.1554 × stacks), stackable 5×. Persists this Ascension.',
+    desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.1554 × stacks), stackable 5×. Stacks endure Ascensions.',
     x:300,  y:97,  requires:[] },
   // Stat nodes clustered around Flurry of Strikes (0, -300) — pentacle, point toward center
   { id:'flurry-dps-1',    type:'dps',    name:'DPS +9%',        icon:'', cost:1,
