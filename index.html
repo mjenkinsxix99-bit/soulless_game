@@ -725,7 +725,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 /* Owned/unlocked spells (any state except locked) get a white button fill */
 .spell-btn:not(.spell-locked) { background:#ffffff; }
 .spell-btn.spell-lit { border-color:#3355aa; box-shadow:0 0 7px rgba(50,90,200,0.3); opacity:1; }
-.spell-btn.spell-dim { border-color:#141230; opacity:0.6; cursor:default; } /* owned but not enough mana — only slightly dimmed */
+.spell-btn.spell-dim { border-color:#141230; background:rgba(255,255,255,0.6); cursor:default; } /* owned but not enough mana — dim the face, NOT the tooltip */
+/* Fade the icon/badges but exclude the tooltip, so element opacity doesn't cascade into it (the tooltip must stay fully opaque like every other spell). */
+.spell-btn.spell-dim > *:not(.spell-tt) { opacity:0.6; }
 .spell-btn.spell-locked { border-color:#221a44; cursor:default; } /* padlock already signals locked — no dimming */
 .spell-btn.spell-active-glow { border-color:#7799ee; box-shadow:0 0 12px rgba(90,140,255,0.7),0 0 26px rgba(70,120,255,0.35); animation:spellGlow 1s ease-in-out infinite; }
 @keyframes spellGlow { 0%,100%{box-shadow:0 0 10px rgba(90,140,255,0.6),0 0 22px rgba(70,120,255,0.3);} 50%{box-shadow:0 0 18px rgba(120,170,255,0.9),0 0 38px rgba(100,160,255,0.5);} }
