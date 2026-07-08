@@ -6274,8 +6274,11 @@ function doRebirthReset(chosenForm){
   totalUpgradePurchases=0; totalMilestonePurchases=0;
   currentAscensionKills=0; eliteBountyTSEarned=0;
 
-  // Reset mana & spell state
-  mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0;
+  // Reset mana & spell state. Invoke Power stacks ENDURE through ascension
+  // (chosenForm is a form) but are wiped by a descent (chosenForm===null).
+  // Reincarnation and hard reset clear them via their own paths.
+  mana=100; completedFloorsThisAscension=[];
+  if(chosenForm===null) invokePowerStacks=0;
   for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
 
