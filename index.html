@@ -4140,6 +4140,9 @@ function onEnemyDeath(){
   if(_tsoulsSum>0) soulMult*=(1+_tsoulsSum);
   var _minionSoulsBonus=getMinionTotalBonus('souls');
   if(_minionSoulsBonus>0) soulMult*=(1+_minionSoulsBonus);
+  // Pentagram mastery: +11% souls per completed-pentagram honor earned
+  var _pentBonus=pentMasterySoulBonus();
+  if(_pentBonus>0) soulMult*=(1+_pentBonus);
   var reward=enemySoulReward.mul(soulMult).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
@@ -4963,6 +4966,20 @@ var ACHIEVEMENTS=[
   // All six form ultimates — doubles the chosen form\'s bonus for each run
   {id:'form-ult-all',        cat:'Identity',  name:'The Complete Self',       desc:'Complete the final form of all six essences. Your chosen form\'s bonus is doubled each run.', check:function(){return['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine'].every(function(id){return achievementsEarned.indexOf(id)>=0;});}},
   {id:'final-form',          cat:'Ascendant', name:'Final Form',              desc:'Complete all seven ascensions',                                                    check:function(){return rebirthCount>=7;}},
+  // Pentagrams — complete a spell cluster (spell node + its 5 surrounding stat nodes)
+  {id:'pent-flurry',       cat:'Pentagrams', name:'Tempest Bound',       desc:'Complete the Flurry of Strikes pentagram. Grants +11% Souls gained.', check:function(){return pentComplete('spell-flurry');}},
+  {id:'pent-crit',         cat:'Pentagrams', name:'Perfect Edge',        desc:'Complete the Critical Strike pentagram. Grants +11% Souls gained.',   check:function(){return pentComplete('spell-critStrike');}},
+  {id:'pent-blade',        cat:'Pentagrams', name:'Twinned Steel',       desc:'Complete the Twin Blades pentagram. Grants +11% Souls gained.',       check:function(){return pentComplete('spell-twinBlades');}},
+  {id:'pent-souls',        cat:'Pentagrams', name:'Soulbound Pair',      desc:'Complete the Twin Souls pentagram. Grants +11% Souls gained.',        check:function(){return pentComplete('spell-twinSouls');}},
+  {id:'pent-rule',         cat:'Pentagrams', name:'Rule Fulfilled',      desc:'Complete the Rule of 3 pentagram. Grants +11% Souls gained.',         check:function(){return pentComplete('spell-ruleOf3');}},
+  {id:'pent-strikes',      cat:'Pentagrams', name:'Doubled Wrath',       desc:'Complete the Twin Strikes pentagram. Grants +11% Souls gained.',      check:function(){return pentComplete('spell-twinStrikes');}},
+  {id:'pent-power3',       cat:'Pentagrams', name:'Trinity of Power',    desc:'Complete the Power of 3 pentagram. Grants +11% Souls gained.',        check:function(){return pentComplete('spell-powerOf3');}},
+  {id:'pent-mana',         cat:'Pentagrams', name:'Endless Thirst',      desc:'Complete the Mana Hungry pentagram. Grants +11% Souls gained.',       check:function(){return pentComplete('spell-manaHungry');}},
+  {id:'pent-invoke',       cat:'Pentagrams', name:'Power Invoked',       desc:'Complete the Invoke Power pentagram. Grants +11% Souls gained.',      check:function(){return pentComplete('spell-invokePower');}},
+  {id:'pent-first',        cat:'Pentagrams', name:'First Seal',          desc:'Complete your first pentagram.',                                     check:function(){return completedPentagramCount()>=1;}},
+  {id:'pent-adept',        cat:'Pentagrams', name:'Adept of the Circle', desc:'Complete 5 pentagrams.',                                             check:function(){return completedPentagramCount()>=5;}},
+  {id:'seal-of-9',         cat:'Pentagrams', name:'The Seal of the 9',   desc:'Complete all 9 pentagrams at once. Every life now begins with Flurry\'s five outer nodes already sealed.', check:function(){return completedPentagramCount()>=9;}},
+  {id:'star-of-sacrifice', cat:'Pentagrams', name:'Star of Sacrifice',  desc:'Own every node of the Tattered tree at once. Every life now begins with 5 Tattered Souls banked.', check:function(){return allTattNodesOwned();}},
   // Elite Prey — first kill of each named elite
   {id:'elite-first-wisp',   cat:'Elite Prey', name:'Wisp Bane',              desc:'Defeat the Wisper elite for the first time',        check:function(){return namedEliteFirstKills.indexOf(0)>=0;}},
   {id:'elite-first-shade',  cat:'Elite Prey', name:'Shade Crusher',          desc:'Defeat the Hollo elite for the first time',         check:function(){return namedEliteFirstKills.indexOf(1)>=0;}},
@@ -5698,6 +5715,53 @@ function isTattNodeUnlocked(node){
   });
 }
 
+// ── PENTAGRAM COMPLETION ──────────────────────────────────────────────────────
+// Each of the 9 spell clusters forms a "pentagram": the central spell node plus
+// its 5 surrounding stat nodes. A pentagram is complete when all 6 are owned.
+var PENTAGRAM_GROUPS = [
+  { spell:'spell-flurry',      achId:'pent-flurry',  nodes:['flurry-dps-1','flurry-souls','flurry-dps-2','flurry-strike','flurry-speed'] },
+  { spell:'spell-critStrike',  achId:'pent-crit',    nodes:['crit-dps-1','crit-strike','crit-dps-2','crit-souls','crit-speed'] },
+  { spell:'spell-twinBlades',  achId:'pent-blade',   nodes:['blade-dps','blade-speed','blade-strike-1','blade-hp','blade-strike-2'] },
+  { spell:'spell-twinSouls',   achId:'pent-souls',   nodes:['souls-souls','souls-strike','souls-speed','souls-dps-2','souls-dps-1'] },
+  { spell:'spell-ruleOf3',     achId:'pent-rule',    nodes:['rule-hp','rule-dps-1','rule-speed','rule-souls','rule-dps-2'] },
+  { spell:'spell-twinStrikes', achId:'pent-strikes', nodes:['strikes-speed','strikes-dps-1','strikes-souls','strikes-strike','strikes-dps-2'] },
+  { spell:'spell-powerOf3',    achId:'pent-power3',  nodes:['power3-speed','power3-crit','power3-dps-1','power3-souls','power3-dps-2'] },
+  { spell:'spell-manaHungry',  achId:'pent-mana',    nodes:['mana-speed','mana-dps-1','mana-souls','mana-crit','mana-dps-2'] },
+  { spell:'spell-invokePower', achId:'pent-invoke',  nodes:['invoke-speed','invoke-dps-1','invoke-souls','invoke-crit','invoke-dps-2'] },
+];
+// The 5 outer nodes of the Flurry pentagram (not the spell) — granted at the start
+// of every life once "The Seal of the 9" honor is earned.
+var SEAL9_START_NODES=['flurry-dps-1','flurry-souls','flurry-dps-2','flurry-strike','flurry-speed'];
+
+function isPentagramComplete(g){
+  if(!(soulShopOwned[g.spell]>=1)) return false;
+  for(var i=0;i<g.nodes.length;i++){ if(!(soulShopOwned[g.nodes[i]]>=1)) return false; }
+  return true;
+}
+function pentComplete(spellId){
+  for(var i=0;i<PENTAGRAM_GROUPS.length;i++){ if(PENTAGRAM_GROUPS[i].spell===spellId) return isPentagramComplete(PENTAGRAM_GROUPS[i]); }
+  return false;
+}
+function completedPentagramCount(){
+  var c=0; for(var i=0;i<PENTAGRAM_GROUPS.length;i++){ if(isPentagramComplete(PENTAGRAM_GROUPS[i])) c++; } return c;
+}
+function allTattNodesOwned(){
+  for(var i=0;i<TATTERED_NODES.length;i++){ if(!(soulShopOwned[TATTERED_NODES[i].id]>=1)) return false; }
+  return true;
+}
+// +11% souls gained per completed-pentagram mastery honor earned (stacks to +99%).
+function pentMasterySoulBonus(){
+  var b=0;
+  for(var i=0;i<PENTAGRAM_GROUPS.length;i++){ if(achievementsEarned.indexOf(PENTAGRAM_GROUPS[i].achId)>=0) b+=0.11; }
+  return b;
+}
+// Re-grant the Seal-of-9 starting nodes after a tree wipe (reincarnate / respec).
+function grantSeal9Nodes(){
+  if(achievementsEarned.indexOf('seal-of-9')>=0){
+    SEAL9_START_NODES.forEach(function(id){ soulShopOwned[id]=1; });
+  }
+}
+
 function buyTatteredNode(id){
   if(rebirthCount<1) return;
   var node=TATTERED_NODES.filter(function(n){return n.id===id;})[0];
@@ -5715,6 +5779,7 @@ function buyTatteredNode(id){
   updateAutoProgressBtn();
   renderTatteredGrid();
   renderSpellPanel();
+  checkAchievements(); // pentagram-completion honors fire the instant a node completes one
   saveGame();
 }
 
@@ -5728,6 +5793,7 @@ function doRespec(){
     soulShopOwned[n.id]=0;
   });
   if(hasEverAscended||hasEverHadAutoProgress) soulShopOwned['auto-progress']=1;
+  grantSeal9Nodes(); // Seal of the 9 reward: keep Flurry's 5 outer nodes through a respec
   // Clear spell active states since spells are no longer owned
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
@@ -6168,6 +6234,9 @@ function doReincarnate(){
   TATTERED_NODES.forEach(function(n){ soulShopOwned[n.id]=0; });
   if(hadAutoProgress) soulShopOwned['auto-progress']=1;
   autoProgressEnabled=hadAutoProgress?autoProgressEnabled:false;
+  // Pentagram starting rewards (persist across lives via earned honors)
+  grantSeal9Nodes();                                                       // Seal of the 9: begin with Flurry's 5 outer nodes
+  if(achievementsEarned.indexOf('star-of-sacrifice')>=0) tatteredSouls+=5; // Star of Sacrifice: begin with 5 TS banked
 
   // Keep: rebirthForm, achievementsEarned, discoveredMinions, elite minions
   wipeNonEliteMinions();
