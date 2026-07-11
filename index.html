@@ -1463,7 +1463,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
 <div id="reincarnate-modal">
   <div id="reincarnate-box">
     <div id="reincarnate-lore">Sacrifice is giving up something good for something better.<br>You have gained much, but to lead others must follow.<br>Are you prepared to take the next step?</div>
-    <div class="reincarnate-info">You will gain <strong id="reincarnate-mp-gain" style="color:#44cc44">0</strong> Minion Points to turn enemies into friends. Maxed level 777 Minions become Elite and stay with you.</div>
+    <div class="reincarnate-info">You will gain <strong id="reincarnate-mp-gain" style="color:#44cc44">0</strong> Minion Points to turn enemies into friends. Maxed level 666 Minions become Elite and stay with you.</div>
     <div class="reincarnate-info" id="reincarnate-refund-line" style="display:none"><span class="reincarnate-keep">You will be refunded <strong id="reincarnate-mp-refund">0</strong> MP for your non-Elite minions.</span></div>
     <div class="reincarnate-info"><span class="reincarnate-loss">You will lose all progress, souls, upgrades and Tattered Souls.</span></div>
     <div class="reincarnate-info"><span class="reincarnate-keep">You will keep all Honors and this form's bonus.</span></div>
@@ -3037,10 +3037,10 @@ var MINION_DATA=[
 
 
 // ── MINION XP / COST HELPERS ─────────────────────────────────────────────────
-var MINION_ELITE_LEVEL=777;
+var MINION_ELITE_LEVEL=666;
 var MINION_REALM_COSTS=[1,2,3,4,5,8,13,21,34,55];
 var MINION_XP_BASE=10;
-var MINION_XP_GROWTH=1.0133;
+var MINION_XP_GROWTH=1.00945;
 
 function getMinionXpForLevel(level){
   return Math.floor(MINION_XP_BASE*Math.pow(MINION_XP_GROWTH,level-1));
