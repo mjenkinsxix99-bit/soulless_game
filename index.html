@@ -3765,7 +3765,7 @@ function spawnSoulCoins(){
   var _floorsComp=completedFloorsThisAscension.length;
   if(_floorsComp>0){
     var _mg=3*0.00001*_floorsComp;
-    if(isSpellActive('manaHungry')) _mg*=1.333;
+    if(isSpellActive('manaHungry')) _mg*=(1+0.333*(spellEffectMult['manaHungry']||1));
     if(rebirthForm==='feline') _mg*=(1+0.10*getFormMult());
     else if(achievementsEarned.indexOf('form-ult-feline')>=0) _mg*=1.10;
     if(ascension4Path==='shadow') _mg*=1.05;
@@ -4124,16 +4124,16 @@ function entityAttack(isAuto, isSpell){
   var lo=entityDmgMin.add(entityDmgBonus).add(bonus);
   var hi=entityDmgMax.add(entityDmgBonus).add(bonus);
   var dmg=rndD(lo,hi);
-  // Spell: Twin Blades — DPS ×2 for auto attacks
-  if(isAuto && isSpellActive('twinBlades')) dmg=dmg.mul(2);
+  // Spell: Twin Blades — DPS ×2 for auto attacks (×6 under Power of 3)
+  if(isAuto && isSpellActive('twinBlades')) dmg=dmg.mul(2*(spellEffectMult['twinBlades']||1));
   var isCrit=false;
-  var effectiveCrit=critClickChance+((!isAuto && isSpellActive('critStrike'))?0.666:0);
+  var effectiveCrit=critClickChance+((!isAuto && isSpellActive('critStrike'))?0.666*(spellEffectMult['critStrike']||1):0);
   if(!isAuto && effectiveCrit>0 && Math.random()<effectiveCrit){
     isCrit=true;
     dmg=dmg.mul(2+critClickMult);
   }
-  // Spell: Twin Strikes — strike damage ×2 for non-auto attacks
-  if(!isAuto && isSpellActive('twinStrikes')) dmg=dmg.mul(2);
+  // Spell: Twin Strikes — strike damage ×2 for non-auto attacks (×6 under Power of 3)
+  if(!isAuto && isSpellActive('twinStrikes')) dmg=dmg.mul(2*(spellEffectMult['twinStrikes']||1));
   // Invoke Power is baked into totalDps/clickDmgBonus by recalcStats — do NOT
   // re-apply it here (bonus already carries it).
   enemyHp=Decimal.max(D(0),enemyHp.sub(dmg));
@@ -4143,7 +4143,7 @@ function entityAttack(isAuto, isSpell){
   updateHpBars();
   // Spell: Rule of 3 — immediately gain enemy death soul value ×3 per strike
   if(isSpellActive('ruleOf3')){
-    var r3=enemySoulReward.mul(3);
+    var r3=enemySoulReward.mul(3*(spellEffectMult['ruleOf3']||1));
     souls=souls.add(r3); totalSouls=totalSouls.add(r3);
     document.getElementById('soul-count').textContent=fmt(souls);
     dirtyU=true;
@@ -4162,8 +4162,8 @@ function onEnemyDeath(){
   else if(achievementsEarned.indexOf('form-ult-androgynous')>=0) soulMult*=1.10;
   if(ascension3Path==='mystic') soulMult*=1.05;
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
-  // Spell: Twin Souls — ×2 souls gained
-  if(isSpellActive('twinSouls')) soulMult*=2;
+  // Spell: Twin Souls — ×2 souls gained (×6 under Power of 3)
+  if(isSpellActive('twinSouls')) soulMult*=2*(spellEffectMult['twinSouls']||1);
   // Tattered Shop: souls gain bonus nodes
   var _tsoulsSum=sumTattNodes(TATT_SOULS_NODES);
   if(_tsoulsSum>0) soulMult*=(1+_tsoulsSum);
@@ -4315,6 +4315,7 @@ var critClickChance=0, critClickMult=0, dvDpsToClickRatio=0, soulAbsorbBonus=0;
 var mana=0, manaMax=100;
 var completedFloorsThisAscension=[];
 var spellEndTimes={};
+var spellEffectMult={}; // per-spell effect multiplier; set to 3 by Power of 3, else 1
 var flurryInterval=null;
 var invokePowerStacks=0;
 var _lastSpellUiTick=0;
@@ -5321,26 +5322,27 @@ function castSpell(id){
     if(mana<spell.manaCost) return;
     if(id!=='powerOf3'&&isSpellActive(id)) return; // no re-cast while active
   }
-  // Check Power of 3 modifier (3× effect)
+  // Power of 3 modifier — triples the EFFECT (not the duration) of the next spell cast.
   var p3=isSpellActive('powerOf3')&&id!=='powerOf3';
-  var durMult=p3?3:1;
+  spellEffectMult[id]=p3?3:1; // read at each spell's effect site; also clears any stale boost on recast
 
   mana-=spell.manaCost;
 
   if(id==='flurry'){
     if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
-    var fDur=spell.duration*durMult+getMinionTotalBonus('spelllength')*1000;
+    var fDur=spell.duration+getMinionTotalBonus('spelllength')*1000;
     var fEnd=Date.now()+fDur;
     spellEndTimes['flurry']=fEnd;
+    var fRate=7*(p3?3:1); // Power of 3: 3× the strikes per second (Flurry's effect)
     flurryInterval=setInterval(function(){
       if(Date.now()>=fEnd){clearInterval(flurryInterval);flurryInterval=null;spellEndTimes['flurry']=0;renderSpellPanel();return;}
       entityAttack(false,true);
-    }, Math.floor(1000/7));
+    }, Math.floor(1000/fRate));
   } else if(id==='invokePower'){
     var add=p3?3:1;
     invokePowerStacks=Math.min(5,invokePowerStacks+add);
   } else {
-    spellEndTimes[id]=Date.now()+spell.duration*durMult+getMinionTotalBonus('spelllength')*1000;
+    spellEndTimes[id]=Date.now()+spell.duration+getMinionTotalBonus('spelllength')*1000;
     if(id==='powerOf3') {/* just set timer, don't consume itself */}
   }
 
