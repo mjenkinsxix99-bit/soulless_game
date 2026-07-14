@@ -3073,7 +3073,7 @@ function getMinionBonusDesc(bonusType, heldMinion){
   var label;
   switch(bonusType){
     case 'souls':      label='bonus to souls gained'; break;
-    case 'dps':        label='bonus to DPS & auto damage'; break;
+    case 'dps':        label='bonus to DPS'; break;
     case 'slash':      label='bonus to strike damage'; break;
     case 'mana':       label='bonus to mana regen'; break;
     case 'ts':         label='TS multiplier (stacking)'; break;
@@ -4511,7 +4511,7 @@ function recalcStats(){
   }
   // Minion bonuses: DPS and slash (additive multipliers)
   var _mDps=getMinionTotalBonus('dps');
-  if(_mDps>0){ totalDps=totalDps.mul(1+_mDps); clickDmgBonus=clickDmgBonus.mul(1+_mDps); }
+  if(_mDps>0){ totalDps=totalDps.mul(1+_mDps); } // DPS only — click/strike damage is the slash minion's bonus
   var _mSlash=getMinionTotalBonus('slash');
   if(_mSlash>0) clickDmgBonus=clickDmgBonus.mul(1+_mSlash);
   // Invoke Power — persistent stackable buff that endures the ascension. Folded
