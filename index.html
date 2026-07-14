@@ -3737,7 +3737,7 @@ function spawnSoulCoins(){
     if(ascension5Path==='holy') _mg*=1.05;
     if(ascension6Path==='knowledge') _mg*=1.10;
     var _tregens={'flurry-speed':0.10,'crit-speed':0.15,'blade-speed':0.20,'souls-speed':0.30,
-      'rule-speed':0.40,'power3-speed':0.50,'mana-speed':0.65,'invoke-speed':0.85,'strikes-speed':1.35};
+      'rule-speed':0.40,'power3-speed':0.65,'mana-speed':0.85,'invoke-speed':1.35,'strikes-speed':0.50};
     var _tregenSum=0;
     for(var _rk in _tregens){if(soulShopOwned[_rk]>=1)_tregenSum+=_tregens[_rk];}
     if(_tregenSum>0) _mg*=(1+_tregenSum);
@@ -4134,7 +4134,7 @@ function onEnemyDeath(){
   if(isSpellActive('twinSouls')) soulMult*=2;
   // Tattered Shop: souls gain bonus nodes
   var _tsouls={'flurry-souls':0.333,'crit-souls':0.333,'souls-souls':0.333,'rule-souls':0.333,
-    'power3-souls':0.333,'mana-souls':0.333,'invoke-souls':0.666,'strikes-souls':0.999};
+    'power3-dps-1':0.333,'mana-souls':0.666,'invoke-souls':0.999,'strikes-strike':0.333};
   var _tsoulsSum=0;
   for(var _sk in _tsouls){if(soulShopOwned[_sk]>=1)_tsoulsSum+=_tsouls[_sk];}
   if(_tsoulsSum>0) soulMult*=(1+_tsoulsSum);
@@ -4477,26 +4477,26 @@ function recalcStats(){
   // Tattered Shop stat node bonuses
   var _tdps={'flurry-dps-1':0.09,'flurry-dps-2':0.09,'crit-dps-1':0.11,'crit-dps-2':0.333,
     'blade-dps':0.333,'souls-dps-1':0.333,'souls-dps-2':0.333,'rule-dps-1':0.333,'rule-dps-2':0.333,
-    'power3-dps-1':0.333,'power3-dps-2':0.333,'mana-dps-1':0.333,'mana-dps-2':0.333,
-    'invoke-dps-2':0.666,'strikes-dps-1':0.666,'strikes-dps-2':0.333};
+    'power3-crit':0.333,'power3-dps-2':0.333,'mana-dps-2':0.666,
+    'invoke-dps-1':0.666,'invoke-dps-2':0.333,'strikes-souls':0.333,'strikes-dps-2':0.333};
   var _tdpsSum=0;
   for(var _dk in _tdps){if(soulShopOwned[_dk]>=1)_tdpsSum+=_tdps[_dk];}
   if(_tdpsSum>0){totalDps=totalDps.mul(1+_tdpsSum);clickDmgBonus=clickDmgBonus.mul(1+_tdpsSum);}
   // Strike: +0.666% of total DPS added as strike damage per node
   var _tstrSum=0;
-  ['flurry-strike','crit-strike','blade-strike-1','souls-strike','strikes-strike'].forEach(function(s){if(soulShopOwned[s]>=1)_tstrSum+=0.00666;});
+  ['flurry-strike','crit-strike','blade-strike-1','souls-strike','invoke-crit'].forEach(function(s){if(soulShopOwned[s]>=1)_tstrSum+=0.00666;});
   if(_tstrSum>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(_tstrSum));
   // Crit chance nodes (+3.33% each)
-  ['blade-strike-2','power3-crit','mana-crit'].forEach(function(s){if(soulShopOwned[s]>=1)critClickChance+=0.0333;});
+  ['blade-strike-2','power3-souls','strikes-dps-1'].forEach(function(s){if(soulShopOwned[s]>=1)critClickChance+=0.0333;});
   // Crit multiplier
-  if(soulShopOwned['invoke-crit']>=1) critClickMult+=3.33;
-  // HP drain
+  if(soulShopOwned['mana-crit']>=1) critClickMult+=3.33;
+  // Tattered Souls gained from Elite bounties (+33.3% each)
   if(soulShopOwned['blade-hp']>=1) tattTsGainMult+=0.333;
   if(soulShopOwned['rule-hp']>=1) tattTsGainMult+=0.333;
-  if(soulShopOwned['invoke-dps-1']>=1) tattTsGainMult+=0.333;
+  if(soulShopOwned['mana-dps-1']>=1) tattTsGainMult+=0.333;
   // Mana cap: recompute from purchased mana nodes
   var _tmana={'flurry-speed':50,'crit-speed':75,'blade-speed':100,'souls-speed':125,'rule-speed':150,
-    'power3-speed':175,'mana-speed':225,'invoke-speed':250,'strikes-speed':250};
+    'power3-speed':225,'mana-speed':250,'invoke-speed':250,'strikes-speed':175};
   var _tmanaBonus=0;
   for(var _mk in _tmana){if(soulShopOwned[_mk]>=1)_tmanaBonus+=_tmana[_mk];}
   manaMax=100+_tmanaBonus;
@@ -5515,7 +5515,7 @@ var TATTERED_NODES = [
     desc:'Increases your Strike Damage by +0.666% of your total DPS.',
     x:173,  y:186,  requires:[] },
   { id:'blade-hp',       type:'souls',  name:'Tattered Souls +33.3%',icon:'', cost:5,
-    desc:'Increases Tattered Souls gained on Ascension by +33.3%.',
+    desc:'Increases Tattered Souls gained from Elite bounties by +33.3%.',
     x:123,  y:223,  requires:[] },
   { id:'blade-strike-2', type:'strike', name:'Crit Chance',    icon:'', cost:5,
     desc:'Increases your Critical Strike chance by +3.33%.',
@@ -5538,7 +5538,7 @@ var TATTERED_NODES = [
     x:-154, y:127,  requires:[] },
   // Stat nodes clustered around Rule of 3 (-285, -93) — pentacle, point toward center
   { id:'rule-hp',        type:'souls',  name:'Tattered Souls +33.3%',icon:'', cost:13,
-    desc:'Increases Tattered Souls gained on Ascension by +33.3%.',
+    desc:'Increases Tattered Souls gained from Elite bounties by +33.3%.',
     x:-150, y:-49,  requires:[] },
   { id:'rule-dps-1',     type:'dps',    name:'DPS +33.3%',     icon:'', cost:13,
     desc:'Increases DPS of all upgrades by +33.3%.',
@@ -5573,7 +5573,7 @@ var TATTERED_NODES = [
     desc:'Increases Mana cap by 250 and Mana regen rate by 85%.',
     x:186,  y:-307, requires:[] },
   { id:'mana-dps-1',  type:'ts',     name:'Tattered Souls +33.3%', icon:'', cost:39,
-    desc:'Increases Tattered Souls gained on Ascension by +33.3%.',
+    desc:'Increases Tattered Souls gained from Elite bounties by +33.3%.',
     x:235,  y:-271, requires:[] },
   { id:'mana-souls',  type:'souls',  name:'Soul Gain',      icon:'', cost:39,
     desc:'Increases all souls gained by 66.6%.',
@@ -6159,20 +6159,30 @@ function getMaleAscGridPos(rc, p3, p4, p5, p6){
   var i6 = p6 ? (_MALE_P6[p6]||0) : 0;
   return            45 + i3*27 + i4*9 + i5*3 + i6;
 }
-function calcUpgradeTSGain(chosenForm){
-  var base=Math.floor(totalUpgradePurchases/666);
-  var form=chosenForm!==undefined?chosenForm:rebirthForm;
-  if(form==='feminine') base=Math.floor(base*(1+0.10*getFormMult()));
-  else if(achievementsEarned.indexOf('form-ult-feminine')>=0) base=Math.floor(base*1.10);
-  if(ascension3Path==='shadow') base=Math.floor(base*1.05);
-  if(ascension6Path==='leather') base=Math.floor(base*1.10);
+function calcUpgradeTSGain(){
+  // Static 666:1 ratio from upgrade purchases. Minion and Tattered-shop bonuses
+  // never touch this portion; the form/ascension/achievement multipliers are
+  // applied later in calcTatteredSoulsGain so they cover the whole total.
+  return Math.max(0,Math.floor(totalUpgradePurchases/666));
+}
+function calcBountyTSGain(){
+  // Elite bounty TS — the minion TS bonus and the Tattered-shop bounty nodes
+  // (tattTsGainMult) apply only here.
+  var base=eliteBountyTSEarned;
   var _mTs=getMinionTotalBonus('ts');
   if(_mTs>0) base=Math.floor(base*(1+_mTs));
   if(tattTsGainMult>0) base=Math.floor(base*(1+tattTsGainMult));
   return Math.max(0,base);
 }
 function calcTatteredSoulsGain(chosenForm){
-  return calcUpgradeTSGain(chosenForm)+eliteBountyTSEarned;
+  var form=chosenForm!==undefined?chosenForm:rebirthForm;
+  var total=calcUpgradeTSGain()+calcBountyTSGain();
+  // Form, ascension-path, and achievement bonuses apply to ALL Tattered Souls gained.
+  if(form==='feminine') total=Math.floor(total*(1+0.10*getFormMult()));
+  else if(achievementsEarned.indexOf('form-ult-feminine')>=0) total=Math.floor(total*1.10);
+  if(ascension3Path==='shadow') total=Math.floor(total*1.05);
+  if(ascension6Path==='leather') total=Math.floor(total*1.10);
+  return Math.max(0,total);
 }
 
 function calcReincarnateMP(){
