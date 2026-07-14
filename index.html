@@ -3182,6 +3182,7 @@ function attemptMinionCapture(typeIdx){
   if(discoveredMinions.indexOf(typeIdx)<0) discoveredMinions.push(typeIdx);
   showMinionCaptureNotif(typeIdx);
   checkAchievements(); // "minions at once" / elite-held honors
+  recalcStats(); dirtyU=true; // new minion changes bonuses (incl. upgrade-cost reduction) — refresh stats & cost display
   renderMinionModal();
   saveGame();
 }
@@ -3214,6 +3215,7 @@ function releaseMinion(typeIdx){
   clampMinionClickerAssignments();
   minionPoints+=refund;
   checkAchievements(); // "minions released" honors (each grants +1% capture chance)
+  recalcStats(); dirtyU=true; // roster change alters bonuses (incl. upgrade-cost reduction) — refresh stats & cost display
   renderMinionModal();
   saveGame();
 }
@@ -7044,7 +7046,7 @@ function buildUpgrades(){
     var actualN, cost, can;
     if(buyQty==='max'){
       actualN=maxAffordableN(u);
-      if(actualN===0){ cost=repCost(u); can=false; actualN=1; }
+      if(actualN===0){ cost=calcCostN(u,1); can=false; actualN=1; }
       else { cost=calcCostN(u,actualN); can=true; }
     } else {
       actualN=buyQty;
