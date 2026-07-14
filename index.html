@@ -4318,6 +4318,7 @@ var spellEndTimes={};
 var spellEffectMult={}; // per-spell effect multiplier; set to 3 by Power of 3, else 1
 var flurryInterval=null;
 var invokePowerStacks=0;
+var invokePowerBonus=0; // summed Invoke Power multiplier contribution; a Power-of-3 cast adds 3× for its single stack
 var _lastSpellUiTick=0;
 
 // Divine Hunger milestone effect labels (replaces generic ×7/×666 text)
@@ -4536,8 +4537,8 @@ function recalcStats(){
   // previously applied only at combat time, so casting it never moved the DPS
   // readout and looked like it did nothing.) The combat-damage paths therefore
   // must NOT re-apply it — totalDps/clickDmgBonus already carry it.
-  if(invokePowerStacks>0){
-    var invMult=1+invokePowerStacks*0.1554;
+  if(invokePowerBonus>0){
+    var invMult=1+invokePowerBonus;
     totalDps=totalDps.mul(invMult);
     clickDmgBonus=clickDmgBonus.mul(invMult);
   }
@@ -5339,8 +5340,8 @@ function castSpell(id){
       entityAttack(false,true);
     }, Math.floor(1000/fRate));
   } else if(id==='invokePower'){
-    var add=p3?3:1;
-    invokePowerStacks=Math.min(5,invokePowerStacks+add);
+    invokePowerStacks=Math.min(5,invokePowerStacks+1); // Power of 3 never adds extra stacks or duration...
+    invokePowerBonus+=0.1554*(p3?3:1);                 // ...it only triples the effect of this single stack
   } else {
     spellEndTimes[id]=Date.now()+spell.duration+getMinionTotalBonus('spelllength')*1000;
     if(id==='powerOf3') {/* just set timer, don't consume itself */}
@@ -5841,7 +5842,7 @@ function doRespec(){
   // Clear spell active states since spells are no longer owned
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
-  invokePowerStacks=0;
+  invokePowerStacks=0; invokePowerBonus=0;
   // auto-progress is a free permanent unlock; don't disable it on respec
   if(!soulShopOwned['auto-progress']) autoProgressEnabled=false;
   if(!hasEverAscended&&!hasEverHadAutoProgress) autoProgressEnabled=false;
@@ -6307,7 +6308,7 @@ function doReincarnate(){
   stage=0; traits={sex:null,adds:[],aff:null,outfit:null};
   totalUpgradePurchases=0; totalMilestonePurchases=0;
   currentAscensionKills=0; eliteBountyTSEarned=0;
-  mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0;
+  mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0; invokePowerBonus=0;
   for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
   _shownUpgrades={};
@@ -6441,7 +6442,7 @@ function doRebirthReset(chosenForm){
   // (chosenForm is a form) but are wiped by a descent (chosenForm===null).
   // Reincarnation and hard reset clear them via their own paths.
   mana=100; completedFloorsThisAscension=[];
-  if(chosenForm===null) invokePowerStacks=0;
+  if(chosenForm===null){ invokePowerStacks=0; invokePowerBonus=0; }
   for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
 
@@ -6574,7 +6575,7 @@ function saveGame(){
     soulShopOwned:soulShopOwned,
     tatteredUpgradesSpent:tatteredUpgradesSpent,
     mana:mana, manaMax:manaMax,
-    invokePowerStacks:invokePowerStacks,
+    invokePowerStacks:invokePowerStacks, invokePowerBonus:invokePowerBonus,
     completedFloorsThisAscension:completedFloorsThisAscension,
     autoProgressEnabled:autoProgressEnabled,
     soundVolume:soundVolume,
@@ -6697,6 +6698,7 @@ function loadGame(){
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
   invokePowerStacks=Math.min(5,data.invokePowerStacks||0); // clamp to the 5-stack cap
+  invokePowerBonus=(data.invokePowerBonus!==undefined)?data.invokePowerBonus:invokePowerStacks*0.1554; // back-compat: derive from stacks for old saves
   if(data.completedFloorsThisAscension) completedFloorsThisAscension=data.completedFloorsThisAscension;
   if(rebirthForm) _rebirthEntityOverride=rebirthForm;
   autoProgressEnabled=data.autoProgressEnabled||false;
