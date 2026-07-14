@@ -3765,7 +3765,6 @@ function spawnSoulCoins(){
   var _floorsComp=completedFloorsThisAscension.length;
   if(_floorsComp>0){
     var _mg=3*0.00001*_floorsComp;
-    if(isSpellActive('manaHungry')) _mg*=(1+0.333*(spellEffectMult['manaHungry']||1));
     if(rebirthForm==='feline') _mg*=(1+0.10*getFormMult());
     else if(achievementsEarned.indexOf('form-ult-feline')>=0) _mg*=1.10;
     if(ascension4Path==='shadow') _mg*=1.05;
@@ -4317,6 +4316,8 @@ var completedFloorsThisAscension=[];
 var spellEndTimes={};
 var spellEffectMult={}; // per-spell effect multiplier; set to 3 by Power of 3, else 1
 var flurryInterval=null;
+var manaHungryInterval=null;
+var powerOf3Armed=false; // Power of 3 stays armed (no timer) until the next spell consumes it
 var invokePowerStacks=0;
 var invokePowerBonus=0; // summed Invoke Power multiplier contribution; a Power-of-3 cast adds 3× for its single stack
 var _lastSpellUiTick=0;
@@ -5303,7 +5304,7 @@ var SPELLS = [
     desc:'The next spell activated gives 3× its effect, then this buff is consumed.' },
   { id:'manaHungry',  tsId:'spell-manaHungry',   icon:'◉', manaCost:333, duration:33300,
     name:'Mana Hungry',
-    desc:'Mana regeneration is increased by 33.3% for 33.3s.' },
+    desc:'Regenerate 0.5% of max Mana per second for 33.3s (1.5%/s under Power of 3).' },
   { id:'invokePower', tsId:'spell-invokePower',  icon:'★', manaCost:666, duration:0,
     name:'Invoke Power',
     desc:'Multiplies DPS and Strike damage by (1 + 0.1554 × stacks). Stackable up to 5× (+77.7% at max). Stacks endure Ascensions.' },
@@ -5311,6 +5312,7 @@ var SPELLS = [
 
 function isSpellActive(id){
   if(id==='invokePower') return false; // stacks-based, no duration
+  if(id==='powerOf3') return powerOf3Armed; // armed until consumed by the next spell — no timer
   return (spellEndTimes[id]||0) > Date.now();
 }
 
@@ -5321,7 +5323,7 @@ function castSpell(id){
     if(invokePowerStacks>=5||mana<spell.manaCost) return;
   } else {
     if(mana<spell.manaCost) return;
-    if(id!=='powerOf3'&&isSpellActive(id)) return; // no re-cast while active
+    if(isSpellActive(id)) return; // no re-cast while active (Power of 3: no re-arm while already armed)
   }
   // Power of 3 modifier — triples the EFFECT (not the duration) of the next spell cast.
   var p3=isSpellActive('powerOf3')&&id!=='powerOf3';
@@ -5342,12 +5344,24 @@ function castSpell(id){
   } else if(id==='invokePower'){
     invokePowerStacks=Math.min(5,invokePowerStacks+1); // Power of 3 never adds extra stacks or duration...
     invokePowerBonus+=0.1554*(p3?3:1);                 // ...it only triples the effect of this single stack
+  } else if(id==='manaHungry'){
+    if(manaHungryInterval){clearInterval(manaHungryInterval);manaHungryInterval=null;}
+    var mhDur=spell.duration+getMinionTotalBonus('spelllength')*1000;
+    var mhEnd=Date.now()+mhDur;
+    spellEndTimes['manaHungry']=mhEnd;
+    var mhRate=0.005*(p3?3:1); // regenerate 0.5% of max mana per second (1.5% under Power of 3)
+    manaHungryInterval=setInterval(function(){
+      if(Date.now()>=mhEnd){clearInterval(manaHungryInterval);manaHungryInterval=null;spellEndTimes['manaHungry']=0;renderSpellPanel();return;}
+      mana=Math.min(manaMax,mana+manaMax*mhRate);
+      updateManaBar();
+    },1000);
+  } else if(id==='powerOf3'){
+    powerOf3Armed=true; // stays armed with no timer until the next spell consumes it
   } else {
     spellEndTimes[id]=Date.now()+spell.duration+getMinionTotalBonus('spelllength')*1000;
-    if(id==='powerOf3') {/* just set timer, don't consume itself */}
   }
 
-  if(p3) spellEndTimes['powerOf3']=0; // consume Power of 3 after modifying another spell
+  if(p3) powerOf3Armed=false; // consume Power of 3 after boosting another spell
 
   // Invoke Power feeds totalDps/clickDmgBonus via recalcStats, so recompute and
   // refresh the stat panel immediately — otherwise the DPS readout wouldn't move
@@ -5444,8 +5458,12 @@ function renderSpellPanel(){
 
     var remaining='';
     if(isActive&&!isInvoke){
-      var secs=Math.max(0,((spellEndTimes[spell.id]||0)-Date.now())/1000);
-      remaining='<div class="spell-tt-status">Active — '+secs.toFixed(1)+'s remaining</div>';
+      if(spell.id==='powerOf3'){
+        remaining='<div class="spell-tt-status">Armed — triples your next spell</div>';
+      } else {
+        var secs=Math.max(0,((spellEndTimes[spell.id]||0)-Date.now())/1000);
+        remaining='<div class="spell-tt-status">Active — '+secs.toFixed(1)+'s remaining</div>';
+      }
     }
     var stacksLine=isInvoke&&invokePowerStacks>0?'<div class="spell-tt-stacks">Stacks: '+invokePowerStacks+' / 5</div>':'';
     var lockedLine=!owned?'<div class="spell-tt-status" style="color:#775599;">Locked — purchase in the Sacrifice tab</div>':'';
@@ -5488,7 +5506,7 @@ var TATTERED_NODES = [
     desc:'Unlocks the spell Power of 3. Cast for 199 Mana: the next spell activated gives 3× its effect, then this buff is consumed.',
     x:-185, y:-255, requires:[] },
   { id:'spell-manaHungry',  type:'spell', name:'Mana Hungry',       icon:'◉', cost:150,
-    desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: mana regeneration +33.3% for 33.3s.',
+    desc:'Unlocks the spell Mana Hungry. Cast for 333 Mana: regenerate 0.5% of max Mana per second for 33.3s (1.5%/s under Power of 3).',
     x:186,  y:-255, requires:[] },
   { id:'spell-invokePower', type:'spell', name:'Invoke Power',      icon:'★', cost:200,
     desc:'Unlocks the spell Invoke Power. Cast for 666 Mana: multiplies all DPS and Strike damage by (1 + 0.1554 × stacks), stackable 5×. Stacks endure Ascensions.',
@@ -5841,6 +5859,8 @@ function doRespec(){
   grantSeal9Nodes(); // Seal of the 9 reward: keep Flurry's 5 outer nodes through a respec
   // Clear spell active states since spells are no longer owned
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
+  if(manaHungryInterval){clearInterval(manaHungryInterval);manaHungryInterval=null;}
+  powerOf3Armed=false;
   for(var _k in spellEndTimes) spellEndTimes[_k]=0;
   invokePowerStacks=0; invokePowerBonus=0;
   // auto-progress is a free permanent unlock; don't disable it on respec
@@ -6311,6 +6331,8 @@ function doReincarnate(){
   mana=100; completedFloorsThisAscension=[]; invokePowerStacks=0; invokePowerBonus=0;
   for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
+  if(manaHungryInterval){ clearInterval(manaHungryInterval); manaHungryInterval=null; }
+  powerOf3Armed=false;
   _shownUpgrades={};
   REP_UPGRADES.forEach(function(u){
     u.level=0;
@@ -6445,6 +6467,8 @@ function doRebirthReset(chosenForm){
   if(chosenForm===null){ invokePowerStacks=0; invokePowerBonus=0; }
   for(var _sk in spellEndTimes) spellEndTimes[_sk]=0;
   if(flurryInterval){ clearInterval(flurryInterval); flurryInterval=null; }
+  if(manaHungryInterval){ clearInterval(manaHungryInterval); manaHungryInterval=null; }
+  powerOf3Armed=false;
 
   // Reset upgrades
   _shownUpgrades={};
