@@ -735,6 +735,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .spell-tt { position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); width:210px; background:#06041a; border:1px solid #2a3688; border-radius:7px; padding:11px 13px; pointer-events:none; z-index:500; display:none; box-shadow:0 4px 22px rgba(0,0,40,0.85); white-space:normal; }
 .spell-btn:hover .spell-tt { display:block; }
 .spell-btn.spell-tt-open .spell-tt { display:block; }
+/* Leftmost two spell tooltips would clip off the left screen edge when centered — anchor them to the button's left edge so they open rightward. */
+.spell-btn:first-child .spell-tt, .spell-btn:nth-child(2) .spell-tt { left:0; transform:none; }
 .spell-tt-name { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; margin-bottom:5px; }
 .spell-tt-cost { font-size:11px; color:#6688cc; margin-bottom:5px; }
 .spell-tt-desc { font-size:12px; color:#c8c0e8; line-height:1.5; }
@@ -1078,6 +1080,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 
   #invoke-bar-outer { width: 120px !important; }
   .spell-tt { bottom: calc(100% + 6px) !important; left: 50% !important; transform: translateX(-50%) !important; }
+  .spell-btn:first-child .spell-tt, .spell-btn:nth-child(2) .spell-tt { left: 0 !important; transform: none !important; }
 
   /* Buy selector, minimap, right panel must sit above the absolute bg image and combat-wrap overflow */
   #buy-selector, #minimap-panel, #right {
