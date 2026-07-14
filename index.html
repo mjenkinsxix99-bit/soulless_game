@@ -5311,7 +5311,7 @@ function castSpell(id){
 
   if(id==='flurry'){
     if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
-    var fDur=spell.duration*durMult;
+    var fDur=spell.duration*durMult+getMinionTotalBonus('spelllength')*1000;
     var fEnd=Date.now()+fDur;
     spellEndTimes['flurry']=fEnd;
     flurryInterval=setInterval(function(){
