@@ -8458,6 +8458,22 @@ function _animateMinionCards() {
       var fn = MINION_DRAW_FNS[et.id];
       if (fn) { fn(cv, now, false, et.isElite); cv._mmDrawn = true; }
     });
+    // XP is added on every kill (addMinionXp) but only writes to the minion data,
+    // not the DOM — so refresh each held minion's fill + level badge live here.
+    var _mmRebuild = false;
+    document.querySelectorAll('#mm-body .mm-card-xpfill').forEach(function(fill) {
+      var card = fill.closest('.mm-card'); if (!card) return;
+      var idx = parseInt(card.getAttribute('data-ei'), 10); if (isNaN(idx)) return;
+      var held = minionSlots.filter(function(m) { return m.typeIdx === idx; })[0];
+      if (!held) return;
+      if (held.isElite) { _mmRebuild = true; return; } // just hit Elite — rebuild to drop the bar and update the badge
+      var pct = Math.floor(held.xp / getMinionXpForLevel(held.level) * 100);
+      var w = pct + '%';
+      if (fill.style.width !== w) fill.style.width = w;
+      var badge = card.querySelector('.mm-card-badge');
+      if (badge) { var t = 'Lv ' + held.level; if (badge.textContent !== t) badge.textContent = t; }
+    });
+    if (_mmRebuild) renderMinionModal();
   }
   _minionModalAnimId = requestAnimationFrame(_animateMinionCards);
 }
