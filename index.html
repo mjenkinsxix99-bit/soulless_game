@@ -1973,7 +1973,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       </ul>
       <h3>Honors — Pentagrams</h3>
       <ul>
-        <li>Completing a full pentagram (a spell node plus its five surrounding nodes) now earns an honor. Each of the nine grants a permanent +11% to Souls gained, stacking to +99% with all nine.</li>
+        <li>Completing a full pentagram (a spell node plus its five surrounding nodes) earns an honor and grants a ×1.11 multiplier to Souls gained while that pentagram stays complete — its own multiplier, separate from every other soul bonus. All nine at once roughly doubles your souls. The Sacrifice Grid resets on reincarnation, so this is re-earned each life.</li>
         <li>First Seal — complete your first pentagram. Adept of the Circle — complete five.</li>
         <li>The Seal of the 9 — complete all nine pentagrams at once. Every life then begins with Flurry's five outer nodes already sealed.</li>
         <li>Star of Sacrifice — own every node in the Sacrifice Grid at once. Every life then begins with 5 Tattered Souls banked.</li>
@@ -4991,15 +4991,15 @@ var ACHIEVEMENTS=[
   {id:'form-ult-all',        cat:'Identity',  name:'The Complete Self',       desc:'Complete the final form of all six essences. Your chosen form\'s bonus is doubled each run.', check:function(){return['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-feline','form-ult-canine','form-ult-equine'].every(function(id){return achievementsEarned.indexOf(id)>=0;});}},
   {id:'final-form',          cat:'Ascendant', name:'Final Form',              desc:'Complete all seven ascensions',                                                    check:function(){return rebirthCount>=7;}},
   // Pentagrams — complete a spell cluster (spell node + its 5 surrounding stat nodes)
-  {id:'pent-flurry',       cat:'Pentagrams', name:'Tempest Bound',       desc:'Complete the Flurry of Strikes pentagram. Grants +11% Souls gained.', check:function(){return pentComplete('spell-flurry');}},
-  {id:'pent-crit',         cat:'Pentagrams', name:'Perfect Edge',        desc:'Complete the Critical Strike pentagram. Grants +11% Souls gained.',   check:function(){return pentComplete('spell-critStrike');}},
-  {id:'pent-blade',        cat:'Pentagrams', name:'Twinned Steel',       desc:'Complete the Twin Blades pentagram. Grants +11% Souls gained.',       check:function(){return pentComplete('spell-twinBlades');}},
-  {id:'pent-souls',        cat:'Pentagrams', name:'Soulbound Pair',      desc:'Complete the Twin Souls pentagram. Grants +11% Souls gained.',        check:function(){return pentComplete('spell-twinSouls');}},
-  {id:'pent-rule',         cat:'Pentagrams', name:'Rule Fulfilled',      desc:'Complete the Rule of 3 pentagram. Grants +11% Souls gained.',         check:function(){return pentComplete('spell-ruleOf3');}},
-  {id:'pent-strikes',      cat:'Pentagrams', name:'Doubled Wrath',       desc:'Complete the Twin Strikes pentagram. Grants +11% Souls gained.',      check:function(){return pentComplete('spell-twinStrikes');}},
-  {id:'pent-power3',       cat:'Pentagrams', name:'Trinity of Power',    desc:'Complete the Power of 3 pentagram. Grants +11% Souls gained.',        check:function(){return pentComplete('spell-powerOf3');}},
-  {id:'pent-mana',         cat:'Pentagrams', name:'Endless Thirst',      desc:'Complete the Mana Hungry pentagram. Grants +11% Souls gained.',       check:function(){return pentComplete('spell-manaHungry');}},
-  {id:'pent-invoke',       cat:'Pentagrams', name:'Power Invoked',       desc:'Complete the Invoke Power pentagram. Grants +11% Souls gained.',      check:function(){return pentComplete('spell-invokePower');}},
+  {id:'pent-flurry',       cat:'Pentagrams', name:'Tempest Bound',       desc:'Complete the Flurry of Strikes pentagram. Grants a ×1.11 Souls multiplier while this pentagram stays complete.', check:function(){return pentComplete('spell-flurry');}},
+  {id:'pent-crit',         cat:'Pentagrams', name:'Perfect Edge',        desc:'Complete the Critical Strike pentagram. Grants a ×1.11 Souls multiplier while this pentagram stays complete.',   check:function(){return pentComplete('spell-critStrike');}},
+  {id:'pent-blade',        cat:'Pentagrams', name:'Twinned Steel',       desc:'Complete the Twin Blades pentagram. Grants a ×1.11 Souls multiplier while this pentagram stays complete.',       check:function(){return pentComplete('spell-twinBlades');}},
+  {id:'pent-souls',        cat:'Pentagrams', name:'Soulbound Pair',      desc:'Complete the Twin Souls pentagram. Grants a ×1.11 Souls multiplier while this pentagram stays complete.',        check:function(){return pentComplete('spell-twinSouls');}},
+  {id:'pent-rule',         cat:'Pentagrams', name:'Rule Fulfilled',      desc:'Complete the Rule of 3 pentagram. Grants a ×1.11 Souls multiplier while this pentagram stays complete.',         check:function(){return pentComplete('spell-ruleOf3');}},
+  {id:'pent-strikes',      cat:'Pentagrams', name:'Doubled Wrath',       desc:'Complete the Twin Strikes pentagram. Grants a ×1.11 Souls multiplier while this pentagram stays complete.',      check:function(){return pentComplete('spell-twinStrikes');}},
+  {id:'pent-power3',       cat:'Pentagrams', name:'Trinity of Power',    desc:'Complete the Power of 3 pentagram. Grants a ×1.11 Souls multiplier while this pentagram stays complete.',        check:function(){return pentComplete('spell-powerOf3');}},
+  {id:'pent-mana',         cat:'Pentagrams', name:'Endless Thirst',      desc:'Complete the Mana Hungry pentagram. Grants a ×1.11 Souls multiplier while this pentagram stays complete.',       check:function(){return pentComplete('spell-manaHungry');}},
+  {id:'pent-invoke',       cat:'Pentagrams', name:'Power Invoked',       desc:'Complete the Invoke Power pentagram. Grants a ×1.11 Souls multiplier while this pentagram stays complete.',      check:function(){return pentComplete('spell-invokePower');}},
   {id:'pent-first',        cat:'Pentagrams', name:'First Seal',          desc:'Complete your first pentagram.',                                     check:function(){return completedPentagramCount()>=1;}},
   {id:'pent-adept',        cat:'Pentagrams', name:'Adept of the Circle', desc:'Complete 5 pentagrams.',                                             check:function(){return completedPentagramCount()>=5;}},
   {id:'seal-of-9',         cat:'Pentagrams', name:'The Seal of the 9',   desc:'Complete all 9 pentagrams at once. Every life now begins with Flurry\'s five outer nodes already sealed.', check:function(){return completedPentagramCount()>=9;}},
@@ -5773,10 +5773,12 @@ function allTattNodesOwned(){
   for(var i=0;i<TATTERED_NODES.length;i++){ if(!(soulShopOwned[TATTERED_NODES[i].id]>=1)) return false; }
   return true;
 }
-// +11% souls gained per completed-pentagram mastery honor earned (stacks to +99%).
+// +11% souls per CURRENTLY-complete pentagram, applied as its own soul multiplier
+// (~2x with all nine). Tied to live grid completion, not the earned honor, so it
+// resets on reincarnation and must be re-earned each life.
 function pentMasterySoulBonus(){
   var b=0;
-  for(var i=0;i<PENTAGRAM_GROUPS.length;i++){ if(achievementsEarned.indexOf(PENTAGRAM_GROUPS[i].achId)>=0) b+=0.11; }
+  for(var i=0;i<PENTAGRAM_GROUPS.length;i++){ if(isPentagramComplete(PENTAGRAM_GROUPS[i])) b+=0.11; }
   return b;
 }
 // Re-grant the Seal-of-9 starting nodes after a tree wipe (reincarnate / respec).
