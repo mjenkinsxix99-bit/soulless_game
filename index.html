@@ -4740,7 +4740,7 @@ var REP_UPGRADES=[
   {id:'ct',name:'Chaos Tide',       icon:26, cost:5.5484e37, costScale:1.077, level:0, type:'dps', perLevel:3.11925e30,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[25].level>=1;}, milestones:mkMs()},
-  {id:'rn',name:'Ragefire Nova',    icon:27, cost:1.5393e48, costScale:1.077, level:0, type:'dps', perLevel:5.7656e35,
+  {id:'rn',name:'Ragefire Nova',    icon:27, cost:1.5393e48, costScale:1.077, level:0, type:'dps', perLevel:8.6484e36,
     desc:function(){return upgradeDescStr(this);},
     vis:function(){return REP_UPGRADES[26].level>=1;}, milestones:mkMs()},
   {id:'ac',name:'Abyssal Call',     icon:28, cost:4.2702e58, costScale:1.077, level:0, type:'dps', perLevel:1.5986e42,
@@ -4796,7 +4796,7 @@ REP_UPGRADES.forEach(function(u){ u.augThresh=augThreshFor(u); u.augEffects=augE
 // owners' old power is preserved via the blended-grandfather migration below.)
 var POST_ASCENSION_UPGRADES = {
   'ct': {baseCost:5.5484e37, perLevel:3.11925e30},
-  'rn': {baseCost:1.5393e48, perLevel:5.7656e35},
+  'rn': {baseCost:1.5393e48, perLevel:8.6484e36},
   'ac': {baseCost:4.2702e58, perLevel:1.5986e42},
   'bf': {baseCost:1.1847e69, perLevel:4.4324e48},
 };
