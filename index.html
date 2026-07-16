@@ -3143,7 +3143,9 @@ function getMinionBonusDesc(bonusType, heldMinion){
       val=(1+lvl*0.0105).toFixed(2)+'x '+label; break;
     case 'mana':
       val=(1+lvl*0.00075017).toFixed(3)+'x '+label; break;
-    case 'ts': case 'minionxp': case 'minionpower':
+    case 'ts':
+      val=(1+lvl*0.00299833).toFixed(3)+'x '+label; break;
+    case 'minionxp': case 'minionpower':
       val=(1+lvl*0.00150033).toFixed(3)+'x '+label; break;
     case 'upgradecost':
       val='-'+(lvl*0.00750167).toFixed(1)+'% '+label; break;
