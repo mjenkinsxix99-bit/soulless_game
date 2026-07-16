@@ -4179,6 +4179,8 @@ function onEnemyDeath(){
   else if(achievementsEarned.indexOf('form-ult-androgynous')>=0) soulMult*=1.10;
   if(ascension3Path==='mystic') soulMult*=1.05;
   if(soulAbsorbBonus>0) soulMult*=(1+soulAbsorbBonus);
+  // 'soulgain' augments (Chaos Tide onward): ×1.33 souls each (compounding)
+  if(augSoulGainMult>1) soulMult*=augSoulGainMult;
   // Spell: Twin Souls — ×2 souls gained (×6 under Power of 3)
   if(isSpellActive('twinSouls')) soulMult*=2*(spellEffectMult['twinSouls']||1);
   // Tattered Shop: souls gain bonus nodes
@@ -4327,6 +4329,7 @@ var autoAttackInterval=3000;
 var entityDmgBonus=D(0);
 var clickDmgBonus=D(0), totalDps=D(0), enemyHpDrainPct=0, tattTsGainMult=0;
 var critClickChance=0, critClickMult=0, dvDpsToClickRatio=0, soulAbsorbBonus=0;
+var augSoulGainMult=1; // ×1.33 per lit 'soulgain' augment (Chaos Tide onward)
 
 // ── MANA & SPELLS ─────────────────────────────────────────────────────────────
 var mana=0, manaMax=100;
@@ -4362,11 +4365,14 @@ var AUG_THRESH_FIVE=[10,25,50,75,150];
 // Brimstone test: keeps the default four augments and adds a fifth at 175 owned
 // carrying the special 'allupgdps' effect (×1.333 to all upgrade DPS).
 var AUG_THRESH_BS=[10,25,75,150,175];
+// Late-game upgrades (Chaos Tide onward) get their own five-augment layout with a
+// 'soulgain' augment (×1.33 souls gained) at slot 3 and ×2 DPS in the other four.
+var AUG_THRESH_LATE=[10,25,50,100,125];
 var AUG_MULT=2; // each purchased 'mult' augment doubles the upgrade's output (compounding)
 // Special augments redistributed from the old Divine Hunger set. Each entry is a
 // per-slot effect list; 'mult' = normal ×2, others apply a global support effect.
 // Effect values: dps2strike +0.666% of Total DPS as Strike, critchance +6.66%,
-// critmult +3.33×, soulsabsorb +22.2%.
+// critmult +3.33×, soulsabsorb +22.2%, soulgain ×1.33 souls gained.
 var AUG_SPECIAL={
   dh:['mult','mult','mult','dps2strike','mult'],
   sl:['mult','mult','mult','mult','dps2strike'],
@@ -4377,10 +4383,17 @@ var AUG_SPECIAL={
   sg:['mult','mult','mult','mult','dps2strike'],
   sk:['mult','mult','mult','mult','critmult'],
   st:['mult','mult','mult','dps2strike','mult'],
-  dm:['mult','mult','mult','mult','dps2strike']
+  dm:['mult','mult','mult','mult','dps2strike'],
+  ct:['mult','mult','soulgain','mult','mult'],
+  rn:['mult','mult','soulgain','mult','mult'],
+  ac:['mult','mult','soulgain','mult','mult'],
+  bf:['mult','mult','soulgain','mult','mult']
 };
+// Upgrades that use the late-game augment thresholds ([10,25,50,100,125]).
+var AUG_LATE_IDS={ct:1,rn:1,ac:1,bf:1};
 function augThreshFor(u){
   if(u.id==='bs') return AUG_THRESH_BS;
+  if(AUG_LATE_IDS[u.id]) return AUG_THRESH_LATE;
   return (u.id==='ss'||AUG_SPECIAL[u.id])?AUG_THRESH_FIVE:AUG_THRESH_DEFAULT;
 }
 function augEffectsFor(u){
@@ -4394,6 +4407,7 @@ function augEffectLabel(u,i){
   if(eff==='critchance') return '+6.66% Critical Strike Chance';
   if(eff==='critmult')   return '+3.33× Critical Strike Damage';
   if(eff==='soulsabsorb')return '+22.2% Souls Absorbed';
+  if(eff==='soulgain')   return '×1.33 Souls Gained';
   if(eff==='allupgdps')  return '×1.333 All Upgrade DPS';
   var typeLabel=u.type==='click'?'Strike Damage':u.type==='drain'?'HP Drain':'DPS';
   return '×2 '+typeLabel;
@@ -4468,7 +4482,7 @@ function upgradeBaseOutput(u){
 }
 function recalcStats(){
   clickDmgBonus=D(0); totalDps=D(0); enemyHpDrainPct=0; tattTsGainMult=0;
-  critClickChance=0; critClickMult=0; dvDpsToClickRatio=0; soulAbsorbBonus=0;
+  critClickChance=0; critClickMult=0; dvDpsToClickRatio=0; soulAbsorbBonus=0; augSoulGainMult=1;
   // ×1.333 per lit 'allupgdps' augment (Brimstone slot 5). Applied to EACH DPS
   // upgrade's output individually below — not as a single global total multiplier.
   var _allUpgDps=0;
@@ -4521,6 +4535,7 @@ function recalcStats(){
       else if(eff==='critchance') critClickChance+=0.0666;
       else if(eff==='critmult') critClickMult+=3.33;
       else if(eff==='soulsabsorb') soulAbsorbBonus+=0.222;
+      else if(eff==='soulgain') augSoulGainMult*=1.33;
     }
   });
   if(dvDpsToClickRatio>0) clickDmgBonus=clickDmgBonus.add(totalDps.mul(dvDpsToClickRatio));
