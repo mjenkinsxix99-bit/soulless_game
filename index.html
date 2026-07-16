@@ -3101,15 +3101,17 @@ function getMinionTotalBonus(bonusType){
     var md=MINION_DATA[m.typeIdx];
     if(!md||md.bonus!==bonusType) return;
     var lvl=m.isElite?MINION_ELITE_LEVEL:m.level;
+    // Coefficients scaled by 777/666 when the Elite cap dropped 777→666, so an
+    // Elite minion (lvl=MINION_ELITE_LEVEL) yields the same boost it did at 777.
     switch(bonusType){
-      case 'souls':case 'dps':case 'slash': sum+=lvl*0.009; break;
-      case 'mana': sum+=lvl*0.000643; break;
-      case 'ts':   sum+=lvl*0.00257; break;
-      case 'minionxp': sum+=lvl*0.001286; break;
-      case 'upgradecost': sum+=lvl*0.0000643; break;
-      case 'elitetimer': sum+=lvl*0.01286; break;
-      case 'minionpower': sum+=lvl*0.001286; break;
-      case 'spelllength': sum+=lvl*0.01116; break;
+      case 'souls':case 'dps':case 'slash': sum+=lvl*0.0105; break;
+      case 'mana': sum+=lvl*0.00075017; break;
+      case 'ts':   sum+=lvl*0.00299833; break;
+      case 'minionxp': sum+=lvl*0.00150033; break;
+      case 'upgradecost': sum+=lvl*0.0000750167; break;
+      case 'elitetimer': sum+=lvl*0.01500333; break;
+      case 'minionpower': sum+=lvl*0.00150033; break;
+      case 'spelllength': sum+=lvl*0.01302; break;
     }
   });
   return sum;
@@ -3138,17 +3140,17 @@ function getMinionBonusDesc(bonusType, heldMinion){
   var val;
   switch(bonusType){
     case 'souls':case 'dps':case 'slash':
-      val=(1+lvl*0.009).toFixed(2)+'x '+label; break;
+      val=(1+lvl*0.0105).toFixed(2)+'x '+label; break;
     case 'mana':
-      val=(1+lvl*0.000643).toFixed(3)+'x '+label; break;
+      val=(1+lvl*0.00075017).toFixed(3)+'x '+label; break;
     case 'ts': case 'minionxp': case 'minionpower':
-      val=(1+lvl*0.001286).toFixed(3)+'x '+label; break;
+      val=(1+lvl*0.00150033).toFixed(3)+'x '+label; break;
     case 'upgradecost':
-      val='-'+(lvl*0.00643).toFixed(1)+'% '+label; break;
+      val='-'+(lvl*0.00750167).toFixed(1)+'% '+label; break;
     case 'elitetimer':
-      val='+'+(lvl*0.01286).toFixed(1)+'s '+label; break;
+      val='+'+(lvl*0.01500333).toFixed(1)+'s '+label; break;
     case 'spelllength':
-      val='+'+(lvl*0.01116).toFixed(1)+'s '+label; break;
+      val='+'+(lvl*0.01302).toFixed(1)+'s '+label; break;
     default: val='n '+label; break;
   }
   return 'Gives '+val;
