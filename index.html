@@ -6399,6 +6399,7 @@ function doReincarnate(){
   // Keep: rebirthForm, achievementsEarned, discoveredMinions, elite minions
   wipeNonEliteMinions();
   rebirthCount=0;
+  captureTargets=[]; releaseMode=false; // clear any pending capture selection on reincarnation
 
   recalcStats();
   mana=manaMax; // start each run with a full mana bar (recalcStats set the cap)
