@@ -195,6 +195,14 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card-elite { border-color:#3a2800; }
 .mm-card-elite.mm-card-discovered { border-color:#d4a843; box-shadow:0 0 8px rgba(212,168,67,0.25); }
 .mm-card-elite:hover { border-color:#e8c050; box-shadow:0 0 14px rgba(212,168,67,0.4); }
+/* Held minions that have reached Elite status get the same golden glow as Elite enemy types. */
+.mm-card-minion-elite { border-color:#d4a843; box-shadow:0 0 10px rgba(212,168,67,0.35); animation:mm-elite-glow 1.8s ease-in-out infinite; }
+.mm-card-minion-elite:hover { border-color:#e8c050; box-shadow:0 0 16px rgba(212,168,67,0.5); }
+.mm-card-minion-elite .mm-card-name { color:#ffd700; }
+@keyframes mm-elite-glow {
+  0%,100% { box-shadow:0 0 8px rgba(212,168,67,0.3); }
+  50%      { box-shadow:0 0 16px rgba(212,168,67,0.55); }
+}
 .mm-card-canvas { display:block; width:100%; aspect-ratio:1; border-radius:0 0 6px 6px; transform:scaleX(-1); }
 .mm-pet-btn { position:absolute; top:4px; left:4px; background:#1a6b1a; border:1px solid #33aa33; color:#aaffaa; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; cursor:pointer; z-index:2; font-family:Georgia,serif; transition:all 0.15s; }
 .mm-pet-btn:hover { background:#22aa22; border-color:#55ff55; }
@@ -3299,8 +3307,10 @@ function drawPetMinion(t){
   if(!cv||petMinionIdx<0) return;
   var et=ENEMY_TYPES[petMinionIdx];
   if(!et) return;
+  var held=minionSlots.filter(function(m){ return m.typeIdx===petMinionIdx; })[0];
+  var showElite=et.isElite||!!(held&&held.isElite);
   var fn=MINION_DRAW_FNS[et.id];
-  if(fn) fn(cv,t,false,false);
+  if(fn) fn(cv,t,false,showElite);
 }
 
 function addMinionXp(){
@@ -3396,7 +3406,7 @@ function renderMinionModal(){
 
       var card=document.createElement('div');
       var isEliteType=et.isElite;
-      card.className='mm-card'+(isEliteType?' mm-card-elite':'')+(discovered?' mm-card-discovered':'');
+      card.className='mm-card'+(isEliteType?' mm-card-elite':'')+(discovered?' mm-card-discovered':'')+((heldMinion&&heldMinion.isElite)?' mm-card-minion-elite':'');
       card.setAttribute('data-ei', String(idx));
 
       // Pet button (top-left of card)
@@ -8488,8 +8498,12 @@ function _animateMinionCards() {
       if (undiscovered && cv._mmDrawn) return;
       var r = cv.getBoundingClientRect();
       if (r.bottom < view.top || r.top > view.bottom) return;
+      // Show the golden Elite treatment for named-Elite enemy types AND for any
+      // held minion that has itself reached Elite status.
+      var heldM = minionSlots.filter(function(m){ return m.typeIdx === idx; })[0];
+      var showElite = et.isElite || !!(heldM && heldM.isElite);
       var fn = MINION_DRAW_FNS[et.id];
-      if (fn) { fn(cv, now, false, et.isElite); cv._mmDrawn = true; }
+      if (fn) { fn(cv, now, false, showElite); cv._mmDrawn = true; }
     });
     // XP is added on every kill (addMinionXp) but only writes to the minion data,
     // not the DOM — so refresh each held minion's fill + level badge live here.
