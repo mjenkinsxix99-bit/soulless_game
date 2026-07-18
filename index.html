@@ -3101,6 +3101,22 @@ function getMinionXpForLevel(level){
   return Math.floor(MINION_XP_BASE*Math.pow(MINION_XP_GROWTH,level-1));
 }
 
+// Floor-scaled minion XP per kill: 1 XP up to global floor 200, then a smooth
+// power^1.5 ramp to MINION_XP_FLOOR_CAP at global floor 1000, flat beyond. Deeper
+// runs reward minion leveling far more than shallow ones. This base multiplier
+// stacks on top of the XP-minion bonus and the pet 2x. Tuned so a full run to
+// floor 1000 with all 10 XP minions at Elite (x11) yields one Elite minion.
+var MINION_XP_FLOOR_START=200;
+var MINION_XP_FLOOR_CAP_FLOOR=1000;
+var MINION_XP_FLOOR_CAP=15;
+function minionXpFloorMult(){
+  var g=absGlobalFloor(curRealm,curLevel,curFloor);
+  if(g<=MINION_XP_FLOOR_START) return 1;
+  if(g>=MINION_XP_FLOOR_CAP_FLOOR) return MINION_XP_FLOOR_CAP;
+  var u=(g-MINION_XP_FLOOR_START)/(MINION_XP_FLOOR_CAP_FLOOR-MINION_XP_FLOOR_START);
+  return 1+(MINION_XP_FLOOR_CAP-1)*Math.pow(u,1.5);
+}
+
 // Returns the summed bonus value across all held minions of the given type.
 // bonusType: 'souls'|'dps'|'slash'|'mana'|'ts'|'minionxp'|'upgradecost'|'elitetimer'|'minionpower'|'spelllength'
 function getMinionTotalBonus(bonusType){
@@ -3315,9 +3331,10 @@ function drawPetMinion(t){
 
 function addMinionXp(){
   var _mXpMult=1+getMinionTotalBonus('minionxp');
+  var _floorMult=minionXpFloorMult();
   minionSlots.forEach(function(m){
     if(m.isElite) return;
-    var xpGain=_mXpMult*(m.typeIdx===petMinionIdx?2:1);
+    var xpGain=_mXpMult*_floorMult*(m.typeIdx===petMinionIdx?2:1);
     m.xp+=xpGain;
     var needed=getMinionXpForLevel(m.level);
     while(m.xp>=needed&&m.level<MINION_ELITE_LEVEL){
