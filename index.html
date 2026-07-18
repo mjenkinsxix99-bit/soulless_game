@@ -6525,8 +6525,8 @@ function doRebirthReset(chosenForm){
     u.milestones=mkAugs(u);
   });
 
-  // Apply rebirth
-  captureTargets=[];
+  // Apply rebirth. Capture selections persist across Ascension (they reserve MP,
+  // which survives a rebirth) — only Reincarnation or manual deselect clears them.
   releaseMode=false;
   if(chosenForm === null){
     rebirthCount = 0;
