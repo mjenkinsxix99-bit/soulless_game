@@ -6453,7 +6453,9 @@ function updateTatteredDisplay(){
   var el=document.getElementById('tattered-count');
   if(el) el.textContent=tatteredSouls.toLocaleString();
   var disp=document.getElementById('tattered-display');
-  if(disp) disp.style.display=rebirthCount>0?'block':'none';
+  // Show once the player has rebirthed OR has any TS banked (e.g. the Star of
+  // Sacrifice reward grants 5 TS at rebirthCount 0 after a reincarnation).
+  if(disp) disp.style.display=(rebirthCount>0||tatteredSouls>0)?'block':'none';
   var preview=document.getElementById('ts-ascend-preview');
   if(preview) preview.textContent='Ascend for '+calcTatteredSoulsGain(rebirthForm).toLocaleString()+' TS';
   updateTatteredBtn();
