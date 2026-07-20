@@ -4161,12 +4161,13 @@ function registerClick(){
   var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString();
   checkAchievements();
 }
-// Rule of 3 spell: every discrete strike — manual click, Flurry spell strike,
-// or minion clicker strike — instantly grants the current enemy's death soul
-// reward ×3. Passive DPS is continuous (not a strike) and is excluded.
+// Rule of 3 spell: each manual click and Flurry spell strike instantly grants
+// the current enemy's FULL death soul reward (every multiplier the kill gets)
+// ×3 — the same payout the kill itself pays. Minion clicker strikes and passive
+// DPS are excluded.
 function applyRuleOf3Strike(){
   if(!isSpellActive('ruleOf3')) return;
-  var r3=enemySoulReward.mul(3*(spellEffectMult['ruleOf3']||1));
+  var r3=enemySoulReward.mul(computeSoulMult()).mul(3*(spellEffectMult['ruleOf3']||1)).floor();
   souls=souls.add(r3); totalSouls=totalSouls.add(r3);
   document.getElementById('soul-count').textContent=fmt(souls);
   dirtyU=true;
@@ -4204,11 +4205,11 @@ function entityAttack(isAuto, isSpell){
 }
 
 
-function onEnemyDeath(){
-  if(enemyDead) return;
-  combatActive=false; enemyDead=true; eliteTimerStart=0;
-  spawnSoulCoins();
-  document.getElementById('elite-timer-wrap').style.visibility='hidden';
+// The full soul multiplier applied to an enemy's death reward: form, ascension,
+// soul-absorb & soul-gain augments, Twin Souls, tattered nodes, minion souls
+// bonus, and pentagram mastery. Shared by onEnemyDeath and the Rule of 3 strike
+// grant so a strike pays exactly what the kill pays.
+function computeSoulMult(){
   var soulMult=1;
   if(rebirthForm==='androgynous') soulMult*=(1+0.10*getFormMult());
   else if(achievementsEarned.indexOf('form-ult-androgynous')>=0) soulMult*=1.10;
@@ -4226,7 +4227,14 @@ function onEnemyDeath(){
   // Pentagram mastery: +11% souls per completed-pentagram honor earned
   var _pentBonus=pentMasterySoulBonus();
   if(_pentBonus>0) soulMult*=(1+_pentBonus);
-  var reward=enemySoulReward.mul(soulMult).floor();
+  return soulMult;
+}
+function onEnemyDeath(){
+  if(enemyDead) return;
+  combatActive=false; enemyDead=true; eliteTimerStart=0;
+  spawnSoulCoins();
+  document.getElementById('elite-timer-wrap').style.visibility='hidden';
+  var reward=enemySoulReward.mul(computeSoulMult()).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
   if(!_tutShown.souls){ _tutShown.souls=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('These are the souls you have collected. Currency to help you grow stronger.',document.getElementById('souls-display'),null); },800); } }
@@ -8067,8 +8075,6 @@ function minionClickerAttackEnemy(){
   var pp=floatPos('enemy-canvas');
   spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
-  // Rule of 3 — minion clicker strikes count as strikes too
-  applyRuleOf3Strike();
   if(enemyHp.lte(0)) onEnemyDeath();
 }
 
