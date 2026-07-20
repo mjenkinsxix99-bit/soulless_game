@@ -211,11 +211,12 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card-name { font-size:16px; font-weight:bold; color:#336633; letter-spacing:1px; line-height:1.2; }
 .mm-card-discovered .mm-card-name { color:#44cc44; }
 .mm-card-elite.mm-card-discovered .mm-card-name { color:#ffd700; }
+.mm-card-status { width:100%; height:24px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
 .mm-card-badge { font-size:13px; color:#7755aa; background:#0a0520; border:1px solid #2a1060; border-radius:3px; padding:1px 5px; }
 .mm-card-badge-elite { color:#ffd700; border-color:#d4a843; background:#0d0900; }
 .mm-card-xpbar { width:80%; height:3px; background:#1a0a30; border-radius:2px; }
 .mm-card-xpfill { height:100%; background:#6633bb; border-radius:2px; }
-.mm-card-flavor { font-size:13px; color:#336633; font-style:italic; line-height:1.4; padding:0 4px; }
+.mm-card-flavor { font-size:13px; color:#336633; font-style:italic; line-height:1.4; padding:0 4px; height:73px; overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:4; }
 .mm-card-discovered .mm-card-flavor { color:#55aa55; }
 .mm-card:hover .mm-card-flavor { color:#88ee88; }
 .mm-card-elite.mm-card-discovered .mm-card-flavor { color:#ffd700; }
@@ -3453,20 +3454,24 @@ function renderMinionModal(){
       nameEl.textContent=et.name+(isEliteType?' ★':'');
       card.appendChild(nameEl);
 
-      // Held indicator (level/elite badge)
+      // Held indicator (level/elite badge). Always append the status slot, even
+      // when empty, so its fixed height keeps every portrait anchored uniformly.
+      var statusEl=document.createElement('div');
+      statusEl.className='mm-card-status';
       if(heldMinion){
         var badgeEl=document.createElement('div');
         badgeEl.className='mm-card-badge'+(heldMinion.isElite?' mm-card-badge-elite':'');
         badgeEl.textContent=heldMinion.isElite?'ELITE ★':'Lv '+heldMinion.level;
-        card.appendChild(badgeEl);
+        statusEl.appendChild(badgeEl);
         if(!heldMinion.isElite){
           var xpPct=Math.floor(heldMinion.xp/getMinionXpForLevel(heldMinion.level)*100);
           var xpBar=document.createElement('div');
           xpBar.className='mm-card-xpbar';
           xpBar.innerHTML='<div class="mm-card-xpfill" style="width:'+xpPct+'%"></div>';
-          card.appendChild(xpBar);
+          statusEl.appendChild(xpBar);
         }
       }
+      card.appendChild(statusEl);
 
       // Flavor text
       var flavorEl=document.createElement('div');
