@@ -4161,6 +4161,16 @@ function registerClick(){
   var _ec=document.getElementById('es-clicks'); if(_ec) _ec.textContent=totalClicks.toLocaleString();
   checkAchievements();
 }
+// Rule of 3 spell: every discrete strike — manual click, Flurry spell strike,
+// or minion clicker strike — instantly grants the current enemy's death soul
+// reward ×3. Passive DPS is continuous (not a strike) and is excluded.
+function applyRuleOf3Strike(){
+  if(!isSpellActive('ruleOf3')) return;
+  var r3=enemySoulReward.mul(3*(spellEffectMult['ruleOf3']||1));
+  souls=souls.add(r3); totalSouls=totalSouls.add(r3);
+  document.getElementById('soul-count').textContent=fmt(souls);
+  dirtyU=true;
+}
 // isAuto: passive strike, excluded from the click counter. isSpell (Flurry) now
 // counts as a click, so only isAuto is gated out here.
 function entityAttack(isAuto, isSpell){
@@ -4189,12 +4199,7 @@ function entityAttack(isAuto, isSpell){
   spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
   // Spell: Rule of 3 — immediately gain enemy death soul value ×3 per strike
-  if(isSpellActive('ruleOf3')){
-    var r3=enemySoulReward.mul(3*(spellEffectMult['ruleOf3']||1));
-    souls=souls.add(r3); totalSouls=totalSouls.add(r3);
-    document.getElementById('soul-count').textContent=fmt(souls);
-    dirtyU=true;
-  }
+  applyRuleOf3Strike();
   if(enemyHp.lte(0)) onEnemyDeath();
 }
 
@@ -8062,6 +8067,8 @@ function minionClickerAttackEnemy(){
   var pp=floatPos('enemy-canvas');
   spawnFloat((isCrit?'CRIT! ':'')+'-'+fmtHp(dmg),isCrit?'crit':'edamage',pp.x,pp.y);
   updateHpBars();
+  // Rule of 3 — minion clicker strikes count as strikes too
+  applyRuleOf3Strike();
   if(enemyHp.lte(0)) onEnemyDeath();
 }
 
