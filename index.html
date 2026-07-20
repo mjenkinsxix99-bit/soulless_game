@@ -4227,8 +4227,13 @@ function computeSoulMult(){
   // Pentagram mastery: +11% souls per completed-pentagram honor earned
   var _pentBonus=pentMasterySoulBonus();
   if(_pentBonus>0) soulMult*=(1+_pentBonus);
+  // Elite Tamer honors: ×2 souls gained per earned Elite Tamer achievement
+  var _et=0;
+  for(var _i=0;_i<ELITE_TAMER_ACH_IDS.length;_i++){ if(achievementsEarned.indexOf(ELITE_TAMER_ACH_IDS[_i])>=0) _et++; }
+  if(_et>0) soulMult*=Math.pow(2,_et);
   return soulMult;
 }
+var ELITE_TAMER_ACH_IDS=['elite-minion-1','elite-minion-10','elite-minion-25','elite-minion-50','elite-minion-100'];
 function onEnemyDeath(){
   if(enemyDead) return;
   combatActive=false; enemyDead=true; eliteTimerStart=0;
@@ -5009,14 +5014,14 @@ var ACHIEVEMENTS=[
   // Realm Walker — one per realm cleared
   {id:'realm-void',        cat:'Realm Walker',name:'Beyond the Void',         desc:'Clear the Void realm',                        check:function(){return highestRealm>=2;}},
   {id:'realm-underworld',  cat:'Realm Walker',name:'Out of the Underworld',   desc:'Clear the Underworld realm',                  check:function(){return highestRealm>=3;}},
-  {id:'realm-purgatory',   cat:'Realm Walker',name:'Purgatory Survived',      desc:'Clear the Purgatory realm',                   check:function(){return highestRealm>=4;}},
-  {id:'realm-undead',      cat:'Realm Walker',name:'Death Denied',            desc:'Clear the Undead realm',                      check:function(){return highestRealm>=5;}},
-  {id:'realm-hades',       cat:'Realm Walker',name:'Hades Forsaken',          desc:'Clear the Hades realm',                       check:function(){return highestRealm>=6;}},
-  {id:'realm-undersea',    cat:'Realm Walker',name:'The Deep Crossed',        desc:'Clear the Undersea realm',                    check:function(){return highestRealm>=7;}},
-  {id:'realm-swamp',       cat:'Realm Walker',name:'The Mire Behind',         desc:'Clear the Swamp realm',                       check:function(){return highestRealm>=8;}},
-  {id:'realm-forest',      cat:'Realm Walker',name:'The Forest Falls',        desc:'Clear the Forest realm',                      check:function(){return highestRealm>=9;}},
-  {id:'realm-skyland',     cat:'Realm Walker',name:'Above the Clouds',        desc:'Clear the Skyland realm',                     check:function(){return highestRealm>=10;}},
-  {id:'realm-heaven',      cat:'Realm Walker',name:'Heaven Unmade',           desc:'Clear the Heaven realm',                      check:function(){return highestRealm>=11;}},
+  {id:'realm-purgatory',   cat:'Realm Walker',name:'Purgatory Survived',      desc:'Clear the Purgatory realm — permanently unlock the 5 Critical Strike grid nodes', check:function(){return highestRealm>=4;}},
+  {id:'realm-undead',      cat:'Realm Walker',name:'Death Denied',            desc:'Clear the Undead realm — start each life with 1 billion souls',            check:function(){return highestRealm>=5;},  startSouls:'1e9'},
+  {id:'realm-hades',       cat:'Realm Walker',name:'Hades Forsaken',          desc:'Clear the Hades realm — permanently unlock the 5 Twin Blades grid nodes',  check:function(){return highestRealm>=6;}},
+  {id:'realm-undersea',    cat:'Realm Walker',name:'The Deep Crossed',        desc:'Clear the Undersea realm — start each life with 1 trillion souls',         check:function(){return highestRealm>=7;},  startSouls:'1e12'},
+  {id:'realm-swamp',       cat:'Realm Walker',name:'The Mire Behind',         desc:'Clear the Swamp realm — permanently unlock the 5 Twin Souls grid nodes',   check:function(){return highestRealm>=8;}},
+  {id:'realm-forest',      cat:'Realm Walker',name:'The Forest Falls',        desc:'Clear the Forest realm — start each life with 1 quadrillion souls',        check:function(){return highestRealm>=9;},  startSouls:'1e15'},
+  {id:'realm-skyland',     cat:'Realm Walker',name:'Above the Clouds',        desc:'Clear the Skyland realm — permanently unlock the 5 Rule of 3 grid nodes',  check:function(){return highestRealm>=10;}},
+  {id:'realm-heaven',      cat:'Realm Walker',name:'Heaven Unmade',           desc:'Clear the Heaven realm — start each life with 1 quintillion souls',        check:function(){return highestRealm>=11;}, startSouls:'1e18'},
   // Ascension
   {id:'asc-1',         cat:'Ascendant',      name:'First Transformation',     desc:'Ascend once',                                 check:function(){return ascendCount>=1;}},
   {id:'asc-5',         cat:'Ascendant',      name:'Five Evolutions',          desc:'Ascend 5 times',                              check:function(){return ascendCount>=5;}},
@@ -5194,11 +5199,11 @@ var ACHIEVEMENTS=[
   {id:'minion-50',   cat:'Minion Tamer', name:'Legion Master',       desc:'Hold 50 minions at once',         check:function(){return minionSlots.length>=50;}},
   {id:'minion-100',  cat:'Minion Tamer', name:'Master of a Hundred', desc:'Hold 100 minions at once',        check:function(){return minionSlots.length>=100;}},
   // Elite minions held at once
-  {id:'elite-minion-1',   cat:'Elite Tamer', name:'First Ascended',        desc:'Hold your first Elite minion',         check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=1;}},
-  {id:'elite-minion-10',  cat:'Elite Tamer', name:'Ten Ascended',          desc:'Hold 10 Elite minions at once',        check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=10;}},
-  {id:'elite-minion-25',  cat:'Elite Tamer', name:'Elite Cohort',          desc:'Hold 25 Elite minions at once',        check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=25;}},
-  {id:'elite-minion-50',  cat:'Elite Tamer', name:'Elite Legion',          desc:'Hold 50 Elite minions at once',        check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=50;}},
-  {id:'elite-minion-100', cat:'Elite Tamer', name:'A Hundred Ascended',    desc:'Hold 100 Elite minions at once',       check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=100;}},
+  {id:'elite-minion-1',   cat:'Elite Tamer', name:'First Ascended',        desc:'Hold your first Elite minion — ×2 souls gained',    check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=1;}},
+  {id:'elite-minion-10',  cat:'Elite Tamer', name:'Ten Ascended',          desc:'Hold 10 Elite minions at once — ×2 souls gained',   check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=10;}},
+  {id:'elite-minion-25',  cat:'Elite Tamer', name:'Elite Cohort',          desc:'Hold 25 Elite minions at once — ×2 souls gained',   check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=25;}},
+  {id:'elite-minion-50',  cat:'Elite Tamer', name:'Elite Legion',          desc:'Hold 50 Elite minions at once — ×2 souls gained',   check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=50;}},
+  {id:'elite-minion-100', cat:'Elite Tamer', name:'A Hundred Ascended',    desc:'Hold 100 Elite minions at once — ×2 souls gained',  check:function(){return minionSlots.filter(function(m){return m.isElite;}).length>=100;}},
   // Minions released — each honor grants +1% capture chance
   {id:'minion-released-1',   cat:'Minion Liberator', name:'Set One Free',      desc:'Release a minion. +1% capture chance.',           check:function(){return minionsReleasedTotal>=1;}},
   {id:'minion-released-10',  cat:'Minion Liberator', name:'Merciful Hand',     desc:'Release 10 minions. +1% capture chance.',         check:function(){return minionsReleasedTotal>=10;}},
@@ -5237,13 +5242,21 @@ function startingSoulBonus(){
 }
 
 function checkAchievements(silent){
+  var earnedSomething=false;
   ACHIEVEMENTS.forEach(function(a){
     if(achievementsEarned.indexOf(a.id)<0&&a.check()){
       achievementsEarned.push(a.id);
       if(!silent) queueAchievement(a);
       _achievementsTabDirty=true;
+      earnedSomething=true;
     }
   });
+  // A newly-earned realm honor may grant spell nodes; an Elite Tamer honor changes
+  // the soul multiplier. Both are picked up by recalcStats. Only run on a change.
+  if(earnedSomething){
+    grantRealmClearNodes();
+    recalcStats();
+  }
   if(_achievementsTabDirty){
     var tabEl=document.getElementById('tab-honors');
     if(tabEl&&tabEl.classList.contains('active')){
@@ -5900,6 +5913,25 @@ function grantSeal9Nodes(){
     SEAL9_START_NODES.forEach(function(id){ soulShopOwned[id]=1; });
   }
 }
+// Realm-clear honors that permanently grant a spell's 5 outer pentagram nodes
+// (barring hard reset). Like the Seal of the 9 flurry nodes, these are re-granted
+// at the start of every life since the grid wipes on reincarnation/respec, and on
+// load so a save that earned the honor before this feature still gets them.
+var REALM_NODE_GRANTS=[
+  {achId:'realm-purgatory', nodes:['crit-dps-1','crit-strike','crit-dps-2','crit-souls','crit-speed']},      // Clear Realm 3 → Critical Strike
+  {achId:'realm-hades',     nodes:['blade-dps','blade-speed','blade-strike-1','blade-hp','blade-strike-2']}, // Clear Realm 5 → Twin Blades
+  {achId:'realm-swamp',     nodes:['souls-souls','souls-strike','souls-speed','souls-dps-2','souls-dps-1']}, // Clear Realm 7 → Twin Souls
+  {achId:'realm-skyland',   nodes:['rule-hp','rule-dps-1','rule-speed','rule-souls','rule-dps-2']},          // Clear Realm 9 → Rule of 3
+];
+function grantRealmClearNodes(){
+  var changed=false;
+  REALM_NODE_GRANTS.forEach(function(g){
+    if(achievementsEarned.indexOf(g.achId)>=0){
+      g.nodes.forEach(function(id){ if(soulShopOwned[id]!==1){ soulShopOwned[id]=1; changed=true; } });
+    }
+  });
+  return changed;
+}
 
 function buyTatteredNode(id){
   if(rebirthCount<1) return;
@@ -5933,6 +5965,7 @@ function doRespec(){
   });
   if(hasEverAscended||hasEverHadAutoProgress) soulShopOwned['auto-progress']=1;
   grantSeal9Nodes(); // Seal of the 9 reward: keep Flurry's 5 outer nodes through a respec
+  grantRealmClearNodes(); // Realm-clear honors: keep their granted spell nodes through a respec
   // Clear spell active states since spells are no longer owned
   if(flurryInterval){clearInterval(flurryInterval);flurryInterval=null;}
   if(manaHungryInterval){clearInterval(manaHungryInterval);manaHungryInterval=null;}
@@ -6424,6 +6457,7 @@ function doReincarnate(){
   autoProgressEnabled=hadAutoProgress?autoProgressEnabled:false;
   // Pentagram starting rewards (persist across lives via earned honors)
   grantSeal9Nodes();                                                       // Seal of the 9: begin with Flurry's 5 outer nodes
+  grantRealmClearNodes();                                                  // Realm-clear honors: begin each life with their granted spell nodes
   if(achievementsEarned.indexOf('star-of-sacrifice')>=0) tatteredSouls+=5; // Star of Sacrifice: begin with 5 TS banked
 
   // Keep: rebirthForm, achievementsEarned, discoveredMinions, elite minions
@@ -6798,6 +6832,7 @@ function loadGame(){
   if(data.soulShopOwned) soulShopOwned=data.soulShopOwned;
   if(hasEverAscended||hasEverHadAutoProgress) soulShopOwned['auto-progress']=1;
   if(soulShopOwned['auto-progress']>=1) hasEverHadAutoProgress=true;
+  grantRealmClearNodes(); // grant realm-clear spell nodes for honors already earned in this save
   tatteredUpgradesSpent=data.tatteredUpgradesSpent||0;
   mana=data.mana||0; manaMax=data.manaMax||100;
   invokePowerStacks=Math.min(5,data.invokePowerStacks||0); // clamp to the 5-stack cap
