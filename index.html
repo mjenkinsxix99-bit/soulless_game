@@ -4444,13 +4444,20 @@ var AUG_SPECIAL={
 };
 // Upgrades that use the late-game augment thresholds ([10,25,50,100,125]).
 var AUG_LATE_IDS={ct:1,rn:1,ac:1,bf:1};
+// v1.7 upgrade rebalance gate. A 1.665 save keeps its OLD prices, DPS, and
+// augment layout until the player ascends or reincarnates in v1.7 — only then
+// does v17BalanceActive flip true and the new balance take effect. Defaults true
+// for fresh games and post-cutover saves; loadGame sets it false for old saves.
+var v17BalanceActive=true;
 function augThreshFor(u){
   if(u.id==='bs') return AUG_THRESH_BS;
-  if(AUG_LATE_IDS[u.id]) return AUG_THRESH_LATE;
+  if(AUG_LATE_IDS[u.id]) return v17BalanceActive?AUG_THRESH_LATE:AUG_THRESH_DEFAULT;
   return (u.id==='ss'||AUG_SPECIAL[u.id])?AUG_THRESH_FIVE:AUG_THRESH_DEFAULT;
 }
 function augEffectsFor(u){
   if(u.id==='bs') return ['mult','mult','mult','mult','allupgdps'];
+  // Pre-v1.7 layout for the gated late upgrades: four plain ×2 augments.
+  if(AUG_LATE_IDS[u.id]&&!v17BalanceActive) return AUG_THRESH_DEFAULT.map(function(){return 'mult';});
   if(AUG_SPECIAL[u.id]) return AUG_SPECIAL[u.id].slice();
   return augThreshFor(u).map(function(){return 'mult';});
 }
@@ -4906,6 +4913,36 @@ function applyPostAscensionUpgrades(){
     var c=u._baseCost;
     for(var i=0;i<u.level;i++) c=c.mul(u.costScale).ceil();
     u.cost=c;
+  });
+}
+
+// ── v1.7 UPGRADE-BALANCE GATE ─────────────────────────────────────────────────
+// The v1.7 ladder rebalance (new per-level DPS for ct→sp, and the new augment
+// layout for ct/rn/ac/bf) must not take effect on a 1.665 save until the player
+// ascends or reincarnates. V17_PERLEVEL snapshots the code-default (v1.7) DPS;
+// V165_PERLEVEL holds the pre-v1.7 DPS. applyBalanceGate() swaps between them
+// (and the matching augment layout) based on v17BalanceActive.
+var V165_PERLEVEL={
+  ct:2.0795e29, rn:5.7656e35, ac:1.5986e42, bf:4.4324e48, ar:1.2289e55,
+  pg:3.4074e61, np:9.4475e67, su:2.6194e74, vm:7.2628e80, cw:2.0137e87,
+  wt:5.5833e93, ec:1.5480e100, ag:4.2922e106, sp:1.1901e113
+};
+var V17_PERLEVEL={};
+REP_UPGRADES.forEach(function(u){ if(V165_PERLEVEL[u.id]!==undefined) V17_PERLEVEL[u.id]=u.perLevel; });
+var V17_AUG_IDS=['ct','rn','ac','bf']; // upgrades whose augment layout also changed in v1.7
+function applyBalanceGate(){
+  REP_UPGRADES.forEach(function(u){
+    if(V165_PERLEVEL[u.id]!==undefined) u.perLevel=v17BalanceActive?V17_PERLEVEL[u.id]:V165_PERLEVEL[u.id];
+  });
+  // Re-derive the augment thresholds/effects (and their costs) for the four
+  // upgrades whose layout differs pre/post-v1.7. Milestone arrays are (re)sized
+  // by the caller: load coerces to augThresh.length, resets use mkAugs.
+  V17_AUG_IDS.forEach(function(id){
+    var u=REP_UPGRADES.filter(function(x){return x.id===id;})[0];
+    if(!u) return;
+    u.augThresh=augThreshFor(u);
+    u.augEffects=augEffectsFor(u);
+    calcMilestoneCosts(u);
   });
 }
 
@@ -6448,6 +6485,8 @@ function doReincarnate(){
   if(manaHungryInterval){ clearInterval(manaHungryInterval); manaHungryInterval=null; }
   powerOf3Armed=false;
   _shownUpgrades={};
+  // Reincarnating in v1.7 activates the new upgrade balance from here on.
+  v17BalanceActive=true; applyBalanceGate();
   REP_UPGRADES.forEach(function(u){
     u.level=0;
     u.cost=D(u._baseCost||u.cost);
@@ -6588,7 +6627,8 @@ function doRebirthReset(chosenForm){
   if(manaHungryInterval){ clearInterval(manaHungryInterval); manaHungryInterval=null; }
   powerOf3Armed=false;
 
-  // Reset upgrades
+  // Reset upgrades. Ascending in v1.7 activates the new upgrade balance.
+  v17BalanceActive=true; applyBalanceGate();
   _shownUpgrades={};
   REP_UPGRADES.forEach(function(u){
     u.level=0;
@@ -6695,6 +6735,7 @@ function saveGame(){
     defeatedElites:defeatedElites,
     firstKillDone:firstKillDone, killCounts:killCounts,
     balanceVersion:CUR_BALANCE_VERSION,
+    v17BalanceActive:v17BalanceActive,
     upgrades:REP_UPGRADES.map(function(u){return{id:u.id,level:u.level,cost:u.cost.toString(),milestones:u.milestones.slice(),gfL:u.grandfatherLevel||0,gfP:u.grandfatherPerLevel?u.grandfatherPerLevel.toString():null};}),
     totalClicks:totalClicks, totalUpgradePurchases:totalUpgradePurchases,
     totalMilestonePurchases:totalMilestonePurchases, ascendCount:ascendCount,
@@ -6773,6 +6814,11 @@ function loadGame(){
   defeatedElites=data.defeatedElites||[];
   firstKillDone=data.firstKillDone||{};
   killCounts=data.killCounts||{};
+  // v1.7 balance gate: old saves (no flag) keep the pre-v1.7 ladder + augment
+  // layout until they ascend/reincarnate. Apply BEFORE the upgrades loop so the
+  // milestone coercion below sizes to the correct (gated) augment count.
+  v17BalanceActive=(data.v17BalanceActive===true);
+  applyBalanceGate();
   if(data.upgrades){
     data.upgrades.forEach(function(saved){
       var u=REP_UPGRADES.filter(function(x){return x.id===saved.id;})[0];
@@ -6829,6 +6875,9 @@ function loadGame(){
   ascension6Path=data.ascension6Path||null;
   if(data.hasEverAscended) hasEverAscended=data.hasEverAscended;
   if(hasEverAscended) applyPostAscensionUpgrades();
+  // applyPostAscensionUpgrades re-set perLevel from the (v1.7) POST table; on a
+  // gated save re-apply the gate so ct/rn/ac/bf keep their pre-v1.7 DPS.
+  if(!v17BalanceActive) applyBalanceGate();
   // One-time rebalance migration: snapshot old per-level DPS for already-owned
   // ct→sp so the smooth ladder doesn't change any current player's login DPS.
   // Runs after hasEverAscended is known (picks pre- vs post-ascension old value).
