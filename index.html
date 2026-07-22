@@ -32,7 +32,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #right { border-left: 1px solid #1e1845; width: 415px; }
 .ph { font-size: 14px; letter-spacing: 3px; color: #9980dd; text-transform: uppercase; border-bottom: 1px solid #1a1535; padding-bottom: 4px; margin-bottom: 10px; }
 .ph.gap { margin-top: 16px; }
-.ucard { border: 1px solid #c8bca0; border-radius: 5px; padding: 11px 12px; margin-bottom: 9px; cursor: default; opacity: 0.5; background: #f0e8b8; transition: border-color 0.2s, background 0.2s; user-select: none; -webkit-user-select: none; }
+.ucard { position: relative; border: 1px solid #c8bca0; border-radius: 5px; padding: 11px 12px; margin-bottom: 9px; cursor: default; opacity: 0.5; background: #f0e8b8; transition: border-color 0.2s, background 0.2s; user-select: none; -webkit-user-select: none; }
 .ucard.can { border-color: #c8a830; opacity: 1; cursor: pointer; background: #fff8c0; }
 .ucard.can:hover { border-color: #e0b820; background: #fffde0; }
 .ucard.bought { border-color: #b5a040; opacity: 0.7; background: #f0e8b8; }
@@ -7234,7 +7234,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   var costHtml='<div class="uc">'+buyPrefix+fmt(cost)+' souls</div>';
   var iconOffset = -(u.icon * 60); // 60px display cell (52px sprite scaled up +8px)
   var iconHtml = '<div class="ucard-icon" style="background-position:'+iconOffset+'px 0;"></div>';
-  d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+costHtml+'</div></div>'+msRowHtml;
+  d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+costHtml+'</div></div>'+msRowHtml+'<div class="mc-drop-hl"></div>';
 
   // Milestone box events — listeners live for the lifetime of the card element
   d.querySelectorAll('.ms-box').forEach(function(box){
