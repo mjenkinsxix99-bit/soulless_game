@@ -3408,7 +3408,6 @@ function showMinionIntroModal(){
   var ov=document.getElementById('minion-intro-overlay');
   if(!ov) return;
   var chk=document.getElementById('minion-intro-chk'); if(chk) chk.checked=false;
-  _tutShown.minionTab=true; // the explainer modal supersedes the old intro tooltip
   ov.classList.add('open');
 }
 function hideMinionIntroModal(){
@@ -3423,7 +3422,9 @@ function openMinionModal(){
   modal.classList.add('open');
   renderMinionModal();
   if(!_minionModalAnimId) _minionModalAnimId = requestAnimationFrame(_animateMinionCards);
-  // First-unlock explainer: show until the player ticks "Do not show this again".
+  // Teaser tooltip only for players who have NOT yet unlocked minions.
+  if(!minionUnlocked && !_tutShown.minionTab){ _tutShown.minionTab=true; setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">You have discovered the Minions!</span> Turn your enemies into allies through sacrifice and make them fight for you.<br><br>This unlocks after you have obtained your first <span style="color:#ffd700;font-weight:bold;">Ultimate Form</span>. Gain their allegiance and make their power yours!<br><br>666 Tattered Souls sacrificed will gain 1 Minion Point when you <span style="color:#ffd700;font-weight:bold;">Reincarnate</span>.',document.getElementById('minion-tab-btn'),null); },600); }
+  // First-unlock explainer modal: only once minions are unlocked, until the player ticks "Do not show this again".
   if(minionUnlocked && !_tutShown.minionIntro){ setTimeout(showMinionIntroModal,350); }
   if(!_tutShown.minionCapture&&minionUnlocked&&minionPoints>=1){ _tutShown.minionCapture=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('To capture an enemy you must select which enemy you want to capture.<br>Each time you defeat them, you have a chance to capture them in exchange for MP.<br><br>Max level Minions become Elite and will survive through Ascension.<br>Non-Elite Minions refund your MP and you must recapture them.',document.getElementById('minion-tab-btn'),null); },_tutShown.minionTab?3000:600); } }
 }
