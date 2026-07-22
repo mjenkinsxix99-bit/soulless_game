@@ -239,6 +239,29 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card-bonus { font-size:13px; color:#6644aa; font-style:italic; margin-top:2px; line-height:1.3; }
 .mm-card-discovered .mm-card-bonus { color:#cc88ff; }
 .mm-card-elite.mm-card-discovered .mm-card-bonus { color:#ffd700; }
+/* ── Portal: per-card element production bar (Elite minions only) ──────────── */
+.mm-card-elembar { width:80%; height:6px; background:#07160a; border:1px solid #1c3a1c; border-radius:3px; margin:4px auto 0; overflow:hidden; }
+.mm-card-elemfill { height:100%; width:0; background:linear-gradient(90deg,#2c9a2c,#5fe05f); box-shadow:0 0 5px rgba(80,220,80,0.5); }
+.mm-card-elembar-dormant { opacity:0.4; filter:grayscale(0.85); }
+.mm-card-elembar-dormant .mm-card-elemfill { background:#3a4a3a; box-shadow:none; }
+/* Portal tab */
+#tab-portal .portal-intro { font-size:13px; color:#9980dd; line-height:1.5; padding:2px 0 10px; }
+.portal-mat-val { color:#d64545; font-variant-numeric:tabular-nums; }
+.portal-mat-val.met { color:#4fd44f; }
+#build-portal-btn { display:block; width:100%; margin:16px 0 6px; padding:12px 0; background:#1a5c1a; border:2px solid #44cc44; color:#ccffcc; font-family:Georgia,serif; font-size:15px; font-weight:bold; letter-spacing:2px; cursor:pointer; border-radius:6px; transition:background 0.2s,box-shadow 0.2s; }
+#build-portal-btn:hover { background:#226622; box-shadow:0 0 16px rgba(68,204,68,0.55); }
+#portal-built-note { font-size:14px; color:#5fe05f; text-align:center; padding:14px 0; font-style:italic; }
+/* Portal tab modal */
+#portal-modal-overlay { display:none; position:fixed; inset:0; background:rgba(2,1,14,0.9); z-index:10001; align-items:center; justify-content:center; padding:20px; }
+#portal-modal-overlay.open { display:flex; }
+#portal-modal-box { background:linear-gradient(160deg,#170b34,#0a0520); border:2px solid #9966ff; border-radius:12px; box-shadow:0 0 34px rgba(150,90,255,0.55); max-width:540px; width:100%; max-height:92%; overflow-y:auto; padding:26px 30px; text-align:center; font-family:Georgia,serif; }
+#portal-modal-title { font-size:22px; font-weight:bold; color:#ece4ff; letter-spacing:1px; margin-bottom:16px; text-shadow:0 0 12px rgba(160,110,255,0.85); }
+#portal-modal-body p { font-size:15px; line-height:1.55; color:#d6c9f5; margin:0 0 13px; text-align:left; }
+#portal-modal-body .pm-cta { text-align:center; font-size:16px; font-weight:bold; color:#ffd76a; text-shadow:0 0 10px rgba(255,190,60,0.6); }
+#portal-modal-dns { font-size:13px; color:#b49ee2; margin:14px 0 18px; display:flex; align-items:center; justify-content:center; gap:7px; }
+#portal-modal-dns label { cursor:pointer; }
+#portal-modal-close { background:#6633bb; border:2px solid #9966ff; color:#fff; font-weight:bold; font-size:15px; letter-spacing:1px; padding:9px 28px; border-radius:6px; cursor:pointer; font-family:Georgia,serif; box-shadow:0 0 12px rgba(150,90,255,0.55); }
+#portal-modal-close:hover { background:#7a44cc; }
 /* Capture notification */
 #minion-capture-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2000; background:#0a0520; border:2px solid #9966ff; border-radius:10px; padding:24px 32px; text-align:center; pointer-events:none; box-shadow:0 0 40px rgba(150,80,255,0.5); }
 #minion-capture-modal.open { display:block; }
@@ -1356,6 +1379,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       </div>
       <div class="tab-bar">
         <button class="tab-btn active" data-tab="upgrades"><span class="ui-icon" style="background-position:-108px 0"></span><span class="tab-tip">Upgrades</span></button>
+        <button class="tab-btn" data-tab="portal"><span class="ui-icon" style="background-position:-432px 0"></span><span class="tab-tip">Portal</span></button>
         <button class="tab-btn" data-tab="honors"><span class="ui-icon" style="background-position:-144px 0"></span><span class="tab-tip">Honors</span></button>
         <button class="tab-btn" data-tab="stats"><span class="ui-icon" style="background-position:-180px 0"></span><span class="tab-tip">Stats</span></button>
       </div>
@@ -1365,6 +1389,13 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       </div>
       <div id="tab-honors" class="tab-pane">
         <div id="ach-list"></div>
+      </div>
+      <div id="tab-portal" class="tab-pane">
+        <div class="ph">Portal to the Realm of the Gods</div>
+        <div class="portal-intro">Only <strong>Elite</strong> minions supply the materials to build the Portal. Gather every material within a single Reincarnation.</div>
+        <div id="portal-mat-list"></div>
+        <button id="build-portal-btn" style="display:none">✦ BUILD PORTAL ✦</button>
+        <div id="portal-built-note" style="display:none">The Portal stands. The Realm of the Gods awaits.</div>
       </div>
       <div id="tab-stats" class="tab-pane">
         <div class="ph">Entity Stats</div>
@@ -1384,7 +1415,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
         <div class="ph gap">Form</div>
         <div id="form-stat-row" style="font-size:14px;color:#9980dd;padding:3px 0 6px;"></div>
         <div id="traits-row"></div>
-        <div class="ph gap" id="element-stocks-header" style="display:none">Element Stocks</div>
+        <div class="ph gap" id="element-stocks-header" style="display:none">Portal Materials</div>
         <div id="element-stocks-list"></div>
       </div>
       </div><!-- #tab-content-area -->
@@ -1920,6 +1951,17 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     </div>
   </div>
 </div>
+<!-- Portal tab intro modal -->
+<div id="portal-modal-overlay">
+  <div id="portal-modal-box">
+    <div id="portal-modal-title">The Portal to the Realm of the Gods</div>
+    <div id="portal-modal-body"></div>
+    <div id="portal-modal-dns">
+      <input type="checkbox" id="portal-modal-chk"><label for="portal-modal-chk">Do not show this again</label>
+    </div>
+    <button id="portal-modal-close">Continue</button>
+  </div>
+</div>
 
 <!-- Release Minion confirmation -->
 <div id="release-confirm-modal">
@@ -2254,7 +2296,7 @@ var _tutShown = {
   souls: false, upgrades: false, deeperHunger: false, milestone: false,
   upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
   ascension: false, honors: false, tatteredShop: false, minionTab: false, minionCapture: false,
-  eliteWin: false, touchHint: false, minionIntro: false
+  eliteWin: false, touchHint: false, minionIntro: false, portalIntro: false
 };
 var _tutQueue = [];
 var _tutActive = false;
@@ -3258,22 +3300,123 @@ function getMinionBonusDesc(bonusType, heldMinion){
   return 'Gives '+val;
 }
 
-// Tick element production. Called from the game loop; offline catchup via elapsed seconds.
+// Tick element production. Called every frame; offline catchup rides the elapsed
+// delta. ONLY Elite minions supply materials: each fills its element bar in
+// PORTAL_BAR_PERIOD_MS and grants +1 of its element on completion. Each element
+// is capped at PORTAL_ELEMENT_REQ (excess production is not banked).
 function tickElementProduction(nowMs){
-  if(minionSlots.length===0){ _lastElementTick=nowMs; return; }
-  var INTERVAL_MS=10000;
   if(_lastElementTick===0){ _lastElementTick=nowMs; return; }
   var elapsed=nowMs-_lastElementTick;
-  if(elapsed<INTERVAL_MS) return;
-  var ticks=Math.floor(elapsed/INTERVAL_MS);
-  _lastElementTick+=ticks*INTERVAL_MS;
-  var eliteMult=1;
+  _lastElementTick=nowMs;
+  if(elapsed<=0||portalBuilt||minionSlots.length===0) return;
   minionSlots.forEach(function(m){
+    if(!m.isElite) return;                        // only Elite minions produce
     var md=MINION_DATA[m.typeIdx];
     if(!md||!md.element) return;
-    var units=m.isElite?2*eliteMult:1;
-    elementStocks[md.element]=(elementStocks[md.element]||0)+units*ticks;
+    var cur=elementStocks[md.element]||0;
+    if(cur>=PORTAL_ELEMENT_REQ){ m.portalProgress=0; return; } // element full — bar idles
+    var prog=(m.portalProgress||0)+elapsed;
+    if(prog>=PORTAL_BAR_PERIOD_MS){
+      var grants=Math.floor(prog/PORTAL_BAR_PERIOD_MS);
+      prog-=grants*PORTAL_BAR_PERIOD_MS;
+      var next=Math.min(PORTAL_ELEMENT_REQ,cur+grants);
+      elementStocks[md.element]=next;
+      if(next>=PORTAL_ELEMENT_REQ) prog=0;        // hit the cap — hold the bar full
+    }
+    m.portalProgress=prog;
   });
+}
+
+// ── Portal UI ───────────────────────────────────────────────────────────────
+function portalRequirementsMet(){
+  for(var i=0;i<ELEM_NAMES.length;i++){ if((elementStocks[ELEM_NAMES[i]]||0)<PORTAL_ELEMENT_REQ) return false; }
+  return (witheredSouls||0)>=1;
+}
+// Build a fresh material checklist into a container (10 elements + Withered Soul).
+function buildPortalMaterialRows(container){
+  if(!container) return;
+  container.innerHTML='';
+  ELEM_NAMES.forEach(function(e){
+    var row=document.createElement('div'); row.className='stat-row portal-mat-row';
+    row.innerHTML='<span>'+ELEM_LABELS[e]+'</span><span class="sv portal-mat-val" data-mat-val="'+e+'"></span>';
+    container.appendChild(row);
+  });
+  var wrow=document.createElement('div'); wrow.className='stat-row portal-mat-row';
+  wrow.innerHTML='<span>Withered Soul</span><span class="sv portal-mat-val" data-mat-val="withered"></span>';
+  container.appendChild(wrow);
+  refreshPortalMaterialValues();
+}
+// Live-update every visible material counter's text + red/green state.
+function refreshPortalMaterialValues(){
+  ELEM_NAMES.forEach(function(e){
+    var v=Math.floor(elementStocks[e]||0);
+    var met=v>=PORTAL_ELEMENT_REQ;
+    document.querySelectorAll('[data-mat-val="'+e+'"]').forEach(function(el){
+      el.textContent=v.toLocaleString()+' / '+PORTAL_ELEMENT_REQ.toLocaleString();
+      el.classList.toggle('met',met);
+    });
+  });
+  var ws=Math.floor(witheredSouls||0);
+  document.querySelectorAll('[data-mat-val="withered"]').forEach(function(el){
+    el.textContent=ws.toLocaleString()+' / 1';
+    el.classList.toggle('met',ws>=1);
+  });
+  var btn=document.getElementById('build-portal-btn');
+  if(btn) btn.style.display=(portalRequirementsMet()&&!portalBuilt)?'block':'none';
+  var note=document.getElementById('portal-built-note');
+  if(note) note.style.display=portalBuilt?'block':'none';
+}
+// Smoothly advance the per-card element bars while the Minions panel is open.
+function updatePortalCardBars(){
+  var modal=document.getElementById('minion-modal');
+  if(!modal||!modal.classList.contains('open')) return;
+  minionSlots.forEach(function(m){
+    if(!m.isElite) return;
+    var md=MINION_DATA[m.typeIdx]; if(!md||!md.element) return;
+    var fill=document.querySelector('.mm-card-elemfill[data-portal-fill="'+m.typeIdx+'"]');
+    if(!fill) return;
+    var pct=((elementStocks[md.element]||0)>=PORTAL_ELEMENT_REQ)?100:((m.portalProgress||0)/PORTAL_BAR_PERIOD_MS*100);
+    fill.style.width=pct+'%';
+  });
+}
+function renderPortalTab(){
+  buildPortalMaterialRows(document.getElementById('portal-mat-list'));
+}
+function buildPortal(){
+  if(!portalRequirementsMet()||portalBuilt) return;
+  ELEM_NAMES.forEach(function(e){ elementStocks[e]=0; }); // materials consumed
+  witheredSouls=Math.max(0,(witheredSouls||0)-1);
+  minionSlots.forEach(function(m){ m.portalProgress=0; });
+  portalBuilt=true;
+  saveGame();
+  renderPortalTab();
+}
+function openPortalTabModal(){
+  var ov=document.getElementById('portal-modal-overlay');
+  if(!ov) return;
+  var body=document.getElementById('portal-modal-body');
+  var dns=document.getElementById('portal-modal-dns');
+  var chk=document.getElementById('portal-modal-chk');
+  if(chk) chk.checked=false;
+  if(!minionUnlocked){
+    // Shown on every visit until Minions are unlocked. No "do not show again".
+    body.innerHTML='<p class="pm-cta">The portal to the realm of the gods awaits.</p><p style="text-align:center">Use your minions to build the Portal.</p>';
+    if(dns) dns.style.display='none';
+    ov.classList.add('open');
+    return;
+  }
+  if(_tutShown.portalIntro) return; // player has dismissed the unlocked briefing
+  body.innerHTML='<p>Elite minions supply the Building materials that will allow you to build the portal to the Realm of the gods.</p>'
+    +'<p>You must reach the materials required in 1 Reincarnation. Once built, the portal cannot be destroyed.</p>'
+    +'<p class="pm-cta">Build it, Enter it, find the gods whose petty jealousy destroyed you. Gain their power to rebuild the society that was lost!</p>';
+  if(dns) dns.style.display='flex';
+  ov.classList.add('open');
+}
+function closePortalTabModal(){
+  var ov=document.getElementById('portal-modal-overlay');
+  if(ov) ov.classList.remove('open');
+  var chk=document.getElementById('portal-modal-chk');
+  if(minionUnlocked && chk && chk.checked){ _tutShown.portalIntro=true; saveGame(); }
 }
 
 function getMinionCostForType(typeIdx){
@@ -3580,6 +3723,23 @@ function renderMinionModal(){
       else if(!heldMinion) cv.style.filter='brightness(0.4)';
       card.appendChild(cv);
 
+      // Element production bar — sits directly above the element label. Only Elite
+      // minions produce, so non-Elite held minions show a dormant (greyed) bar.
+      if(heldMinion){
+        var pbar=document.createElement('div');
+        pbar.className='mm-card-elembar'+(heldMinion.isElite?'':' mm-card-elembar-dormant');
+        var pfill=document.createElement('div');
+        pfill.className='mm-card-elemfill';
+        pfill.setAttribute('data-portal-fill', String(idx));
+        var ppct=0;
+        if(heldMinion.isElite&&md.element){
+          ppct=((elementStocks[md.element]||0)>=PORTAL_ELEMENT_REQ)?100:((heldMinion.portalProgress||0)/PORTAL_BAR_PERIOD_MS*100);
+        }
+        pfill.style.width=ppct+'%';
+        pbar.appendChild(pfill);
+        card.appendChild(pbar);
+      }
+
       // Element
       var elemEl=document.createElement('div');
       elemEl.className='mm-card-element';
@@ -3806,6 +3966,15 @@ var minionsSacrificedTotal=0; // lifetime minions sacrificed (mechanic not yet i
 var discoveredMinions=[];
 var elementStocks={earth:0,stone:0,metal:0,wood:0,plant:0,water:0,fire:0,research:0,holy:0,dark:0};
 var _lastElementTick=0;
+// ── Portal to the Realm of the Gods ─────────────────────────────────────────
+// Ordered element list (also used for the material checklist).
+var ELEM_NAMES=['earth','stone','metal','wood','plant','water','fire','research','holy','dark'];
+var ELEM_LABELS={earth:'Earth',stone:'Stone',metal:'Metal',wood:'Wood',plant:'Plant',water:'Water',fire:'Fire',research:'Research',holy:'Holy',dark:'Dark'};
+var PORTAL_ELEMENT_REQ=2400;      // materials of each element needed to build the portal
+var PORTAL_BAR_PERIOD_MS=45000;   // an Elite minion fills its element bar (grants +1) every 45s (2x a base minion)
+var witheredSouls=0;              // consumed by the portal; produced by the (upcoming) minion-sacrifice system
+var portalBuilt=false;           // once built, the portal cannot be destroyed
+var _lastPortalUiRefresh=0;
 var tatteredSouls=0;
 var totalTSSacrificed=0;
 var rebirthCount=0;
@@ -6598,6 +6767,11 @@ function doReincarnate(){
 
   // Keep: rebirthForm, achievementsEarned, discoveredMinions, elite minions
   wipeNonEliteMinions();
+  // Portal materials must be gathered within a single Reincarnation — reset element
+  // stocks and every minion's bar progress. Withered Souls are NOT reset.
+  ELEM_NAMES.forEach(function(e){ elementStocks[e]=0; });
+  minionSlots.forEach(function(m){ m.portalProgress=0; });
+  _lastElementTick=0;
   rebirthCount=0;
   captureTargets=[]; releaseMode=false; // clear any pending capture selection on reincarnation
 
@@ -6871,6 +7045,8 @@ function saveGame(){
     discoveredMinions:discoveredMinions.slice(),
     elementStocks:JSON.parse(JSON.stringify(elementStocks)),
     lastElementTick:_lastElementTick,
+    witheredSouls:witheredSouls,
+    portalBuilt:portalBuilt,
     redeemedCodes:redeemedCodes.slice(),
     minionClickerAssignments:minionClickerAssignments.slice(),
     savedAt:Date.now()
@@ -7007,6 +7183,8 @@ function loadGame(){
   if(data.discoveredMinions) discoveredMinions=data.discoveredMinions;
   if(data.elementStocks) elementStocks=data.elementStocks;
   if(data.lastElementTick) _lastElementTick=data.lastElementTick;
+  if(typeof data.witheredSouls==='number') witheredSouls=data.witheredSouls;
+  if(typeof data.portalBuilt==='boolean') portalBuilt=data.portalBuilt;
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
   if(data.minionClickerAssignments) minionClickerAssignments=data.minionClickerAssignments;
   _offlineSavedAt=data.savedAt||0;
@@ -7544,26 +7722,13 @@ function updateEntityStatsPanel(){
   var dsAuto=document.getElementById('ds-auto');
   if(dsStrike) dsStrike.textContent=strikeStr;
   if(dsAuto) dsAuto.textContent=autoStr;
-  // Element stocks
+  // Portal materials — the same live checklist shown on the Portal tab.
   var elHdr=document.getElementById('element-stocks-header');
   var elList=document.getElementById('element-stocks-list');
-  if(elHdr&&elList&&minionUnlocked){
-    var ELEM_NAMES=['earth','stone','metal','wood','plant','water','fire','research','holy','dark'];
-    var hasAny=ELEM_NAMES.some(function(e){return (elementStocks[e]||0)>0;});
-    elHdr.style.display=hasAny?'':'none';
-    if(hasAny){
-      elList.innerHTML='';
-      ELEM_NAMES.forEach(function(e){
-        var v=elementStocks[e]||0;
-        if(v<=0) return;
-        var row=document.createElement('div');
-        row.className='stat-row';
-        row.innerHTML='<span>'+e.charAt(0).toUpperCase()+e.slice(1)+'</span><span class="sv">'+Math.floor(v).toLocaleString()+'</span>';
-        elList.appendChild(row);
-      });
-    } else {
-      elList.innerHTML='';
-    }
+  if(elHdr&&elList){
+    elHdr.style.display=minionUnlocked?'':'none';
+    if(minionUnlocked){ buildPortalMaterialRows(elList); }
+    else { elList.innerHTML=''; }
   }
 }
 
@@ -8509,6 +8674,8 @@ function gameLoop(){
   }
 
   tickElementProduction(now);
+  updatePortalCardBars();
+  if(now-_lastPortalUiRefresh>=500){ _lastPortalUiRefresh=now; refreshPortalMaterialValues(); }
   tickMinionClickers(now);
 
   drawEntityCanvas(now);
@@ -9320,6 +9487,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     document.getElementById('tab-'+tab).classList.add('active');
     if(tab==='honors'){ renderAchievementsTab(); _achievementsTabDirty=false; }
     if(tab==='stats'){ updateEntityStatsPanel(); }
+    if(tab==='portal'){ renderPortalTab(); openPortalTabModal(); }
     // Restore the tab's remembered scroll (Honors always opens at the top).
     if(_tca){ _tca.scrollTop=(tab==='honors')?0:(_tabScrollPos[tab]||0); }
   });
@@ -9353,6 +9521,8 @@ document.querySelectorAll('.left-tab-btn').forEach(function(btn){
 document.getElementById('tm-close-btn').addEventListener('click', closeTatteredModal);
 document.getElementById('mm-close-btn').addEventListener('click', closeMinionModal);
 document.getElementById('minion-intro-close').addEventListener('click', hideMinionIntroModal);
+document.getElementById('portal-modal-close').addEventListener('click', closePortalTabModal);
+document.getElementById('build-portal-btn').addEventListener('click', buildPortal);
 document.getElementById('minion-intro-overlay').addEventListener('click', function(e){
   if(e.target===this) hideMinionIntroModal(); // click the dark backdrop to dismiss
 });
