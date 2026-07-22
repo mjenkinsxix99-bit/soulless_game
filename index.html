@@ -258,6 +258,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #portal-modal-title { font-size:22px; font-weight:bold; color:#ece4ff; letter-spacing:1px; margin-bottom:16px; text-shadow:0 0 12px rgba(160,110,255,0.85); }
 #portal-modal-body p { font-size:15px; line-height:1.55; color:#d6c9f5; margin:0 0 13px; text-align:left; }
 #portal-modal-body .pm-cta { text-align:center; font-size:16px; font-weight:bold; color:#ffd76a; text-shadow:0 0 10px rgba(255,190,60,0.6); }
+#portal-modal-body .pm-warn { text-align:center; font-size:14px; font-weight:bold; color:#d64545; margin-top:6px; }
 #portal-modal-dns { font-size:13px; color:#b49ee2; margin:14px 0 18px; display:flex; align-items:center; justify-content:center; gap:7px; }
 #portal-modal-dns label { cursor:pointer; }
 #portal-modal-close { background:#6633bb; border:2px solid #9966ff; color:#fff; font-weight:bold; font-size:15px; letter-spacing:1px; padding:9px 28px; border-radius:6px; cursor:pointer; font-family:Georgia,serif; box-shadow:0 0 12px rgba(150,90,255,0.55); }
@@ -3408,7 +3409,8 @@ function openPortalTabModal(){
   if(_tutShown.portalIntro) return; // player has dismissed the unlocked briefing
   body.innerHTML='<p>Elite minions supply the Building materials that will allow you to build the portal to the Realm of the gods.</p>'
     +'<p>You must reach the materials required in 1 Reincarnation. Once built, the portal cannot be destroyed.</p>'
-    +'<p class="pm-cta">Build it, Enter it, find the gods whose petty jealousy destroyed you. Gain their power to rebuild the society that was lost!</p>';
+    +'<p class="pm-cta">Build it, Enter it, find the gods whose petty jealousy destroyed you. Gain their power to rebuild the society that was lost!</p>'
+    +'<p class="pm-warn">You will need 1 Withered Soul, obtained by Immolating an Elite minion.</p>';
   if(dns) dns.style.display='flex';
   ov.classList.add('open');
 }
