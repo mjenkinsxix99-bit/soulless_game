@@ -246,8 +246,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .mm-card-elembar-dormant .mm-card-elemfill { background:#3a4a3a; box-shadow:none; }
 /* Portal tab */
 #tab-portal .portal-intro { font-size:13px; color:#9980dd; line-height:1.5; padding:2px 0 10px; }
-.portal-mat-val { color:#d64545; font-variant-numeric:tabular-nums; }
-.portal-mat-val.met { color:#4fd44f; }
+.stat-row .sv.portal-mat-val { color:#d64545; font-variant-numeric:tabular-nums; }
+.stat-row .sv.portal-mat-val.met { color:#4fd44f; }
 #build-portal-btn { display:block; width:100%; margin:16px 0 6px; padding:12px 0; background:#1a5c1a; border:2px solid #44cc44; color:#ccffcc; font-family:Georgia,serif; font-size:15px; font-weight:bold; letter-spacing:2px; cursor:pointer; border-radius:6px; transition:background 0.2s,box-shadow 0.2s; }
 #build-portal-btn:hover { background:#226622; box-shadow:0 0 16px rgba(68,204,68,0.55); }
 #portal-built-note { font-size:14px; color:#5fe05f; text-align:center; padding:14px 0; font-style:italic; }
@@ -7047,6 +7047,7 @@ function saveGame(){
     lastElementTick:_lastElementTick,
     witheredSouls:witheredSouls,
     portalBuilt:portalBuilt,
+    portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
     minionClickerAssignments:minionClickerAssignments.slice(),
     savedAt:Date.now()
@@ -7183,6 +7184,14 @@ function loadGame(){
   if(data.discoveredMinions) discoveredMinions=data.discoveredMinions;
   if(data.elementStocks) elementStocks=data.elementStocks;
   if(data.lastElementTick) _lastElementTick=data.lastElementTick;
+  // One-time migration: the Portal gate replaced an older silent accumulator, so
+  // saves from before it carry meaningless (often huge) element stocks. Wipe them
+  // once and clear per-minion bar progress so materials start fresh at 0.
+  if(!data.portalMaterialsV2){
+    ELEM_NAMES.forEach(function(e){ elementStocks[e]=0; });
+    minionSlots.forEach(function(m){ if(m) m.portalProgress=0; });
+    _lastElementTick=0;
+  }
   if(typeof data.witheredSouls==='number') witheredSouls=data.witheredSouls;
   if(typeof data.portalBuilt==='boolean') portalBuilt=data.portalBuilt;
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
