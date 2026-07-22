@@ -169,6 +169,18 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #mm-release-btn:hover { background:#1a0404; border-color:#ff2222; }
 #mm-release-btn.active { background:#cc0000; border-color:#ff2222; color:#000; box-shadow:0 0 8px rgba(255,80,80,0.7); }
 #mm-release-btn.active:hover { background:#ff2222; }
+/* Minion first-unlock explainer — overlays inside the Minions tab */
+#minion-intro-overlay { display:none; position:absolute; inset:0; background:rgba(2,1,14,0.9); z-index:30; align-items:center; justify-content:center; padding:20px; }
+#minion-intro-overlay.open { display:flex; }
+#minion-intro-box { background:linear-gradient(160deg,#170b34,#0a0520); border:2px solid #9966ff; border-radius:12px; box-shadow:0 0 34px rgba(150,90,255,0.55); max-width:560px; width:100%; max-height:92%; overflow-y:auto; padding:26px 30px; text-align:center; font-family:Georgia,serif; }
+#minion-intro-title { font-size:24px; font-weight:bold; color:#ece4ff; letter-spacing:1px; margin-bottom:16px; text-shadow:0 0 12px rgba(160,110,255,0.85); }
+#minion-intro-body p { font-size:15px; line-height:1.55; color:#d6c9f5; margin:0 0 14px; text-align:left; }
+#minion-intro-body .mi-cta { text-align:center; font-size:17px; font-weight:bold; color:#ffd76a; text-shadow:0 0 10px rgba(255,190,60,0.6); margin-top:4px; }
+#minion-intro-body .mi-hl { color:#ffd76a; font-weight:bold; }
+#minion-intro-dns { font-size:13px; color:#b49ee2; margin:14px 0 18px; display:flex; align-items:center; justify-content:center; gap:7px; }
+#minion-intro-dns label { cursor:pointer; }
+#minion-intro-close { background:#6633bb; border:2px solid #9966ff; color:#fff; font-weight:bold; font-size:15px; letter-spacing:1px; padding:9px 28px; border-radius:6px; cursor:pointer; font-family:Georgia,serif; box-shadow:0 0 12px rgba(150,90,255,0.55); transition:background 0.15s,box-shadow 0.15s; }
+#minion-intro-close:hover { background:#7a44d0; box-shadow:0 0 18px rgba(150,90,255,0.8); }
 #release-confirm-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:950; align-items:center; justify-content:center; }
 #release-confirm-modal.open { display:flex; }
 #release-confirm-box { background:#0a0a18; border:2px solid #cc0000; border-radius:10px; padding:24px 30px; max-width:420px; width:90%; text-align:center; font-family:Georgia,serif; }
@@ -1891,6 +1903,22 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <span id="mm-reinc-mp-gain">0</span> MP on Reincarnation &nbsp;|&nbsp; <span id="mm-reinc-ts-next">666</span> TS to next MP
   </div>
   <div id="mm-body"></div>
+  <!-- First-unlock explainer, pops up within the Minions tab -->
+  <div id="minion-intro-overlay">
+    <div id="minion-intro-box">
+      <div id="minion-intro-title">You now have access to <span class="mi-hl">MINIONS!</span></div>
+      <div id="minion-intro-body">
+        <p>Turning enemies into allies can make you <span class="mi-hl">unstoppable</span>. Select the minion you would like to obtain, kill that minion for a chance to bring it under your control and use its power.</p>
+        <p>Your <span class="mi-hl">FIRST</span> minion from the Void Realm is <span class="mi-hl">free</span>, but after that you need <span class="mi-hl">Minion Points</span>, earned by sacrificing Tattered Souls in Reincarnation. Every <span class="mi-hl">666</span> Tattered Souls earns you another Minion Point. Each Realm has a set cost of MP to capture a minion, and don't worry! Your Tattered Souls from multiple Ascensions and Reincarnations keep adding up, even the ones sacrificed in the Sacrifice Grid.</p>
+        <p>Minions have a Max level of <span class="mi-hl">666</span>, at which point they become <span class="mi-hl">ELITE</span> minions, and stay with you through Reincarnation. You may not get them to Elite right away, but whenever you release a Minion through Release or Reincarnating, you are refunded the MP required to obtain them.</p>
+        <p class="mi-cta">Go! Build your <span class="mi-hl">ARMY!</span> The gods are beginning to notice....</p>
+      </div>
+      <div id="minion-intro-dns">
+        <input type="checkbox" id="minion-intro-chk"><label for="minion-intro-chk">Do not show this again</label>
+      </div>
+      <button id="minion-intro-close">Let's Go!</button>
+    </div>
+  </div>
 </div>
 
 <!-- Release Minion confirmation -->
@@ -2182,7 +2210,7 @@ var _tutShown = {
   souls: false, upgrades: false, deeperHunger: false, milestone: false,
   upgrades200: false, floorCleared: false, elite: false, eliteFail: false,
   ascension: false, honors: false, tatteredShop: false, minionTab: false, minionCapture: false,
-  eliteWin: false, touchHint: false
+  eliteWin: false, touchHint: false, minionIntro: false
 };
 var _tutQueue = [];
 var _tutActive = false;
@@ -3235,7 +3263,12 @@ function checkMinionUnlock(){
   if(minionUnlocked) return;
   var formUlts=['form-ult-masculine','form-ult-feminine','form-ult-androgynous','form-ult-canine','form-ult-feline','form-ult-equine'];
   for(var i=0;i<formUlts.length;i++){
-    if(achievementsEarned.indexOf(formUlts[i])>=0){ minionUnlocked=true; updateMinionTabBtn(); return; }
+    if(achievementsEarned.indexOf(formUlts[i])>=0){
+      minionUnlocked=true; updateMinionTabBtn();
+      // Just unlocked: auto-open the Minions tab, which pops the explainer modal.
+      if(!_tutShown.minionIntro){ setTimeout(openMinionModal,1200); }
+      return;
+    }
   }
 }
 
@@ -3371,13 +3404,27 @@ function wipeNonEliteMinions(){
 
 var REALM_NAMES_MM=['Purgatory','Limbo','Underworld','Void','Abyss','Inferno','Pandemonium','Tartarus','Oblivion','Eternity'];
 
+function showMinionIntroModal(){
+  var ov=document.getElementById('minion-intro-overlay');
+  if(!ov) return;
+  var chk=document.getElementById('minion-intro-chk'); if(chk) chk.checked=false;
+  _tutShown.minionTab=true; // the explainer modal supersedes the old intro tooltip
+  ov.classList.add('open');
+}
+function hideMinionIntroModal(){
+  var ov=document.getElementById('minion-intro-overlay');
+  if(ov) ov.classList.remove('open');
+  var chk=document.getElementById('minion-intro-chk');
+  if(chk&&chk.checked){ _tutShown.minionIntro=true; saveGame(); }
+}
 function openMinionModal(){
   var modal=document.getElementById('minion-modal');
   if(!modal) return;
   modal.classList.add('open');
   renderMinionModal();
   if(!_minionModalAnimId) _minionModalAnimId = requestAnimationFrame(_animateMinionCards);
-  if(!_tutShown.minionTab){ _tutShown.minionTab=true; setTimeout(function(){ showTutorialTip('<span style="color:#ffd700;font-weight:bold;">You have discovered the Minions!</span> Turn your enemies into allies through sacrifice and make them fight for you.<br><br>This unlocks after you have obtained your first <span style="color:#ffd700;font-weight:bold;">Ultimate Form</span>. Gain their allegiance and make their power yours!<br><br>666 Tattered Souls sacrificed will gain 1 Minion Point when you <span style="color:#ffd700;font-weight:bold;">Reincarnate</span>.',document.getElementById('minion-tab-btn'),null); },600); }
+  // First-unlock explainer: show until the player ticks "Do not show this again".
+  if(minionUnlocked && !_tutShown.minionIntro){ setTimeout(showMinionIntroModal,350); }
   if(!_tutShown.minionCapture&&minionUnlocked&&minionPoints>=1){ _tutShown.minionCapture=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('To capture an enemy you must select which enemy you want to capture.<br>Each time you defeat them, you have a chance to capture them in exchange for MP.<br><br>Max level Minions become Elite and will survive through Ascension.<br>Non-Elite Minions refund your MP and you must recapture them.',document.getElementById('minion-tab-btn'),null); },_tutShown.minionTab?3000:600); } }
 }
 
@@ -9260,6 +9307,10 @@ document.querySelectorAll('.left-tab-btn').forEach(function(btn){
 // ── TATTERED MODAL EVENTS ─────────────────────────────────────────────────────
 document.getElementById('tm-close-btn').addEventListener('click', closeTatteredModal);
 document.getElementById('mm-close-btn').addEventListener('click', closeMinionModal);
+document.getElementById('minion-intro-close').addEventListener('click', hideMinionIntroModal);
+document.getElementById('minion-intro-overlay').addEventListener('click', function(e){
+  if(e.target===this) hideMinionIntroModal(); // click the dark backdrop to dismiss
+});
 document.getElementById('mm-release-btn').addEventListener('click', function(){
   if(releaseMode) exitReleaseMode(); else enterReleaseMode();
 });
