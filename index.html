@@ -3495,20 +3495,29 @@ var GOD_NODES=[
   { key:'Aeneas', x:66.58, y:35.71 },
   { key:'Jason', x:27.56, y:67.84 },
   { key:'Gilgamesh', x:74.97, y:67.63 },
-  { key:'God I', x:78.45, y:51.36 },
-  { key:'God II', x:82.40, y:45.12 },
-  { key:'God III', x:80.70, y:40.21 },
-  { key:'God IV', x:83.08, y:37.04 },
-  { key:'God V', x:79.74, y:31.11 },
-  { key:'God VI', x:84.04, y:15.04 }
+  { key:'God I', x:78.45, y:51.36, god:true },
+  { key:'God II', x:82.40, y:45.12, god:true },
+  { key:'God III', x:80.70, y:40.21, god:true },
+  { key:'God IV', x:83.08, y:37.04, god:true },
+  { key:'God V', x:79.74, y:31.11, god:true },
+  { key:'God VI', x:84.04, y:15.04, god:true }
 ];
-var godMapCleared=0;      // sequential: how many nodes cleared, in GOD_NODES order
+var GILGAMESH_KEY='Gilgamesh';
+var godCleared=[];        // keys of nodes defeated (order-independent)
 var _pendingGodNode=-1;
 
+function isGodCleared(key){ return godCleared.indexOf(key)>=0; }
+// Any hero can be attempted in any order. The six stairway gods stay locked until
+// Gilgamesh falls, then must be climbed in sequence.
 function nodeState(i){
-  if(i<godMapCleared) return 'cleared';
-  if(i===godMapCleared) return 'avail';
-  return 'locked';
+  var nd=GOD_NODES[i];
+  if(isGodCleared(nd.key)) return 'cleared';
+  if(nd.god){
+    if(!isGodCleared(GILGAMESH_KEY)) return 'locked';
+    for(var j=0;j<i;j++){ if(GOD_NODES[j].god && !isGodCleared(GOD_NODES[j].key)) return 'locked'; }
+    return 'avail';
+  }
+  return 'avail';
 }
 function renderGodMap(){
   var stage=document.getElementById('godmap-stage');
@@ -3549,7 +3558,10 @@ function closeGodNode(){
 // Temporary dev hook: mark the pending node cleared so the state machine can be
 // tested before the real challenge/fight chain exists.
 function devClearGodNode(){
-  if(_pendingGodNode===godMapCleared && godMapCleared<GOD_NODES.length){ godMapCleared++; saveGame(); }
+  if(_pendingGodNode>=0){
+    var nd=GOD_NODES[_pendingGodNode];
+    if(nodeState(_pendingGodNode)==='avail' && !isGodCleared(nd.key)){ godCleared.push(nd.key); saveGame(); }
+  }
   closeGodNode();
   renderGodMap();
 }
@@ -7279,7 +7291,7 @@ function saveGame(){
     lastElementTick:_lastElementTick,
     burningSouls:burningSouls,
     portalBuilt:portalBuilt,
-    godMapCleared:godMapCleared,
+    godCleared:godCleared.slice(),
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
     minionClickerAssignments:minionClickerAssignments.slice(),
@@ -7428,7 +7440,8 @@ function loadGame(){
   if(typeof data.burningSouls==='number') burningSouls=data.burningSouls;
   else if(typeof data.witheredSouls==='number') burningSouls=data.witheredSouls; // legacy field name
   if(typeof data.portalBuilt==='boolean') portalBuilt=data.portalBuilt;
-  if(typeof data.godMapCleared==='number') godMapCleared=data.godMapCleared;
+  if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
+  else if(typeof data.godMapCleared==='number') godCleared=GOD_NODES.slice(0,data.godMapCleared).map(function(n){return n.key;}); // legacy count
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
   if(data.minionClickerAssignments) minionClickerAssignments=data.minionClickerAssignments;
   _offlineSavedAt=data.savedAt||0;
