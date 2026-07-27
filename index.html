@@ -279,6 +279,34 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #portal-modal-dns label { cursor:pointer; }
 #portal-modal-close { background:#6633bb; border:2px solid #9966ff; color:#fff; font-weight:bold; font-size:15px; letter-spacing:1px; padding:9px 28px; border-radius:6px; cursor:pointer; font-family:Georgia,serif; box-shadow:0 0 12px rgba(150,90,255,0.55); }
 #portal-modal-close:hover { background:#7a44cc; }
+/* ── God Realm map ──────────────────────────────────────────────────────────── */
+#enter-portal-btn { display:none; width:100%; margin:16px 0 6px; padding:12px 0; background:#1a1030; border:2px solid #9966ff; color:#e6d8ff; font-family:Georgia,serif; font-size:15px; font-weight:bold; letter-spacing:2px; cursor:pointer; border-radius:6px; box-shadow:0 0 14px rgba(150,90,255,0.4); transition:background 0.2s,box-shadow 0.2s; }
+#enter-portal-btn:hover { background:#2a1850; box-shadow:0 0 20px rgba(150,90,255,0.7); }
+#preview-godmap-btn { display:block; width:100%; margin:6px 0; padding:6px 0; background:transparent; border:1px dashed #55447a; color:#8f7ac0; font-family:Georgia,serif; font-size:11px; letter-spacing:1px; cursor:pointer; border-radius:5px; }
+#preview-godmap-btn:hover { border-color:#7a5fb0; color:#b49ee2; }
+#godmap-overlay { display:none; position:fixed; inset:0; background:rgba(2,1,10,0.94); z-index:10002; align-items:center; justify-content:center; padding:16px; }
+#godmap-overlay.open { display:flex; }
+#godmap-box { position:relative; }
+#godmap-stage { position:relative; display:inline-block; line-height:0; box-shadow:0 0 40px rgba(0,0,0,0.8); border-radius:6px; overflow:hidden; }
+#godmap-img { display:block; max-width:95vw; max-height:86vh; width:auto; height:auto; image-rendering:pixelated; }
+#godmap-close { position:absolute; top:-2px; right:-2px; z-index:5; width:34px; height:34px; background:#880000; border:2px solid #cc0000; color:#000; font-size:18px; font-weight:bold; border-radius:5px; cursor:pointer; line-height:1; }
+#godmap-close:hover { background:#cc0000; border-color:#ff2222; }
+#godmap-title { position:absolute; top:8px; left:50%; transform:translateX(-50%); font-family:Georgia,serif; font-size:16px; letter-spacing:3px; color:#ffe9b0; text-shadow:0 0 10px rgba(0,0,0,0.9),0 0 16px rgba(255,200,80,0.5); pointer-events:none; }
+.gm-node { position:absolute; width:4.7%; aspect-ratio:66/48; transform:translate(-50%,-50%); background-image:url('artwork/map_nodes.webp'); background-size:300% 100%; background-repeat:no-repeat; background-position:0% center; image-rendering:pixelated; cursor:pointer; }
+.gm-node.locked { opacity:0.3; filter:grayscale(0.7); cursor:default; }
+.gm-node.cleared { background-position:100% center; }
+.gm-node.avail { animation:gmBlink 1s infinite; }
+.gm-node.avail:hover, .gm-node.cleared:hover { filter:drop-shadow(0 0 5px rgba(255,215,80,0.9)) brightness(1.15); }
+@keyframes gmBlink { 0%,49.9% { background-position:0% center; } 50%,100% { background-position:50% center; } }
+#godnode-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10003; align-items:center; justify-content:center; padding:20px; }
+#godnode-modal.open { display:flex; }
+#godnode-box { background:linear-gradient(160deg,#170b34,#0a0520); border:2px solid #9966ff; border-radius:12px; box-shadow:0 0 34px rgba(150,90,255,0.55); max-width:420px; width:100%; padding:26px 30px; text-align:center; font-family:Georgia,serif; }
+#godnode-name { font-size:22px; font-weight:bold; color:#ffe9b0; letter-spacing:1px; margin-bottom:12px; text-shadow:0 0 12px rgba(255,200,80,0.5); }
+#godnode-text { font-size:15px; color:#d6c9f5; line-height:1.5; margin-bottom:18px; }
+#godnode-close { background:#6633bb; border:2px solid #9966ff; color:#fff; font-weight:bold; font-size:14px; letter-spacing:1px; padding:8px 24px; border-radius:6px; cursor:pointer; font-family:Georgia,serif; }
+#godnode-close:hover { background:#7a44d0; }
+#godnode-complete { display:block; width:100%; margin-bottom:10px; background:#1a5c1a; border:1px dashed #44cc44; color:#bfe6bf; font-size:12px; letter-spacing:1px; padding:7px 0; border-radius:5px; cursor:pointer; font-family:Georgia,serif; }
+#godnode-complete:hover { background:#226622; }
 /* Capture notification */
 #minion-capture-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2000; background:#0a0520; border:2px solid #9966ff; border-radius:10px; padding:24px 32px; text-align:center; pointer-events:none; box-shadow:0 0 40px rgba(150,80,255,0.5); }
 #minion-capture-modal.open { display:block; }
@@ -1413,6 +1441,8 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
         <div id="portal-mat-list"></div>
         <button id="build-portal-btn" style="display:none">✦ BUILD PORTAL ✦</button>
         <div id="portal-built-note" style="display:none">The Portal stands. The Realm of the Gods awaits.</div>
+        <button id="enter-portal-btn">✦ ENTER THE PORTAL ✦</button>
+        <button id="preview-godmap-btn">Preview God Realm (dev)</button>
       </div>
       <div id="tab-stats" class="tab-pane">
         <div class="ph">Entity Stats</div>
@@ -1997,6 +2027,26 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       <button id="release-confirm-yes">Release</button>
       <button id="release-confirm-no">Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- God Realm map -->
+<div id="godmap-overlay">
+  <div id="godmap-box">
+    <div id="godmap-stage">
+      <img id="godmap-img" src="artwork/hero_map.webp" alt="Path to Olympus">
+    </div>
+    <div id="godmap-title">The Path to Olympus</div>
+    <button id="godmap-close">✕</button>
+  </div>
+</div>
+<!-- God Realm node placeholder -->
+<div id="godnode-modal">
+  <div id="godnode-box">
+    <div id="godnode-name"></div>
+    <div id="godnode-text">Challenge coming soon.</div>
+    <button id="godnode-complete">✓ Mark Cleared (dev)</button>
+    <button id="godnode-close">Close</button>
   </div>
 </div>
 
@@ -3415,6 +3465,8 @@ function updatePortalCardBars(){
 }
 function renderPortalTab(){
   buildPortalMaterialRows(document.getElementById('portal-mat-list'));
+  var enterBtn=document.getElementById('enter-portal-btn');
+  if(enterBtn) enterBtn.style.display=portalBuilt?'block':'none';
 }
 function buildPortal(){
   if(!portalRequirementsMet()||portalBuilt) return;
@@ -3424,6 +3476,82 @@ function buildPortal(){
   portalBuilt=true;
   saveGame();
   renderPortalTab();
+}
+
+// ── God Realm map ─────────────────────────────────────────────────────────────
+// Node positions are % of the map image (placed with the node-placer tool).
+// Heroes 1-13 then six god/stairway placeholders, in sequence.
+var GOD_NODES=[
+  { key:'Heracles', x:40.25, y:81.34 },
+  { key:'Achilles', x:50.96, y:74.49 },
+  { key:'Sigurd', x:48.30, y:51.77 },
+  { key:'Hippolyta', x:30.90, y:43.59 },
+  { key:'Perseus', x:23.74, y:21.69 },
+  { key:'Karna', x:62.28, y:83.49 },
+  { key:'Maui', x:21.01, y:87.07 },
+  { key:'Penthesilea', x:47.34, y:38.17 },
+  { key:'Atalanta', x:40.38, y:22.41 },
+  { key:'Britomartis', x:37.79, y:7.26 },
+  { key:'Aeneas', x:66.58, y:35.71 },
+  { key:'Jason', x:27.56, y:67.84 },
+  { key:'Gilgamesh', x:74.97, y:67.63 },
+  { key:'God I', x:78.45, y:51.36 },
+  { key:'God II', x:82.40, y:45.12 },
+  { key:'God III', x:80.70, y:40.21 },
+  { key:'God IV', x:83.08, y:37.04 },
+  { key:'God V', x:79.74, y:31.11 },
+  { key:'God VI', x:84.04, y:15.04 }
+];
+var godMapCleared=0;      // sequential: how many nodes cleared, in GOD_NODES order
+var _pendingGodNode=-1;
+
+function nodeState(i){
+  if(i<godMapCleared) return 'cleared';
+  if(i===godMapCleared) return 'avail';
+  return 'locked';
+}
+function renderGodMap(){
+  var stage=document.getElementById('godmap-stage');
+  if(!stage) return;
+  stage.querySelectorAll('.gm-node').forEach(function(n){ n.remove(); });
+  GOD_NODES.forEach(function(nd,i){
+    var el=document.createElement('div');
+    var st=nodeState(i);
+    el.className='gm-node '+st;
+    el.style.left=nd.x+'%'; el.style.top=nd.y+'%';
+    el.title=nd.key+(st==='cleared'?' — cleared':st==='avail'?' — available':' — locked');
+    if(st==='avail'){
+      (function(idx){ el.addEventListener('click',function(){ openGodNode(idx); }); })(i);
+    }
+    stage.appendChild(el);
+  });
+}
+function openGodMap(){
+  var ov=document.getElementById('godmap-overlay');
+  if(!ov) return;
+  renderGodMap();
+  ov.classList.add('open');
+}
+function closeGodMap(){
+  var ov=document.getElementById('godmap-overlay');
+  if(ov) ov.classList.remove('open');
+}
+function openGodNode(i){
+  _pendingGodNode=i;
+  document.getElementById('godnode-name').textContent=GOD_NODES[i].key;
+  document.getElementById('godnode-text').textContent='Challenge coming soon. Prove yourself worthy to face '+GOD_NODES[i].key+'.';
+  document.getElementById('godnode-modal').classList.add('open');
+}
+function closeGodNode(){
+  document.getElementById('godnode-modal').classList.remove('open');
+  _pendingGodNode=-1;
+}
+// Temporary dev hook: mark the pending node cleared so the state machine can be
+// tested before the real challenge/fight chain exists.
+function devClearGodNode(){
+  if(_pendingGodNode===godMapCleared && godMapCleared<GOD_NODES.length){ godMapCleared++; saveGame(); }
+  closeGodNode();
+  renderGodMap();
 }
 function openPortalTabModal(){
   var ov=document.getElementById('portal-modal-overlay');
@@ -7151,6 +7279,7 @@ function saveGame(){
     lastElementTick:_lastElementTick,
     burningSouls:burningSouls,
     portalBuilt:portalBuilt,
+    godMapCleared:godMapCleared,
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
     minionClickerAssignments:minionClickerAssignments.slice(),
@@ -7299,6 +7428,7 @@ function loadGame(){
   if(typeof data.burningSouls==='number') burningSouls=data.burningSouls;
   else if(typeof data.witheredSouls==='number') burningSouls=data.witheredSouls; // legacy field name
   if(typeof data.portalBuilt==='boolean') portalBuilt=data.portalBuilt;
+  if(typeof data.godMapCleared==='number') godMapCleared=data.godMapCleared;
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
   if(data.minionClickerAssignments) minionClickerAssignments=data.minionClickerAssignments;
   _offlineSavedAt=data.savedAt||0;
@@ -9637,6 +9767,11 @@ document.getElementById('mm-close-btn').addEventListener('click', closeMinionMod
 document.getElementById('minion-intro-close').addEventListener('click', hideMinionIntroModal);
 document.getElementById('portal-modal-close').addEventListener('click', closePortalTabModal);
 document.getElementById('build-portal-btn').addEventListener('click', buildPortal);
+document.getElementById('enter-portal-btn').addEventListener('click', openGodMap);
+document.getElementById('preview-godmap-btn').addEventListener('click', openGodMap);
+document.getElementById('godmap-close').addEventListener('click', closeGodMap);
+document.getElementById('godnode-close').addEventListener('click', closeGodNode);
+document.getElementById('godnode-complete').addEventListener('click', devClearGodNode);
 document.getElementById('minion-intro-overlay').addEventListener('click', function(e){
   if(e.target===this) hideMinionIntroModal(); // click the dark backdrop to dismiss
 });
