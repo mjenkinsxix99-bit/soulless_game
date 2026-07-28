@@ -3774,6 +3774,9 @@ function enterHeroFight(idx){
   var ch=document.getElementById('click-hint'); if(ch) ch.style.visibility='hidden';
   document.getElementById('elite-timer-wrap').style.visibility='hidden';
   document.getElementById('crown').style.display='none';
+  // Raise the enemy zone so the full-size hero's feet land on the normal enemy line
+  // (restored on exit when the resize event re-runs the realm layout).
+  var cw=document.getElementById('combat-wrap'); if(cw) cw.style.top='calc(36% + 82px)';
   updateHpBars();
 }
 function drawHeroBattleSprite(ecv){
@@ -3782,13 +3785,11 @@ function drawHeroBattleSprite(ecv){
   ctx.clearRect(0,0,W,H);
   if(heroFightIdx<0||!_heroSheet.complete) return;
   var col=heroFightIdx%4, row=Math.floor(heroFightIdx/4);
-  // Match the game's enemy sizing/anchor: elite-sized, feet at 75% of the canvas.
-  var drawH=Math.min(H*0.72, H-10)*0.8;
-  var drawW=drawH;                             // hero cells are square (512x512)
-  var dx=(W-drawW)/2, dy=(H*0.75)-drawH;
+  // Full-size hero (a HERO towers over normal enemies); the enemy zone is raised
+  // in enterHeroFight so its feet land on the normal enemy line, not the canvas floor.
   ctx.save();                                  // flip so the hero faces the entity on the left
   ctx.translate(W,0); ctx.scale(-1,1);
-  ctx.drawImage(_heroSheet, col*512,row*512,512,512, dx,dy, drawW,drawH);
+  ctx.drawImage(_heroSheet, col*512,row*512,512,512, 0,0, W,H);
   ctx.restore();
 }
 function onHeroDefeated(){
