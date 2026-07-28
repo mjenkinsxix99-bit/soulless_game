@@ -939,7 +939,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .tm-edge { stroke:#1e1440; stroke-width:1.5; fill:none; }
 .tm-edge.active { stroke:#aa44ff; stroke-width:2.5; filter:drop-shadow(0 0 5px rgba(170,60,255,0.75)); }
 /* global floating tooltip (position:fixed, avoids overflow clip) */
-#tatt-tooltip,#hover-tooltip { display:none; position:fixed; width:220px; background:#06041a; border:1px solid #3344aa; border-radius:8px; padding:12px 14px; z-index:1100; pointer-events:none; box-shadow:0 6px 28px rgba(0,0,40,0.9); }
+#tatt-tooltip,#hover-tooltip { display:none; position:fixed; width:220px; background:#06041a; border:1px solid #3344aa; border-radius:8px; padding:12px 14px; z-index:10050; pointer-events:none; box-shadow:0 6px 28px rgba(0,0,40,0.9); }
 #tatt-tooltip.show,#hover-tooltip.show { display:block; }
 #hover-tooltip-title { font-size:13px; color:#ccaaff; font-weight:bold; letter-spacing:1px; margin-bottom:5px; }
 #hover-tooltip-body { font-size:12px; color:#c8c0e8; line-height:1.5; }
@@ -3576,6 +3576,14 @@ var GOD_NODES=[
   { key:'God VI', x:84.04, y:15.04, god:true }
 ];
 var GILGAMESH_KEY='Gilgamesh';
+// Each hero yields one challenge-upgrade power (names match the Portal upgrades).
+var HERO_POWERS={
+  Heracles:'Strength of Heracles', Achilles:'Elite-Rush', Sigurd:'Auto Upgrade',
+  Hippolyta:'Spoils of War', Perseus:'Treasures Abound', Karna:'Auto-sacrifice minion',
+  Maui:'Shapeshifter', Penthesilea:'Glory in Sacrifice', Atalanta:'Golden Apple',
+  Britomartis:'Soul Catcher', Aeneas:'Auto-reincarnate', Jason:'Elite minions, 100%',
+  Gilgamesh:'Auto-ascend'
+};
 var godCleared=[];        // keys of nodes defeated (order-independent)
 var _pendingGodNode=-1;
 
@@ -3601,7 +3609,15 @@ function renderGodMap(){
     var st=nodeState(i);
     el.className='gm-node '+st;
     el.style.left=nd.x+'%'; el.style.top=nd.y+'%';
-    el.title=nd.key+(st==='cleared'?' — cleared':st==='avail'?' — available':' — locked');
+    // Game-style hover tooltip: hero name + the power they yield.
+    (function(node,state){
+      var power=HERO_POWERS[node.key];
+      var body=power?('Power: '+power):(node.god?'The realm of the Gods':'');
+      var title=node.key+(state==='cleared'?' ✓':'');
+      el.addEventListener('mouseenter',function(e){ showHoverTooltip(title,body,e.clientX,e.clientY); });
+      el.addEventListener('mousemove',function(e){ posHoverTooltip(e.clientX,e.clientY); });
+      el.addEventListener('mouseleave',hideHoverTooltip);
+    })(nd,st);
     if(st==='avail'){
       (function(idx){ el.addEventListener('click',function(){ openGodNode(idx); }); })(i);
     }
