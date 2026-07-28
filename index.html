@@ -334,19 +334,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #hero-enc-battle:disabled { opacity:0.38; cursor:not-allowed; }
 #hero-enc-devclear { position:absolute; bottom:12px; right:14px; background:transparent; border:1px dashed #55447a; color:#8f7ac0; font-family:Georgia,serif; font-size:11px; letter-spacing:1px; padding:5px 10px; border-radius:5px; cursor:pointer; z-index:3; }
 #hero-enc-devclear:hover { border-color:#7a5fb0; color:#b49ee2; }
-/* Hero fight: zone background overlay on the battlefield (leaves the locked realm-bg untouched) */
-#hero-fight-bg { display:none; position:absolute; inset:0; z-index:1; background-position:center; background-size:cover; background-repeat:no-repeat; }
-/* Full-screen fade */
-#fade-overlay { position:fixed; inset:0; background:#000; opacity:0; pointer-events:none; z-index:20000; transition:opacity 0.42s ease; }
-/* Hero victory panel */
-#hero-victory { display:none; position:fixed; inset:0; z-index:15000; align-items:center; justify-content:center; padding:20px; background:rgba(2,1,10,0.35); }
-#hero-victory.open { display:flex; }
-#hero-victory-box { background:linear-gradient(160deg,#1a1200,#0d0800); border:2px solid #d4a843; border-radius:14px; box-shadow:0 0 44px rgba(212,168,67,0.55); max-width:min(90vw,520px); padding:26px 32px; text-align:center; font-family:Georgia,serif; }
-#hero-victory-title { font-size:26px; font-weight:bold; color:#ffe9b0; letter-spacing:3px; text-shadow:0 0 16px rgba(255,200,80,0.6); margin-bottom:12px; }
-#hero-victory-flavor { color:#f0e6ff; font-size:16px; line-height:1.55; margin-bottom:20px; }
-#hero-victory-flavor .hef-lore { font-style:italic; }
-#hero-victory-claim { background:#e8c24a; border:2px solid #ffe27a; color:#1a1000; font-family:Georgia,serif; font-size:16px; font-weight:bold; letter-spacing:1px; padding:11px 30px; border-radius:8px; cursor:pointer; box-shadow:0 0 18px rgba(255,210,80,0.6); }
-#hero-victory-claim:hover { background:#ffd75e; }
 /* Capture notification */
 #minion-capture-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2000; background:#0a0520; border:2px solid #9966ff; border-radius:10px; padding:24px 32px; text-align:center; pointer-events:none; box-shadow:0 0 40px rgba(150,80,255,0.5); }
 #minion-capture-modal.open { display:block; }
@@ -1397,7 +1384,6 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <div id="battlefield">
       <canvas id="bg-canvas"></canvas>
       <img id="realm-bg-img" src="" alt="" />
-      <div id="hero-fight-bg"></div>
       <div id="update-banner">✦ Update Available — Click to Refresh ✦</div>
       <div id="combat-wrap">
         <div id="enemy-zone">
@@ -2083,16 +2069,6 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     </div>
     <div id="godmap-title">The Path to Olympus</div>
     <button id="godmap-close">✕</button>
-  </div>
-</div>
-<!-- Full-screen fade (hero fight transitions) -->
-<div id="fade-overlay"></div>
-<!-- Hero defeated → flavor + claim -->
-<div id="hero-victory">
-  <div id="hero-victory-box">
-    <div id="hero-victory-title">Victory</div>
-    <div id="hero-victory-flavor"></div>
-    <button id="hero-victory-claim">Claim</button>
   </div>
 </div>
 <!-- Hero encounter (battleground shell) -->
@@ -3721,7 +3697,7 @@ function openHeroEncounter(i){
     ? ('<div class="hef-lore">'+info.lore+'</div><div class="hef-trial">Trial — '+info.challenge+'</div>')
     : 'The realm of the Gods awaits.';
   var battle=document.getElementById('hero-enc-battle');
-  battle.disabled=false; battle.title=''; // TEMP: ungated for dev so the fight is reachable (re-gate with the challenge system)
+  battle.disabled=true; battle.title='Complete the challenge to Battle'; // gated until the challenge system exists
   ov.classList.add('open');
 }
 function closeHeroEncounter(){
@@ -3731,89 +3707,8 @@ function closeHeroEncounter(){
 }
 // Accept: reincarnate + apply the hero's handicap — wired per hero later.
 function acceptHeroChallenge(){ /* stub */ }
-
-// ── The hero fight (reuses the main battlefield) ─────────────────────────────
-var inHeroFight=false, heroFightIdx=-1, heroFightStart=0;
-var HERO_FIGHT_SECONDS=120;      // hero HP = your DPS x this, so auto-DPS alone wins in ~2 min
-var _heroSheet=new Image(); _heroSheet.src='artwork/sprites_heroes.webp';
-
-function fadeToBlack(cb){
-  var f=document.getElementById('fade-overlay');
-  if(!f){ if(cb) cb(); return; }
-  f.style.pointerEvents='auto'; f.style.opacity='1';
-  setTimeout(function(){ if(cb) cb(); }, 440);
-}
-function fadeFromBlack(){
-  var f=document.getElementById('fade-overlay'); if(!f) return;
-  f.style.opacity='0';
-  setTimeout(function(){ f.style.pointerEvents='none'; }, 440);
-}
-// Battle button → fade → enter the fight → fade in.
-function doHeroBattle(){
-  if(_pendingGodNode<0||_pendingGodNode>=13) return;
-  var idx=_pendingGodNode;
-  fadeToBlack(function(){ enterHeroFight(idx); fadeFromBlack(); });
-}
-function enterHeroFight(idx){
-  heroFightIdx=idx; inHeroFight=true; heroFightStart=Date.now();
-  var key=GOD_NODES[idx].key;
-  closeHeroEncounter();
-  var gm=document.getElementById('godmap-overlay'); if(gm) gm.classList.remove('open');
-  var entBtn=document.querySelector('.left-tab-btn[data-ltab="entity"]'); if(entBtn) entBtn.click();
-  var hp=(typeof totalDps!=='undefined'&&totalDps&&totalDps.gt(0))?totalDps.mul(HERO_FIGHT_SECONDS):D(1000);
-  enemyMaxHp=hp; enemyHp=hp;
-  enemyDead=false; combatActive=true; lastAutoAttack=Date.now(); lastDrainTick=Date.now();
-  var nameEl=document.getElementById('enemy-name-label');
-  nameEl.textContent=key; nameEl.className='cname elite-label';
-  document.getElementById('enemy-hp-bar').className='hp-fill enemy-hp elite';
-  var zone=HERO_ZONE[key], bg=document.getElementById('hero-fight-bg');
-  if(bg){ bg.style.backgroundImage=zone?("url('artwork/"+ZONE_BG[zone]+"')"):'none'; bg.style.display='block'; }
-  var mp=document.getElementById('minimap-panel'); if(mp) mp.style.display='none';
-  document.getElementById('elite-timer-wrap').style.visibility='hidden';
-  document.getElementById('crown').style.display='none';
-  updateHpBars();
-}
-function drawHeroBattleSprite(ecv){
-  var ctx=ecv.getContext('2d');
-  ctx.clearRect(0,0,ecv.width,ecv.height);
-  if(heroFightIdx<0||!_heroSheet.complete) return;
-  var col=heroFightIdx%4, row=Math.floor(heroFightIdx/4);
-  ctx.save();                                  // flip so the hero faces the entity on the left
-  ctx.translate(ecv.width,0); ctx.scale(-1,1);
-  ctx.drawImage(_heroSheet, col*512,row*512,512,512, 0,0, ecv.width,ecv.height);
-  ctx.restore();
-}
-function onHeroDefeated(){
-  enemyDead=true; combatActive=false;
-  var key=GOD_NODES[heroFightIdx]?GOD_NODES[heroFightIdx].key:'';
-  var info=HERO_INFO[key], power=HERO_POWERS[key];
-  document.getElementById('hero-victory-flavor').innerHTML=info?('<div class="hef-lore">'+info.lore+'</div>'):'';
-  document.getElementById('hero-victory-claim').textContent='Claim '+(power||'Reward');
-  document.getElementById('hero-victory').classList.add('open');
-}
-function claimHeroVictory(){
-  var key=GOD_NODES[heroFightIdx]?GOD_NODES[heroFightIdx].key:null;
-  if(key && !isGodCleared(key)) godCleared.push(key);   // node → cleared; power unlocks in the Portal
-  saveGame();
-  document.getElementById('hero-victory').classList.remove('open');
-  var fightMs=Math.max(0, Date.now()-heroFightStart);
-  fadeToBlack(function(){
-    exitHeroFight();
-    renderGodMap();
-    // Away screen catches the player and returns them to their world.
-    try{ localStorage.setItem(OFFLINE_APPLIED_KEY,'0'); }catch(e){}
-    var ref=Date.now()-fightMs;
-    try{ localStorage.setItem(OFFLINE_TS_KEY,String(ref)); }catch(e){}
-    applyOfflineProgress(ref);
-    fadeFromBlack();
-  });
-}
-function exitHeroFight(){
-  inHeroFight=false; heroFightIdx=-1;
-  var bg=document.getElementById('hero-fight-bg'); if(bg) bg.style.display='none';
-  var mp=document.getElementById('minimap-panel'); if(mp) mp.style.display='';
-  spawnEnemy();   // restore the normal enemy for the player's current floor
-}
+// Battle: the ~2-minute hero fight — wired later.
+function doHeroBattle(){ /* stub */ }
 // Temporary dev hook: mark the pending node cleared to exercise the map states.
 function devClearGodNode(){
   if(_pendingGodNode>=0){
@@ -5003,7 +4898,6 @@ function computeSoulMult(){
 var ELITE_TAMER_ACH_IDS=['elite-minion-1','elite-minion-10','elite-minion-25','elite-minion-50','elite-minion-100'];
 function onEnemyDeath(){
   if(enemyDead) return;
-  if(inHeroFight){ onHeroDefeated(); return; }   // hero fight has its own victory flow
   combatActive=false; enemyDead=true; eliteTimerStart=0;
   spawnSoulCoins();
   document.getElementById('elite-timer-wrap').style.visibility='hidden';
@@ -9180,7 +9074,7 @@ function gameLoop(){
       updateHpBars();
       if(enemyHp.lte(0)) onEnemyDeath();
     } else { lastDrainTick=now; }
-    if(isEliteFight()&&eliteTimerStart>0&&!inHeroFight){
+    if(isEliteFight()&&eliteTimerStart>0){
       var eliteMs=20000+getMinionTotalBonus('elitetimer')*1000;
       var elapsed=now-eliteTimerStart;
       var pct=Math.max(0,1-elapsed/eliteMs);
@@ -9202,8 +9096,7 @@ function gameLoop(){
   var ecv=document.getElementById('enemy-canvas');
   var eid=def()?def().id:'wisp';
   var _elite=isEliteFight();
-  if(inHeroFight)            drawHeroBattleSprite(ecv);
-  else if(eid==='wisp')      drawWispSprite(ecv,now,enemyDead,_elite);
+  if(eid==='wisp')           drawWispSprite(ecv,now,enemyDead,_elite);
   else if(eid==='shade')     drawShadeSprite(ecv,now,enemyDead,_elite);
   else if(eid==='specter')   drawSpecterSprite(ecv,now,enemyDead,_elite);
   else if(eid==='haunt')     drawHauntSprite(ecv,now,enemyDead,_elite);
@@ -10050,7 +9943,6 @@ document.getElementById('hero-enc-retreat').addEventListener('click', closeHeroE
 document.getElementById('hero-enc-accept').addEventListener('click', acceptHeroChallenge);
 document.getElementById('hero-enc-battle').addEventListener('click', doHeroBattle);
 document.getElementById('hero-enc-devclear').addEventListener('click', devClearGodNode);
-document.getElementById('hero-victory-claim').addEventListener('click', claimHeroVictory);
 document.getElementById('minion-intro-overlay').addEventListener('click', function(e){
   if(e.target===this) hideMinionIntroModal(); // click the dark backdrop to dismiss
 });
