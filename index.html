@@ -3778,12 +3778,17 @@ function enterHeroFight(idx){
 }
 function drawHeroBattleSprite(ecv){
   var ctx=ecv.getContext('2d');
-  ctx.clearRect(0,0,ecv.width,ecv.height);
+  var W=ecv.width, H=ecv.height;
+  ctx.clearRect(0,0,W,H);
   if(heroFightIdx<0||!_heroSheet.complete) return;
   var col=heroFightIdx%4, row=Math.floor(heroFightIdx/4);
+  // Match the game's enemy sizing/anchor: elite-sized, feet at 75% of the canvas.
+  var drawH=Math.min(H*0.72, H-10)*0.8;
+  var drawW=drawH;                             // hero cells are square (512x512)
+  var dx=(W-drawW)/2, dy=(H*0.75)-drawH;
   ctx.save();                                  // flip so the hero faces the entity on the left
-  ctx.translate(ecv.width,0); ctx.scale(-1,1);
-  ctx.drawImage(_heroSheet, col*512,row*512,512,512, 0,0, ecv.width,ecv.height);
+  ctx.translate(W,0); ctx.scale(-1,1);
+  ctx.drawImage(_heroSheet, col*512,row*512,512,512, dx,dy, drawW,drawH);
   ctx.restore();
 }
 function onHeroDefeated(){
