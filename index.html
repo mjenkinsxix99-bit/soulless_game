@@ -284,6 +284,21 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #enter-portal-btn:hover { background:#2a1850; box-shadow:0 0 20px rgba(150,90,255,0.7); }
 #preview-godmap-btn { display:block; width:100%; margin:6px 0; padding:6px 0; background:transparent; border:1px dashed #55447a; color:#8f7ac0; font-family:Georgia,serif; font-size:11px; letter-spacing:1px; cursor:pointer; border-radius:5px; }
 #preview-godmap-btn:hover { border-color:#7a5fb0; color:#b49ee2; }
+/* Portal built view — portal art frames the challenge-upgrade list */
+#portal-built-view { position:relative; margin-top:8px; background:url('artwork/portal.webp') top center / 100% auto no-repeat, #06020e; border-radius:6px; }
+#portal-built-view #enter-portal-btn { position:relative; z-index:2; display:block; width:70%; margin:14% auto 0; }
+#challenge-upg-list { position:relative; z-index:2; padding:14px 15% 20px; }
+.cu-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 4px; border-bottom:1px solid rgba(212,168,67,0.18); }
+.cu-label { text-align:left; min-width:0; }
+.cu-name { color:#ffd76a; font-weight:bold; font-size:13px; letter-spacing:0.4px; text-shadow:0 0 5px rgba(0,0,0,0.95); }
+.cu-desc { color:#e6cf94; font-size:11px; font-style:italic; text-shadow:0 0 5px rgba(0,0,0,0.95); line-height:1.25; }
+.cu-buy-btn { flex-shrink:0; background:#b18cff; border:1px solid #cbb0ff; color:#1a0f30; font-family:Georgia,serif; font-weight:bold; font-size:11px; line-height:1.1; padding:5px 10px; border-radius:5px; cursor:pointer; text-align:center; box-shadow:0 0 8px rgba(160,120,255,0.4); }
+.cu-buy-btn:hover { background:#c4a4ff; }
+.cu-buy-btn .cu-cost { display:block; font-size:10px; color:#3a1f5e; }
+.cu-toggle { flex-shrink:0; background:#1a1030; border:1px solid #6644aa; color:#9980cc; font-family:Georgia,serif; font-size:11px; font-weight:bold; letter-spacing:1px; padding:5px 12px; border-radius:5px; cursor:pointer; min-width:52px; }
+.cu-toggle.on { background:#e8c24a; border-color:#ffe27a; color:#1a1000; box-shadow:0 0 8px rgba(255,210,80,0.6); }
+.cu-val { flex-shrink:0; width:64px; background:#0a0518; border:1px solid #55447a; color:#ffe9b0; font-family:Georgia,serif; font-size:12px; text-align:center; padding:5px 4px; border-radius:5px; }
+.cu-ctl { display:flex; align-items:center; gap:6px; flex-shrink:0; }
 #godmap-overlay { display:none; position:fixed; inset:0; background:rgba(2,1,10,0.94); z-index:10002; align-items:center; justify-content:center; padding:16px; }
 #godmap-overlay.open { display:flex; }
 #godmap-box { position:relative; }
@@ -1435,11 +1450,15 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       </div>
       <div id="tab-portal" class="tab-pane">
         <div class="ph">Portal to the Realm of the Gods</div>
-        <div class="portal-intro">Only <strong>Elite</strong> minions supply the materials to build the Portal. Gather every material within a single Reincarnation.</div>
-        <div id="portal-mat-list"></div>
-        <button id="build-portal-btn" style="display:none">✦ BUILD PORTAL ✦</button>
-        <div id="portal-built-note" style="display:none">The Portal stands. The Realm of the Gods awaits.</div>
-        <button id="enter-portal-btn">✦ ENTER THE PORTAL ✦</button>
+        <div id="portal-pre-build">
+          <div class="portal-intro">Only <strong>Elite</strong> minions supply the materials to build the Portal. Gather every material within a single Reincarnation.</div>
+          <div id="portal-mat-list"></div>
+          <button id="build-portal-btn" style="display:none">✦ BUILD PORTAL ✦</button>
+        </div>
+        <div id="portal-built-view" style="display:none">
+          <button id="enter-portal-btn">✦ ENTER THE PORTAL ✦</button>
+          <div id="challenge-upg-list"></div>
+        </div>
         <button id="preview-godmap-btn">Preview God Realm (dev)</button>
       </div>
       <div id="tab-stats" class="tab-pane">
@@ -3462,9 +3481,65 @@ function updatePortalCardBars(){
   });
 }
 function renderPortalTab(){
-  buildPortalMaterialRows(document.getElementById('portal-mat-list'));
-  var enterBtn=document.getElementById('enter-portal-btn');
-  if(enterBtn) enterBtn.style.display=portalBuilt?'block':'none';
+  var pre=document.getElementById('portal-pre-build');
+  var built=document.getElementById('portal-built-view');
+  if(pre) pre.style.display=portalBuilt?'none':'';
+  if(built) built.style.display=portalBuilt?'':'none';
+  if(portalBuilt){ renderChallengeUpgrades(); }
+  else { buildPortalMaterialRows(document.getElementById('portal-mat-list')); }
+}
+
+// ── Challenge upgrades (the 13 hero powers) ──────────────────────────────────
+// type: 'buy' = Burning-Souls upgrade button; 'toggleval' = on/off + number box;
+// 'toggle' = plain on/off. Costs and effects are wired later, per power.
+var CHALLENGE_UPGRADES=[
+  { id:'str_heracles',   name:'Strength of Heracles', desc:'DPS boost',                       type:'buy' },
+  { id:'spoils_war',     name:'Spoils of War',        desc:'Increase TS from bounties',       type:'buy' },
+  { id:'soul_catcher',   name:'Soul Catcher',         desc:'Souls gain boost',                type:'buy' },
+  { id:'glory_sacrifice',name:'Glory in Sacrifice',   desc:'Increase Burning Souls',          type:'buy' },
+  { id:'shapeshifter',   name:'Shapeshifter',         desc:'Form presets',                    type:'buy' },
+  { id:'golden_apple',   name:'Golden Apple',         desc:'Chance for ×7 souls',        type:'buy' },
+  { id:'treasures',      name:'Treasures Abound',     desc:'Increased soul-urn chance',       type:'buy' },
+  { id:'auto_ascend',    name:'Auto-ascend',          desc:'Ascend at the floor you choose',  type:'toggleval', ph:'floor' },
+  { id:'auto_reinc',     name:'Auto-reincarnate',     desc:'Reincarnate at set Tattered Souls',type:'toggleval', ph:'TS' },
+  { id:'auto_sacrifice', name:'Auto-sacrifice minion',desc:'Chosen minions are automatically Immolated', type:'toggleval', ph:'#' },
+  { id:'elite_rush',     name:'Elite-Rush',           desc:'Fight Elites only until Fail',    type:'toggle' },
+  { id:'auto_upgrade',   name:'Auto Upgrade',         desc:'Auto-clickers progress on Upgrades', type:'toggle' },
+  { id:'elite_100',      name:'Elite minions, 100%',  desc:'Elites have 100% chance to become minion (must have enough MP)', type:'toggle' }
+];
+var challengeUpg={}; // id -> { level, on, val }
+function cuState(id){ if(!challengeUpg[id]) challengeUpg[id]={ level:0, on:false, val:'' }; return challengeUpg[id]; }
+// Placeholder cost until balance is set: 5 x next level.
+function cuCost(id){ return 5*(cuState(id).level+1); }
+function renderChallengeUpgrades(){
+  var list=document.getElementById('challenge-upg-list');
+  if(!list) return;
+  list.innerHTML='';
+  CHALLENGE_UPGRADES.forEach(function(u){
+    var st=cuState(u.id);
+    var row=document.createElement('div'); row.className='cu-row';
+    var lbl=document.createElement('div'); lbl.className='cu-label';
+    lbl.innerHTML='<div class="cu-name">'+u.name+(u.type==='buy'&&st.level>0?' <span style="color:#e6cf94">Lv '+st.level+'</span>':'')+'</div><div class="cu-desc">'+u.desc+'</div>';
+    row.appendChild(lbl);
+    if(u.type==='buy'){
+      var btn=document.createElement('button'); btn.className='cu-buy-btn';
+      btn.innerHTML='Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>';
+      (function(id){ btn.addEventListener('click',function(){ /* spend + effect wired later */ }); })(u.id);
+      row.appendChild(btn);
+    } else if(u.type==='toggleval'){
+      var ctl=document.createElement('div'); ctl.className='cu-ctl';
+      var inp=document.createElement('input'); inp.className='cu-val'; inp.type='number'; inp.min='0'; inp.placeholder=u.ph; inp.value=st.val;
+      (function(id){ inp.addEventListener('input',function(){ cuState(id).val=this.value; saveGame(); }); })(u.id);
+      var tg=document.createElement('button'); tg.className='cu-toggle'+(st.on?' on':''); tg.textContent=st.on?'ON':'OFF';
+      (function(id,b){ tg.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tg);
+      ctl.appendChild(inp); ctl.appendChild(tg); row.appendChild(ctl);
+    } else {
+      var tg2=document.createElement('button'); tg2.className='cu-toggle'+(st.on?' on':''); tg2.textContent=st.on?'ON':'OFF';
+      (function(id,b){ tg2.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tg2);
+      row.appendChild(tg2);
+    }
+    list.appendChild(row);
+  });
 }
 function buildPortal(){
   if(!portalRequirementsMet()||portalBuilt) return;
@@ -7290,6 +7365,7 @@ function saveGame(){
     burningSouls:burningSouls,
     portalBuilt:portalBuilt,
     godCleared:godCleared.slice(),
+    challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
     minionClickerAssignments:minionClickerAssignments.slice(),
@@ -7438,6 +7514,7 @@ function loadGame(){
   if(typeof data.burningSouls==='number') burningSouls=data.burningSouls;
   else if(typeof data.witheredSouls==='number') burningSouls=data.witheredSouls; // legacy field name
   if(typeof data.portalBuilt==='boolean') portalBuilt=data.portalBuilt;
+  if(data.challengeUpg&&typeof data.challengeUpg==='object') challengeUpg=data.challengeUpg;
   if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
   else if(typeof data.godMapCleared==='number') godCleared=GOD_NODES.slice(0,data.godMapCleared).map(function(n){return n.key;}); // legacy count
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
