@@ -3779,19 +3779,25 @@ function enterHeroFight(idx){
   var cw=document.getElementById('combat-wrap'); if(cw) cw.style.top='calc(36% + 82px)';
   updateHpBars();
 }
+// Per-hero alpha bounding box (fractions of the 512 cell): content center x,
+// half-width, and foot y — so the ground shadow scales/sits like every enemy's.
+var HERO_BOUNDS=[{cx:0.501,halfW:0.421,footY:0.979},{cx:0.504,halfW:0.473,footY:0.982},{cx:0.505,halfW:0.454,footY:0.971},{cx:0.495,halfW:0.458,footY:0.984},{cx:0.498,halfW:0.379,footY:0.965},{cx:0.502,halfW:0.377,footY:0.979},{cx:0.496,halfW:0.445,footY:0.975},{cx:0.506,halfW:0.375,footY:0.975},{cx:0.509,halfW:0.392,footY:0.984},{cx:0.505,halfW:0.382,footY:0.967},{cx:0.501,halfW:0.403,footY:0.98},{cx:0.503,halfW:0.435,footY:0.975},{cx:0.501,halfW:0.419,footY:0.984}];
 function drawHeroBattleSprite(ecv){
   var ctx=ecv.getContext('2d');
   var W=ecv.width, H=ecv.height;
   ctx.clearRect(0,0,W,H);
   if(heroFightIdx<0||!_heroSheet.complete) return;
   var col=heroFightIdx%4, row=Math.floor(heroFightIdx/4);
-  // Ground shadow under the hero's feet, like every enemy.
-  var shadowRx=W*0.30, shadowRy=shadowRx*0.22, shadowY=H*0.92;
+  var bnd=HERO_BOUNDS[heroFightIdx]||{cx:0.5,halfW:0.42,footY:0.97};
+  // Ground shadow scaled to the hero's real width (like the enemy's drawW*0.48) and at its feet.
+  var shCX=bnd.cx*W;
+  var shadowRx=(bnd.halfW*2*W)*0.48, shadowRy=shadowRx*0.22;
+  var shadowY=bnd.footY*H - shadowRy*0.5;
   ctx.save();
   ctx.globalAlpha=0.9;
-  var g=ctx.createRadialGradient(W/2,shadowY,0,W/2,shadowY,shadowRx);
+  var g=ctx.createRadialGradient(shCX,shadowY,0,shCX,shadowY,shadowRx);
   g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(0.6,'rgba(0,0,0,0.6)'); g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(W/2,shadowY,shadowRx,shadowRy,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(shCX,shadowY,shadowRx,shadowRy,0,0,Math.PI*2); ctx.fill();
   ctx.restore();
   // Full-size hero in its natural orientation (faces the entity, same as the compendium).
   ctx.drawImage(_heroSheet, col*512,row*512,512,512, 0,0, W,H);
