@@ -3785,12 +3785,16 @@ function drawHeroBattleSprite(ecv){
   ctx.clearRect(0,0,W,H);
   if(heroFightIdx<0||!_heroSheet.complete) return;
   var col=heroFightIdx%4, row=Math.floor(heroFightIdx/4);
-  // Full-size hero (a HERO towers over normal enemies); the enemy zone is raised
-  // in enterHeroFight so its feet land on the normal enemy line, not the canvas floor.
-  ctx.save();                                  // flip so the hero faces the entity on the left
-  ctx.translate(W,0); ctx.scale(-1,1);
-  ctx.drawImage(_heroSheet, col*512,row*512,512,512, 0,0, W,H);
+  // Ground shadow under the hero's feet, like every enemy.
+  var shadowRx=W*0.30, shadowRy=shadowRx*0.22, shadowY=H*0.92;
+  ctx.save();
+  ctx.globalAlpha=0.9;
+  var g=ctx.createRadialGradient(W/2,shadowY,0,W/2,shadowY,shadowRx);
+  g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(0.6,'rgba(0,0,0,0.6)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(W/2,shadowY,shadowRx,shadowRy,0,0,Math.PI*2); ctx.fill();
   ctx.restore();
+  // Full-size hero in its natural orientation (faces the entity, same as the compendium).
+  ctx.drawImage(_heroSheet, col*512,row*512,512,512, 0,0, W,H);
 }
 function onHeroDefeated(){
   enemyDead=true; combatActive=false;
