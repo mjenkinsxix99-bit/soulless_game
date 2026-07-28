@@ -3498,14 +3498,14 @@ var CHALLENGE_UPGRADES=[
   { id:'soul_catcher',   name:'Soul Catcher',         desc:'Souls gain boost',                type:'buy' },
   { id:'glory_sacrifice',name:'Glory in Sacrifice',   desc:'Increase Burning Souls',          type:'buy' },
   { id:'shapeshifter',   name:'Shapeshifter',         desc:'Form presets',                    type:'buy' },
-  { id:'golden_apple',   name:'Golden Apple',         desc:'Chance for ×7 souls',        type:'buy' },
-  { id:'treasures',      name:'Treasures Abound',     desc:'Increased soul-urn chance',       type:'buy' },
-  { id:'auto_ascend',    name:'Auto-ascend',          desc:'Ascend at the floor you choose',  type:'toggleval', ph:'floor' },
-  { id:'auto_reinc',     name:'Auto-reincarnate',     desc:'Reincarnate at set Tattered Souls',type:'toggleval', ph:'TS' },
-  { id:'auto_sacrifice', name:'Auto-sacrifice minion',desc:'Chosen minions are automatically Immolated', type:'toggleval', ph:'#' },
+  { id:'golden_apple',   name:'Treasures Abound',     desc:'Chance for ×7 souls',        type:'buy' },
+  { id:'treasures',      name:'Contained Spirits',    desc:'Increased soul-urn chance',       type:'buy' },
+  { id:'auto_ascend',    name:'Immortal',             desc:'Ascend at the floor you choose',  type:'toggleval', ph:'floor' },
+  { id:'auto_reinc',     name:'Phoenix',              desc:'Reincarnate at set Tattered Souls',type:'toggleval', ph:'TS' },
+  { id:'auto_sacrifice', name:'Willing Sacrifice',    desc:'Chosen minions are automatically Immolated', type:'toggleval', ph:'#' },
   { id:'elite_rush',     name:'Elite-Rush',           desc:'Fight Elites only until Fail',    type:'toggle' },
   { id:'auto_upgrade',   name:'Auto Upgrade',         desc:'Auto-clickers progress on Upgrades', type:'toggle' },
-  { id:'elite_100',      name:'Elite minions, 100%',  desc:'Elites have 100% chance to become minion (must have enough MP)', type:'toggle' }
+  { id:'elite_100',      name:'Elite Capture',        desc:'Elites have 100% chance to become minion (must have enough MP)', type:'toggle' }
 ];
 var challengeUpg={}; // id -> { level, on, val }
 function cuState(id){ if(!challengeUpg[id]) challengeUpg[id]={ level:0, on:false, val:'' }; return challengeUpg[id]; }
@@ -3579,10 +3579,10 @@ var GILGAMESH_KEY='Gilgamesh';
 // Each hero yields one challenge-upgrade power (names match the Portal upgrades).
 var HERO_POWERS={
   Heracles:'Strength of Heracles', Achilles:'Elite-Rush', Sigurd:'Auto Upgrade',
-  Hippolyta:'Spoils of War', Perseus:'Treasures Abound', Karna:'Auto-sacrifice minion',
-  Maui:'Shapeshifter', Penthesilea:'Glory in Sacrifice', Atalanta:'Golden Apple',
-  Britomartis:'Soul Catcher', Aeneas:'Auto-reincarnate', Jason:'Elite minions, 100%',
-  Gilgamesh:'Auto-ascend'
+  Hippolyta:'Spoils of War', Perseus:'Contained Spirits', Karna:'Elite Capture',
+  Maui:'Shapeshifter', Penthesilea:'Glory in Sacrifice', Atalanta:'Treasures Abound',
+  Britomartis:'Soul Catcher', Aeneas:'Immortal', Jason:'Willing Sacrifice',
+  Gilgamesh:'Phoenix'
 };
 var godCleared=[];        // keys of nodes defeated (order-independent)
 var _pendingGodNode=-1;
