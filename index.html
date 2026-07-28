@@ -311,15 +311,29 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .gm-node.locked { opacity:0.3; filter:grayscale(0.7); cursor:default; }
 .gm-node.cleared { background-position:100% center; }
 .gm-node.avail:hover, .gm-node.cleared:hover { filter:drop-shadow(0 0 5px rgba(255,215,80,0.9)) brightness(1.15); }
-#godnode-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:10003; align-items:center; justify-content:center; padding:20px; }
-#godnode-modal.open { display:flex; }
-#godnode-box { background:linear-gradient(160deg,#170b34,#0a0520); border:2px solid #9966ff; border-radius:12px; box-shadow:0 0 34px rgba(150,90,255,0.55); max-width:420px; width:100%; padding:26px 30px; text-align:center; font-family:Georgia,serif; }
-#godnode-name { font-size:22px; font-weight:bold; color:#ffe9b0; letter-spacing:1px; margin-bottom:12px; text-shadow:0 0 12px rgba(255,200,80,0.5); }
-#godnode-text { font-size:15px; color:#d6c9f5; line-height:1.5; margin-bottom:18px; }
-#godnode-close { background:#6633bb; border:2px solid #9966ff; color:#fff; font-weight:bold; font-size:14px; letter-spacing:1px; padding:8px 24px; border-radius:6px; cursor:pointer; font-family:Georgia,serif; }
-#godnode-close:hover { background:#7a44d0; }
-#godnode-complete { display:block; width:100%; margin-bottom:10px; background:#1a5c1a; border:1px dashed #44cc44; color:#bfe6bf; font-size:12px; letter-spacing:1px; padding:7px 0; border-radius:5px; cursor:pointer; font-family:Georgia,serif; }
-#godnode-complete:hover { background:#226622; }
+/* Hero encounter (battleground shell) */
+#hero-encounter-overlay { display:none; position:fixed; inset:0; z-index:10004; background:#06020e center/cover no-repeat; flex-direction:column; align-items:center; justify-content:center; font-family:Georgia,serif; }
+#hero-encounter-overlay.open { display:flex; }
+#hero-enc-close { position:absolute; top:12px; right:14px; width:34px; height:34px; background:#880000; border:2px solid #cc0000; color:#000; font-size:18px; font-weight:bold; border-radius:5px; cursor:pointer; line-height:1; z-index:3; }
+#hero-enc-close:hover { background:#cc0000; border-color:#ff2222; }
+#hero-enc-top { position:absolute; top:20px; left:0; right:0; text-align:center; z-index:2; pointer-events:none; }
+#hero-enc-name { font-size:30px; font-weight:bold; color:#ffe9b0; letter-spacing:2px; text-shadow:0 0 14px rgba(0,0,0,0.95),0 0 22px rgba(255,200,80,0.5); }
+#hero-enc-power { font-size:15px; color:#e6cf94; letter-spacing:1px; margin-top:3px; text-shadow:0 0 10px rgba(0,0,0,0.95); }
+#hero-enc-sprite { width:min(50vh,360px); aspect-ratio:1; background-image:url('artwork/sprites_heroes.webp'); background-size:400% 400%; background-repeat:no-repeat; image-rendering:pixelated; filter:drop-shadow(0 10px 22px rgba(0,0,0,0.75)); margin-bottom:4px; }
+#hero-enc-flavor { max-width:min(90vw,600px); background:rgba(6,3,20,0.82); border:1px solid #6644aa; border-radius:10px; padding:13px 20px; color:#e0d6f5; text-align:center; box-shadow:0 0 24px rgba(0,0,0,0.6); }
+#hero-enc-flavor .hef-lore { font-size:16px; font-style:italic; color:#f0e6ff; margin-bottom:6px; }
+#hero-enc-flavor .hef-trial { font-size:13px; color:#d4a843; letter-spacing:0.5px; }
+#hero-enc-buttons { display:flex; gap:12px; margin-top:18px; }
+#hero-enc-buttons button { font-family:Georgia,serif; font-size:15px; font-weight:bold; letter-spacing:1px; padding:10px 24px; border-radius:6px; cursor:pointer; transition:filter 0.15s; }
+#hero-enc-retreat { background:#1a1030; border:2px solid #6644aa; color:#c4b5fd; }
+#hero-enc-retreat:hover { background:#2a1850; }
+#hero-enc-accept { background:#e8c24a; border:2px solid #ffe27a; color:#1a1000; box-shadow:0 0 14px rgba(255,210,80,0.5); }
+#hero-enc-accept:hover { background:#ffd75e; }
+#hero-enc-battle { background:#7a1f1f; border:2px solid #cc4444; color:#ffdada; }
+#hero-enc-battle:hover:not(:disabled) { background:#a02a2a; }
+#hero-enc-battle:disabled { opacity:0.38; cursor:not-allowed; }
+#hero-enc-devclear { position:absolute; bottom:12px; right:14px; background:transparent; border:1px dashed #55447a; color:#8f7ac0; font-family:Georgia,serif; font-size:11px; letter-spacing:1px; padding:5px 10px; border-radius:5px; cursor:pointer; z-index:3; }
+#hero-enc-devclear:hover { border-color:#7a5fb0; color:#b49ee2; }
 /* Capture notification */
 #minion-capture-modal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2000; background:#0a0520; border:2px solid #9966ff; border-radius:10px; padding:24px 32px; text-align:center; pointer-events:none; box-shadow:0 0 40px rgba(150,80,255,0.5); }
 #minion-capture-modal.open { display:block; }
@@ -2057,14 +2071,21 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <button id="godmap-close">✕</button>
   </div>
 </div>
-<!-- God Realm node placeholder -->
-<div id="godnode-modal">
-  <div id="godnode-box">
-    <div id="godnode-name"></div>
-    <div id="godnode-text">Challenge coming soon.</div>
-    <button id="godnode-complete">✓ Mark Cleared (dev)</button>
-    <button id="godnode-close">Close</button>
+<!-- Hero encounter (battleground shell) -->
+<div id="hero-encounter-overlay">
+  <button id="hero-enc-close">✕</button>
+  <div id="hero-enc-top">
+    <div id="hero-enc-name"></div>
+    <div id="hero-enc-power"></div>
   </div>
+  <div id="hero-enc-sprite"></div>
+  <div id="hero-enc-flavor"></div>
+  <div id="hero-enc-buttons">
+    <button id="hero-enc-retreat">Retreat</button>
+    <button id="hero-enc-accept">Accept Challenge</button>
+    <button id="hero-enc-battle">Battle</button>
+  </div>
+  <button id="hero-enc-devclear">✓ mark cleared (dev)</button>
 </div>
 
 <!-- Immolate info -->
@@ -3619,7 +3640,7 @@ function renderGodMap(){
       el.addEventListener('mouseleave',hideHoverTooltip);
     })(nd,st);
     if(st==='avail'){
-      (function(idx){ el.addEventListener('click',function(){ openGodNode(idx); }); })(i);
+      (function(idx){ el.addEventListener('click',function(){ openHeroEncounter(idx); }); })(i);
     }
     stage.appendChild(el);
   });
@@ -3634,24 +3655,67 @@ function closeGodMap(){
   var ov=document.getElementById('godmap-overlay');
   if(ov) ov.classList.remove('open');
 }
-function openGodNode(i){
+// ── Hero encounter (battleground shell) ──────────────────────────────────────
+// Hero → battleground zone → background file.
+var HERO_ZONE={ Heracles:'beach',Jason:'beach',Maui:'beach', Hippolyta:'forest',Britomartis:'forest',Atalanta:'forest',
+  Perseus:'swamp', Penthesilea:'temple',Karna:'temple', Achilles:'plains',Sigurd:'plains', Aeneas:'mountain',Gilgamesh:'mountain' };
+var ZONE_BG={ beach:'beach_background.webp',forest:'forest_realm.webp',swamp:'swamp_realm.webp',
+  temple:'temple_background.webp',plains:'plains_background.webp',mountain:'mountain_background.webp' };
+// Lore hook (placeholder flavor until real flavor text) + challenge line, per hero.
+var HERO_INFO={
+  Heracles:{lore:'The Twelve Labors.',challenge:'Male form — gain 12 Elite minions in one run'},
+  Achilles:{lore:'Invulnerable but for one flaw.',challenge:'Reach a floor with zero Elite-timer fails — one slip resets'},
+  Sigurd:{lore:'Slew Fafnir with the reforged blade Gram.',challenge:'Click/slash only — fell a designated Elite'},
+  Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Clear locked to a Feminine form'},
+  Perseus:{lore:'Slew Medusa by never looking upon her.',challenge:'Spells only — no click, no auto'},
+  Karna:{lore:'Gave away his armor, and his life.',challenge:'Auto-DPS only — the archer never brawls'},
+  Maui:{lore:'The shapeshifting trickster.',challenge:'Androgynous form — reach a floor having taken 3+ Forms'},
+  Penthesilea:{lore:'Charged to her death at Troy.',challenge:'Feminine form, no retreat — only forward'},
+  Atalanta:{lore:'Lost the race chasing golden apples.',challenge:'Reach a floor within a time limit'},
+  Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture N minions in one run'},
+  Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Reach a floor under a run-long burden'},
+  Jason:{lore:'Assembled the Argonauts.',challenge:'Minion/pet damage only — the crew fights'},
+  Gilgamesh:{lore:'Failed to stay awake seven nights.',challenge:'Automations disabled — manual to a floor'}
+};
+function openHeroEncounter(i){
   _pendingGodNode=i;
-  document.getElementById('godnode-name').textContent=GOD_NODES[i].key;
-  document.getElementById('godnode-text').textContent='Challenge coming soon. Prove yourself worthy to face '+GOD_NODES[i].key+'.';
-  document.getElementById('godnode-modal').classList.add('open');
+  var nd=GOD_NODES[i], key=nd.key;
+  var ov=document.getElementById('hero-encounter-overlay');
+  if(!ov) return;
+  var zone=HERO_ZONE[key];
+  ov.style.backgroundImage = zone ? ("url('artwork/"+ZONE_BG[zone]+"')") : 'none';
+  var spr=document.getElementById('hero-enc-sprite');
+  if(!nd.god && i<13){                       // heroes live on the 4-col sprite sheet
+    var col=i%4, row=Math.floor(i/4);
+    spr.style.display=''; spr.style.backgroundPosition=(col/3*100)+'% '+(row/3*100)+'%';
+  } else { spr.style.display='none'; }
+  document.getElementById('hero-enc-name').textContent=key;
+  var power=HERO_POWERS[key];
+  document.getElementById('hero-enc-power').textContent=power?('Yields: '+power):'';
+  var info=HERO_INFO[key];
+  document.getElementById('hero-enc-flavor').innerHTML = info
+    ? ('<div class="hef-lore">'+info.lore+'</div><div class="hef-trial">Trial — '+info.challenge+'</div>')
+    : 'The realm of the Gods awaits.';
+  var battle=document.getElementById('hero-enc-battle');
+  battle.disabled=true; battle.title='Complete the challenge to Battle'; // gated until the challenge system exists
+  ov.classList.add('open');
 }
-function closeGodNode(){
-  document.getElementById('godnode-modal').classList.remove('open');
+function closeHeroEncounter(){
+  var ov=document.getElementById('hero-encounter-overlay');
+  if(ov) ov.classList.remove('open');
   _pendingGodNode=-1;
 }
-// Temporary dev hook: mark the pending node cleared so the state machine can be
-// tested before the real challenge/fight chain exists.
+// Accept: reincarnate + apply the hero's handicap — wired per hero later.
+function acceptHeroChallenge(){ /* stub */ }
+// Battle: the ~2-minute hero fight — wired later.
+function doHeroBattle(){ /* stub */ }
+// Temporary dev hook: mark the pending node cleared to exercise the map states.
 function devClearGodNode(){
   if(_pendingGodNode>=0){
     var nd=GOD_NODES[_pendingGodNode];
     if(nodeState(_pendingGodNode)==='avail' && !isGodCleared(nd.key)){ godCleared.push(nd.key); saveGame(); }
   }
-  closeGodNode();
+  closeHeroEncounter();
   renderGodMap();
 }
 function openPortalTabModal(){
@@ -9874,8 +9938,11 @@ document.getElementById('build-portal-btn').addEventListener('click', buildPorta
 document.getElementById('enter-portal-btn').addEventListener('click', openGodMap);
 document.getElementById('preview-godmap-btn').addEventListener('click', openGodMap);
 document.getElementById('godmap-close').addEventListener('click', closeGodMap);
-document.getElementById('godnode-close').addEventListener('click', closeGodNode);
-document.getElementById('godnode-complete').addEventListener('click', devClearGodNode);
+document.getElementById('hero-enc-close').addEventListener('click', closeHeroEncounter);
+document.getElementById('hero-enc-retreat').addEventListener('click', closeHeroEncounter);
+document.getElementById('hero-enc-accept').addEventListener('click', acceptHeroChallenge);
+document.getElementById('hero-enc-battle').addEventListener('click', doHeroBattle);
+document.getElementById('hero-enc-devclear').addEventListener('click', devClearGodNode);
 document.getElementById('minion-intro-overlay').addEventListener('click', function(e){
   if(e.target===this) hideMinionIntroModal(); // click the dark backdrop to dismiss
 });
