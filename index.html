@@ -3658,10 +3658,12 @@ function openGodMap(){
   if(!ov) return;
   renderGodMap();
   ov.classList.add('open');
+  playGodMusic('map');
 }
 function closeGodMap(){
   var ov=document.getElementById('godmap-overlay');
   if(ov) ov.classList.remove('open');
+  stopGodMusic();                              // back to the main game → resume realm music
 }
 // ── Hero encounter (battleground shell) ──────────────────────────────────────
 // Hero → battleground zone → background file.
@@ -3707,6 +3709,7 @@ function openHeroEncounter(i){
   var battle=document.getElementById('hero-enc-battle');
   battle.disabled=false; battle.title=''; // TEMP: ungated for dev so the fight is reachable (re-gate with the challenge system)
   ov.classList.add('open');
+  playGodMusic('map');                          // olive & wine covers the map + viewing heroes
 }
 function closeHeroEncounter(){
   var ov=document.getElementById('hero-encounter-overlay');
@@ -3768,6 +3771,7 @@ function enterHeroFight(idx){
   // Hide the right panel + buy selector so the battlefield (and its background) spans the screen.
   var rp=document.getElementById('right'); if(rp) rp.style.display='none';
   var bs=document.getElementById('buy-selector'); if(bs) bs.style.display='none';
+  playGodMusic('battle');                        // aegis of brass for the fight
   updateHpBars();
 }
 // Per-hero alpha bounding box (fractions of the 512 cell): content center x,
@@ -3825,6 +3829,7 @@ function exitHeroFight(){
   var ch=document.getElementById('click-hint'); if(ch) ch.style.visibility='';
   var rp=document.getElementById('right'); if(rp) rp.style.display='';
   var bs=document.getElementById('buy-selector'); if(bs) bs.style.display='';
+  stopGodMusic();                              // back in the world → resume realm music
   window.dispatchEvent(new Event('resize'));   // force the bg tick to re-apply the real realm background
   spawnEnemy();                                // restore the normal enemy for the player's current floor
 }
@@ -4510,8 +4515,10 @@ var _bgmAudio=null;
 var _bgmRealm=-1;
 function bgmSetVolume(){
   if(_bgmAudio) _bgmAudio.volume=soundVolume;
+  if(_godMusic) _godMusic.volume=soundVolume;
 }
 function bgmPlay(realm){
+  if(_godMusicKey) return;       // god-realm music owns the audio right now — no realm music
   var track=REALM_TRACKS[realm-1]||null;
   if(realm===_bgmRealm) return; // already playing this realm
   _bgmRealm=realm;
@@ -4525,6 +4532,24 @@ function bgmPlay(realm){
 function bgmStop(){
   if(_bgmAudio){ _bgmAudio.pause(); _bgmAudio=null; }
   _bgmRealm=-1;
+}
+// ── God-realm music: map/encounter loop + battle loop, suppressing realm music ──
+var _godMusic=null, _godMusicKey='';
+var GOD_TRACKS={ map:'music/olive_and_wine.mp3', battle:'music/aegis_of_brass.mp3' };
+function playGodMusic(key){
+  if(_godMusicKey===key && _godMusic) return; // already looping this track
+  _godMusicKey=key;                            // set first so bgmPlay stays suppressed
+  if(_bgmAudio){ _bgmAudio.pause(); _bgmAudio=null; } _bgmRealm=-1; // silence realm music
+  if(_godMusic){ _godMusic.pause(); _godMusic=null; }
+  if(soundVolume<=0) return;
+  var a=new Audio(GOD_TRACKS[key]); a.loop=true; a.volume=soundVolume;
+  a.play().catch(function(){});
+  _godMusic=a;
+}
+function stopGodMusic(){
+  if(_godMusic){ _godMusic.pause(); _godMusic=null; }
+  _godMusicKey='';
+  bgmPlay(curRealm);                           // resume the player's realm track
 }
 var _realmToastTimer=null;
 function showRealmToast(clearedRealm){
