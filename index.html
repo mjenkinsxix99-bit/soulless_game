@@ -73,16 +73,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
 #realm-bg-img-left { display:none; position:absolute; top:0; left:0; pointer-events:none; z-index:1; width:auto; height:auto; transform-origin:top left; }
 #realm-bg-img { display:none; position:absolute; top:0; left:0; transform-origin:top left; pointer-events:none; z-index:1; width:auto; height:auto; }
-#combat-oval { position:absolute; left:50%; top:36%; transform:translate(-50%,-50%);
-  width:930px; height:930px; border-radius:50%;
-  background:radial-gradient(circle at center,
-    rgba(0,0,0,0.55) 0%,
-    rgba(0,0,0,0.42) 18%,
-    rgba(0,0,0,0.25) 38%,
-    rgba(0,0,0,0.09) 58%,
-    rgba(0,0,0,0.02) 74%,
-    transparent 86%);
-  pointer-events:none; z-index:1; transition: width 0.3s, height 0.3s; }
 #combat-wrap { position:absolute; left:50%; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
 /* Update available banner */
 #update-banner { display:none; position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:50; background:#0a0800; border:1px solid #d4a843; border-radius:6px; padding:7px 18px; font-family:Georgia,serif; font-size:12px; color:#d4a843; letter-spacing:1px; white-space:nowrap; box-shadow:0 0 14px rgba(212,168,67,0.35); cursor:pointer; transition:box-shadow 0.2s; }
@@ -1149,7 +1139,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   /* Battlefield-specific bg hidden — shared bg covers both panels */
   #realm-bg-img  { display: none !important; }
   #bg-canvas     { display: none !important; }
-  #combat-oval   { display: none !important; }
 
   /* Left panel: transparent so shared bg shows through */
   #left {
@@ -1425,7 +1414,6 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
         <div id="click-hint">0 / 10</div>
       </div>
       </div><!-- /combat-wrap -->
-      <div id="combat-oval"></div>
       <div id="ss-global-arrow">⮞</div>
       <div id="realm-label">Realm: Void</div>
 
@@ -4865,10 +4853,6 @@ function spawnEnemy(){
   // bar width: elite is 50% wider than regular
   var barWidth=elite?330:220;
   document.getElementById('enemy-zone').querySelectorAll('.hp-wrap').forEach(function(w){w.style.width=barWidth+'px';});
-  // resize the circle to fully enshroud the canvas with comfortable margin
-  var circleSize=sz+600;
-  var oval=document.getElementById('combat-oval');
-  oval.style.width=circleSize+'px'; oval.style.height=circleSize+'px';
   // Pick enemy type
   var realmOffset = ((curRealm-1) % REALM_NAMES.length) * LEVELS_PER_REALM;
   if(elite){
