@@ -3662,6 +3662,13 @@ var CHALLENGE_DEFS={
     noAscend:true,           // flat run from Ether — no ascension for the duration
     failOnEliteTimer:true,   // one failed Elite timer and the trial is lost
     label:'Floor'
+  },
+  Sigurd:{
+    type:'floor',            // reach an absolute floor
+    targetFloor:100,         // clear floor 100 (realm 1's final Elite)
+    noAscend:true,           // flat run from Ether
+    onlyUpgrade:'ss',        // only Spirit Slash may be bought — click damage alone
+    label:'Floor'
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
@@ -3680,6 +3687,16 @@ function challengeForbidsAscend(){
   if(!activeChallenge) return false;
   var d=CHALLENGE_DEFS[activeChallenge];
   return !!(d&&d.noAscend);
+}
+// When a trial restricts purchases to a single upgrade (Sigurd), returns its id.
+function challengeOnlyUpgrade(){
+  if(!activeChallenge) return null;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return (d&&d.onlyUpgrade)?d.onlyUpgrade:null;
+}
+function upgradeAllowedNow(u){
+  var only=challengeOnlyUpgrade();
+  return !only || (u&&u.id===only);
 }
 // Grey out every form the active trial forbids, in either form picker.
 function applyFormLockUI(){
@@ -3725,6 +3742,7 @@ function failChallenge(msg){
   activeChallenge=null; challengeProgress=0;
   hideChallengeBanner();
   checkRebirthButton();     // a no-ascend lock lifts now the trial is over
+  buildUpgrades();          // any upgrade-restriction lifts too
   applyFormLockUI();
   saveGame();
   showGameToast(msg||'Trial failed');
@@ -3736,6 +3754,7 @@ function completeChallenge(){
   activeChallenge=null; challengeProgress=0;
   hideChallengeBanner();
   checkRebirthButton();     // a no-ascend lock lifts now the trial is passed
+  buildUpgrades();          // any upgrade-restriction lifts too
   saveGame();
   showGameToast('Trial complete — '+key+"'s Battle is unlocked");
 }
@@ -3745,6 +3764,7 @@ function abandonChallenge(){
   activeChallenge=null; challengeProgress=0;
   hideChallengeBanner();
   checkRebirthButton();     // a no-ascend lock lifts on abandon
+  buildUpgrades();          // any upgrade-restriction lifts too
   applyFormLockUI();
   saveGame();
 }
@@ -3808,7 +3828,7 @@ var ZONE_BG={ beach:'beach_background.webp',forest:'forest_realm.webp',swamp:'sw
 var HERO_INFO={
   Heracles:{lore:'The Twelve Labors.',challenge:'Male form — gain 12 Elite minions in one run'},
   Achilles:{lore:'Invulnerable but for one flaw.',challenge:'Clear floor 420 from Ether — no ascension, no failed Elite battle. One flaw, the trial fails.'},
-  Sigurd:{lore:'Slew Fafnir with the reforged blade Gram.',challenge:'Click/slash only — fell a designated Elite'},
+  Sigurd:{lore:'Slew Fafnir with the reforged blade Gram.',challenge:'Clear floor 100 from Ether with click damage alone — only Spirit Slash may be forged.'},
   Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Clear locked to a Feminine form'},
   Perseus:{lore:'Slew Medusa by never looking upon her.',challenge:'Spells only — no click, no auto'},
   Karna:{lore:'Gave away his armor, and his life.',challenge:'Auto-DPS only — the archer never brawls'},
@@ -3900,6 +3920,7 @@ function acceptHeroChallenge(){
   recalcStats(); dirtyU=true;
   applyFormLockUI();
   checkRebirthButton();     // apply any no-ascend lock for this trial
+  buildUpgrades();          // apply any upgrade restriction (Sigurd: only Spirit Slash)
   updateChallengeBanner();
   saveGame();
   closeHeroEncounter();
@@ -8269,6 +8290,7 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   // Card buy click — always attached; affordability checked at call time
   d.addEventListener('click',function(e){
     if(e.target.closest('.ms-box')) return;
+    if(!upgradeAllowedNow(u)) return;             // trial forbids this upgrade
     var n=(buyQty==='max')?maxAffordableN(u):buyQty;
     if(n<1) return;
     var total=calcCostN(u,n);
@@ -8331,16 +8353,17 @@ function patchMilestoneRow(card, u){
 function buildUpgrades(){
   var el=document.getElementById('upgrade-list');
 
-  // Remove cards for upgrades that are no longer visible (sticky: never remove once shown)
+  // Remove cards for upgrades that are no longer visible (sticky: never remove once
+  // shown), or that the active trial forbids (Sigurd: only Spirit Slash).
   el.querySelectorAll('.ucard[data-uid]').forEach(function(card){
     var u=REP_UPGRADES.find(function(x){ return x.id===card.getAttribute('data-uid'); });
-    if(!u||(!u.vis()&&!_shownUpgrades[u.id])) el.removeChild(card);
+    if(!u||(!u.vis()&&!_shownUpgrades[u.id])||!upgradeAllowedNow(u)) el.removeChild(card);
   });
 
   REP_UPGRADES.forEach(function(u){
     var visible=u.vis()||_shownUpgrades[u.id];
     if(u.vis()) _shownUpgrades[u.id]=true;
-    if(!visible) return;
+    if(!visible||!upgradeAllowedNow(u)) return;   // trial may restrict to one upgrade
     var actualN, cost, can;
     if(buyQty==='max'){
       actualN=maxAffordableN(u);
@@ -9193,7 +9216,7 @@ function minionClickerAttackEnemy(){
 // chain every 250ms. Returns true if anything was bought.
 function minionClickerBuyUpgrade(upgradeId){
   var u=REP_UPGRADES.find(function(x){return x.id===upgradeId;});
-  if(!u||!u.vis()) return false;
+  if(!u||!u.vis()||!upgradeAllowedNow(u)) return false;
   var n=(buyQty==='max')?maxAffordableN(u):buyQty;
   if(n<1) return false;
   var total=calcCostN(u,n);
@@ -10474,6 +10497,7 @@ function buyAllAffordable(auto){
   // Build a flat list of all purchasable augments (threshold met, not yet bought, can afford)
   var augments=[];
   REP_UPGRADES.forEach(function(u){
+    if(!upgradeAllowedNow(u)) return;             // trial forbids this upgrade's augments
     for(var mi=0;mi<u.milestones.length;mi++){
       if(!u.milestones[mi]&&u.level>=getMsThresh(u,mi)){
         augments.push({u:u,mi:mi,cost:augCost(u,mi)});
