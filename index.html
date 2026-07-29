@@ -3777,6 +3777,9 @@ function enterHeroFight(idx){
   // Raise the enemy zone so the full-size hero's feet land on the normal enemy line
   // (restored on exit when the resize event re-runs the realm layout).
   var cw=document.getElementById('combat-wrap'); if(cw) cw.style.top='calc(36% + 82px)';
+  // Hide the right panel + buy selector so the battlefield (and its background) spans the screen.
+  var rp=document.getElementById('right'); if(rp) rp.style.display='none';
+  var bs=document.getElementById('buy-selector'); if(bs) bs.style.display='none';
   updateHpBars();
 }
 // Per-hero alpha bounding box (fractions of the 512 cell): content center x,
@@ -3832,6 +3835,8 @@ function exitHeroFight(){
   var mp=document.getElementById('minimap-panel'); if(mp) mp.style.display='';
   var rl=document.getElementById('realm-label'); if(rl) rl.style.visibility='';
   var ch=document.getElementById('click-hint'); if(ch) ch.style.visibility='';
+  var rp=document.getElementById('right'); if(rp) rp.style.display='';
+  var bs=document.getElementById('buy-selector'); if(bs) bs.style.display='';
   window.dispatchEvent(new Event('resize'));   // force the bg tick to re-apply the real realm background
   spawnEnemy();                                // restore the normal enemy for the player's current floor
 }
