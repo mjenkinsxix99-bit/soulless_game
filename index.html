@@ -309,7 +309,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #hero-enc-top { position:absolute; top:20px; left:0; right:0; text-align:center; z-index:2; pointer-events:none; }
 #hero-enc-name { font-size:30px; font-weight:bold; color:#ffe9b0; letter-spacing:2px; text-shadow:0 0 14px rgba(0,0,0,0.95),0 0 22px rgba(255,200,80,0.5); }
 #hero-enc-power { font-size:15px; color:#e6cf94; letter-spacing:1px; margin-top:3px; text-shadow:0 0 10px rgba(0,0,0,0.95); }
-#hero-enc-sprite { width:min(50vh,360px); aspect-ratio:1; background-image:url('artwork/sprites_heroes.webp'); background-size:400% 400%; background-repeat:no-repeat; image-rendering:pixelated; filter:drop-shadow(0 10px 22px rgba(0,0,0,0.75)); margin-bottom:4px; }
+#hero-enc-sprite-wrap { position:relative; width:min(50vh,360px); aspect-ratio:1; margin-bottom:4px; }
+#hero-enc-sprite { position:absolute; inset:0; background-image:url('artwork/sprites_heroes.webp'); background-size:400% 400%; background-repeat:no-repeat; image-rendering:pixelated; z-index:2; }
+#hero-enc-shadow { position:absolute; transform:translate(-50%,-50%); border-radius:50%; z-index:1; pointer-events:none; background:radial-gradient(circle at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.54) 60%, rgba(0,0,0,0) 100%); }
 #hero-enc-flavor { max-width:min(90vw,600px); background:rgba(6,3,20,0.82); border:1px solid #6644aa; border-radius:10px; padding:13px 20px; color:#e0d6f5; text-align:center; box-shadow:0 0 24px rgba(0,0,0,0.6); }
 #hero-enc-flavor .hef-lore { font-size:16px; font-style:italic; color:#f0e6ff; margin-bottom:6px; }
 #hero-enc-flavor .hef-trial { font-size:13px; color:#d4a843; letter-spacing:0.5px; }
@@ -2086,7 +2088,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <div id="hero-enc-name"></div>
     <div id="hero-enc-power"></div>
   </div>
-  <div id="hero-enc-sprite"></div>
+  <div id="hero-enc-sprite-wrap"><div id="hero-enc-shadow"></div><div id="hero-enc-sprite"></div></div>
   <div id="hero-enc-flavor"></div>
   <div id="hero-enc-buttons">
     <button id="hero-enc-retreat">Retreat</button>
@@ -3695,10 +3697,18 @@ function openHeroEncounter(i){
   var zone=HERO_ZONE[key];
   ov.style.backgroundImage = zone ? ("url('artwork/"+ZONE_BG[zone]+"')") : 'none';
   var spr=document.getElementById('hero-enc-sprite');
+  var sh=document.getElementById('hero-enc-shadow');
   if(!nd.god && i<13){                       // heroes live on the 4-col sprite sheet
     var col=i%4, row=Math.floor(i/4);
     spr.style.display=''; spr.style.backgroundPosition=(col/3*100)+'% '+(row/3*100)+'%';
-  } else { spr.style.display='none'; }
+    // Ground shadow matching the battle (per-hero width/foot from HERO_BOUNDS).
+    if(sh){
+      var bnd=HERO_BOUNDS[i]||{cx:0.5,halfW:0.42,footY:0.97};
+      var wpct=bnd.halfW*2*0.96*100;
+      sh.style.display=''; sh.style.left=(bnd.cx*100)+'%'; sh.style.top=(bnd.footY*100)+'%';
+      sh.style.width=wpct+'%'; sh.style.height=(wpct*0.22)+'%';
+    }
+  } else { spr.style.display='none'; if(sh) sh.style.display='none'; }
   document.getElementById('hero-enc-name').textContent=key;
   var power=HERO_POWERS[key];
   document.getElementById('hero-enc-power').textContent=power?('Yields: '+power):'';
