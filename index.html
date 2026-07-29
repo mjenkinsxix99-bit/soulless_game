@@ -326,6 +326,17 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #hero-enc-battle:disabled { opacity:0.38; cursor:not-allowed; }
 #hero-enc-devclear { position:absolute; bottom:12px; right:14px; background:transparent; border:1px dashed #55447a; color:#8f7ac0; font-family:Georgia,serif; font-size:11px; letter-spacing:1px; padding:5px 10px; border-radius:5px; cursor:pointer; z-index:3; }
 #hero-enc-devclear:hover { border-color:#7a5fb0; color:#b49ee2; }
+#hero-enc-msg { margin-top:14px; min-height:20px; color:#ff8a8a; font-family:Georgia,serif; font-size:15px; letter-spacing:0.5px; text-align:center; text-shadow:0 0 10px rgba(0,0,0,0.9); opacity:0; transition:opacity 0.25s; }
+#hero-enc-msg.show { opacity:1; }
+/* Form picker: a trial can forbid every form but the required one */
+.form-card.form-locked, .fm-form-card.form-locked { opacity:0.28; filter:grayscale(1); pointer-events:none; }
+/* Active-trial banner */
+#challenge-banner { display:none; position:fixed; top:52px; left:50%; transform:translateX(-50%); z-index:9998; align-items:center; gap:14px; background:linear-gradient(160deg,rgba(26,11,52,0.96),rgba(10,5,32,0.96)); border:1px solid #9966ff; border-radius:9px; padding:8px 14px; box-shadow:0 0 22px rgba(150,90,255,0.45); font-family:Georgia,serif; }
+#challenge-banner.show { display:flex; }
+#challenge-banner-text { color:#e6d6ff; font-size:14px; letter-spacing:0.5px; white-space:nowrap; }
+#challenge-banner-text b { color:#ffd75e; }
+#challenge-abandon { background:#3a1414; border:1px solid #aa4444; color:#ffcaca; font-family:Georgia,serif; font-size:12px; letter-spacing:1px; padding:5px 12px; border-radius:5px; cursor:pointer; }
+#challenge-abandon:hover { background:#5a1c1c; }
 /* Full-screen fade */
 #fade-overlay { position:fixed; inset:0; background:#000; opacity:0; pointer-events:none; z-index:20000; transition:opacity 0.42s ease; }
 /* Hero victory panel */
@@ -2095,7 +2106,14 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <button id="hero-enc-accept">Accept Challenge</button>
     <button id="hero-enc-battle">Battle</button>
   </div>
+  <div id="hero-enc-msg"></div>
   <button id="hero-enc-devclear">✓ mark cleared (dev)</button>
+</div>
+
+<!-- Active-trial banner -->
+<div id="challenge-banner">
+  <span id="challenge-banner-text"></span>
+  <button id="challenge-abandon">Abandon</button>
 </div>
 
 <!-- Immolate info -->
@@ -3618,6 +3636,83 @@ var HERO_POWERS={
 var godCleared=[];        // keys of nodes defeated (order-independent)
 var _pendingGodNode=-1;
 
+// ── Challenge (trial) system ─────────────────────────────────────────────────
+// Each hero's Battle stays gated until its trial is passed. A trial is accepted
+// from the encounter screen: it reincarnates the player from Ether, applies a
+// handicap, and sets a goal. Completing the goal (in one run) un-gates Battle.
+var challengesPassed={};   // hero key -> true once its trial has been completed
+var activeChallenge=null;  // hero key of the trial currently in progress (null = none)
+var challengeProgress=0;   // generic progress counter for the active trial
+var MINION_SLOT_CAP=100;   // there are 100 capturable minion types
+
+// Only heroes listed here enforce a trial. Heroes without a def keep the Battle
+// button open (dev) until their trial is built out, one at a time.
+var CHALLENGE_DEFS={
+  Heracles:{
+    form:'masculine',        // the trial must be run in this form (picker locks to it)
+    goal:12,                 // train this many minions to Elite in one run
+    needSlots:12,            // empty minion slots required before Accept will kick off
+    label:'Elite minions trained',
+    noSlotsMsg:'You do not have enough empty minion slots.'
+  }
+};
+function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
+function isChallengePassed(key){ return challengesPassed[key]===true; }
+function eliteMinionCount(){ return minionSlots.filter(function(m){return m.isElite;}).length; }
+// Reincarnation wipes non-Elites, so the room a trial actually has to train new
+// minions is the cap minus the Elites already held (which survive).
+function emptyMinionSlotsAfterReincarnate(){ return MINION_SLOT_CAP - eliteMinionCount(); }
+function challengeRequiredForm(){
+  if(!activeChallenge) return null;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return (d&&d.form)?d.form:null;
+}
+// Grey out every form the active trial forbids, in either form picker.
+function applyFormLockUI(){
+  var req=challengeRequiredForm();
+  document.querySelectorAll('.form-card,.fm-form-card').forEach(function(c){
+    var f=c.getAttribute('data-form');
+    c.classList.toggle('form-locked', !!(req && f!==req));
+  });
+}
+function updateChallengeBanner(){
+  var b=document.getElementById('challenge-banner');
+  if(!b) return;
+  if(!activeChallenge){ b.classList.remove('show'); return; }
+  var def=CHALLENGE_DEFS[activeChallenge]||{};
+  var t=document.getElementById('challenge-banner-text');
+  if(t) t.innerHTML='<b>'+activeChallenge+"'s Trial</b> &mdash; "+(def.label||'Progress')+': '+challengeProgress+' / '+(def.goal||'?');
+  b.classList.add('show');
+}
+function hideChallengeBanner(){ var b=document.getElementById('challenge-banner'); if(b) b.classList.remove('show'); }
+// Count a minion reaching Elite toward the active trial (form-gated when required).
+function noteEliteTrained(){
+  if(!activeChallenge) return;
+  var def=CHALLENGE_DEFS[activeChallenge];
+  if(!def||!def.goal) return;
+  if(def.form && rebirthForm!==def.form) return;   // must be run in the required form
+  challengeProgress++;
+  updateChallengeBanner();
+  if(challengeProgress>=def.goal) completeChallenge();
+}
+function completeChallenge(){
+  var key=activeChallenge;
+  if(!key) return;
+  challengesPassed[key]=true;
+  activeChallenge=null; challengeProgress=0;
+  hideChallengeBanner();
+  saveGame();
+  showGameToast('Trial complete — '+key+"'s Battle is unlocked");
+}
+// Give up the current trial without reincarnating (the run continues as-is).
+function abandonChallenge(){
+  if(!activeChallenge) return;
+  activeChallenge=null; challengeProgress=0;
+  hideChallengeBanner();
+  applyFormLockUI();
+  saveGame();
+}
+
 function isGodCleared(key){ return godCleared.indexOf(key)>=0; }
 // Any hero can be attempted in any order. The six stairway gods stay locked until
 // Gilgamesh falls, then must be climbed in sequence.
@@ -3716,8 +3811,20 @@ function openHeroEncounter(i){
   document.getElementById('hero-enc-flavor').innerHTML = info
     ? ('<div class="hef-lore">'+info.lore+'</div><div class="hef-trial">Trial — '+info.challenge+'</div>')
     : 'The realm of the Gods awaits.';
+  // Battle is gated behind the hero's trial. Heroes whose trial isn't built yet
+  // (no CHALLENGE_DEFS entry) stay open so their fight is still reachable.
   var battle=document.getElementById('hero-enc-battle');
-  battle.disabled=false; battle.title=''; // TEMP: ungated for dev so the fight is reachable (re-gate with the challenge system)
+  var accept=document.getElementById('hero-enc-accept');
+  var gated=heroHasChallenge(key) && !isChallengePassed(key);
+  battle.disabled=gated;
+  battle.title=gated?('Pass '+key+"'s trial to unlock the Battle"):'';
+  if(accept){
+    // Accept is meaningful only for a gated hero whose trial isn't already running.
+    var showAccept = heroHasChallenge(key) && !isChallengePassed(key) && activeChallenge!==key;
+    accept.style.display = showAccept ? '' : 'none';
+  }
+  var msg=document.getElementById('hero-enc-msg');
+  if(msg){ msg.textContent=''; msg.classList.remove('show'); }
   ov.classList.add('open');
   playGodMusic('map');                          // olive & wine covers the map + viewing heroes
 }
@@ -3726,8 +3833,40 @@ function closeHeroEncounter(){
   if(ov) ov.classList.remove('open');
   _pendingGodNode=-1;
 }
-// Accept: reincarnate + apply the hero's handicap — wired per hero later.
-function acceptHeroChallenge(){ /* stub */ }
+// Show a message on the encounter overlay itself (it sits above the game).
+function showHeroEncMsg(text){
+  var msg=document.getElementById('hero-enc-msg');
+  if(!msg) return;
+  msg.textContent=text;
+  msg.classList.remove('show'); void msg.offsetWidth; msg.classList.add('show');
+}
+// Accept a hero's trial: verify prerequisites, reincarnate from Ether, arm the goal.
+function acceptHeroChallenge(){
+  if(_pendingGodNode<0||_pendingGodNode>=GOD_NODES.length) return;
+  var key=GOD_NODES[_pendingGodNode].key;
+  var def=CHALLENGE_DEFS[key];
+  if(!def) return;                       // no trial defined for this hero yet
+  if(isChallengePassed(key)) return;     // already cleared — nothing to accept
+  // HARD LOCK: must have room to capture & train the required minions. Checked
+  // against post-reincarnate capacity (non-Elites are wiped, Elites survive).
+  if(def.needSlots && emptyMinionSlotsAfterReincarnate() < def.needSlots){
+    showHeroEncMsg(def.noSlotsMsg||'You do not have enough empty minion slots.');
+    return;                              // does NOT kick off the trial
+  }
+  // Reincarnate from Ether (full soft reset; also clears any prior trial), then
+  // arm this trial and start truly formless so the form must be earned in-run.
+  doReincarnate();
+  rebirthForm=null; _rebirthEntityOverride=null;   // truly Ether again
+  activeChallenge=key; challengeProgress=0;
+  var _np=FORM_NAMEPLATES[rebirthForm];
+  document.getElementById('entity-stage-label').textContent=_np?_np.label:'You are Ether.';
+  document.getElementById('stage-desc').textContent=_np?_np.desc:'Shapeless. Hungry.';
+  recalcStats(); dirtyU=true;
+  applyFormLockUI();
+  updateChallengeBanner();
+  saveGame();
+  closeHeroEncounter();
+}
 
 // ── The hero fight (reuses the real battlefield) ─────────────────────────────
 var inHeroFight=false, heroFightIdx=-1, heroFightStart=0;
@@ -4073,7 +4212,7 @@ function addMinionXp(){
       m.xp-=needed;
       m.level++;
       needed=getMinionXpForLevel(m.level);
-      if(m.level>=MINION_ELITE_LEVEL){ m.isElite=true; m.xp=0; break; }
+      if(m.level>=MINION_ELITE_LEVEL){ m.isElite=true; m.xp=0; noteEliteTrained(); break; }
     }
   });
 }
@@ -4562,13 +4701,15 @@ function stopGodMusic(){
   bgmPlay(curRealm);                           // resume the player's realm track
 }
 var _realmToastTimer=null;
-function showRealmToast(clearedRealm){
+function showRealmToast(clearedRealm){ showGameToast('Cleared Realm '+clearedRealm); }
+// Generic gold banner toast (reuses the realm-toast node).
+function showGameToast(text,ms){
   var t=document.getElementById('realm-toast');
   if(!t) return;
-  t.textContent='Cleared Realm '+clearedRealm;
+  t.textContent=text;
   t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
   clearTimeout(_realmToastTimer);
-  _realmToastTimer=setTimeout(function(){ t.classList.remove('show'); },2600);
+  _realmToastTimer=setTimeout(function(){ t.classList.remove('show'); },ms||2600);
 }
 var eliteKillsTotal=0;
 var highestGlobalFloorEver=0;
@@ -7271,6 +7412,9 @@ function openReincarnateModal(){
 }
 
 function doReincarnate(){
+  // A reincarnation abandons any trial in progress. acceptHeroChallenge() calls
+  // this first and re-arms the trial afterward, so its own accept isn't lost.
+  if(activeChallenge){ activeChallenge=null; challengeProgress=0; hideChallengeBanner(); applyFormLockUI(); }
   var mp=calcReincarnateMP(); // capture before any state changes — same value the modal showed
   tatteredSouls+=calcTatteredSoulsGain(rebirthForm);
   totalTSSacrificed+=tatteredSouls+tatteredUpgradesSpent;
@@ -7596,6 +7740,9 @@ function saveGame(){
     burningSouls:burningSouls,
     portalBuilt:portalBuilt,
     godCleared:godCleared.slice(),
+    challengesPassed:JSON.parse(JSON.stringify(challengesPassed)),
+    activeChallenge:activeChallenge,
+    challengeProgress:challengeProgress,
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
@@ -7746,6 +7893,9 @@ function loadGame(){
   else if(typeof data.witheredSouls==='number') burningSouls=data.witheredSouls; // legacy field name
   if(typeof data.portalBuilt==='boolean') portalBuilt=data.portalBuilt;
   if(data.challengeUpg&&typeof data.challengeUpg==='object') challengeUpg=data.challengeUpg;
+  if(data.challengesPassed&&typeof data.challengesPassed==='object') challengesPassed=data.challengesPassed;
+  activeChallenge=(typeof data.activeChallenge==='string')?data.activeChallenge:null;
+  challengeProgress=(typeof data.challengeProgress==='number')?data.challengeProgress:0;
   if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
   else if(typeof data.godMapCleared==='number') godCleared=GOD_NODES.slice(0,data.godMapCleared).map(function(n){return n.key;}); // legacy count
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
@@ -8409,6 +8559,7 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
     } else {
       document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
       document.getElementById('form-confirm-btn').classList.remove('show');
+      applyFormLockUI();
       document.getElementById('form-modal').classList.add('open');
     }
   }
@@ -8417,6 +8568,8 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
 var _selectedForm=null;
 document.querySelectorAll('.form-card').forEach(function(card){
   card.addEventListener('click',function(){
+    var req=challengeRequiredForm();                              // trial form lock
+    if(req && card.getAttribute('data-form')!==req) return;
     document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
     card.classList.add('picked');
     _selectedForm=card.getAttribute('data-form');
@@ -8821,6 +8974,7 @@ function openFormMasterModal(){
   _fmForm=null; _fmPath3=null; _fmPath4=null; _fmPath5=null; _fmPath6=null;
   document.querySelectorAll('.fm-form-card,.fm-path-card').forEach(function(c){c.classList.remove('picked');});
   document.getElementById('fm-begin-btn').classList.remove('ready');
+  applyFormLockUI();
   document.getElementById('form-master-modal').classList.add('open');
   _fmDrawPreview();
 }
@@ -8832,6 +8986,8 @@ function _fmCheckReady(){
 
 document.querySelectorAll('.fm-form-card').forEach(function(card){
   card.addEventListener('click',function(){
+    var req=challengeRequiredForm();                              // trial form lock
+    if(req && card.getAttribute('data-form')!==req) return;
     document.querySelectorAll('.fm-form-card').forEach(function(c){c.classList.remove('picked');});
     card.classList.add('picked');
     _fmForm=card.getAttribute('data-form');
@@ -8881,6 +9037,7 @@ document.getElementById('fm-ether-btn').addEventListener('click',function(){
   document.getElementById('form-master-modal').classList.remove('open');
   document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
   document.getElementById('form-confirm-btn').classList.remove('show');
+  applyFormLockUI();
   document.getElementById('form-modal').classList.add('open');
 });
 
@@ -9937,6 +10094,7 @@ buildMinimap();
 checkRebirthButton();
 updateTatteredDisplay();
 updateTatteredBtn();
+updateChallengeBanner();   // restore an in-progress trial banner
 updateManaBar();
 renderSpellPanel();
 updateVolumeSlider();
@@ -10096,6 +10254,7 @@ document.getElementById('hero-enc-accept').addEventListener('click', acceptHeroC
 document.getElementById('hero-enc-battle').addEventListener('click', doHeroBattle);
 document.getElementById('hero-victory-claim').addEventListener('click', claimHeroVictory);
 document.getElementById('hero-enc-devclear').addEventListener('click', devClearGodNode);
+document.getElementById('challenge-abandon').addEventListener('click', abandonChallenge);
 document.getElementById('minion-intro-overlay').addEventListener('click', function(e){
   if(e.target===this) hideMinionIntroModal(); // click the dark backdrop to dismiss
 });
