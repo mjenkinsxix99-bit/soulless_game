@@ -3649,11 +3649,19 @@ var MINION_SLOT_CAP=100;   // there are 100 capturable minion types
 // button open (dev) until their trial is built out, one at a time.
 var CHALLENGE_DEFS={
   Heracles:{
+    type:'elites',           // goal counts minions trained to Elite
     form:'masculine',        // the trial must be run in this form (picker locks to it)
     goal:12,                 // train this many minions to Elite in one run
     needSlots:12,            // empty minion slots required before Accept will kick off
     label:'Elite minions trained',
     noSlotsMsg:'You do not have enough empty minion slots.'
+  },
+  Achilles:{
+    type:'floor',            // goal is reaching an absolute floor
+    targetFloor:420,         // clear this global floor to pass
+    noAscend:true,           // flat run from Ether — no ascension for the duration
+    failOnEliteTimer:true,   // one failed Elite timer and the trial is lost
+    label:'Floor'
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
@@ -3666,6 +3674,12 @@ function challengeRequiredForm(){
   if(!activeChallenge) return null;
   var d=CHALLENGE_DEFS[activeChallenge];
   return (d&&d.form)?d.form:null;
+}
+// True while a trial forbids ascending (flat-run trials like Achilles).
+function challengeForbidsAscend(){
+  if(!activeChallenge) return false;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return !!(d&&d.noAscend);
 }
 // Grey out every form the active trial forbids, in either form picker.
 function applyFormLockUI(){
@@ -3681,7 +3695,8 @@ function updateChallengeBanner(){
   if(!activeChallenge){ b.classList.remove('show'); return; }
   var def=CHALLENGE_DEFS[activeChallenge]||{};
   var t=document.getElementById('challenge-banner-text');
-  if(t) t.innerHTML='<b>'+activeChallenge+"'s Trial</b> &mdash; "+(def.label||'Progress')+': '+challengeProgress+' / '+(def.goal||'?');
+  var target=(def.type==='floor')?def.targetFloor:(def.goal||'?');
+  if(t) t.innerHTML='<b>'+activeChallenge+"'s Trial</b> &mdash; "+(def.label||'Progress')+': '+challengeProgress+' / '+target;
   b.classList.add('show');
 }
 function hideChallengeBanner(){ var b=document.getElementById('challenge-banner'); if(b) b.classList.remove('show'); }
@@ -3689,11 +3704,30 @@ function hideChallengeBanner(){ var b=document.getElementById('challenge-banner'
 function noteEliteTrained(){
   if(!activeChallenge) return;
   var def=CHALLENGE_DEFS[activeChallenge];
-  if(!def||!def.goal) return;
+  if(!def||def.type!=='elites'||!def.goal) return;
   if(def.form && rebirthForm!==def.form) return;   // must be run in the required form
   challengeProgress++;
   updateChallengeBanner();
   if(challengeProgress>=def.goal) completeChallenge();
+}
+// Track deepest floor reached toward a 'floor' trial (Achilles); complete at target.
+function noteFloorProgress(){
+  if(!activeChallenge) return;
+  var def=CHALLENGE_DEFS[activeChallenge];
+  if(!def||def.type!=='floor') return;
+  var gf=absGlobalFloor(curRealm,curLevel,curFloor);
+  if(gf>challengeProgress){ challengeProgress=gf; updateChallengeBanner(); }
+  if(gf>=def.targetFloor) completeChallenge();
+}
+// A trial's fail condition tripped (e.g. an Elite timer ran out). End it, lost.
+function failChallenge(msg){
+  if(!activeChallenge) return;
+  activeChallenge=null; challengeProgress=0;
+  hideChallengeBanner();
+  checkRebirthButton();     // a no-ascend lock lifts now the trial is over
+  applyFormLockUI();
+  saveGame();
+  showGameToast(msg||'Trial failed');
 }
 function completeChallenge(){
   var key=activeChallenge;
@@ -3701,6 +3735,7 @@ function completeChallenge(){
   challengesPassed[key]=true;
   activeChallenge=null; challengeProgress=0;
   hideChallengeBanner();
+  checkRebirthButton();     // a no-ascend lock lifts now the trial is passed
   saveGame();
   showGameToast('Trial complete — '+key+"'s Battle is unlocked");
 }
@@ -3709,6 +3744,7 @@ function abandonChallenge(){
   if(!activeChallenge) return;
   activeChallenge=null; challengeProgress=0;
   hideChallengeBanner();
+  checkRebirthButton();     // a no-ascend lock lifts on abandon
   applyFormLockUI();
   saveGame();
 }
@@ -3771,7 +3807,7 @@ var ZONE_BG={ beach:'beach_background.webp',forest:'forest_realm.webp',swamp:'sw
 // Lore hook (placeholder flavor until real flavor text) + challenge line, per hero.
 var HERO_INFO={
   Heracles:{lore:'The Twelve Labors.',challenge:'Male form — gain 12 Elite minions in one run'},
-  Achilles:{lore:'Invulnerable but for one flaw.',challenge:'Reach a floor with zero Elite-timer fails — one slip resets'},
+  Achilles:{lore:'Invulnerable but for one flaw.',challenge:'Clear floor 420 from Ether — no ascension, no failed Elite battle. One flaw, the trial fails.'},
   Sigurd:{lore:'Slew Fafnir with the reforged blade Gram.',challenge:'Click/slash only — fell a designated Elite'},
   Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Clear locked to a Feminine form'},
   Perseus:{lore:'Slew Medusa by never looking upon her.',challenge:'Spells only — no click, no auto'},
@@ -3863,6 +3899,7 @@ function acceptHeroChallenge(){
   document.getElementById('stage-desc').textContent=_np?_np.desc:'Shapeless. Hungry.';
   recalcStats(); dirtyU=true;
   applyFormLockUI();
+  checkRebirthButton();     // apply any no-ascend lock for this trial
   updateChallengeBanner();
   saveGame();
   closeHeroEncounter();
@@ -5236,6 +5273,7 @@ function onEnemyDeath(){
 
     if(curLevel>=LEVELS_PER_REALM&&curRealm===highestRealm){
       updateHighestFloor(); checkAchievements();
+      noteFloorProgress();   // this realm-final elite counts before we cross over
       setTimeout(function(){
         curRealm++;
         if(curRealm>highestRealm) highestRealm=curRealm;
@@ -5297,6 +5335,7 @@ function onEnemyDeath(){
   buildMinimap();
   updateProgressLabel();
   updateHighestFloor(); checkAchievements();
+  noteFloorProgress();   // advance a 'floor' trial (Achilles) toward its target
   // Elite kills are rare progress milestones — persist those immediately.
   // Regular kills can stream in several times a second with clicker minions
   // assigned to the enemy, so batch their saves.
@@ -5307,6 +5346,10 @@ function onEliteDpsCheckFail(){
   combatActive=false; eliteTimerStart=0;
   hitFlashTime=0; attackFlashTime=0;
   document.getElementById('elite-timer-wrap').style.visibility='hidden';
+  // A trial that fails on a missed Elite timer (Achilles) is lost right here.
+  if(activeChallenge && CHALLENGE_DEFS[activeChallenge] && CHALLENGE_DEFS[activeChallenge].failOnEliteTimer){
+    failChallenge('Elite battle failed — Achilles’ trial is lost.');
+  }
   curFloor=FLOORS_PER_LEVEL; floorWins=WINS_PER_FLOOR;
   if(autoProgressEnabled){ autoProgressEnabled=false; saveGame(); }
   buildMinimap();
@@ -7492,6 +7535,7 @@ function checkRebirthButton(){
   if(!btn) return;
   var doomUpgrade=REP_UPGRADES.find(function(u){return u.id==='dm';});
   var canAscend=doomUpgrade&&doomUpgrade.level>=1;
+  if(challengeForbidsAscend()) canAscend=false;   // flat-run trial locks ascension
   btn.style.display=canAscend?'block':'none';
   var inUltimateForm=rebirthCount>=7||achievementsEarned.indexOf('form-ult-all')>=0;
   if(rBtn) rBtn.style.display=(canAscend&&inUltimateForm)?'block':'none';
