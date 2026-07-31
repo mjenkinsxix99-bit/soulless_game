@@ -3682,6 +3682,14 @@ var CHALLENGE_DEFS={
     failOnTimeout:true,      // clock hits zero → trial lost
     goalText:'Reach Skyland',
     label:'Floor'
+  },
+  Perseus:{
+    type:'floor',            // reach an absolute floor
+    targetFloor:601,         // reach the Swamp (realm 7, floor 1)
+    spellsOnly:true,         // only spell damage lands — clicks, minions, auto-DPS do nothing
+    startNodes:['spell-flurry'], // Flurry unlocked at accept, or there's no way to deal damage
+    goalText:'Reach the Swamp',
+    label:'Floor'
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
@@ -3711,6 +3719,13 @@ function upgradeAllowedNow(u){
   var only=challengeOnlyUpgrade();
   return !only || (u&&u.id===only);
 }
+// True while a trial allows only spell damage (Perseus): clicks, minion
+// clickers, and auto-DPS all deal nothing — only Flurry (a spell) lands.
+function challengeSpellsOnly(){
+  if(!activeChallenge) return false;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return !!(d&&d.spellsOnly);
+}
 // Grey out every form the active trial forbids, in either form picker.
 function applyFormLockUI(){
   var req=challengeRequiredForm();
@@ -3726,7 +3741,10 @@ function updateChallengeBanner(){
   var def=CHALLENGE_DEFS[activeChallenge]||{};
   var t=document.getElementById('challenge-banner-text');
   var progressStr;
-  if(def.goalText) progressStr=def.goalText;
+  if(def.goalText){
+    progressStr=def.goalText;
+    if(def.type==='floor') progressStr+=' — Floor '+challengeProgress+' / '+def.targetFloor;
+  }
   else if(def.type==='floor') progressStr=(def.label||'Floor')+': '+challengeProgress+' / '+def.targetFloor;
   else progressStr=(def.label||'Progress')+': '+challengeProgress+' / '+(def.goal||'?');
   if(t) t.innerHTML='<b>'+activeChallenge+"'s Trial</b> &mdash; "+progressStr;
@@ -3865,7 +3883,7 @@ var HERO_INFO={
   Achilles:{lore:'Invulnerable but for one flaw.',challenge:'Clear floor 420 from Ether — no ascension, no failed Elite battle. One flaw, the trial fails.'},
   Sigurd:{lore:'Slew Fafnir with the reforged blade Gram.',challenge:'Clear floor 100 from Ether with click damage alone — only Spirit Slash may be forged.'},
   Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Reach Skyland within 60 minutes — locked to the Feminine form.'},
-  Perseus:{lore:'Slew Medusa by never looking upon her.',challenge:'Spells only — no click, no auto'},
+  Perseus:{lore:'Slew Medusa by never looking upon her.',challenge:'Reach the Swamp from Ether — spells only. Only Flurry of Strikes deals damage (fed by your click damage).'},
   Karna:{lore:'Gave away his armor, and his life.',challenge:'Auto-DPS only — the archer never brawls'},
   Maui:{lore:'The shapeshifting trickster.',challenge:'Androgynous form — reach a floor having taken 3+ Forms'},
   Penthesilea:{lore:'Charged to her death at Troy.',challenge:'Feminine form, no retreat — only forward'},
@@ -3950,6 +3968,8 @@ function acceptHeroChallenge(){
   rebirthForm=null; _rebirthEntityOverride=null;   // truly Ether again
   activeChallenge=key; challengeProgress=0;
   challengeDeadline=(def.timeLimitMs)?(Date.now()+def.timeLimitMs):0;   // start any countdown
+  // Some trials must begin with a node unlocked (Perseus: Flurry, else no damage).
+  if(def.startNodes){ def.startNodes.forEach(function(id){ soulShopOwned[id]=1; }); renderSpellPanel(); }
   var _np=FORM_NAMEPLATES[rebirthForm];
   document.getElementById('entity-stage-label').textContent=_np?_np.label:'You are Ether.';
   document.getElementById('stage-desc').textContent=_np?_np.desc:'Shapeless. Hungry.';
@@ -5223,6 +5243,7 @@ function applyRuleOf3Strike(){
 // counts as a click, so only isAuto is gated out here.
 function entityAttack(isAuto, isSpell){
   if(!combatActive||enemyDead) return;
+  if(challengeSpellsOnly() && !isSpell) return;   // spells-only trial: only Flurry lands
   if(!isAuto){ registerClick(); }
   if(!isAuto && combatAnim) attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
@@ -9229,6 +9250,7 @@ function assignMinionClicker(target, upgradeId){
 
 function minionClickerAttackEnemy(){
   if(!combatActive||enemyDead) return;
+  if(challengeSpellsOnly()) return;               // spells-only trial: minion clicks deal nothing
   var avgLvl=getMinionpowerAvgLevel();
   if(avgLvl<=0) return;
   var dmg=clickDmgBonus.mul(avgLvl*0.0006435);
@@ -9468,7 +9490,9 @@ function gameLoop(){
   var now=Date.now();
 
   if(combatActive&&!enemyDead){
-    if(def()){
+    // A spells-only trial (Perseus) zeroes auto-DPS and HP drain — only Flurry deals damage.
+    var _spellsOnly=challengeSpellsOnly();
+    if(def()&&!_spellsOnly){
       var _dt=(now-lastAutoAttack)/1000;
       lastAutoAttack=now;
       var _dpsDmg=totalDps.mul(_dt);
@@ -9480,7 +9504,7 @@ function gameLoop(){
         if(enemyHp.lte(0)) onEnemyDeath();
       }
     } else { lastAutoAttack=now; }
-    if(enemyHpDrainPct>0){
+    if(enemyHpDrainPct>0&&!_spellsOnly){
       var drainAmt=enemyMaxHp.mul(enemyHpDrainPct).mul((now-lastDrainTick)/1000);
       lastDrainTick=now;
       enemyHp=Decimal.max(D(0),enemyHp.sub(drainAmt));
