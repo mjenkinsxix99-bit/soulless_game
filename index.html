@@ -3649,6 +3649,8 @@ var challengesPassed={};   // hero key -> true once its trial has been completed
 var activeChallenge=null;  // hero key of the trial currently in progress (null = none)
 var challengeProgress=0;   // generic progress counter for the active trial
 var challengeDeadline=0;   // timestamp a timed trial fails at (0 = untimed)
+var challengeSoulsAmassed=D(0);   // running soul tally for a 'souls' trial (survives ascensions)
+var _challengeSoulsBaseline=D(0); // last-seen totalSouls, to accumulate positive deltas
 var MINION_SLOT_CAP=100;   // there are 100 capturable minion types
 
 // Only heroes listed here enforce a trial. Heroes without a def keep the Battle
@@ -3679,7 +3681,7 @@ var CHALLENGE_DEFS={
   Atalanta:{
     type:'floor',            // reach an absolute floor
     targetFloor:801,         // reach Skyland (realm 9, floor 1)
-    form:'feminine',         // locked to the Feminine form; all other choices free
+    form:'equine',           // locked to the Equine form (the race-horse) — all other choices free
     timeLimitMs:3600000,     // 60-minute countdown
     failOnTimeout:true,      // clock hits zero → trial lost
     goalText:'Reach Skyland',
@@ -3717,6 +3719,15 @@ var CHALLENGE_DEFS={
     noRetreat:true,            // Elite timers off, minimap locked, auto-progress forced on — only forward
     goalText:'Reach Heaven',
     label:'Floor'
+  },
+  Hippolyta:{
+    type:'souls',              // amass a soul total (tallied across ascensions)
+    soulGoal:'1e70',           // amass this many souls
+    form:'feminine',           // locked to the Feminine form; all other choices free
+    timeLimitMs:3600000,       // 60-minute countdown
+    failOnTimeout:true,        // clock hits zero → trial lost
+    goalText:'Amass souls',
+    label:'Souls'
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
@@ -3822,7 +3833,10 @@ function updateChallengeBanner(){
   var def=CHALLENGE_DEFS[activeChallenge]||{};
   var t=document.getElementById('challenge-banner-text');
   var progressStr;
-  if(def.goalText){
+  if(def.type==='souls'){
+    progressStr=(def.goalText||'Souls')+' — '+fmt(challengeSoulsAmassed)+' / '+fmt(D(def.soulGoal));
+  }
+  else if(def.goalText){
     progressStr=def.goalText;
     if(def.type==='floor') progressStr+=' — Floor '+challengeProgress+' / '+def.targetFloor;
   }
@@ -3852,6 +3866,18 @@ function tickChallengeTimer(now){
   }
 }
 function hideChallengeTimer(){ var t=document.getElementById('challenge-timer'); if(t) t.style.display='none'; }
+// Souls trial (Hippolyta): tally every soul earned (positive totalSouls deltas,
+// so it survives ascension resets) and complete when the goal is reached in form.
+var _lastSoulsBannerTick=0;
+function tickChallengeSouls(now){
+  if(!activeChallenge) return;
+  var def=CHALLENGE_DEFS[activeChallenge];
+  if(!def||def.type!=='souls') return;
+  if(totalSouls.gt(_challengeSoulsBaseline)) challengeSoulsAmassed=challengeSoulsAmassed.add(totalSouls.sub(_challengeSoulsBaseline));
+  _challengeSoulsBaseline=totalSouls;                       // resets low after an ascension — deltas stay positive
+  if(now-_lastSoulsBannerTick>=400){ _lastSoulsBannerTick=now; updateChallengeBanner(); }
+  if(challengeSoulsAmassed.gte(D(def.soulGoal)) && challengeExtraGoalMet(def)) completeChallenge();
+}
 // Count a minion reaching Elite toward the active trial (form-gated when required).
 function noteEliteTrained(){
   if(!activeChallenge) return;
@@ -3964,12 +3990,12 @@ var HERO_INFO={
   Heracles:{lore:'The Twelve Labors.',challenge:'Male form — gain 12 Elite minions in one run'},
   Achilles:{lore:'Invulnerable but for one flaw.',challenge:'Clear floor 420 from Ether — no ascension, no failed Elite battle. One flaw, the trial fails.'},
   Sigurd:{lore:'Slew Fafnir with the reforged blade Gram.',challenge:'Clear floor 100 from Ether with click damage alone — only Spirit Slash may be forged.'},
-  Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Clear locked to a Feminine form'},
+  Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Amass 1e70 souls within 60 minutes — locked to the Feminine form.'},
   Perseus:{lore:'Slew Medusa by never looking upon her.',challenge:'Reach the Swamp from Ether — spells only. Only Flurry of Strikes deals damage (fed by your click damage).'},
   Karna:{lore:'Gave away his armor, and his life.',challenge:'Reach the Forest from Ether — passive DPS only. No clicks, no minion clickers, no Flurry.'},
   Maui:{lore:'The shapeshifting trickster.',challenge:'Reach the Undersea as Androgynous — ascend the normal channel and take all three paths (Holy, Shadow, Mystic), each once.'},
   Penthesilea:{lore:'Charged to her death at Troy.',challenge:'Reach Heaven as Feminine — no retreat. Elite timers off, minimap locked, auto-progress forced on. Success or surrender.'},
-  Atalanta:{lore:'Lost the race chasing golden apples.',challenge:'Reach Skyland within 60 minutes — locked to the Feminine form.'},
+  Atalanta:{lore:'Lost the race chasing golden apples.',challenge:'Reach Skyland within 60 minutes — locked to the Equine form.'},
   Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture N minions in one run'},
   Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Reach a floor under a run-long burden'},
   Jason:{lore:'Assembled the Argonauts.',challenge:'Minion/pet damage only — the crew fights'},
@@ -4050,6 +4076,7 @@ function acceptHeroChallenge(){
   rebirthForm=null; _rebirthEntityOverride=null;   // truly Ether again
   ascension3Path=null; ascension4Path=null; ascension5Path=null; ascension6Path=null; // Ether has no evolution yet
   activeChallenge=key; challengeProgress=0;
+  challengeSoulsAmassed=D(0); _challengeSoulsBaseline=totalSouls;        // reset any soul tally
   challengeDeadline=(def.timeLimitMs)?(Date.now()+def.timeLimitMs):0;   // start any countdown
   // Some trials must begin with a node unlocked (Perseus: Flurry, else no damage).
   if(def.startNodes){ def.startNodes.forEach(function(id){ soulShopOwned[id]=1; }); renderSpellPanel(); }
@@ -7961,6 +7988,7 @@ function saveGame(){
     activeChallenge:activeChallenge,
     challengeProgress:challengeProgress,
     challengeDeadline:challengeDeadline,
+    challengeSoulsAmassed:wholeStr(challengeSoulsAmassed),
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
@@ -8115,6 +8143,8 @@ function loadGame(){
   activeChallenge=(typeof data.activeChallenge==='string')?data.activeChallenge:null;
   challengeProgress=(typeof data.challengeProgress==='number')?data.challengeProgress:0;
   challengeDeadline=(typeof data.challengeDeadline==='number')?data.challengeDeadline:0;
+  challengeSoulsAmassed=D(data.challengeSoulsAmassed||0);
+  _challengeSoulsBaseline=totalSouls;   // resume the tally from the current total (already loaded above)
   if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
   else if(typeof data.godMapCleared==='number') godCleared=GOD_NODES.slice(0,data.godMapCleared).map(function(n){return n.key;}); // legacy count
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
@@ -9622,6 +9652,7 @@ function gameLoop(){
   }
 
   tickChallengeTimer(now);
+  tickChallengeSouls(now);
   tickElementProduction(now);
   updatePortalCardBars();
   if(now-_lastPortalUiRefresh>=500){ _lastPortalUiRefresh=now; refreshPortalMaterialValues(); }
