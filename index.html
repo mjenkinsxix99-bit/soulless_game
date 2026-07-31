@@ -3709,6 +3709,14 @@ var CHALLENGE_DEFS={
     distinctPaths:true,        // holy/shadow/mystic each chosen once across ascensions 3-5
     goalText:'Reach the Undersea',
     label:'Floor'
+  },
+  Penthesilea:{
+    type:'floor',              // reach an absolute floor
+    targetFloor:901,           // reach Heaven (realm 10, floor 1)
+    form:'feminine',           // locked to the Feminine form
+    noRetreat:true,            // Elite timers off, minimap locked, auto-progress forced on — only forward
+    goalText:'Reach Heaven',
+    label:'Floor'
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
@@ -3763,6 +3771,12 @@ function challengeDistinctPaths(){
   if(!activeChallenge) return false;
   var d=CHALLENGE_DEFS[activeChallenge];
   return !!(d&&d.distinctPaths);
+}
+// Penthesilea: no retreat — Elite timers off, minimap locked, auto-progress forced on.
+function challengeNoRetreat(){
+  if(!activeChallenge) return false;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return !!(d&&d.noRetreat);
 }
 // A path element already spent on an earlier ascension is off-limits at 4 and 5.
 function pathBlockedNow(level, elem){
@@ -3954,7 +3968,7 @@ var HERO_INFO={
   Perseus:{lore:'Slew Medusa by never looking upon her.',challenge:'Reach the Swamp from Ether — spells only. Only Flurry of Strikes deals damage (fed by your click damage).'},
   Karna:{lore:'Gave away his armor, and his life.',challenge:'Reach the Forest from Ether — passive DPS only. No clicks, no minion clickers, no Flurry.'},
   Maui:{lore:'The shapeshifting trickster.',challenge:'Reach the Undersea as Androgynous — ascend the normal channel and take all three paths (Holy, Shadow, Mystic), each once.'},
-  Penthesilea:{lore:'Charged to her death at Troy.',challenge:'Feminine form, no retreat — only forward'},
+  Penthesilea:{lore:'Charged to her death at Troy.',challenge:'Reach Heaven as Feminine — no retreat. Elite timers off, minimap locked, auto-progress forced on. Success or surrender.'},
   Atalanta:{lore:'Lost the race chasing golden apples.',challenge:'Reach a floor within a time limit'},
   Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture N minions in one run'},
   Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Reach a floor under a run-long burden'},
@@ -4048,6 +4062,7 @@ function acceptHeroChallenge(){
   applyFormLockUI();
   checkRebirthButton();     // apply any no-ascend lock for this trial
   buildUpgrades();          // apply any upgrade restriction (Sigurd: only Spirit Slash)
+  buildMinimap();           // apply any no-retreat lock (Penthesilea: cells + auto-progress)
   updateChallengeBanner();
   saveGame();
   closeHeroEncounter();
@@ -5138,6 +5153,7 @@ function buildMinimap(){
     if(!locked){
       (function(rl,l,f){
         cell.addEventListener('click',function(){
+          if(challengeNoRetreat()) return;         // no-retreat trial: minimap not clickable
           minimapNewFloor=false;
           navigateTo(l,f,rl);
         });
@@ -5149,8 +5165,10 @@ function buildMinimap(){
   // Stash nav targets on buttons; disable when nothing to go to
   var prevBtn=document.getElementById('mm-prev');
   var nextBtn=document.getElementById('mm-next');
-  if(prevBtn){prevBtn._room=prevRoom; prevBtn.disabled=!prevRoom;}
-  if(nextBtn){nextBtn._room=nextRoom; nextBtn.disabled=!nextRoom;}
+  var noRetreat=challengeNoRetreat();               // no-retreat: nav buttons + cells locked
+  if(prevBtn){prevBtn._room=prevRoom; prevBtn.disabled=!prevRoom||noRetreat;}
+  if(nextBtn){nextBtn._room=nextRoom; nextBtn.disabled=!nextRoom||noRetreat;}
+  cellsEl.style.pointerEvents=noRetreat?'none':'';
 
   // Red arrow: show below minimap pointing up at next available floor cell
   var arrowEl=document.getElementById('mm-new-arrow');
@@ -5175,6 +5193,7 @@ function buildMinimap(){
 function updateAutoProgressBtn(){
   var btn=document.getElementById('mm-auto');
   if(!btn) return;
+  if(challengeNoRetreat()){ soulShopOwned['auto-progress']=1; autoProgressEnabled=true; } // locked on — only forward
   if(!soulShopOwned['auto-progress']&&!hasEverAscended){ btn.style.display='none'; return; }
   btn.style.display='';
   btn.classList.toggle('ap-on', autoProgressEnabled);
@@ -5239,7 +5258,11 @@ function spawnEnemy(){
   document.getElementById('enemy-hp-bar').className='hp-fill enemy-hp'+(elite?' elite':'');
   document.getElementById('enemy-name-label').className='cname '+(elite?'elite-label':'enemy-label');
 
-  if(elite){
+  if(elite&&challengeNoRetreat()){
+    // No-retreat trial: Elites have no timer — you can never be knocked back.
+    eliteTimerStart=0;
+    document.getElementById('elite-timer-wrap').style.visibility='hidden';
+  } else if(elite){
     eliteTimerStart=Date.now();
     document.getElementById('elite-timer-wrap').style.visibility='visible';
     document.getElementById('elite-timer-bar').style.width='100%';
@@ -10694,6 +10717,7 @@ document.getElementById('mm-next').addEventListener('click',function(){
 });
 document.getElementById('mm-auto').addEventListener('click',function(){
   if(!soulShopOwned['auto-progress']) return;
+  if(challengeNoRetreat()) return;                 // no-retreat trial: auto-progress locked on
   autoProgressEnabled=!autoProgressEnabled;
   updateAutoProgressBtn();
   saveGame();
