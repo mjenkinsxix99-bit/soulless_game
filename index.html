@@ -330,6 +330,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #hero-enc-msg.show { opacity:1; }
 /* Form picker: a trial can forbid every form but the required one */
 .form-card.form-locked, .fm-form-card.form-locked { opacity:0.28; filter:grayscale(1); pointer-events:none; }
+/* Path picker: a distinct-paths trial (Maui) forbids re-taking a spent path */
+.path4-card.path-locked, .path5-card.path-locked { opacity:0.28; filter:grayscale(1); pointer-events:none; }
 /* Active-trial banner */
 #challenge-banner { display:none; position:fixed; top:52px; left:50%; transform:translateX(-50%); z-index:9998; align-items:center; gap:14px; background:linear-gradient(160deg,rgba(26,11,52,0.96),rgba(10,5,32,0.96)); border:1px solid #9966ff; border-radius:9px; padding:8px 14px; box-shadow:0 0 22px rgba(150,90,255,0.45); font-family:Georgia,serif; }
 #challenge-banner.show { display:flex; }
@@ -3698,6 +3700,15 @@ var CHALLENGE_DEFS={
     grantSouls:1000,         // bootstrap souls (only if the player wouldn't already start with more)
     goalText:'Reach the Forest',
     label:'Floor'
+  },
+  Maui:{
+    type:'floor',              // reach an absolute floor
+    targetFloor:501,           // reach the Undersea (realm 6, floor 1)
+    form:'androgynous',        // locked to Androgynous via the regular form modal
+    forceRegularAscension:true, // must use the normal ascend channel, not the Form Master modal
+    distinctPaths:true,        // holy/shadow/mystic each chosen once across ascensions 3-5
+    goalText:'Reach the Undersea',
+    label:'Floor'
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
@@ -3741,6 +3752,47 @@ function challengeAutoOnly(){
   var d=CHALLENGE_DEFS[activeChallenge];
   return !!(d&&d.autoOnly);
 }
+// Maui: must ascend through the normal channel (not the mastered-all-forms modal).
+function challengeForcesRegularAscension(){
+  if(!activeChallenge) return false;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return !!(d&&d.forceRegularAscension);
+}
+// Maui: holy/shadow/mystic must each be taken once across ascensions 3-5.
+function challengeDistinctPaths(){
+  if(!activeChallenge) return false;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return !!(d&&d.distinctPaths);
+}
+// A path element already spent on an earlier ascension is off-limits at 4 and 5.
+function pathBlockedNow(level, elem){
+  if(!challengeDistinctPaths()) return false;
+  if(level>=4 && ascension3Path===elem) return true;
+  if(level>=5 && ascension4Path===elem) return true;
+  return false;
+}
+function applyPathExclusivityUI(level){
+  var sel=(level===4)?'.path4-card':(level===5?'.path5-card':null);
+  if(!sel) return;
+  document.querySelectorAll(sel).forEach(function(c){
+    c.classList.toggle('path-locked', pathBlockedNow(level, c.getAttribute('data-path')));
+  });
+}
+function distinctPathsCount(){
+  var n=0;
+  ['holy','shadow','mystic'].forEach(function(e){
+    if(ascension3Path===e||ascension4Path===e||ascension5Path===e) n++;
+  });
+  return n;
+}
+function distinctPathsMet(){ return distinctPathsCount()>=3; }
+// A trial may require more than reaching the floor: being in the locked form
+// (Hippolyta/Maui) and, for Maui, having taken all three ascension paths.
+function challengeExtraGoalMet(def){
+  if(def&&def.form&&rebirthForm!==def.form) return false;
+  if(def&&def.distinctPaths&&!distinctPathsMet()) return false;
+  return true;
+}
 // Grey out every form the active trial forbids, in either form picker.
 function applyFormLockUI(){
   var req=challengeRequiredForm();
@@ -3762,6 +3814,7 @@ function updateChallengeBanner(){
   }
   else if(def.type==='floor') progressStr=(def.label||'Floor')+': '+challengeProgress+' / '+def.targetFloor;
   else progressStr=(def.label||'Progress')+': '+challengeProgress+' / '+(def.goal||'?');
+  if(def.distinctPaths) progressStr+=' · Paths '+distinctPathsCount()+' / 3';
   if(t) t.innerHTML='<b>'+activeChallenge+"'s Trial</b> &mdash; "+progressStr;
   b.classList.add('show');
 }
@@ -3802,7 +3855,7 @@ function noteFloorProgress(){
   if(!def||def.type!=='floor') return;
   var gf=absGlobalFloor(curRealm,curLevel,curFloor);
   if(gf>challengeProgress){ challengeProgress=gf; updateChallengeBanner(); }
-  if(gf>=def.targetFloor) completeChallenge();
+  if(gf>=def.targetFloor && challengeExtraGoalMet(def)) completeChallenge();
 }
 // A trial's fail condition tripped (e.g. an Elite timer ran out). End it, lost.
 function failChallenge(msg){
@@ -3900,7 +3953,7 @@ var HERO_INFO={
   Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Reach Skyland within 60 minutes — locked to the Feminine form.'},
   Perseus:{lore:'Slew Medusa by never looking upon her.',challenge:'Reach the Swamp from Ether — spells only. Only Flurry of Strikes deals damage (fed by your click damage).'},
   Karna:{lore:'Gave away his armor, and his life.',challenge:'Reach the Forest from Ether — passive DPS only. No clicks, no minion clickers, no Flurry.'},
-  Maui:{lore:'The shapeshifting trickster.',challenge:'Androgynous form — reach a floor having taken 3+ Forms'},
+  Maui:{lore:'The shapeshifting trickster.',challenge:'Reach the Undersea as Androgynous — ascend the normal channel and take all three paths (Holy, Shadow, Mystic), each once.'},
   Penthesilea:{lore:'Charged to her death at Troy.',challenge:'Feminine form, no retreat — only forward'},
   Atalanta:{lore:'Lost the race chasing golden apples.',challenge:'Reach a floor within a time limit'},
   Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture N minions in one run'},
@@ -3981,6 +4034,7 @@ function acceptHeroChallenge(){
   // arm this trial and start truly formless so the form must be earned in-run.
   doReincarnate();
   rebirthForm=null; _rebirthEntityOverride=null;   // truly Ether again
+  ascension3Path=null; ascension4Path=null; ascension5Path=null; ascension6Path=null; // Ether has no evolution yet
   activeChallenge=key; challengeProgress=0;
   challengeDeadline=(def.timeLimitMs)?(Date.now()+def.timeLimitMs):0;   // start any countdown
   // Some trials must begin with a node unlocked (Perseus: Flurry, else no damage).
@@ -8677,6 +8731,7 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
     document.getElementById('path4-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path4-card').forEach(function(c){c.classList.remove('picked');});
     document.getElementById('path4-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+    applyPathExclusivityUI(4);                  // Maui: grey the path already taken
     document.getElementById('path4-modal').classList.add('open');
     _selectedPath4=null;
   } else if(rebirthCount===4){
@@ -8684,6 +8739,7 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
     document.getElementById('path5-ascend-btn').classList.remove('ready');
     document.querySelectorAll('.path5-card').forEach(function(c){c.classList.remove('picked');});
     document.getElementById('path5-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
+    applyPathExclusivityUI(5);                  // Maui: grey the two paths already taken
     document.getElementById('path5-modal').classList.add('open');
     _selectedPath5=null;
   } else if(rebirthCount===5){
@@ -8698,7 +8754,7 @@ document.getElementById('rebirth-ascend-now').addEventListener('click',function(
     document.getElementById('final-ts-gain').textContent=calcTatteredSoulsGain(rebirthForm).toLocaleString();
     document.getElementById('final-modal').classList.add('open');
   } else {
-    if(hasAllFormUlts()){
+    if(hasAllFormUlts() && !challengeForcesRegularAscension()){
       openFormMasterModal();
     } else {
       document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
@@ -8847,6 +8903,7 @@ var _pendingPath4Choice=null;
 
 document.querySelectorAll('.path4-card').forEach(function(card){
   card.addEventListener('click',function(){
+    if(pathBlockedNow(4,card.getAttribute('data-path'))) return;   // distinct-paths lock
     document.querySelectorAll('.path4-card').forEach(function(c){c.classList.remove('picked');});
     card.classList.add('picked');
     _selectedPath4=card.getAttribute('data-path');
@@ -8912,6 +8969,7 @@ var _pendingPath5Choice=null;
 
 document.querySelectorAll('.path5-card').forEach(function(card){
   card.addEventListener('click',function(){
+    if(pathBlockedNow(5,card.getAttribute('data-path'))) return;   // distinct-paths lock
     document.querySelectorAll('.path5-card').forEach(function(c){c.classList.remove('picked');});
     card.classList.add('picked');
     _selectedPath5=card.getAttribute('data-path');
