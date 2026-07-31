@@ -3728,6 +3728,14 @@ var CHALLENGE_DEFS={
     failOnTimeout:true,        // clock hits zero → trial lost
     goalText:'Amass souls',
     label:'Souls'
+  },
+  Britomartis:{
+    type:'elites',             // capture & train minions to Elite in one life
+    form:'canine',             // locked to the Canine form; all other choices free
+    goal:15,                   // train this many minions to Elite (the "big net")
+    needSlots:15,              // empty minion slots required before Accept will kick off
+    label:'Elite minions trained',
+    noSlotsMsg:'You do not have enough empty minion slots.'
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
@@ -3996,7 +4004,7 @@ var HERO_INFO={
   Maui:{lore:'The shapeshifting trickster.',challenge:'Reach the Undersea as Androgynous — ascend the normal channel and take all three paths (Holy, Shadow, Mystic), each once.'},
   Penthesilea:{lore:'Charged to her death at Troy.',challenge:'Reach Heaven as Feminine — no retreat. Elite timers off, minimap locked, auto-progress forced on. Success or surrender.'},
   Atalanta:{lore:'Lost the race chasing golden apples.',challenge:'Reach Skyland within 60 minutes — locked to the Equine form.'},
-  Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture N minions in one run'},
+  Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture and train 15 minions to Elite in one life — locked to the Canine form.'},
   Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Reach a floor under a run-long burden'},
   Jason:{lore:'Assembled the Argonauts.',challenge:'Minion/pet damage only — the crew fights'},
   Gilgamesh:{lore:'Failed to stay awake seven nights.',challenge:'Automations disabled — manual to a floor'}
