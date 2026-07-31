@@ -335,6 +335,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #challenge-banner.show { display:flex; }
 #challenge-banner-text { color:#e6d6ff; font-size:14px; letter-spacing:0.5px; white-space:nowrap; }
 #challenge-banner-text b { color:#ffd75e; }
+/* Timed-trial countdown at the top of the battlefield */
+#challenge-timer { display:none; position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:6; background:rgba(10,5,32,0.9); border:1px solid #cf8bff; border-radius:7px; padding:5px 16px; color:#ffe9b0; font-family:Georgia,serif; font-size:15px; font-weight:bold; letter-spacing:1px; white-space:nowrap; box-shadow:0 0 16px rgba(150,90,255,0.5); text-shadow:0 0 8px rgba(0,0,0,0.9); pointer-events:none; }
 #challenge-abandon { background:#3a1414; border:1px solid #aa4444; color:#ffcaca; font-family:Georgia,serif; font-size:12px; letter-spacing:1px; padding:5px 12px; border-radius:5px; cursor:pointer; }
 #challenge-abandon:hover { background:#5a1c1c; }
 /* Full-screen fade */
@@ -1397,6 +1399,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       <canvas id="bg-canvas"></canvas>
       <img id="realm-bg-img" src="" alt="" />
       <div id="update-banner">✦ Update Available — Click to Refresh ✦</div>
+      <div id="challenge-timer"></div>
       <div id="combat-wrap">
         <div id="enemy-zone">
         <div class="canvas-wrap" style="position:relative;">
@@ -3643,6 +3646,7 @@ var _pendingGodNode=-1;
 var challengesPassed={};   // hero key -> true once its trial has been completed
 var activeChallenge=null;  // hero key of the trial currently in progress (null = none)
 var challengeProgress=0;   // generic progress counter for the active trial
+var challengeDeadline=0;   // timestamp a timed trial fails at (0 = untimed)
 var MINION_SLOT_CAP=100;   // there are 100 capturable minion types
 
 // Only heroes listed here enforce a trial. Heroes without a def keep the Battle
@@ -3668,6 +3672,15 @@ var CHALLENGE_DEFS={
     targetFloor:100,         // clear floor 100 (realm 1's final Elite)
     noAscend:true,           // flat run from Ether
     onlyUpgrade:'ss',        // only Spirit Slash may be bought — click damage alone
+    label:'Floor'
+  },
+  Hippolyta:{
+    type:'floor',            // reach an absolute floor
+    targetFloor:801,         // reach Skyland (realm 9, floor 1)
+    form:'feminine',         // locked to the Feminine form; all other choices free
+    timeLimitMs:3600000,     // 60-minute countdown
+    failOnTimeout:true,      // clock hits zero → trial lost
+    goalText:'Reach Skyland',
     label:'Floor'
   }
 };
@@ -3712,11 +3725,33 @@ function updateChallengeBanner(){
   if(!activeChallenge){ b.classList.remove('show'); return; }
   var def=CHALLENGE_DEFS[activeChallenge]||{};
   var t=document.getElementById('challenge-banner-text');
-  var target=(def.type==='floor')?def.targetFloor:(def.goal||'?');
-  if(t) t.innerHTML='<b>'+activeChallenge+"'s Trial</b> &mdash; "+(def.label||'Progress')+': '+challengeProgress+' / '+target;
+  var progressStr;
+  if(def.goalText) progressStr=def.goalText;
+  else if(def.type==='floor') progressStr=(def.label||'Floor')+': '+challengeProgress+' / '+def.targetFloor;
+  else progressStr=(def.label||'Progress')+': '+challengeProgress+' / '+(def.goal||'?');
+  if(t) t.innerHTML='<b>'+activeChallenge+"'s Trial</b> &mdash; "+progressStr;
   b.classList.add('show');
 }
 function hideChallengeBanner(){ var b=document.getElementById('challenge-banner'); if(b) b.classList.remove('show'); }
+// Battlefield countdown for timed trials (Hippolyta). Ticked from the game loop.
+function tickChallengeTimer(now){
+  var t=document.getElementById('challenge-timer');
+  if(!activeChallenge||challengeDeadline<=0){ if(t) t.style.display='none'; return; }
+  var remain=challengeDeadline-now;
+  if(remain<=0){
+    if(t) t.style.display='none';
+    failChallenge('Time expired — '+activeChallenge+'’s trial is lost.');
+    return;
+  }
+  if(t){
+    t.style.display='block';
+    var def=CHALLENGE_DEFS[activeChallenge]||{};
+    var totalSec=Math.ceil(remain/1000);
+    var mm=Math.floor(totalSec/60), ss=totalSec%60;
+    t.textContent=(def.goalText||'Reach the goal')+' — '+mm+':'+(ss<10?'0':'')+ss;
+  }
+}
+function hideChallengeTimer(){ var t=document.getElementById('challenge-timer'); if(t) t.style.display='none'; }
 // Count a minion reaching Elite toward the active trial (form-gated when required).
 function noteEliteTrained(){
   if(!activeChallenge) return;
@@ -3739,8 +3774,8 @@ function noteFloorProgress(){
 // A trial's fail condition tripped (e.g. an Elite timer ran out). End it, lost.
 function failChallenge(msg){
   if(!activeChallenge) return;
-  activeChallenge=null; challengeProgress=0;
-  hideChallengeBanner();
+  activeChallenge=null; challengeProgress=0; challengeDeadline=0;
+  hideChallengeBanner(); hideChallengeTimer();
   checkRebirthButton();     // a no-ascend lock lifts now the trial is over
   buildUpgrades();          // any upgrade-restriction lifts too
   applyFormLockUI();
@@ -3751,8 +3786,8 @@ function completeChallenge(){
   var key=activeChallenge;
   if(!key) return;
   challengesPassed[key]=true;
-  activeChallenge=null; challengeProgress=0;
-  hideChallengeBanner();
+  activeChallenge=null; challengeProgress=0; challengeDeadline=0;
+  hideChallengeBanner(); hideChallengeTimer();
   checkRebirthButton();     // a no-ascend lock lifts now the trial is passed
   buildUpgrades();          // any upgrade-restriction lifts too
   saveGame();
@@ -3761,8 +3796,8 @@ function completeChallenge(){
 // Give up the current trial without reincarnating (the run continues as-is).
 function abandonChallenge(){
   if(!activeChallenge) return;
-  activeChallenge=null; challengeProgress=0;
-  hideChallengeBanner();
+  activeChallenge=null; challengeProgress=0; challengeDeadline=0;
+  hideChallengeBanner(); hideChallengeTimer();
   checkRebirthButton();     // a no-ascend lock lifts on abandon
   buildUpgrades();          // any upgrade-restriction lifts too
   applyFormLockUI();
@@ -3829,7 +3864,7 @@ var HERO_INFO={
   Heracles:{lore:'The Twelve Labors.',challenge:'Male form — gain 12 Elite minions in one run'},
   Achilles:{lore:'Invulnerable but for one flaw.',challenge:'Clear floor 420 from Ether — no ascension, no failed Elite battle. One flaw, the trial fails.'},
   Sigurd:{lore:'Slew Fafnir with the reforged blade Gram.',challenge:'Clear floor 100 from Ether with click damage alone — only Spirit Slash may be forged.'},
-  Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Clear locked to a Feminine form'},
+  Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Reach Skyland within 60 minutes — locked to the Feminine form.'},
   Perseus:{lore:'Slew Medusa by never looking upon her.',challenge:'Spells only — no click, no auto'},
   Karna:{lore:'Gave away his armor, and his life.',challenge:'Auto-DPS only — the archer never brawls'},
   Maui:{lore:'The shapeshifting trickster.',challenge:'Androgynous form — reach a floor having taken 3+ Forms'},
@@ -3914,6 +3949,7 @@ function acceptHeroChallenge(){
   doReincarnate();
   rebirthForm=null; _rebirthEntityOverride=null;   // truly Ether again
   activeChallenge=key; challengeProgress=0;
+  challengeDeadline=(def.timeLimitMs)?(Date.now()+def.timeLimitMs):0;   // start any countdown
   var _np=FORM_NAMEPLATES[rebirthForm];
   document.getElementById('entity-stage-label').textContent=_np?_np.label:'You are Ether.';
   document.getElementById('stage-desc').textContent=_np?_np.desc:'Shapeless. Hungry.';
@@ -7808,6 +7844,7 @@ function saveGame(){
     challengesPassed:JSON.parse(JSON.stringify(challengesPassed)),
     activeChallenge:activeChallenge,
     challengeProgress:challengeProgress,
+    challengeDeadline:challengeDeadline,
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
@@ -7961,6 +7998,7 @@ function loadGame(){
   if(data.challengesPassed&&typeof data.challengesPassed==='object') challengesPassed=data.challengesPassed;
   activeChallenge=(typeof data.activeChallenge==='string')?data.activeChallenge:null;
   challengeProgress=(typeof data.challengeProgress==='number')?data.challengeProgress:0;
+  challengeDeadline=(typeof data.challengeDeadline==='number')?data.challengeDeadline:0;
   if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
   else if(typeof data.godMapCleared==='number') godCleared=GOD_NODES.slice(0,data.godMapCleared).map(function(n){return n.key;}); // legacy count
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
@@ -9460,6 +9498,7 @@ function gameLoop(){
     }
   }
 
+  tickChallengeTimer(now);
   tickElementProduction(now);
   updatePortalCardBars();
   if(now-_lastPortalUiRefresh>=500){ _lastPortalUiRefresh=now; refreshPortalMaterialValues(); }
