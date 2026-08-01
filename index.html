@@ -3742,7 +3742,7 @@ var CHALLENGE_DEFS={
   Aeneas:{
     type:'floor',              // reach an absolute floor
     targetFloor:200,           // descend to the Underworld boss (realm 2's final Elite)
-    eliteHpDebuff:2.0,         // each Elite killed this ascension TRIPLES Elite HP (x3 compounding)
+    eliteHpDebuff:4.0,         // each Elite killed this ascension x5s Elite HP (x5 compounding)
     bountyFromFloor:10,        // the TS bounty (normally floor 150+) starts at floor 10 here
     goalText:'Descend the Underworld',
     label:'Floor'
@@ -3884,7 +3884,7 @@ function updateChallengeBanner(){
   else if(def.type==='floor') progressStr=(def.label||'Floor')+': '+challengeProgress+' / '+def.targetFloor;
   else progressStr=(def.label||'Progress')+': '+challengeProgress+' / '+(def.goal||'?');
   if(def.distinctPaths) progressStr+=' · Paths '+distinctPathsCount()+' / 3';
-  if(def.eliteHpDebuff) progressStr+=' · Elite HP ×'+challengeEliteHpMult().toFixed(2);
+  if(def.eliteHpDebuff) progressStr+=' · Elite HP ×'+fmt(D(challengeEliteHpMult()));
   if(t) t.innerHTML='<b>'+activeChallenge+"'s Trial</b> &mdash; "+progressStr;
   b.classList.add('show');
 }
@@ -4042,7 +4042,7 @@ var HERO_INFO={
   Penthesilea:{lore:'Charged to her death at Troy.',challenge:'Reach Heaven as Feminine — no retreat. Elite timers off, minimap locked, auto-progress forced on. Success or surrender.'},
   Atalanta:{lore:'Lost the race chasing golden apples.',challenge:'Reach Skyland within 60 minutes — locked to the Equine form.'},
   Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture and train 15 minions to Elite in one life — locked to the Canine form.'},
-  Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Descend to the Underworld boss (floor 200). Each Elite slain TRIPLES the HP of every Elite after it (resets each ascension) — bank Tattered Souls to endure.'},
+  Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Descend to the Underworld boss (floor 200). Each Elite slain multiplies every later Elite’s HP by 5× (resets each ascension) — bank Tattered Souls to endure.'},
   Jason:{lore:'Assembled the Argonauts.',challenge:'Minion/pet damage only — the crew fights'},
   Gilgamesh:{lore:'Failed to stay awake seven nights.',challenge:'Automations disabled — manual to a floor'}
 };
