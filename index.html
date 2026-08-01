@@ -3390,6 +3390,7 @@ function minionXpFloorMult(){
 // Returns the summed bonus value across all held minions of the given type.
 // bonusType: 'souls'|'dps'|'slash'|'mana'|'ts'|'minionxp'|'upgradecost'|'elitetimer'|'minionpower'|'spelllength'
 function getMinionTotalBonus(bonusType){
+  if(challengeNoMinions()) return 0;             // bare-handed trial: minions grant nothing
   var sum=0;
   minionSlots.forEach(function(m){
     var md=MINION_DATA[m.typeIdx];
@@ -3657,12 +3658,12 @@ var MINION_SLOT_CAP=100;   // there are 100 capturable minion types
 // button open (dev) until their trial is built out, one at a time.
 var CHALLENGE_DEFS={
   Heracles:{
-    type:'elites',           // goal counts minions trained to Elite
-    form:'masculine',        // the trial must be run in this form (picker locks to it)
-    goal:12,                 // train this many minions to Elite in one run
-    needSlots:12,            // empty minion slots required before Accept will kick off
-    label:'Elite minions trained',
-    noSlotsMsg:'You do not have enough empty minion slots.'
+    type:'floor',            // reach an absolute floor
+    targetFloor:500,         // defeat Elite Molok, the Hades boss (realm 5's final Elite)
+    form:'masculine',        // locked to the Masculine form
+    noMinions:true,          // bare-handed — live minion bonuses, clickers, and capture all disabled
+    goalText:'Defeat Elite Molok',
+    label:'Floor'
   },
   Achilles:{
     type:'floor',            // goal is reaching an absolute floor
@@ -3797,6 +3798,12 @@ function challengeNoRetreat(){
   var d=CHALLENGE_DEFS[activeChallenge];
   return !!(d&&d.noRetreat);
 }
+// Heracles: bare-handed — no live minion help (bonuses, clickers, capture all off).
+function challengeNoMinions(){
+  if(!activeChallenge) return false;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return !!(d&&d.noMinions);
+}
 // A path element already spent on an earlier ascension is off-limits at 4 and 5.
 function pathBlockedNow(level, elem){
   if(!challengeDistinctPaths()) return false;
@@ -3912,6 +3919,7 @@ function failChallenge(msg){
   hideChallengeBanner(); hideChallengeTimer();
   checkRebirthButton();     // a no-ascend lock lifts now the trial is over
   buildUpgrades();          // any upgrade-restriction lifts too
+  recalcStats(); dirtyU=true;   // minion bonuses (bare-handed) come back
   applyFormLockUI();
   saveGame();
   showGameToast(msg||'Trial failed');
@@ -3924,6 +3932,7 @@ function completeChallenge(){
   hideChallengeBanner(); hideChallengeTimer();
   checkRebirthButton();     // a no-ascend lock lifts now the trial is passed
   buildUpgrades();          // any upgrade-restriction lifts too
+  recalcStats(); dirtyU=true;   // minion bonuses (bare-handed) come back
   saveGame();
   showGameToast('Trial complete — '+key+"'s Battle is unlocked");
 }
@@ -3934,6 +3943,7 @@ function abandonChallenge(){
   hideChallengeBanner(); hideChallengeTimer();
   checkRebirthButton();     // a no-ascend lock lifts on abandon
   buildUpgrades();          // any upgrade-restriction lifts too
+  recalcStats(); dirtyU=true;   // minion bonuses (bare-handed) come back
   applyFormLockUI();
   saveGame();
 }
@@ -3995,7 +4005,7 @@ var ZONE_BG={ beach:'beach_background.webp',forest:'forest_realm.webp',swamp:'sw
   temple:'temple_background.webp',plains:'plains_background.webp',mountain:'mountain_background.webp' };
 // Lore hook (placeholder flavor until real flavor text) + challenge line, per hero.
 var HERO_INFO={
-  Heracles:{lore:'The Twelve Labors.',challenge:'Male form — gain 12 Elite minions in one run'},
+  Heracles:{lore:'The Twelve Labors.',challenge:'Bare-handed — no minions. Defeat Elite Molok, the Hades boss (floor 500), in the Masculine form.'},
   Achilles:{lore:'Invulnerable but for one flaw.',challenge:'Clear floor 420 from Ether — no ascension, no failed Elite battle. One flaw, the trial fails.'},
   Sigurd:{lore:'Slew Fafnir with the reforged blade Gram.',challenge:'Clear floor 100 from Ether with click damage alone — only Spirit Slash may be forged.'},
   Hippolyta:{lore:'Amazon queen, girdled by Ares.',challenge:'Amass 1e70 souls within 60 minutes — locked to the Feminine form.'},
@@ -4303,6 +4313,7 @@ function updateMinionTabBtn(){
 
 function attemptMinionCapture(typeIdx){
   if(!minionUnlocked) return;
+  if(challengeNoMinions()) return;               // bare-handed trial: no capturing
   if(captureTargets.indexOf(typeIdx)<0) return;
   var cost=getMinionCostForType(typeIdx);
   if(minionPoints<cost) return;
@@ -9387,7 +9398,7 @@ function assignMinionClicker(target, upgradeId){
 
 function minionClickerAttackEnemy(){
   if(!combatActive||enemyDead) return;
-  if(challengeSpellsOnly()||challengeAutoOnly()) return;   // spells-only / auto-only: minion clicks deal nothing
+  if(challengeSpellsOnly()||challengeAutoOnly()||challengeNoMinions()) return;   // spells-only / auto-only / bare-handed
   var avgLvl=getMinionpowerAvgLevel();
   if(avgLvl<=0) return;
   var dmg=clickDmgBonus.mul(avgLvl*0.0006435);
@@ -9412,6 +9423,7 @@ function minionClickerAttackEnemy(){
 // tickMinionClickers so several assigned clickers don't repeat the whole
 // chain every 250ms. Returns true if anything was bought.
 function minionClickerBuyUpgrade(upgradeId){
+  if(challengeNoMinions()) return false;         // bare-handed trial: minion clickers do nothing
   var u=REP_UPGRADES.find(function(x){return x.id===upgradeId;});
   if(!u||!u.vis()||!upgradeAllowedNow(u)) return false;
   var n=(buyQty==='max')?maxAffordableN(u):buyQty;
