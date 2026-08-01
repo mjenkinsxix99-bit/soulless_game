@@ -3652,6 +3652,7 @@ var challengeProgress=0;   // generic progress counter for the active trial
 var challengeDeadline=0;   // timestamp a timed trial fails at (0 = untimed)
 var challengeSoulsAmassed=D(0);   // running soul tally for a 'souls' trial (survives ascensions)
 var _challengeSoulsBaseline=D(0); // last-seen totalSouls, to accumulate positive deltas
+var challengeEliteStacks=0;       // Aeneas: Elites killed this ascension (compounding HP curse)
 var MINION_SLOT_CAP=100;   // there are 100 capturable minion types
 
 // Only heroes listed here enforce a trial. Heroes without a def keep the Battle
@@ -3737,6 +3738,14 @@ var CHALLENGE_DEFS={
     needSlots:15,              // empty minion slots required before Accept will kick off
     label:'Elite minions trained',
     noSlotsMsg:'You do not have enough empty minion slots.'
+  },
+  Aeneas:{
+    type:'floor',              // reach an absolute floor
+    targetFloor:200,           // descend to the Underworld boss (realm 2's final Elite)
+    eliteHpDebuff:0.07,        // each Elite killed this ascension: +7% Elite HP, compounding
+    bountyFromFloor:10,        // the TS bounty (normally floor 150+) starts at floor 10 here
+    goalText:'Descend the Underworld',
+    label:'Floor'
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
@@ -3804,6 +3813,23 @@ function challengeNoMinions(){
   var d=CHALLENGE_DEFS[activeChallenge];
   return !!(d&&d.noMinions);
 }
+// Aeneas: per-Elite compounding HP curse (resets each ascension). Returns the
+// per-stack rate (0 = none) and the current HP multiplier from accrued stacks.
+function challengeEliteHpDebuff(){
+  if(!activeChallenge) return 0;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return (d&&d.eliteHpDebuff)?d.eliteHpDebuff:0;
+}
+function challengeEliteHpMult(){
+  var rate=challengeEliteHpDebuff();
+  return rate>0 ? Math.pow(1+rate, challengeEliteStacks) : 1;
+}
+// The TS bounty floor threshold — a trial can lower it (Aeneas: floor 10).
+function challengeBountyFloor(){
+  if(!activeChallenge) return 150;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return (d&&d.bountyFromFloor)?d.bountyFromFloor:150;
+}
 // A path element already spent on an earlier ascension is off-limits at 4 and 5.
 function pathBlockedNow(level, elem){
   if(!challengeDistinctPaths()) return false;
@@ -3858,6 +3884,7 @@ function updateChallengeBanner(){
   else if(def.type==='floor') progressStr=(def.label||'Floor')+': '+challengeProgress+' / '+def.targetFloor;
   else progressStr=(def.label||'Progress')+': '+challengeProgress+' / '+(def.goal||'?');
   if(def.distinctPaths) progressStr+=' · Paths '+distinctPathsCount()+' / 3';
+  if(def.eliteHpDebuff) progressStr+=' · Elite HP ×'+challengeEliteHpMult().toFixed(2);
   if(t) t.innerHTML='<b>'+activeChallenge+"'s Trial</b> &mdash; "+progressStr;
   b.classList.add('show');
 }
@@ -4015,7 +4042,7 @@ var HERO_INFO={
   Penthesilea:{lore:'Charged to her death at Troy.',challenge:'Reach Heaven as Feminine — no retreat. Elite timers off, minimap locked, auto-progress forced on. Success or surrender.'},
   Atalanta:{lore:'Lost the race chasing golden apples.',challenge:'Reach Skyland within 60 minutes — locked to the Equine form.'},
   Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture and train 15 minions to Elite in one life — locked to the Canine form.'},
-  Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Reach a floor under a run-long burden'},
+  Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Descend to the Underworld boss (floor 200). Each Elite slain makes Elites +7% tougher (compounding, resets each ascension) — bank Tattered Souls to endure.'},
   Jason:{lore:'Assembled the Argonauts.',challenge:'Minion/pet damage only — the crew fights'},
   Gilgamesh:{lore:'Failed to stay awake seven nights.',challenge:'Automations disabled — manual to a floor'}
 };
@@ -4093,7 +4120,7 @@ function acceptHeroChallenge(){
   doReincarnate();
   rebirthForm=null; _rebirthEntityOverride=null;   // truly Ether again
   ascension3Path=null; ascension4Path=null; ascension5Path=null; ascension6Path=null; // Ether has no evolution yet
-  activeChallenge=key; challengeProgress=0;
+  activeChallenge=key; challengeProgress=0; challengeEliteStacks=0;
   challengeSoulsAmassed=D(0); _challengeSoulsBaseline=totalSouls;        // reset any soul tally
   challengeDeadline=(def.timeLimitMs)?(Date.now()+def.timeLimitMs):0;   // start any countdown
   // Some trials must begin with a node unlocked (Perseus: Flurry, else no damage).
@@ -5291,6 +5318,7 @@ function spawnEnemy(){
   }
 
   var hp = elite ? eliteHp(lv) : floorHp(lv,fl);
+  if(elite && challengeEliteHpDebuff()>0) hp = hp.mul(challengeEliteHpMult()).ceil();   // Aeneas curse
   enemyMaxHp   = hp;
   enemyHp      = hp;
   enemyDmgMin  = floorDmgMin(hp);
@@ -5467,6 +5495,7 @@ function onEnemyDeath(){
 
   if(isEliteFight()){
     eliteKillsTotal++;
+    if(challengeEliteHpDebuff()>0){ challengeEliteStacks++; updateChallengeBanner(); }   // Aeneas: curse deepens
     // Elite beaten — add this level's enemy type to the pool
     // Use the same modulo wrap as spawnEnemy's realmOffset so realm 11+ maps back to indices 0-99
     var typeIdx2=((curRealm-1)%REALM_NAMES.length)*LEVELS_PER_REALM+curLevel-1;
@@ -5474,7 +5503,7 @@ function onEnemyDeath(){
     if(defeatedElites.indexOf(typeIdx2)<0){
       defeatedElites.push(typeIdx2);
       var _eliteGF=absGlobalFloor(curRealm,curLevel,FLOORS_PER_LEVEL+1);
-      if(_eliteGF>=150){ eliteBountyTSEarned+=Math.round(_eliteGF/100); updateTatteredDisplay(); }
+      if(_eliteGF>=challengeBountyFloor()){ eliteBountyTSEarned+=Math.round(_eliteGF/100); updateTatteredDisplay(); }
       if(curRealm===highestRealm){
         // add next type to pool if not already there
         var nextType=typeIdx2+1;
@@ -7685,6 +7714,7 @@ function doReincarnate(){
   // Full reset — same as ascension but also wipes TS and soulShop (except auto-progress)
   var _startBonus=startingSoulBonus(); // Striker achievement reward — persists across soft resets
   souls=_startBonus; totalSouls=_startBonus;
+  challengeEliteStacks=0;   // Aeneas curse resets each ascension / reincarnation
   curRealm=1; curLevel=1; curFloor=1; floorWins=0;
   highestRealm=1; highestLevel=1; highestFloor=1;
   highestGlobalFloorEver=0;
@@ -7829,6 +7859,7 @@ function doRebirthReset(chosenForm){
   // Reset all progress
   var _startBonus=startingSoulBonus(); // Striker achievement reward — persists across soft resets
   souls=_startBonus; totalSouls=_startBonus;
+  challengeEliteStacks=0;   // Aeneas curse resets each ascension / reincarnation
   curRealm=1; curLevel=1; curFloor=1; floorWins=0;
   highestRealm=1; highestLevel=1; highestFloor=1;
   highestGlobalFloorEver=0;
@@ -8007,6 +8038,7 @@ function saveGame(){
     activeChallenge:activeChallenge,
     challengeProgress:challengeProgress,
     challengeDeadline:challengeDeadline,
+    challengeEliteStacks:challengeEliteStacks,
     challengeSoulsAmassed:wholeStr(challengeSoulsAmassed),
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
     portalMaterialsV2:true,
@@ -8162,6 +8194,7 @@ function loadGame(){
   activeChallenge=(typeof data.activeChallenge==='string')?data.activeChallenge:null;
   challengeProgress=(typeof data.challengeProgress==='number')?data.challengeProgress:0;
   challengeDeadline=(typeof data.challengeDeadline==='number')?data.challengeDeadline:0;
+  challengeEliteStacks=(typeof data.challengeEliteStacks==='number')?data.challengeEliteStacks:0;
   challengeSoulsAmassed=D(data.challengeSoulsAmassed||0);
   _challengeSoulsBaseline=totalSouls;   // resume the tally from the current total (already loaded above)
   if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
