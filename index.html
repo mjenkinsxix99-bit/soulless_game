@@ -3746,6 +3746,13 @@ var CHALLENGE_DEFS={
     bountyFromFloor:10,        // the TS bounty (normally floor 150+) starts at floor 10 here
     goalText:'Descend the Underworld',
     label:'Floor'
+  },
+  Jason:{
+    type:'floor',              // (no targetFloor yet — testing how deep minion-only reaches)
+    minionsOnly:true,          // only minion-clicker damage lands; clicks, auto-DPS, spells do nothing
+    needEliteAutoclicker:true, // must own at least 1 Elite autoclicker (minionpower) minion to accept
+    noAutoclickerMsg:'You need at least 1 Elite autoclicker minion.',
+    label:'Deepest floor'
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
@@ -3830,6 +3837,16 @@ function challengeBountyFloor(){
   var d=CHALLENGE_DEFS[activeChallenge];
   return (d&&d.bountyFromFloor)?d.bountyFromFloor:150;
 }
+// Jason: minion-clicker damage only — clicks, auto-DPS, spells all deal nothing.
+function challengeMinionsOnly(){
+  if(!activeChallenge) return false;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return !!(d&&d.minionsOnly);
+}
+// An "Elite autoclicker" = an Elite minion whose bonus is minionpower (the clicker source).
+function eliteAutoclickerCount(){
+  return minionSlots.filter(function(m){ return m.isElite && MINION_DATA[m.typeIdx] && MINION_DATA[m.typeIdx].bonus==='minionpower'; }).length;
+}
 // A path element already spent on an earlier ascension is off-limits at 4 and 5.
 function pathBlockedNow(level, elem){
   if(!challengeDistinctPaths()) return false;
@@ -3881,7 +3898,7 @@ function updateChallengeBanner(){
     progressStr=def.goalText;
     if(def.type==='floor') progressStr+=' — Floor '+challengeProgress+' / '+def.targetFloor;
   }
-  else if(def.type==='floor') progressStr=(def.label||'Floor')+': '+challengeProgress+' / '+def.targetFloor;
+  else if(def.type==='floor') progressStr=(def.label||'Floor')+': '+challengeProgress+(def.targetFloor?(' / '+def.targetFloor):'');
   else progressStr=(def.label||'Progress')+': '+challengeProgress+' / '+(def.goal||'?');
   if(def.distinctPaths) progressStr+=' · Paths '+distinctPathsCount()+' / 3';
   if(def.eliteHpDebuff) progressStr+=' · Elite HP ×'+fmt(D(challengeEliteHpMult()));
@@ -3937,7 +3954,7 @@ function noteFloorProgress(){
   if(!def||def.type!=='floor') return;
   var gf=absGlobalFloor(curRealm,curLevel,curFloor);
   if(gf>challengeProgress){ challengeProgress=gf; updateChallengeBanner(); }
-  if(gf>=def.targetFloor && challengeExtraGoalMet(def)) completeChallenge();
+  if(def.targetFloor && gf>=def.targetFloor && challengeExtraGoalMet(def)) completeChallenge();  // no targetFloor = testing, never completes
 }
 // A trial's fail condition tripped (e.g. an Elite timer ran out). End it, lost.
 function failChallenge(msg){
@@ -4043,7 +4060,7 @@ var HERO_INFO={
   Atalanta:{lore:'Lost the race chasing golden apples.',challenge:'Reach Skyland within 60 minutes — locked to the Equine form.'},
   Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture and train 15 minions to Elite in one life — locked to the Canine form.'},
   Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Descend to the Underworld boss (floor 200). Each Elite slain multiplies every later Elite’s HP by 5× (resets each ascension) — bank Tattered Souls to endure.'},
-  Jason:{lore:'Assembled the Argonauts.',challenge:'Minion/pet damage only — the crew fights'},
+  Jason:{lore:'Assembled the Argonauts.',challenge:'Only the crew fights — minion clickers deal all damage; clicks, auto-DPS and spells do nothing. Needs an Elite autoclicker minion to begin.'},
   Gilgamesh:{lore:'Failed to stay awake seven nights.',challenge:'Automations disabled — manual to a floor'}
 };
 function openHeroEncounter(i){
@@ -4113,6 +4130,11 @@ function acceptHeroChallenge(){
   // against post-reincarnate capacity (non-Elites are wiped, Elites survive).
   if(def.needSlots && emptyMinionSlotsAfterReincarnate() < def.needSlots){
     showHeroEncMsg(def.noSlotsMsg||'You do not have enough empty minion slots.');
+    return;                              // does NOT kick off the trial
+  }
+  // HARD LOCK (Jason): the crew must be able to fight — need an Elite autoclicker.
+  if(def.needEliteAutoclicker && eliteAutoclickerCount() < 1){
+    showHeroEncMsg(def.noAutoclickerMsg||'You need at least 1 Elite autoclicker minion.');
     return;                              // does NOT kick off the trial
   }
   // Reincarnate from Ether (full soft reset; also clears any prior trial), then
@@ -5412,7 +5434,7 @@ function applyRuleOf3Strike(){
 function entityAttack(isAuto, isSpell){
   if(!combatActive||enemyDead) return;
   if(challengeSpellsOnly() && !isSpell) return;   // spells-only trial: only Flurry lands
-  if(challengeAutoOnly()) return;                 // auto-only trial: no strikes at all (incl. Flurry)
+  if(challengeAutoOnly()||challengeMinionsOnly()) return;  // auto-only / minions-only: no player strikes (incl. Flurry)
   if(!isAuto){ registerClick(); }
   if(!isAuto && combatAnim) attackFlashTime=Date.now();
   var bonus=isAuto?totalDps.mul(autoAttackInterval/1000).floor():clickDmgBonus;
@@ -9672,9 +9694,10 @@ function gameLoop(){
   var now=Date.now();
 
   if(combatActive&&!enemyDead){
-    // A spells-only trial (Perseus) zeroes auto-DPS and HP drain — only Flurry deals damage.
+    // Spells-only (Perseus) and minions-only (Jason) both zero auto-DPS and HP drain.
     var _spellsOnly=challengeSpellsOnly();
-    if(def()&&!_spellsOnly){
+    var _noAutoDmg=_spellsOnly||challengeMinionsOnly();
+    if(def()&&!_noAutoDmg){
       var _dt=(now-lastAutoAttack)/1000;
       lastAutoAttack=now;
       var _dpsDmg=totalDps.mul(_dt);
@@ -9686,7 +9709,7 @@ function gameLoop(){
         if(enemyHp.lte(0)) onEnemyDeath();
       }
     } else { lastAutoAttack=now; }
-    if(enemyHpDrainPct>0&&!_spellsOnly){
+    if(enemyHpDrainPct>0&&!_noAutoDmg){
       var drainAmt=enemyMaxHp.mul(enemyHpDrainPct).mul((now-lastDrainTick)/1000);
       lastDrainTick=now;
       enemyHp=Decimal.max(D(0),enemyHp.sub(drainAmt));
