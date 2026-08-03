@@ -3747,6 +3747,10 @@ var CHALLENGE_DEFS={
     goalText:'Descend the Underworld',
     label:'Floor'
   },
+  Gilgamesh:{
+    type:'pay',                // pay a lump of Tattered Souls to earn the fight (no run, no autocomplete)
+    cost:120000                // 12 tablets x 10,000 TS — paid all at once, consumed (no MP)
+  },
   Jason:{
     type:'floor',              // battle through the Undersea (clear realm 6's final Elite)
     targetFloor:600,
@@ -4070,7 +4074,7 @@ var HERO_INFO={
   Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture and train 15 minions to Elite in one life — locked to the Canine form.'},
   Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Descend to the Underworld boss (floor 200). Each Elite slain multiplies every later Elite’s HP by 5× (resets each ascension) — bank Tattered Souls to endure.'},
   Jason:{lore:'Assembled the Argonauts.',challenge:'Battle through the Undersea (floor 600) — only the crew fights. Minion clickers deal all damage; clicks, auto-DPS and spells do nothing. Needs an Elite autoclicker minion to begin.'},
-  Gilgamesh:{lore:'Failed to stay awake seven nights.',challenge:'Automations disabled — manual to a floor'}
+  Gilgamesh:{lore:'Failed to stay awake seven nights.',challenge:'Pay the toll of the twelve tablets — 120,000 Tattered Souls, all at once, consumed forever — to prove yourself worthy to fight.'}
 };
 function openHeroEncounter(i){
   _pendingGodNode=i;
@@ -4110,6 +4114,9 @@ function openHeroEncounter(i){
     // Accept is meaningful only for a gated hero whose trial isn't already running.
     var showAccept = heroHasChallenge(key) && !isChallengePassed(key) && activeChallenge!==key;
     accept.style.display = showAccept ? '' : 'none';
+    // A payment trial (Gilgamesh) relabels Accept as the toll.
+    var _cdef=CHALLENGE_DEFS[key];
+    accept.textContent = (_cdef&&_cdef.type==='pay') ? ('Pay '+_cdef.cost.toLocaleString()+' Tattered Souls') : 'Accept Challenge';
   }
   var msg=document.getElementById('hero-enc-msg');
   if(msg){ msg.textContent=''; msg.classList.remove('show'); }
@@ -4135,6 +4142,21 @@ function acceptHeroChallenge(){
   var def=CHALLENGE_DEFS[key];
   if(!def) return;                       // no trial defined for this hero yet
   if(isChallengePassed(key)) return;     // already cleared — nothing to accept
+  // PAYMENT trial (Gilgamesh): pay a lump of Tattered Souls, all at once. No
+  // reincarnation, no MP, the souls are simply consumed. This unlocks the Battle.
+  if(def.type==='pay'){
+    if(tatteredSouls < def.cost){
+      showHeroEncMsg('You must pay '+def.cost.toLocaleString()+' Tattered Souls, all at once. You have '+tatteredSouls.toLocaleString()+'.');
+      return;
+    }
+    tatteredSouls -= def.cost;           // lost — no MP, no refund
+    challengesPassed[key]=true;
+    updateTatteredDisplay();
+    saveGame();
+    closeHeroEncounter();
+    showGameToast(def.cost.toLocaleString()+' Tattered Souls paid — '+key+' will face you');
+    return;
+  }
   // HARD LOCK: must have room to capture & train the required minions. Checked
   // against post-reincarnate capacity (non-Elites are wiped, Elites survive).
   if(def.needSlots && emptyMinionSlotsAfterReincarnate() < def.needSlots){
