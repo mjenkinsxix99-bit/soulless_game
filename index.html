@@ -279,6 +279,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #portal-built-view #enter-portal-btn { position:relative; z-index:2; display:block; width:70%; margin:14% auto 0; }
 #challenge-upg-list { position:relative; z-index:2; padding:122px 15% 20px; }
 .cu-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 4px; border-bottom:1px solid rgba(212,168,67,0.18); }
+.cu-empty { color:#c9b57e; font-size:12px; font-style:italic; text-align:center; padding:22px 12px; line-height:1.4; text-shadow:0 0 5px rgba(0,0,0,0.95); }
 .cu-label { text-align:left; min-width:0; }
 .cu-name { color:#ffd76a; font-weight:bold; font-size:13px; letter-spacing:0.4px; text-shadow:0 0 5px rgba(0,0,0,0.95); }
 .cu-desc { color:#e6cf94; font-size:11px; font-style:italic; text-shadow:0 0 5px rgba(0,0,0,0.95); line-height:1.25; }
@@ -3548,20 +3549,31 @@ function renderPortalTab(){
 // type: 'buy' = Burning-Souls upgrade button; 'toggleval' = on/off + number box;
 // 'toggle' = plain on/off. Costs and effects are wired later, per power.
 var CHALLENGE_UPGRADES=[
-  { id:'str_heracles',   name:'Strength of Heracles', desc:'DPS boost',                       type:'buy' },
-  { id:'spoils_war',     name:'Spoils of War',        desc:'Increase TS from bounties',       type:'buy' },
-  { id:'soul_catcher',   name:'Soul Catcher',         desc:'Souls gain boost',                type:'buy' },
-  { id:'glory_sacrifice',name:'Glory in Sacrifice',   desc:'Increase Burning Souls',          type:'buy' },
-  { id:'shapeshifter',   name:'Shapeshifter',         desc:'Form presets',                    type:'buy' },
-  { id:'golden_apple',   name:'Treasures Abound',     desc:'Chance for ×7 souls',        type:'buy' },
-  { id:'treasures',      name:'Contained Spirits',    desc:'Increased soul-urn chance',       type:'buy' },
-  { id:'auto_ascend',    name:'Immortal',             desc:'Ascend at the floor you choose',  type:'toggleval', ph:'floor' },
-  { id:'auto_reinc',     name:'Phoenix',              desc:'Reincarnate at set Tattered Souls',type:'toggleval', ph:'TS' },
-  { id:'auto_sacrifice', name:'Willing Sacrifice',    desc:'Chosen minions are automatically Immolated', type:'toggleval', ph:'#' },
-  { id:'elite_rush',     name:'Elite-Rush',           desc:'Fight Elites only until Fail',    type:'toggle' },
-  { id:'auto_upgrade',   name:'Auto Upgrade',         desc:'Auto-clickers progress on Upgrades', type:'toggle' },
-  { id:'elite_100',      name:'Elite Capture',        desc:'Elites have 100% chance to become minion (must have enough MP)', type:'toggle' }
+  { id:'str_heracles',   hero:'Heracles',    name:'Strength of Heracles', desc:'DPS boost',                       type:'buy' },
+  { id:'spoils_war',     hero:'Hippolyta',   name:'Spoils of War',        desc:'Increase TS from bounties',       type:'buy' },
+  { id:'soul_catcher',   hero:'Britomartis', name:'Soul Catcher',         desc:'Souls gain boost',                type:'buy' },
+  { id:'glory_sacrifice',hero:'Penthesilea', name:'Glory in Sacrifice',   desc:'Increase Burning Souls',          type:'buy' },
+  { id:'shapeshifter',   hero:'Maui',        name:'Shapeshifter',         desc:'Form presets',                    type:'buy' },
+  { id:'golden_apple',   hero:'Atalanta',    name:'Treasures Abound',     desc:'Chance for ×7 souls',        type:'buy' },
+  { id:'treasures',      hero:'Perseus',     name:'Contained Spirits',    desc:'Increased soul-urn chance',       type:'buy' },
+  { id:'auto_ascend',    hero:'Aeneas',      name:'Immortal',             desc:'Ascend at the floor you choose',  type:'toggleval', ph:'floor' },
+  { id:'auto_reinc',     hero:'Gilgamesh',   name:'Phoenix',              desc:'Reincarnate at set Tattered Souls',type:'toggleval', ph:'TS' },
+  { id:'auto_sacrifice', hero:'Jason',       name:'Willing Sacrifice',    desc:'Chosen minions are automatically Immolated', type:'toggleval', ph:'#' },
+  { id:'elite_rush',     hero:'Achilles',    name:'Elite-Rush',           desc:'Fight Elites only until Fail',    type:'toggle' },
+  { id:'auto_upgrade',   hero:'Sigurd',      name:'Auto Upgrade',         desc:'Auto-clickers progress on Upgrades', type:'toggle' },
+  { id:'elite_100',      hero:'Karna',       name:'Elite Capture',        desc:'Elites have 100% chance to become minion (must have enough MP)', type:'toggle' }
 ];
+// The powers the player has actually earned (hero defeated), in hero-node order —
+// so the list fills gap-free from the top and a newly-won power slots into place.
+function earnedChallengeUpgrades(){
+  var byHero={}; CHALLENGE_UPGRADES.forEach(function(u){ byHero[u.hero]=u; });
+  var out=[];
+  GOD_NODES.forEach(function(nd){
+    if(nd.god) return;
+    if(isGodCleared(nd.key) && byHero[nd.key]) out.push(byHero[nd.key]);
+  });
+  return out;
+}
 var challengeUpg={}; // id -> { level, on, val }
 function cuState(id){ if(!challengeUpg[id]) challengeUpg[id]={ level:0, on:false, val:'' }; return challengeUpg[id]; }
 // Portal-upgrade (hero-power) EFFECTS must be read through these accessors, never
@@ -3578,7 +3590,14 @@ function renderChallengeUpgrades(){
   var list=document.getElementById('challenge-upg-list');
   if(!list) return;
   list.innerHTML='';
-  CHALLENGE_UPGRADES.forEach(function(u){
+  var earned=earnedChallengeUpgrades();
+  if(!earned.length){
+    var empty=document.createElement('div'); empty.className='cu-empty';
+    empty.textContent='Defeat the heroes of the God Realm to claim their powers.';
+    list.appendChild(empty);
+    return;
+  }
+  earned.forEach(function(u){
     var st=cuState(u.id);
     var row=document.createElement('div'); row.className='cu-row';
     var lbl=document.createElement('div'); lbl.className='cu-label';
