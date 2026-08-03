@@ -3749,7 +3749,8 @@ var CHALLENGE_DEFS={
   },
   Gilgamesh:{
     type:'pay',                // pay a lump of Tattered Souls to earn the fight (no run, no autocomplete)
-    cost:120000                // 12 tablets x 10,000 TS — paid all at once, consumed (no MP)
+    cost:120000,               // 12 tablets x 10,000 TS — paid all at once, consumed (no MP)
+    form:'feline'              // must be in the Feline form to pay the toll
   },
   Jason:{
     type:'floor',              // battle through the Undersea (clear realm 6's final Elite)
@@ -4074,7 +4075,7 @@ var HERO_INFO={
   Britomartis:{lore:'Goddess of hunting nets.',challenge:'Capture and train 15 minions to Elite in one life — locked to the Canine form.'},
   Aeneas:{lore:'Fled burning Troy to found a new world.',challenge:'Descend to the Underworld boss (floor 200). Each Elite slain multiplies every later Elite’s HP by 5× (resets each ascension) — bank Tattered Souls to endure.'},
   Jason:{lore:'Assembled the Argonauts.',challenge:'Battle through the Undersea (floor 600) — only the crew fights. Minion clickers deal all damage; clicks, auto-DPS and spells do nothing. Needs an Elite autoclicker minion to begin.'},
-  Gilgamesh:{lore:'Failed to stay awake seven nights.',challenge:'Pay the toll of the twelve tablets — 120,000 Tattered Souls, all at once, consumed forever — to prove yourself worthy to fight.'}
+  Gilgamesh:{lore:'Failed to stay awake seven nights.',challenge:'In the Feline form, pay the toll of the twelve tablets — 120,000 Tattered Souls, all at once, consumed forever — to prove yourself worthy to fight.'}
 };
 function openHeroEncounter(i){
   _pendingGodNode=i;
@@ -4145,6 +4146,11 @@ function acceptHeroChallenge(){
   // PAYMENT trial (Gilgamesh): pay a lump of Tattered Souls, all at once. No
   // reincarnation, no MP, the souls are simply consumed. This unlocks the Battle.
   if(def.type==='pay'){
+    if(def.form && rebirthForm!==def.form){
+      var _fn=def.form.charAt(0).toUpperCase()+def.form.slice(1);
+      showHeroEncMsg('You must take the '+_fn+' form to pay the toll.');
+      return;
+    }
     if(tatteredSouls < def.cost){
       showHeroEncMsg('You must pay '+def.cost.toLocaleString()+' Tattered Souls, all at once. You have '+tatteredSouls.toLocaleString()+'.');
       return;
