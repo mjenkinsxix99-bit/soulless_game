@@ -3750,6 +3750,7 @@ var CHALLENGE_DEFS={
   Jason:{
     type:'floor',              // (no targetFloor yet — testing how deep minion-only reaches)
     minionsOnly:true,          // only minion-clicker damage lands; clicks, auto-DPS, spells do nothing
+    noSpells:true,             // spells can't be cast OR purchased — no power outside the crew
     needEliteAutoclicker:true, // must own at least 1 Elite autoclicker (minionpower) minion to accept
     noAutoclickerMsg:'You need at least 1 Elite autoclicker minion.',
     label:'Deepest floor'
@@ -3842,6 +3843,12 @@ function challengeMinionsOnly(){
   if(!activeChallenge) return false;
   var d=CHALLENGE_DEFS[activeChallenge];
   return !!(d&&d.minionsOnly);
+}
+// Jason: spells are wholly off — can't be cast, can't be bought (no power outside minions).
+function challengeNoSpells(){
+  if(!activeChallenge) return false;
+  var d=CHALLENGE_DEFS[activeChallenge];
+  return !!(d&&d.noSpells);
 }
 // An "Elite autoclicker" = an Elite minion whose bonus is minionpower (the clicker source).
 function eliteAutoclickerCount(){
@@ -6710,6 +6717,7 @@ function isSpellActive(id){
 }
 
 function castSpell(id){
+  if(challengeNoSpells()) return;                 // trial with spells disabled (Jason)
   var spell=SPELLS.filter(function(s){return s.id===id;})[0];
   if(!spell) return;
   if(id==='invokePower'){
@@ -7241,6 +7249,7 @@ function buyTatteredNode(id){
   if(rebirthCount<1) return;
   var node=TATTERED_NODES.filter(function(n){return n.id===id;})[0];
   if(!node) return;
+  if(challengeNoSpells() && node.type==='spell') return;   // Jason: spell unlocks can't be bought
   if(soulShopOwned[id]>=1) return;
   if(!isTattNodeUnlocked(node)) return;
   if(tatteredSouls<node.cost) return;
