@@ -167,6 +167,11 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #mm-immolate-btn.active:hover { background:#ffd75e; }
 #mm-bs-display { font-size:14px; font-weight:bold; color:#ffb347; font-family:Georgia,serif; text-shadow:0 0 6px rgba(255,140,40,0.4); }
 .mm-card-immolate-target { border-color:#ff8c1a !important; background:#1a0d00 !important; box-shadow:0 0 12px rgba(255,140,30,0.6); }
+/* Willing Sacrifice: AUTO toggle (red off / green on) + marked-card outline */
+#mm-auto-immolate-btn { background:#7a1414; border:2px solid #cc3333; color:#000; font-size:15px; font-weight:bold; padding:7px 16px; border-radius:5px; cursor:pointer; letter-spacing:2px; font-family:Georgia,serif; margin-right:8px; transition:all 0.2s; }
+#mm-auto-immolate-btn:hover { background:#8f1a1a; }
+#mm-auto-immolate-btn.on { background:#1f9e2f; border-color:#46d456; color:#000; box-shadow:0 0 14px rgba(70,212,86,0.75); }
+.mm-card-auto-immolate { box-shadow:inset 0 0 0 3px #ff2020, 0 0 10px rgba(255,32,32,0.5) !important; }
 /* Minion first-unlock explainer — overlays inside the Minions tab */
 #minion-intro-overlay { display:none; position:absolute; inset:0; background:rgba(2,1,14,0.9); z-index:30; align-items:center; justify-content:center; padding:20px; }
 #minion-intro-overlay.open { display:flex; }
@@ -2023,6 +2028,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       <button id="mm-release-btn">Release Minion</button>
     </div>
     <div id="mm-header-center">
+      <button id="mm-auto-immolate-btn" style="display:none;">AUTO</button>
       <button id="mm-immolate-btn">Immolate</button>
       <span id="mm-bs-display">Burning Souls: <span id="mm-bs-val">0</span></span>
     </div>
@@ -3558,7 +3564,7 @@ var CHALLENGE_UPGRADES=[
   { id:'treasures',      hero:'Perseus',     name:'Contained Spirits',    desc:'Increased soul-urn chance',       type:'buy' },
   { id:'auto_ascend',    hero:'Aeneas',      name:'Immortal',             desc:'Ascend at Set Floor',             type:'toggleval', ph:'floor' },
   { id:'auto_reinc',     hero:'Gilgamesh',   name:'Phoenix',              desc:'Reincarnate at set Tattered Souls',type:'toggleval', ph:'TS' },
-  { id:'auto_sacrifice', hero:'Jason',       name:'Willing Sacrifice',    desc:'Chosen minions are automatically Immolated', type:'toggleval', ph:'#' },
+  { id:'auto_sacrifice', hero:'Jason',       name:'Willing Sacrifice',    desc:'Auto-immolate up to N marked minions on Elite (set in the Compendium)', type:'buy', costScale:'linear', maxLevel:100 },
   { id:'elite_rush',     hero:'Achilles',    name:'Elite-Rush',           desc:'Fight Elites only until Fail',    type:'toggle' },
   { id:'auto_upgrade',   hero:'Sigurd',      name:'Auto Upgrade',         desc:'Auto-clickers progress on Upgrades', type:'toggle' },
   { id:'elite_100',      hero:'Karna',       name:'Elite Capture',        desc:'Elite enemies become minions (+20%/lvl catch, must have MP)', type:'buy', costScale:'doubling', maxLevel:5 }
@@ -3609,6 +3615,40 @@ function spoilsMult(){ return cuAdditiveMult('spoils_war', 0.06, 0.01); }       
 function gloryMult(){ var L=cuLevel('glory_sacrifice'); return L>0 ? 1+0.25*L : 1; }
 // Elite Capture — Elite enemies capture at 20%×level (max 100% at L5). 0 = power off.
 function eliteCaptureChance(){ var L=cuLevel('elite_100'); return L>0 ? Math.min(1,0.20*L) : 0; }
+
+// ── Willing Sacrifice (auto-immolate) ───────────────────────────────────────
+function willingSacrificeMax(){ return cuLevel('auto_sacrifice'); }   // markable count; 0 = off/suppressed
+function updateAutoImmolateBtn(){
+  var b=document.getElementById('mm-auto-immolate-btn');
+  if(!b) return;
+  b.style.display=(!activeChallenge && willingSacrificeMax()>0) ? '' : 'none';
+  b.classList.toggle('on', autoImmolateOn);
+}
+// Marked minions that have reached Elite are immolated (Glory carry applies) and
+// re-flagged for capture, so they recapture → retrain → re-immolate on a loop.
+function processAutoImmolate(){
+  if(activeChallenge || !autoImmolateOn || willingSacrificeMax()<=0) return;
+  var changed=false;
+  for(var i=minionSlots.length-1;i>=0;i--){
+    var m=minionSlots[i];
+    if(m.isElite && autoImmolateTargets.indexOf(m.typeIdx)>=0){
+      var t=m.typeIdx;
+      minionSlots.splice(i,1);
+      creditBurningSouls(1);
+      if(captureTargets.indexOf(t)<0) captureTargets.push(t);   // re-target for recapture
+      changed=true;
+    }
+  }
+  if(changed){
+    var petStillHeld=minionSlots.some(function(mm){return mm.typeIdx===petMinionIdx;});
+    if(!petStillHeld){ petMinionIdx=-1; var cv=document.getElementById('pet-canvas'); if(cv) cv.style.display='none'; }
+    clampMinionClickerAssignments();
+    updateBurningSoulDisplay();
+    recalcStats(); dirtyU=true;
+    if(document.getElementById('minion-modal').classList.contains('open')) renderMinionModal();
+    throttledSave();
+  }
+}
 
 // ── Immortal (auto-ascend) & Phoenix (auto-reincarnate) ─────────────────────
 function anyAscendModalOpen(){
@@ -3782,6 +3822,8 @@ var challengeSoulsAmassed=D(0);   // running soul tally for a 'souls' trial (sur
 var _challengeSoulsBaseline=D(0); // last-seen totalSouls, to accumulate positive deltas
 var challengeEliteStacks=0;       // Aeneas: Elites killed this ascension (compounding HP curse)
 var _devBsGranted=false;          // DEV: one-time 1000-BS test grant flag (remove before release)
+var autoImmolateOn=false;         // Willing Sacrifice: AUTO button state (green=on)
+var autoImmolateTargets=[];       // minion typeIdx marked for auto-immolate on Elite
 var MINION_SLOT_CAP=100;   // there are 100 capturable minion types
 
 // Only heroes listed here enforce a trial. Heroes without a def keep the Battle
@@ -4681,6 +4723,7 @@ function addMinionXp(){
       if(m.level>=MINION_ELITE_LEVEL){ m.isElite=true; m.xp=0; noteEliteTrained(); break; }
     }
   });
+  processAutoImmolate();   // Willing Sacrifice: immolate any marked minion that just hit Elite
 }
 
 function showMinionCaptureNotif(typeIdx){
@@ -4887,6 +4930,17 @@ function renderMinionModal(){
             if(heldMinionRef) requestReleaseMinion(captureIdx);
             return; // empty cards do nothing; the button toggles the mode off
           }
+          if(autoImmolateOn){                       // Willing Sacrifice: mark for auto-immolate
+            var am=autoImmolateTargets.indexOf(captureIdx);
+            if(am>=0){ autoImmolateTargets.splice(am,1); }
+            else {
+              if(autoImmolateTargets.length>=willingSacrificeMax()){ showCaptureMsg('Auto-immolate limit reached ('+willingSacrificeMax()+').',e.clientX,e.clientY); return; }
+              autoImmolateTargets.push(captureIdx);
+            }
+            updateCaptureSelectionUI();
+            saveGame();
+            return;
+          }
           var sel=captureTargets.indexOf(captureIdx);
           if(sel>=0){
             captureTargets.splice(sel,1);
@@ -4932,7 +4986,9 @@ function updateCaptureSelectionUI(){
     // affect it — only the targeted highlight is toggled here.
     c.classList.toggle('mm-card-targeted',captureTargets.indexOf(idx)>=0);
     c.classList.toggle('mm-card-immolate-target',immolateTargets.indexOf(idx)>=0);
+    c.classList.toggle('mm-card-auto-immolate',autoImmolateTargets.indexOf(idx)>=0);
   });
+  updateAutoImmolateBtn();
   var btn=document.getElementById('mm-release-btn');
   if(btn) btn.classList.toggle('active',releaseMode);
   var imBtn=document.getElementById('mm-immolate-btn');
@@ -8243,6 +8299,8 @@ function saveGame(){
     challengeSoulsAmassed:wholeStr(challengeSoulsAmassed),
     bsCarry:_bsCarry,
     devBsGranted:_devBsGranted,
+    autoImmolateOn:autoImmolateOn,
+    autoImmolateTargets:autoImmolateTargets.slice(),
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
@@ -8401,6 +8459,8 @@ function loadGame(){
   challengeSoulsAmassed=D(data.challengeSoulsAmassed||0);
   _bsCarry=(typeof data.bsCarry==='number')?data.bsCarry:0;
   _devBsGranted=!!data.devBsGranted;
+  autoImmolateOn=!!data.autoImmolateOn;
+  if(Array.isArray(data.autoImmolateTargets)) autoImmolateTargets=data.autoImmolateTargets;
   _challengeSoulsBaseline=totalSouls;   // resume the tally from the current total (already loaded above)
   if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
   else if(typeof data.godMapCleared==='number') godCleared=GOD_NODES.slice(0,data.godMapCleared).map(function(n){return n.key;}); // legacy count
@@ -10791,6 +10851,13 @@ document.getElementById('mm-release-btn').addEventListener('click', function(){
 });
 document.getElementById('mm-immolate-btn').addEventListener('click', function(){
   if(immolateMode) immolateSelected(); else enterImmolateMode();
+});
+document.getElementById('mm-auto-immolate-btn').addEventListener('click', function(){
+  autoImmolateOn=!autoImmolateOn;
+  if(autoImmolateOn){ immolateMode=false; immolateTargets=[]; releaseMode=false; }  // AUTO takes the card clicks
+  updateAutoImmolateBtn();
+  updateCaptureSelectionUI();
+  saveGame();
 });
 document.getElementById('immolate-info-close').addEventListener('click', function(){
   if(document.getElementById('immolate-dns-chk').checked){ _tutShown.immolateIntro=true; saveGame(); }
