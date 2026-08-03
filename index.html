@@ -4196,6 +4196,9 @@ function acceptHeroChallenge(){
   updateChallengeBanner();
   saveGame();
   closeHeroEncounter();
+  closeGodMap();                                   // leave the God Realm — back to the game
+  var _ub=document.querySelector('.tab-btn[data-tab="upgrades"]');   // open the Upgrades tab, not Portal
+  if(_ub) _ub.click();
 }
 
 // ── The hero fight (reuses the real battlefield) ─────────────────────────────
