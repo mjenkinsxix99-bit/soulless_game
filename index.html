@@ -113,6 +113,16 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .dmg-float.edamage { color: #9980dd; }
 .dmg-float.ndamage { color: #cc5555; }
 .dmg-float.crit { color: #ffd700; font-size: 26px; text-shadow: 0 0 10px rgba(255,215,0,0.9), 0 0 22px rgba(255,165,0,0.6); }
+.dmg-float.soul { color: #ffcf5e; font-size: 22px; text-shadow: 0 0 10px rgba(255,200,80,0.9), 0 0 20px rgba(255,150,40,0.55); }
+/* Contained Spirits — clickable Soul Urn on the battlefield */
+.soul-urn { position:absolute; z-index:22; cursor:pointer; opacity:0; transform:scale(0.6); transition:opacity 0.35s ease, transform 0.35s ease; filter:drop-shadow(0 0 8px rgba(180,150,255,0.75)); }
+.soul-urn.show { opacity:1; transform:scale(1); }
+.soul-urn img { width:100%; height:100%; image-rendering:auto; pointer-events:none; -webkit-user-drag:none; user-select:none; }
+.soul-urn .urn-count { position:absolute; bottom:-6px; left:50%; transform:translateX(-50%); min-width:20px; padding:1px 6px; background:rgba(20,8,40,0.92); border:1px solid #b18cff; border-radius:9px; color:#e9dcff; font-family:Georgia,serif; font-size:12px; font-weight:bold; text-align:center; pointer-events:none; box-shadow:0 0 7px rgba(160,120,255,0.6); }
+.soul-urn.urn-hit { animation:urn-shake 0.22s ease; }
+.soul-urn.urn-burst { animation:urn-burst 0.5s ease-out forwards; }
+@keyframes urn-shake { 0%,100%{transform:scale(1) rotate(0)} 25%{transform:scale(1.08) rotate(-7deg)} 75%{transform:scale(1.08) rotate(7deg)} }
+@keyframes urn-burst { 0%{opacity:1;transform:scale(1)} 40%{opacity:1;transform:scale(1.4)} 100%{opacity:0;transform:scale(1.9)} }
 @keyframes floatup { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-55px)} }
 @keyframes soul-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
 .soul-pulse { display:inline-block; animation: soul-pulse 0.35s ease-out; }
@@ -3652,6 +3662,81 @@ function eliteCaptureChance(){ var L=cuLevel('elite_100'); return L>0 ? Math.min
 // No decay. 0 = power off / suppressed during a challenge.
 function treasuresAboundChance(){ var L=cuLevel('golden_apple'); return L>0 ? (0.01+Math.min(0.99,0.002*L)) : 0; }
 
+// ── Contained Spirits (Soul Urn) ─────────────────────────────────────────────
+// Perseus's power. When a polished enemy dies there's a chance its spirit is
+// caught in a Soul Urn that appears near the battlefield for a minute. Click it
+// 13 times to release ×7 the polished enemy's souls (×49 the base). Only one urn
+// exists at a time. +0.25%/level, capped at 25%. 0 = off / suppressed in a trial.
+function containedSpiritsChance(){ var L=cuLevel('treasures'); return L>0 ? Math.min(0.25, 0.0025*L) : 0; }
+var soulUrn=null;               // active urn: {el,reward,clicks,timer} — one at a time
+var URN_POSITIONS=[             // 5 clock spots around the enemy (dx,dy from canvas centre)
+  {dx:-120, dy:0},             // 9:00
+  {dx:-86,  dy:-86},           // 10:30
+  {dx:0,    dy:-122},          // 12:00
+  {dx:86,   dy:-86},           // 1:30
+  {dx:120,  dy:0}              // 3:00
+];
+var URN_CLICKS_NEEDED=13;
+var URN_LIFETIME_MS=60000;
+function removeSoulUrn(){
+  if(!soulUrn) return;
+  clearTimeout(soulUrn.timer);
+  if(soulUrn.el&&soulUrn.el.parentNode) soulUrn.el.parentNode.removeChild(soulUrn.el);
+  soulUrn=null;
+}
+function spawnSoulUrn(reward){
+  removeSoulUrn();
+  var wrap=document.querySelector('#enemy-zone .canvas-wrap');
+  if(!wrap) return;
+  var pos=URN_POSITIONS[Math.floor(Math.random()*URN_POSITIONS.length)];
+  var sprite=Math.floor(Math.random()*4)+1;   // urn_1..urn_4
+  var size=76;
+  var el=document.createElement('div');
+  el.className='soul-urn';
+  el.style.left=(165+pos.dx-size/2)+'px';
+  el.style.top =(165+pos.dy-size/2)+'px';
+  el.style.width=size+'px'; el.style.height=size+'px';
+  el.innerHTML='<img src="artwork/urn_'+sprite+'.webp" alt="Soul Urn" draggable="false">'+
+               '<div class="urn-count">'+URN_CLICKS_NEEDED+'</div>';
+  el.addEventListener('click', onSoulUrnClick);
+  wrap.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('show'); });
+  var timer=setTimeout(expireSoulUrn, URN_LIFETIME_MS);
+  soulUrn={ el:el, reward:reward, clicks:0, timer:timer };
+}
+function onSoulUrnClick(e){
+  e.stopPropagation();
+  if(!soulUrn) return;
+  soulUrn.clicks++;
+  var el=soulUrn.el;
+  el.classList.remove('urn-hit'); void el.offsetWidth; el.classList.add('urn-hit');   // shake
+  if(soulUrn.clicks>=URN_CLICKS_NEEDED){ completeSoulUrn(); return; }
+  var cnt=el.querySelector('.urn-count');
+  if(cnt) cnt.textContent=(URN_CLICKS_NEEDED-soulUrn.clicks);
+}
+function completeSoulUrn(){
+  if(!soulUrn) return;
+  var payout=soulUrn.reward.mul(7).floor();   // ×7 the polished reward → ×49 the base
+  souls=souls.add(payout); totalSouls=totalSouls.add(payout);
+  document.getElementById('soul-count').textContent=fmt(souls);
+  dirtyU=true;
+  var el=soulUrn.el;
+  var fl=document.getElementById('float-layer').getBoundingClientRect();
+  var r=el.getBoundingClientRect();
+  spawnFloat('+'+fmt(payout)+' souls','soul', r.left-fl.left+r.width/2-30, r.top-fl.top);
+  el.classList.add('urn-burst');
+  clearTimeout(soulUrn.timer);
+  var ref=soulUrn; soulUrn=null;
+  setTimeout(function(){ if(ref.el&&ref.el.parentNode) ref.el.parentNode.removeChild(ref.el); }, 500);
+  checkAchievements(); throttledSave();
+}
+function expireSoulUrn(){
+  if(!soulUrn) return;
+  var ref=soulUrn; soulUrn=null;
+  ref.el.classList.remove('show');
+  setTimeout(function(){ if(ref.el&&ref.el.parentNode) ref.el.parentNode.removeChild(ref.el); }, 400);
+}
+
 // ── Willing Sacrifice (auto-immolate) ───────────────────────────────────────
 function willingSacrificeMax(){ return cuLevel('auto_sacrifice'); }   // markable count; 0 = off/suppressed
 function updateAutoImmolateBtn(){
@@ -5863,6 +5948,8 @@ function onEnemyDeath(){
   var reward=enemySoulReward.mul(computeSoulMult()).floor();
   souls=souls.add(reward); totalSouls=totalSouls.add(reward);
   document.getElementById('soul-count').textContent=fmt(souls);
+  // Contained Spirits — a polished enemy may leave a clickable Soul Urn behind.
+  if(enemyPolished && !soulUrn && Math.random()<containedSpiritsChance()) spawnSoulUrn(reward);
   if(!_tutShown.souls){ _tutShown.souls=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('These are the souls you have collected. Currency to help you grow stronger.',document.getElementById('souls-display'),null); },800); } }
   dirtyU=true;
 
@@ -8148,6 +8235,7 @@ function doReincarnate(){
   captureTargets=[]; releaseMode=false; // clear any pending capture selection on reincarnation
   immolateMode=false; immolateTargets=[];
   resetSmartClickersToTop();   // SMART Clickers restart from the top upgrades
+  removeSoulUrn();             // any active Soul Urn is abandoned on reincarnation
 
   recalcStats();
   mana=manaMax; // start each run with a full mana bar (recalcStats set the cap)
@@ -8302,6 +8390,7 @@ function doRebirthReset(chosenForm){
   // Reload entity image as chosen form image
   _rebirthEntityOverride=chosenForm;
   resetSmartClickersToTop();   // SMART Clickers restart from the top upgrades
+  removeSoulUrn();             // any active Soul Urn is abandoned on ascension
 
   recalcStats();
   mana=manaMax; // start each run with a full mana bar (recalcStats set the cap)
