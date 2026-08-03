@@ -3556,7 +3556,7 @@ var CHALLENGE_UPGRADES=[
   { id:'shapeshifter',   hero:'Maui',        name:'Shapeshifter',         desc:'Form presets',                    type:'buy' },
   { id:'golden_apple',   hero:'Atalanta',    name:'Treasures Abound',     desc:'Chance for ×7 souls',        type:'buy' },
   { id:'treasures',      hero:'Perseus',     name:'Contained Spirits',    desc:'Increased soul-urn chance',       type:'buy' },
-  { id:'auto_ascend',    hero:'Aeneas',      name:'Immortal',             desc:'Ascend at the floor you choose',  type:'toggleval', ph:'floor' },
+  { id:'auto_ascend',    hero:'Aeneas',      name:'Immortal',             desc:'Ascend at Set Floor',             type:'toggleval', ph:'floor' },
   { id:'auto_reinc',     hero:'Gilgamesh',   name:'Phoenix',              desc:'Reincarnate at set Tattered Souls',type:'toggleval', ph:'TS' },
   { id:'auto_sacrifice', hero:'Jason',       name:'Willing Sacrifice',    desc:'Chosen minions are automatically Immolated', type:'toggleval', ph:'#' },
   { id:'elite_rush',     hero:'Achilles',    name:'Elite-Rush',           desc:'Fight Elites only until Fail',    type:'toggle' },
@@ -3609,6 +3609,46 @@ function spoilsMult(){ return cuAdditiveMult('spoils_war', 0.06, 0.01); }       
 function gloryMult(){ var L=cuLevel('glory_sacrifice'); return L>0 ? 1+0.25*L : 1; }
 // Elite Capture — Elite enemies capture at 20%×level (max 100% at L5). 0 = power off.
 function eliteCaptureChance(){ var L=cuLevel('elite_100'); return L>0 ? Math.min(1,0.20*L) : 0; }
+
+// ── Immortal (auto-ascend) & Phoenix (auto-reincarnate) ─────────────────────
+function anyAscendModalOpen(){
+  var ids=['rebirth-modal','form-modal','form-master-modal','flesh-modal','path3-modal','path4-modal','path5-modal','path6-modal','final-modal'];
+  for(var i=0;i<ids.length;i++){ var e=document.getElementById(ids[i]); if(e&&e.classList.contains('open')) return true; }
+  return false;
+}
+// Trigger the ascend flow directly, bypassing the Doom gate (openRebirthModal
+// doesn't check it). Opens the stage modal for the choice. (Preset auto-fill
+// arrives with Shapeshifter.)
+function autoAscendTrigger(){
+  openRebirthModal();
+  var b=document.getElementById('rebirth-ascend-now');
+  if(b) b.click();
+}
+// Immortal: when the set floor is reached, auto-open the ascend flow (once per
+// climb — disarms until you drop back below the floor, e.g. after ascending).
+var _immortalArmed=true;
+function checkImmortal(){
+  if(activeChallenge) return;                       // suppressed during challenges
+  if(!cuOn('auto_ascend')) return;                  // toggle off / suppressed
+  var target=parseInt(cuVal('auto_ascend'),10);
+  if(!target||target<1) return;
+  var gf=absGlobalFloor(curRealm,curLevel,curFloor);
+  if(gf<target){ _immortalArmed=true; return; }
+  if(!_immortalArmed || anyAscendModalOpen()) return;
+  _immortalArmed=false;
+  autoAscendTrigger();
+}
+// Phoenix: when banked TS exceeds the set value and you're in Ultimate form,
+// auto-reincarnate (no confirm). Bypasses Doom; Ultimate form still required.
+function tickPhoenix(){
+  if(activeChallenge) return;
+  if(!cuOn('auto_reinc')) return;
+  if(rebirthCount<7) return;                        // Ultimate form still required
+  if(anyAscendModalOpen()) return;                  // don't reincarnate mid-ascension
+  var target=parseInt(cuVal('auto_reinc'),10);
+  if(!target||target<1) return;
+  if(tatteredSouls>target) doReincarnate();
+}
 // Credit Burning Souls with Glory's multiplier, carrying the fraction so none is lost.
 var _bsCarry=0;
 function creditBurningSouls(baseCount){
@@ -5739,6 +5779,7 @@ function onEnemyDeath(){
   updateProgressLabel();
   updateHighestFloor(); checkAchievements();
   noteFloorProgress();   // advance a 'floor' trial (Achilles) toward its target
+  checkImmortal();       // Immortal: auto-ascend when the set floor is reached
   // Elite kills are rare progress milestones — persist those immediately.
   // Regular kills can stream in several times a second with clicker minions
   // assigned to the enemy, so batch their saves.
@@ -9872,6 +9913,7 @@ function gameLoop(){
 
   tickChallengeTimer(now);
   tickChallengeSouls(now);
+  tickPhoenix();          // Phoenix: auto-reincarnate at set TS (Ultimate form)
   tickElementProduction(now);
   updatePortalCardBars();
   if(now-_lastPortalUiRefresh>=500){ _lastPortalUiRefresh=now; refreshPortalMaterialValues(); }
