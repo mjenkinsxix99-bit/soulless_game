@@ -3549,7 +3549,7 @@ function renderPortalTab(){
 // type: 'buy' = Burning-Souls upgrade button; 'toggleval' = on/off + number box;
 // 'toggle' = plain on/off. Costs and effects are wired later, per power.
 var CHALLENGE_UPGRADES=[
-  { id:'str_heracles',   hero:'Heracles',    name:'Strength of Heracles', desc:'DPS boost',                       type:'buy' },
+  { id:'str_heracles',   hero:'Heracles',    name:'Strength of Heracles', desc:'DPS boost',                       type:'buy', costScale:'linear' },
   { id:'spoils_war',     hero:'Hippolyta',   name:'Spoils of War',        desc:'Increase TS from bounties',       type:'buy' },
   { id:'soul_catcher',   hero:'Britomartis', name:'Soul Catcher',         desc:'Souls gain boost',                type:'buy' },
   { id:'glory_sacrifice',hero:'Penthesilea', name:'Glory in Sacrifice',   desc:'Increase Burning Souls',          type:'buy' },
@@ -3584,8 +3584,37 @@ function cuState(id){ if(!challengeUpg[id]) challengeUpg[id]={ level:0, on:false
 function cuLevel(id){ return activeChallenge ? 0 : cuState(id).level; }
 function cuOn(id){ return activeChallenge ? false : cuState(id).on; }
 function cuVal(id){ return activeChallenge ? '' : cuState(id).val; }
-// Placeholder cost until balance is set: 5 x next level.
-function cuCost(id){ return 5*(cuState(id).level+1); }
+
+// Strength of Heracles (str_heracles) — DPS multiplier. +0.20 per level for the
+// first 10 levels, the per-level gain dropping 0.01 each further decade but never
+// below +0.10 (from level 101 on it stays +0.10, forever). Level 1 = x1.20,
+// L2 = x1.40 ... L10 = x3.00, L11 = x3.19 ... L100 = x16.50, then +0.10/level.
+// Reads cuLevel() so it's x1 during a challenge.
+function heraclesDpsMult(){
+  var L=cuLevel('str_heracles');
+  if(L<=0) return 1;
+  var mult=1, lim=Math.min(L,100);
+  for(var i=1;i<=lim;i++){ mult+=0.20-0.01*Math.floor((i-1)/10); } // levels 1-100 (always >=+0.11)
+  if(L>100) mult+=(L-100)*0.10;                                    // level 101+ : +0.10 each, forever
+  return mult;
+}
+// Earning a power (defeating its hero) grants it level 1 automatically.
+function ensureEarnedPowerLevels(){
+  var changed=false;
+  CHALLENGE_UPGRADES.forEach(function(u){
+    if(isGodCleared(u.hero) && cuState(u.id).level<1){ cuState(u.id).level=1; changed=true; }
+  });
+  return changed;
+}
+// Cost (Burning Souls) to buy the next level, by the power's named cost scale.
+//   'linear' — cost to reach level L = L Burning Souls (L9 -> L10 costs 10, etc.)
+// Powers without an assigned scale use the placeholder (5 x next level).
+function cuCost(id){
+  var u=CHALLENGE_UPGRADES.filter(function(x){return x.id===id;})[0];
+  var lv=cuState(id).level;
+  if(u&&u.costScale==='linear') return lv+1;
+  return 5*(lv+1);
+}
 function renderChallengeUpgrades(){
   var list=document.getElementById('challenge-upg-list');
   if(!list) return;
@@ -3606,7 +3635,16 @@ function renderChallengeUpgrades(){
     if(u.type==='buy'){
       var btn=document.createElement('button'); btn.className='cu-buy-btn';
       btn.innerHTML='Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>';
-      (function(id){ btn.addEventListener('click',function(){ /* spend + effect wired later */ }); })(u.id);
+      (function(id){ btn.addEventListener('click',function(){
+        var cost=cuCost(id);
+        if((burningSouls||0) < cost) return;
+        burningSouls-=cost;
+        cuState(id).level++;
+        recalcStats(); dirtyU=true;
+        updateBurningSoulDisplay();
+        renderChallengeUpgrades();
+        saveGame();
+      }); })(u.id);
       row.appendChild(btn);
     } else if(u.type==='toggleval'){
       var ctl=document.createElement('div'); ctl.className='cu-ctl';
@@ -4317,6 +4355,7 @@ function onHeroDefeated(){
 function claimHeroVictory(){
   var key=GOD_NODES[heroFightIdx]?GOD_NODES[heroFightIdx].key:null;
   if(key && !isGodCleared(key)) godCleared.push(key);   // node → cleared; power unlocks in the Portal
+  ensureEarnedPowerLevels(); recalcStats();             // grant the new power's level 1
   saveGame();
   document.getElementById('hero-victory').classList.remove('open');
   var fightMs=Math.max(0, Date.now()-heroFightStart);
@@ -4346,7 +4385,7 @@ function exitHeroFight(){
 function devClearGodNode(){
   if(_pendingGodNode>=0){
     var nd=GOD_NODES[_pendingGodNode];
-    if(nodeState(_pendingGodNode)==='avail' && !isGodCleared(nd.key)){ godCleared.push(nd.key); saveGame(); }
+    if(nodeState(_pendingGodNode)==='avail' && !isGodCleared(nd.key)){ godCleared.push(nd.key); ensureEarnedPowerLevels(); recalcStats(); saveGame(); }
   }
   closeHeroEncounter();
   renderGodMap();
@@ -5964,6 +6003,9 @@ function recalcStats(){
     totalDps=totalDps.mul(invMult);
     clickDmgBonus=clickDmgBonus.mul(invMult);
   }
+  // Portal power — Strength of Heracles (DPS only; heraclesDpsMult is x1 during a challenge)
+  var _heraMult=heraclesDpsMult();
+  if(_heraMult>1) totalDps=totalDps.mul(_heraMult);
 }
 
 var _msTip=null;
@@ -8289,6 +8331,7 @@ function loadGame(){
   _challengeSoulsBaseline=totalSouls;   // resume the tally from the current total (already loaded above)
   if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
   else if(typeof data.godMapCleared==='number') godCleared=GOD_NODES.slice(0,data.godMapCleared).map(function(n){return n.key;}); // legacy count
+  ensureEarnedPowerLevels();   // any already-earned power sits at least at level 1
   if(data.redeemedCodes) redeemedCodes=data.redeemedCodes;
   if(data.minionClickerAssignments) minionClickerAssignments=data.minionClickerAssignments;
   _offlineSavedAt=data.savedAt||0;
