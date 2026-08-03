@@ -303,6 +303,24 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .cu-buy-btn .cu-cost { display:block; font-size:10px; color:#3a1f5e; }
 .cu-toggle { flex-shrink:0; background:#1a1030; border:1px solid #6644aa; color:#9980cc; font-family:Georgia,serif; font-size:11px; font-weight:bold; letter-spacing:1px; padding:5px 12px; border-radius:5px; cursor:pointer; min-width:52px; }
 .cu-toggle.on { background:#e8c24a; border-color:#ffe27a; color:#1a1000; box-shadow:0 0 8px rgba(255,210,80,0.6); }
+/* Shapeshifter — preset boxes */
+.cu-row-shapeshifter { flex-wrap:wrap; }
+.ss-preset-grid { flex-basis:100%; width:100%; display:grid; grid-template-columns:repeat(2,1fr); gap:7px; margin-top:9px; }
+.ss-preset { background:#140a26; border:1px solid #5a3f8f; border-radius:6px; padding:7px 8px; display:flex; flex-direction:column; gap:5px; position:relative; }
+.ss-preset.filled { border-color:#b18cff; box-shadow:0 0 7px rgba(160,120,255,0.35); }
+.ss-preset.active { border-color:#ffe27a; box-shadow:0 0 10px rgba(255,210,80,0.6); }
+.ss-preset-num { position:absolute; top:5px; right:8px; font-size:10px; font-weight:bold; color:#8a74c0; font-family:Georgia,serif; }
+.ss-preset-label { color:#e9dcff; font-family:Georgia,serif; font-size:11px; font-weight:bold; text-transform:capitalize; line-height:1.2; padding-right:14px; min-height:26px; }
+.ss-preset:not(.filled) .ss-preset-label { color:#6b5a94; font-style:italic; font-weight:normal; }
+.ss-preset-btns { display:flex; gap:4px; }
+.ss-preset-btns button { flex:1; font-family:Georgia,serif; font-weight:bold; font-size:10px; letter-spacing:0.5px; padding:4px 0; border-radius:4px; cursor:pointer; border:1px solid; }
+.ss-preset-btns button:disabled { opacity:0.4; cursor:default; }
+.ss-use { background:#1f9e2f; border-color:#46d456; color:#04160a; }
+.ss-use:not(:disabled):hover { background:#28b23a; }
+.ss-save { background:#2f7a45; border-color:#4fd07a; color:#eafff0; }
+.ss-save:hover { background:#379152; }
+.ss-clear { background:#7a1414; border-color:#cc3333; color:#ffe0e0; }
+.ss-clear:not(:disabled):hover { background:#8f1a1a; }
 .cu-val { flex-shrink:0; width:64px; background:#0a0518; border:1px solid #55447a; color:#ffe9b0; font-family:Georgia,serif; font-size:12px; text-align:center; padding:5px 4px; border-radius:5px; }
 .cu-ctl { display:flex; align-items:center; gap:6px; flex-shrink:0; }
 #godmap-overlay { display:none; position:fixed; inset:0; background:rgba(2,1,10,0.94); z-index:10002; align-items:center; justify-content:center; padding:16px; }
@@ -3601,7 +3619,7 @@ var CHALLENGE_UPGRADES=[
   { id:'spoils_war',     hero:'Hippolyta',   name:'Spoils of War',        desc:'Increase TS from bounties',       type:'buy', costScale:'doubling' },
   { id:'soul_catcher',   hero:'Britomartis', name:'Soul Catcher',         desc:'Souls gain boost',                type:'buy', costScale:'linear' },
   { id:'glory_sacrifice',hero:'Penthesilea', name:'Glory in Sacrifice',   desc:'Increase Burning Souls',          type:'buy', costScale:'doubling' },
-  { id:'shapeshifter',   hero:'Maui',        name:'Shapeshifter',         desc:'Form presets',                    type:'buy' },
+  { id:'shapeshifter',   hero:'Maui',        name:'Shapeshifter',         desc:'Save and re-apply full ascension forms (Form Master)', type:'shapeshifter', costScale:'doubling', maxLevel:8 },
   { id:'golden_apple',   hero:'Atalanta',    name:'Treasures Abound',     desc:'Chance for ×7 souls',        type:'buy' },
   { id:'treasures',      hero:'Perseus',     name:'Contained Spirits',    desc:'Increased soul-urn chance',       type:'buy' },
   { id:'auto_ascend',    hero:'Aeneas',      name:'Immortal',             desc:'Ascend at Set Floor',             type:'toggleval', ph:'floor' },
@@ -3737,6 +3755,74 @@ function expireSoulUrn(){
   setTimeout(function(){ if(ref.el&&ref.el.parentNode) ref.el.parentNode.removeChild(ref.el); }, 400);
 }
 
+// ── Shapeshifter (form presets) ──────────────────────────────────────────────
+// Maui's power. Each level (Doubling cost, max 8) unlocks one preset box that can
+// store a full ascension configuration — form + the three path choices + weapon.
+// USE re-applies a preset in one shot (a Form-Master ascension) and marks it as the
+// preset Immortal/Phoenix auto-ascend will reuse. Buying extra boxes and USE both
+// require Form Master (all six form ultimates). Untouched by Hero Challenges: these
+// read cuState directly (not the suppressing cuLevel) so boxes persist during a trial.
+var formPresets=[];       // up to 8 saved configs: {form,p3,p4,p5,p6} or null
+var activePresetIdx=-1;   // preset Immortal/Phoenix reuses; -1 = none
+function shapeshifterBoxes(){ return cuState('shapeshifter').level; }   // one box per level
+function presetComplete(p){ return !!(p && p.form && p.p3 && p.p4 && p.p5 && p.p6); }
+function currentFormConfig(){ return { form:rebirthForm, p3:ascension3Path, p4:ascension4Path, p5:ascension5Path, p6:ascension6Path }; }
+function presetLabel(p){
+  if(!presetComplete(p)) return 'Empty';
+  var np=FORM_NAMEPLATES[p.form];
+  var fn=(np&&np.label?np.label:p.form).replace(/\.$/,'');
+  return fn+' · '+p.p3+'/'+p.p4+'/'+p.p5+'/'+p.p6;
+}
+function saveFormPreset(idx){
+  var cfg=currentFormConfig();
+  if(!presetComplete(cfg)){ showGameToast('Reach a full form (a Form Master) before saving a preset.'); return; }
+  formPresets[idx]=cfg;
+  renderChallengeUpgrades(); saveGame();
+}
+function clearFormPreset(idx){
+  formPresets[idx]=null;
+  if(activePresetIdx===idx) activePresetIdx=-1;
+  renderChallengeUpgrades(); saveGame();
+}
+// Apply a stored config in one shot — mirrors the Form Master modal's Begin button.
+function applyFormPreset(p){
+  ascension3Path=p.p3; ascension4Path=p.p4; ascension5Path=p.p5; ascension6Path=p.p6;
+  rebirthCount=5;
+  hasEverAscended=true;
+  soulShopOwned['auto-progress']=1;
+  hasEverHadAutoProgress=true;
+  doRebirthReset(p.form);
+}
+function useFormPreset(idx){
+  var p=formPresets[idx];
+  if(!presetComplete(p)){ showGameToast('That preset is empty.'); return; }
+  activePresetIdx=idx;                              // Immortal/Phoenix reuse this one
+  var doomUpgrade=REP_UPGRADES.find(function(u){return u.id==='dm';});
+  var canAscend=doomUpgrade&&doomUpgrade.level>=1&&!challengeForbidsAscend();
+  if(!canAscend){ showGameToast('Reach Doom to ascend.'); renderChallengeUpgrades(); saveGame(); return; }
+  if(!hasAllFormUlts()){ showGameToast('You must master all 6 forms to use a preset.'); renderChallengeUpgrades(); saveGame(); return; }
+  if(anyAscendModalOpen()){ return; }
+  applyFormPreset(p);
+  renderChallengeUpgrades(); saveGame();
+}
+function buildPresetBox(idx){
+  var p=formPresets[idx];
+  var complete=presetComplete(p);
+  var box=document.createElement('div');
+  box.className='ss-preset'+(activePresetIdx===idx?' active':'')+(complete?' filled':'');
+  box.innerHTML='<div class="ss-preset-num">'+(idx+1)+'</div><div class="ss-preset-label">'+presetLabel(p)+'</div>';
+  var btns=document.createElement('div'); btns.className='ss-preset-btns';
+  var useB=document.createElement('button'); useB.className='ss-use'; useB.textContent='USE'; useB.disabled=!complete;
+  var saveB=document.createElement('button'); saveB.className='ss-save'; saveB.textContent='SAVE';
+  var clrB=document.createElement('button'); clrB.className='ss-clear'; clrB.textContent='CLEAR'; clrB.disabled=!complete;
+  (function(i){ useB.addEventListener('click',function(){ useFormPreset(i); }); })(idx);
+  (function(i){ saveB.addEventListener('click',function(){ saveFormPreset(i); }); })(idx);
+  (function(i){ clrB.addEventListener('click',function(){ clearFormPreset(i); }); })(idx);
+  btns.appendChild(useB); btns.appendChild(saveB); btns.appendChild(clrB);
+  box.appendChild(btns);
+  return box;
+}
+
 // ── Willing Sacrifice (auto-immolate) ───────────────────────────────────────
 function willingSacrificeMax(){ return cuLevel('auto_sacrifice'); }   // markable count; 0 = off/suppressed
 function updateAutoImmolateBtn(){
@@ -3831,9 +3917,13 @@ function anyAscendModalOpen(){
   return false;
 }
 // Trigger the ascend flow directly, bypassing the Doom gate (openRebirthModal
-// doesn't check it). Opens the stage modal for the choice. (Preset auto-fill
-// arrives with Shapeshifter.)
+// doesn't check it). If a Shapeshifter preset is active and the player is a Form
+// Master, apply it in one shot (no modal); otherwise open the stage modal.
 function autoAscendTrigger(){
+  if(activePresetIdx>=0 && hasAllFormUlts()){
+    var p=formPresets[activePresetIdx];
+    if(presetComplete(p)){ applyFormPreset(p); return; }
+  }
   openRebirthModal();
   var b=document.getElementById('rebirth-ascend-now');
   if(b) b.click();
@@ -3952,6 +4042,32 @@ function renderChallengeUpgrades(){
       var tgB=document.createElement('button'); tgB.className='cu-toggle'+(st.on?' on':''); tgB.textContent=st.on?'ON':'OFF';
       (function(id,b){ tgB.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; updateSmartTargetBoxes(); saveGame(); }); })(u.id,tgB);
       ctlB.appendChild(buyB); ctlB.appendChild(tgB); row.appendChild(ctlB);
+    } else if(u.type==='shapeshifter'){
+      row.classList.add('cu-row-shapeshifter');
+      // Upgrade button buys another preset box (gated behind Form Master past L1).
+      var ctlS=document.createElement('div'); ctlS.className='cu-ctl';
+      var atMaxS=u.maxLevel&&st.level>=u.maxLevel;
+      var buyS=document.createElement('button'); buyS.className='cu-buy-btn';
+      buyS.innerHTML=atMaxS?'<span class="cu-cost">MAX</span>':('Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>');
+      if(atMaxS) buyS.disabled=true;
+      (function(id,mx){ buyS.addEventListener('click',function(){
+        if(mx&&cuState(id).level>=mx) return;
+        if(!hasAllFormUlts()){ showGameToast('You must master all 6 forms to upgrade this power.'); return; }
+        var cost=cuCost(id);
+        if((burningSouls||0) < cost){ showGameToast('Not enough Burning Souls.'); return; }
+        burningSouls-=cost;
+        cuState(id).level++;
+        recalcStats(); dirtyU=true;
+        updateBurningSoulDisplay();
+        renderChallengeUpgrades();
+        saveGame();
+      }); })(u.id,u.maxLevel);
+      ctlS.appendChild(buyS); row.appendChild(ctlS);
+      // One preset box per level.
+      var grid=document.createElement('div'); grid.className='ss-preset-grid';
+      var boxes=shapeshifterBoxes();
+      for(var _bi=0; _bi<boxes; _bi++){ grid.appendChild(buildPresetBox(_bi)); }
+      row.appendChild(grid);
     } else {
       var tg2=document.createElement('button'); tg2.className='cu-toggle'+(st.on?' on':''); tg2.textContent=st.on?'ON':'OFF';
       (function(id,b){ tg2.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tg2);
@@ -8525,6 +8641,8 @@ function saveGame(){
     autoImmolateOn:autoImmolateOn,
     autoImmolateTargets:autoImmolateTargets.slice(),
     upgradeTargetLevels:JSON.parse(JSON.stringify(upgradeTargetLevels)),
+    formPresets:JSON.parse(JSON.stringify(formPresets)),
+    activePresetIdx:activePresetIdx,
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
@@ -8686,6 +8804,8 @@ function loadGame(){
   autoImmolateOn=!!data.autoImmolateOn;
   if(Array.isArray(data.autoImmolateTargets)) autoImmolateTargets=data.autoImmolateTargets;
   if(data.upgradeTargetLevels&&typeof data.upgradeTargetLevels==='object') upgradeTargetLevels=data.upgradeTargetLevels;
+  if(Array.isArray(data.formPresets)) formPresets=data.formPresets;
+  if(typeof data.activePresetIdx==='number') activePresetIdx=data.activePresetIdx;
   _challengeSoulsBaseline=totalSouls;   // resume the tally from the current total (already loaded above)
   if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
   else if(typeof data.godMapCleared==='number') godCleared=GOD_NODES.slice(0,data.godMapCleared).map(function(n){return n.key;}); // legacy count
