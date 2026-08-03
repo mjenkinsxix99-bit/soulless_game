@@ -3564,6 +3564,14 @@ var CHALLENGE_UPGRADES=[
 ];
 var challengeUpg={}; // id -> { level, on, val }
 function cuState(id){ if(!challengeUpg[id]) challengeUpg[id]={ level:0, on:false, val:'' }; return challengeUpg[id]; }
+// Portal-upgrade (hero-power) EFFECTS must be read through these accessors, never
+// cuState() directly: during an active challenge they report level 0 / off / no
+// value, so a trial NEVER benefits from portal-power levels (challenges are tuned
+// as though the player has none). The Portal tab still displays the real levels;
+// only their gameplay effect is suppressed.
+function cuLevel(id){ return activeChallenge ? 0 : cuState(id).level; }
+function cuOn(id){ return activeChallenge ? false : cuState(id).on; }
+function cuVal(id){ return activeChallenge ? '' : cuState(id).val; }
 // Placeholder cost until balance is set: 5 x next level.
 function cuCost(id){ return 5*(cuState(id).level+1); }
 function renderChallengeUpgrades(){
