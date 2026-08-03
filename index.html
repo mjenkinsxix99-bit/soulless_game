@@ -10549,6 +10549,14 @@ initUpgradeIcons();
 initMist(28);
 loadSettings();
 var _hadSave = loadGame();
+// DEV/TEST: one-time grant — all hero powers earned + 1000 Burning Souls. Remove before release.
+if(!localStorage.getItem('soulless_devgrant_v1')){
+  GOD_NODES.forEach(function(nd){ if(!nd.god && godCleared.indexOf(nd.key)<0) godCleared.push(nd.key); });
+  ensureEarnedPowerLevels();
+  burningSouls=(burningSouls||0)+1000;
+  try{ localStorage.setItem('soulless_devgrant_v1','1'); }catch(e){}
+  saveGame();
+}
 updateHighestFloor();
 recalcStats();
 applyOfflineProgress(_offlineSavedAt);
