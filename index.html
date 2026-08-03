@@ -2904,16 +2904,23 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   }
 
   // White flash on hit
+  var polishHere = enemyPolished && canvas.id === 'enemy-canvas';   // battlefield enemy only
   if (!dead && hitAge < 220 && !isPortrait) {
     var hf = 1 - hitAge / 220;
     ctx.filter = 'brightness(' + (1 + hf * 5) + ') saturate(' + (1 - hf * 0.8) + ')';
   } else if (elite && !dead) {
     // Gold tint for elites
     ctx.filter = 'sepia(0.55) saturate(3.5) hue-rotate(8deg) brightness(1.2)';
+  } else if (polishHere && !dead) {
+    // Silver tint for polished (Treasures Abound) enemies
+    ctx.filter = 'grayscale(0.9) brightness(1.4) contrast(1.12)';
   }
   if (elite) {
     ctx.shadowColor = '#ffd700';
     ctx.shadowBlur = 28 + Math.sin(t * 0.003) * 8;
+  } else if (polishHere) {
+    ctx.shadowColor = '#e2ecff';
+    ctx.shadowBlur = 24 + Math.sin(t * 0.003) * 8;
   }
   ctx.drawImage(sheet, spriteIdx * _cw + sd.px, sd.py, sd.w, sd.h, dx, dy, drawW, drawH);
   ctx.filter = 'none';
@@ -2978,6 +2985,28 @@ function drawEnemySprite(canvas, t, dead, elite, sheet, sheetLoaded, floatSpeed,
   ctx.fillStyle = vg;
   ctx.fill();
   ctx.globalCompositeOperation = 'source-over';
+
+  // Treasures Abound — silver sparkles swirling around a polished enemy (on top,
+  // outside the vignette so they aren't clipped). Battlefield enemy only.
+  if (polishHere && !dead) {
+    var polishColors = ['#ffffff','#eaf2ff','#cfe0f5','#bccfe6'];
+    ctx.save();
+    enemySparkles.forEach(function(s) {
+      var a = s.angle + t * s.speed;
+      var pulse = (Math.sin(t * 0.003 + s.phase) + 1) / 2;
+      var sx = cx + Math.cos(a) * s.dist * scaleX;
+      var sy = cy + Math.sin(a) * s.dist * scaleY;
+      var sz = s.size * (0.5 + pulse * 0.8);
+      if (sz < 0.3) return;
+      ctx.globalAlpha = deathFade * (0.4 + pulse * 0.6);
+      ctx.fillStyle = s.bright ? '#ffffff' : polishColors[Math.floor(s.phase*2)%4];
+      ctx.fillRect(sx - sz/2, sy - sz/2, sz, sz);
+      ctx.globalAlpha = deathFade * (0.3 + pulse * 0.4);
+      ctx.fillRect(sx - sz*1.2, sy - sz*0.2, sz*2.4, sz*0.4);
+      ctx.fillRect(sx - sz*0.2, sy - sz*1.2, sz*0.4, sz*2.4);
+    });
+    ctx.restore();
+  }
 }
 
 // Void (realm 1) — float
@@ -3618,6 +3647,10 @@ function spoilsMult(){ return cuAdditiveMult('spoils_war', 0.06, 0.01); }       
 function gloryMult(){ var L=cuLevel('glory_sacrifice'); return L>0 ? 1+0.25*L : 1; }
 // Elite Capture — Elite enemies capture at 20%×level (max 100% at L5). 0 = power off.
 function eliteCaptureChance(){ var L=cuLevel('elite_100'); return L>0 ? Math.min(1,0.20*L) : 0; }
+// Treasures Abound — chance a non-Elite spawns "polished" (silver, sparkling, ×7 souls).
+// Base 1% + 0.20%/level, the level bonus capped at +99% (so total tops out at 100%).
+// No decay. 0 = power off / suppressed during a challenge.
+function treasuresAboundChance(){ var L=cuLevel('golden_apple'); return L>0 ? (0.01+Math.min(0.99,0.002*L)) : 0; }
 
 // ── Willing Sacrifice (auto-immolate) ───────────────────────────────────────
 function willingSacrificeMax(){ return cuLevel('auto_sacrifice'); }   // markable count; 0 = off/suppressed
@@ -5204,6 +5237,8 @@ var lastAutoAttack=0, lastDrainTick=0;
 var combatActive=false, enemyDead=false;
 var eliteTimerStart=0;
 var currentEnemyTypeIdx=0;
+var enemyPolished=false;   // Treasures Abound: this enemy is a silver, sparkling ×7-souls prize
+var enemySparkles=[];      // orbiting sparkle set built for a polished enemy
 
 var stage=0, traits={sex:null,adds:[],aff:null,outfit:null};
 var pending={}, mstage=0, evReady=false;
@@ -5644,6 +5679,23 @@ function spawnEnemy(){
     currentEnemyTypeIdx = regularPool[Math.floor(Math.random() * regularPool.length)];
   }
 
+  // Treasures Abound — roll a polished (silver, ×7-souls) enemy. Elites never polish.
+  enemyPolished = false;
+  if(!elite && Math.random() < treasuresAboundChance()){
+    enemyPolished = true;
+    enemySparkles = [];
+    for(var _ps=0;_ps<12;_ps++){
+      enemySparkles.push({
+        angle: Math.random()*Math.PI*2,
+        dist:  62+Math.random()*46,
+        speed: 0.0005+Math.random()*0.0008,
+        phase: Math.random()*Math.PI*2,
+        size:  1.6+Math.random()*2.6,
+        bright: Math.random()>0.5
+      });
+    }
+  }
+
   var hp = elite ? eliteHp(lv) : floorHp(lv,fl);
   if(elite && challengeEliteHpDebuff()>0) hp = hp.mul(challengeEliteHpMult()).ceil();   // Aeneas curse
   enemyMaxHp   = hp;
@@ -5797,6 +5849,8 @@ function computeSoulMult(){
   if(_et>0) soulMult*=Math.pow(2,_et);
   // Portal power — Soul Catcher (×souls; x1 during a challenge)
   soulMult*=soulCatcherMult();
+  // Portal power — Treasures Abound: a polished enemy pays ×7 souls
+  if(enemyPolished) soulMult*=7;
   return soulMult;
 }
 var ELITE_TAMER_ACH_IDS=['elite-minion-1','elite-minion-10','elite-minion-25','elite-minion-50','elite-minion-100'];
