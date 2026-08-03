@@ -3561,7 +3561,7 @@ var CHALLENGE_UPGRADES=[
   { id:'auto_sacrifice', hero:'Jason',       name:'Willing Sacrifice',    desc:'Chosen minions are automatically Immolated', type:'toggleval', ph:'#' },
   { id:'elite_rush',     hero:'Achilles',    name:'Elite-Rush',           desc:'Fight Elites only until Fail',    type:'toggle' },
   { id:'auto_upgrade',   hero:'Sigurd',      name:'Auto Upgrade',         desc:'Auto-clickers progress on Upgrades', type:'toggle' },
-  { id:'elite_100',      hero:'Karna',       name:'Elite Capture',        desc:'Elites have 100% chance to become minion (must have enough MP)', type:'toggle' }
+  { id:'elite_100',      hero:'Karna',       name:'Elite Capture',        desc:'Elite enemies become minions (+20%/lvl catch, must have MP)', type:'buy', costScale:'doubling', maxLevel:5 }
 ];
 // The powers the player has actually earned (hero defeated), in hero-node order —
 // so the list fills gap-free from the top and a newly-won power slots into place.
@@ -3607,6 +3607,8 @@ function soulCatcherMult(){ return cuAdditiveMult('soul_catcher', 0.20, 0.10); }
 function spoilsMult(){ return cuAdditiveMult('spoils_war', 0.06, 0.01); }         // ×Elite-bounty TS
 // Glory in Sacrifice — flat +0.25/level, no decay. ×Burning Souls per immolation.
 function gloryMult(){ var L=cuLevel('glory_sacrifice'); return L>0 ? 1+0.25*L : 1; }
+// Elite Capture — Elite enemies capture at 20%×level (max 100% at L5). 0 = power off.
+function eliteCaptureChance(){ var L=cuLevel('elite_100'); return L>0 ? Math.min(1,0.20*L) : 0; }
 // Credit Burning Souls with Glory's multiplier, carrying the fraction so none is lost.
 var _bsCarry=0;
 function creditBurningSouls(baseCount){
@@ -3652,8 +3654,11 @@ function renderChallengeUpgrades(){
     row.appendChild(lbl);
     if(u.type==='buy'){
       var btn=document.createElement('button'); btn.className='cu-buy-btn';
-      btn.innerHTML='Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>';
-      (function(id){ btn.addEventListener('click',function(){
+      var atMax=u.maxLevel&&st.level>=u.maxLevel;
+      btn.innerHTML=atMax?'<span class="cu-cost">MAX</span>':('Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>');
+      if(atMax) btn.disabled=true;
+      (function(id,mx){ btn.addEventListener('click',function(){
+        if(mx&&cuState(id).level>=mx) return;
         var cost=cuCost(id);
         if((burningSouls||0) < cost) return;
         burningSouls-=cost;
@@ -3662,7 +3667,7 @@ function renderChallengeUpgrades(){
         updateBurningSoulDisplay();
         renderChallengeUpgrades();
         saveGame();
-      }); })(u.id);
+      }); })(u.id,u.maxLevel);
       row.appendChild(btn);
     } else if(u.type==='toggleval'){
       var ctl=document.createElement('div'); ctl.className='cu-ctl';
@@ -4490,7 +4495,9 @@ function attemptMinionCapture(typeIdx){
   if(captureTargets.indexOf(typeIdx)<0) return;
   var cost=getMinionCostForType(typeIdx);
   if(minionPoints<cost) return;
-  if(Math.random()>getMinionCatchChance()) return;
+  // Elite Capture (Karna) overrides the roll for Elite enemies: 20%×level (100% at L5).
+  var _catch=(isEliteFight()&&eliteCaptureChance()>0)?eliteCaptureChance():getMinionCatchChance();
+  if(Math.random()>_catch) return;
   minionPoints-=cost;
   captureTargets.splice(captureTargets.indexOf(typeIdx),1); // deselect after successful capture
   minionSlots.push({typeIdx:typeIdx,level:1,xp:0,isElite:false});
