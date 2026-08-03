@@ -3736,6 +3736,7 @@ var challengeDeadline=0;   // timestamp a timed trial fails at (0 = untimed)
 var challengeSoulsAmassed=D(0);   // running soul tally for a 'souls' trial (survives ascensions)
 var _challengeSoulsBaseline=D(0); // last-seen totalSouls, to accumulate positive deltas
 var challengeEliteStacks=0;       // Aeneas: Elites killed this ascension (compounding HP curse)
+var _devBsGranted=false;          // DEV: one-time 1000-BS test grant flag (remove before release)
 var MINION_SLOT_CAP=100;   // there are 100 capturable minion types
 
 // Only heroes listed here enforce a trial. Heroes without a def keep the Battle
@@ -8193,6 +8194,7 @@ function saveGame(){
     challengeEliteStacks:challengeEliteStacks,
     challengeSoulsAmassed:wholeStr(challengeSoulsAmassed),
     bsCarry:_bsCarry,
+    devBsGranted:_devBsGranted,
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
@@ -8350,6 +8352,7 @@ function loadGame(){
   challengeEliteStacks=(typeof data.challengeEliteStacks==='number')?data.challengeEliteStacks:0;
   challengeSoulsAmassed=D(data.challengeSoulsAmassed||0);
   _bsCarry=(typeof data.bsCarry==='number')?data.bsCarry:0;
+  _devBsGranted=!!data.devBsGranted;
   _challengeSoulsBaseline=totalSouls;   // resume the tally from the current total (already loaded above)
   if(Array.isArray(data.godCleared)) godCleared=data.godCleared;
   else if(typeof data.godMapCleared==='number') godCleared=GOD_NODES.slice(0,data.godMapCleared).map(function(n){return n.key;}); // legacy count
@@ -10549,14 +10552,13 @@ initUpgradeIcons();
 initMist(28);
 loadSettings();
 var _hadSave = loadGame();
-// DEV/TEST: one-time grant — all hero powers earned + 1000 Burning Souls. Remove before release.
-if(!localStorage.getItem('soulless_devgrant_v1')){
-  GOD_NODES.forEach(function(nd){ if(!nd.god && godCleared.indexOf(nd.key)<0) godCleared.push(nd.key); });
-  ensureEarnedPowerLevels();
-  burningSouls=(burningSouls||0)+1000;
-  try{ localStorage.setItem('soulless_devgrant_v1','1'); }catch(e){}
-  saveGame();
-}
+// DEV/TEST: grant all hero powers (idempotent, every load) + 1000 Burning Souls once.
+// Remove before release.
+portalBuilt=true;   // the powers panel only renders once the portal is built
+GOD_NODES.forEach(function(nd){ if(!nd.god && godCleared.indexOf(nd.key)<0) godCleared.push(nd.key); });
+ensureEarnedPowerLevels();
+if(!_devBsGranted){ burningSouls=(burningSouls||0)+1000; _devBsGranted=true; }
+try{ updateBurningSoulDisplay(); }catch(e){}
 updateHighestFloor();
 recalcStats();
 applyOfflineProgress(_offlineSavedAt);
