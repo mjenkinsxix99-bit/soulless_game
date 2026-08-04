@@ -285,25 +285,25 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #portal-modal-close { background:#6633bb; border:2px solid #9966ff; color:#fff; font-weight:bold; font-size:15px; letter-spacing:1px; padding:9px 28px; border-radius:6px; cursor:pointer; font-family:Georgia,serif; box-shadow:0 0 12px rgba(150,90,255,0.55); }
 #portal-modal-close:hover { background:#7a44cc; }
 /* ── God Realm map ──────────────────────────────────────────────────────────── */
-#enter-portal-btn { display:none; width:100%; margin:16px 0 6px; padding:12px 0; background:#1a1030; border:2px solid #9966ff; color:#e6d8ff; font-family:Georgia,serif; font-size:15px; font-weight:bold; letter-spacing:2px; cursor:pointer; border-radius:6px; box-shadow:0 0 14px rgba(150,90,255,0.4); transition:background 0.2s,box-shadow 0.2s; }
-#enter-portal-btn:hover { background:#2a1850; box-shadow:0 0 20px rgba(150,90,255,0.7); }
+#enter-portal-btn { display:none; width:100%; margin:16px 0 6px; padding:12px 0; background:#1a1030; border:2px solid #d4a843; color:#ffe9b0; font-family:Georgia,serif; font-size:15px; font-weight:bold; letter-spacing:2px; cursor:pointer; border-radius:6px; box-shadow:0 0 14px rgba(212,168,67,0.5); transition:background 0.2s,box-shadow 0.2s; text-shadow:0 0 8px rgba(255,200,80,0.6); }
+#enter-portal-btn:hover { background:#2a1850; border-color:#ffe27a; box-shadow:0 0 22px rgba(212,168,67,0.85); }
 #preview-godmap-btn { display:block; width:100%; margin:6px 0; padding:6px 0; background:transparent; border:1px dashed #55447a; color:#8f7ac0; font-family:Georgia,serif; font-size:11px; letter-spacing:1px; cursor:pointer; border-radius:5px; }
 #preview-godmap-btn:hover { border-color:#7a5fb0; color:#b49ee2; }
 /* Portal built view — portal art frames the challenge-upgrade list */
 #portal-built-view { position:relative; margin-top:8px; background:url('artwork/portal.webp') center -50px / 115% auto no-repeat, #06020e; border-radius:6px; }
 #portal-built-view #enter-portal-btn { position:relative; z-index:2; display:block; width:70%; margin:14% auto 0; }
-#challenge-upg-list { position:relative; z-index:2; padding:122px 15% 20px; }
-.cu-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 4px; border-bottom:1px solid rgba(212,168,67,0.18); }
-.cu-empty { color:#c9b57e; font-size:12px; font-style:italic; text-align:center; padding:22px 12px; line-height:1.4; text-shadow:0 0 5px rgba(0,0,0,0.95); }
+#challenge-upg-list { position:relative; z-index:2; padding:122px 9% 20px; }
+.cu-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 4px; border-bottom:1px solid rgba(212,168,67,0.18); }
+.cu-empty { color:#c9b57e; font-size:15px; font-style:italic; text-align:center; padding:22px 12px; line-height:1.4; text-shadow:0 0 5px rgba(0,0,0,0.95); }
 .cu-label { text-align:left; min-width:0; }
-.cu-name { color:#ffd76a; font-weight:bold; font-size:13px; letter-spacing:0.4px; text-shadow:0 0 5px rgba(0,0,0,0.95); }
-.cu-desc { color:#e6cf94; font-size:11px; font-style:italic; text-shadow:0 0 5px rgba(0,0,0,0.95); line-height:1.25; }
-.cu-buy-btn { flex-shrink:0; background:#b18cff; border:1px solid #cbb0ff; color:#1a0f30; font-family:Georgia,serif; font-weight:bold; font-size:11px; line-height:1.1; padding:5px 10px; border-radius:5px; cursor:pointer; text-align:center; box-shadow:0 0 8px rgba(160,120,255,0.4); }
+.cu-name { color:#ffd76a; font-weight:bold; font-size:17px; letter-spacing:0.4px; text-shadow:0 0 5px rgba(0,0,0,0.95); }
+.cu-desc { color:#e6cf94; font-size:14px; font-style:italic; text-shadow:0 0 5px rgba(0,0,0,0.95); line-height:1.3; }
+.cu-buy-btn { flex-shrink:0; background:#b18cff; border:1px solid #cbb0ff; color:#1a0f30; font-family:Georgia,serif; font-weight:bold; font-size:14px; line-height:1.1; padding:7px 12px; border-radius:5px; cursor:pointer; text-align:center; box-shadow:0 0 8px rgba(160,120,255,0.4); }
 .cu-buy-btn:hover { background:#c4a4ff; }
-.cu-buy-btn .cu-cost { display:block; font-size:10px; color:#3a1f5e; }
-.cu-toggle { flex-shrink:0; background:#1a1030; border:1px solid #6644aa; color:#9980cc; font-family:Georgia,serif; font-size:11px; font-weight:bold; letter-spacing:1px; padding:5px 12px; border-radius:5px; cursor:pointer; min-width:52px; }
+.cu-buy-btn .cu-cost { display:block; font-size:12px; color:#3a1f5e; }
+.cu-toggle { flex-shrink:0; background:#1a1030; border:1px solid #6644aa; color:#9980cc; font-family:Georgia,serif; font-size:14px; font-weight:bold; letter-spacing:1px; padding:7px 14px; border-radius:5px; cursor:pointer; min-width:58px; }
 .cu-toggle.on { background:#e8c24a; border-color:#ffe27a; color:#1a1000; box-shadow:0 0 8px rgba(255,210,80,0.6); }
-.cu-hint { flex-shrink:0; color:#c9b57e; font-size:10px; font-style:italic; text-align:right; max-width:96px; line-height:1.25; text-shadow:0 0 5px rgba(0,0,0,0.95); }
+.cu-hint { flex-shrink:0; color:#c9b57e; font-size:13px; font-style:italic; text-align:right; max-width:120px; line-height:1.25; text-shadow:0 0 5px rgba(0,0,0,0.95); }
 /* Shapeshifter — "Open Presets" button in the Portal row */
 .cu-presets-btn { background:#7a4bd0; border-color:#a986f0; color:#f3ecff; }
 .cu-presets-btn:hover { background:#8a5be0; }
@@ -334,7 +334,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #fm-main { flex:1; min-width:0; text-align:center; }
 #fm-close-btn { flex:1; max-width:160px; padding:12px 16px; background:#2a0a4a; border:2px solid #6a3aa0; color:#e9dcff; font-family:Georgia,serif; font-size:14px; letter-spacing:2px; cursor:pointer; border-radius:6px; transition:background 0.2s, box-shadow 0.2s; }
 #fm-close-btn:hover { background:#3a1560; box-shadow:0 0 14px rgba(120,70,180,0.5); }
-.cu-val { flex-shrink:0; width:64px; background:#0a0518; border:1px solid #55447a; color:#ffe9b0; font-family:Georgia,serif; font-size:12px; text-align:center; padding:5px 4px; border-radius:5px; }
+.cu-val { flex-shrink:0; width:68px; background:#0a0518; border:1px solid #55447a; color:#ffe9b0; font-family:Georgia,serif; font-size:14px; text-align:center; padding:6px 4px; border-radius:5px; }
 .cu-ctl { display:flex; align-items:center; gap:6px; flex-shrink:0; }
 #godmap-overlay { display:none; position:fixed; inset:0; background:rgba(2,1,10,0.94); z-index:10002; align-items:center; justify-content:center; padding:16px; }
 #godmap-overlay.open { display:flex; }
@@ -1563,6 +1563,8 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
         <div class="ph gap">Enemy Defeats</div>
         <div class="kill-row"><span>Enemies Destroyed</span><span class="kv" id="kp-enemies">0</span></div>
         <div class="kill-row"><span>Elites Destroyed</span><span class="kv" id="kp-elites">0</span></div>
+        <div class="ph gap">Challenge Records</div>
+        <div id="challenge-records-list"></div>
         <div class="ph gap">Form</div>
         <div id="form-stat-row" style="font-size:14px;color:#9980dd;padding:3px 0 6px;"></div>
         <div id="traits-row"></div>
@@ -4298,6 +4300,8 @@ var _pendingGodNode=-1;
 // from the encounter screen: it reincarnates the player from Ether, applies a
 // handicap, and sets a goal. Completing the goal (in one run) un-gates Battle.
 var challengesPassed={};   // hero key -> true once its trial has been completed
+var challengeClearTimes={};// hero key -> wall-clock ms taken to clear its trial (record book)
+var challengeStartTime=0;  // timestamp the active trial was accepted (for the clear-time record)
 var activeChallenge=null;  // hero key of the trial currently in progress (null = none)
 var challengeProgress=0;   // generic progress counter for the active trial
 var challengeDeadline=0;   // timestamp a timed trial fails at (0 = untimed)
@@ -4417,6 +4421,31 @@ var CHALLENGE_DEFS={
   }
 };
 function heroHasChallenge(key){ return !!CHALLENGE_DEFS[key]; }
+// Format a trial clear time (ms) for the record book.
+function fmtChallengeTime(ms){
+  if(ms<1000) return 'Instant';
+  var tot=Math.floor(ms/1000);
+  var h=Math.floor(tot/3600), m=Math.floor((tot%3600)/60), s=tot%60;
+  if(h>0) return h+'h '+m+'m';
+  if(m>0) return m+'m '+s+'s';
+  return s+'s';
+}
+// Stats tab: a record of each hero trial and the best (fastest) time it was cleared.
+function renderChallengeRecords(){
+  var el=document.getElementById('challenge-records-list');
+  if(!el) return;
+  var rows='';
+  GOD_NODES.forEach(function(nd){
+    if(nd.god||!heroHasChallenge(nd.key)) return;
+    var t=challengeClearTimes[nd.key];
+    var val;
+    if(t!==undefined) val='<span class="kv good">'+fmtChallengeTime(t)+'</span>';
+    else if(nd.key===activeChallenge) val='<span class="kv" style="color:#ffcc33">In progress…</span>';
+    else val='<span class="kv" style="color:#6b5a8a">—</span>';
+    rows+='<div class="kill-row"><span>'+nd.key+'</span>'+val+'</div>';
+  });
+  el.innerHTML=rows;
+}
 function isChallengePassed(key){ return challengesPassed[key]===true; }
 function eliteMinionCount(){ return minionSlots.filter(function(m){return m.isElite;}).length; }
 // Reincarnation wipes non-Elites, so the room a trial actually has to train new
@@ -4639,7 +4668,14 @@ function completeChallenge(){
   var key=activeChallenge;
   if(!key) return;
   challengesPassed[key]=true;
+  // Record the fastest clear (wall-clock from accept). Keep the best time on a re-clear.
+  if(challengeStartTime>0){
+    var elapsed=Date.now()-challengeStartTime;
+    if(challengeClearTimes[key]===undefined||elapsed<challengeClearTimes[key]) challengeClearTimes[key]=elapsed;
+  }
+  challengeStartTime=0;
   activeChallenge=null; challengeProgress=0; challengeDeadline=0;
+  renderChallengeRecords();
   hideChallengeBanner(); hideChallengeTimer();
   checkRebirthButton();     // a no-ascend lock lifts now the trial is passed
   buildUpgrades();          // any upgrade-restriction lifts too
@@ -4690,7 +4726,7 @@ function renderGodMap(){
       el.addEventListener('mousemove',function(e){ posHoverTooltip(e.clientX,e.clientY); });
       el.addEventListener('mouseleave',hideHoverTooltip);
     })(nd,st);
-    if(st==='avail'){
+    if(st==='avail'||st==='cleared'){   // cleared heroes stay revisitable (Battle already un-gated)
       (function(idx){ el.addEventListener('click',function(){ openHeroEncounter(idx); }); })(i);
     }
     stage.appendChild(el);
@@ -4810,6 +4846,7 @@ function acceptHeroChallenge(){
     }
     tatteredSouls -= def.cost;           // lost — no MP, no refund
     challengesPassed[key]=true;
+    if(challengeClearTimes[key]===undefined) challengeClearTimes[key]=0;   // an instant toll
     updateTatteredDisplay();
     saveGame();
     closeHeroEncounter();
@@ -4833,6 +4870,7 @@ function acceptHeroChallenge(){
   rebirthForm=null; _rebirthEntityOverride=null;   // truly Ether again
   ascension3Path=null; ascension4Path=null; ascension5Path=null; ascension6Path=null; // Ether has no evolution yet
   activeChallenge=key; challengeProgress=0; challengeEliteStacks=0;
+  challengeStartTime=Date.now();                                        // start the clear-time clock
   challengeSoulsAmassed=D(0); _challengeSoulsBaseline=totalSouls;        // reset any soul tally
   challengeDeadline=(def.timeLimitMs)?(Date.now()+def.timeLimitMs):0;   // start any countdown
   // Some trials must begin with a node unlocked (Perseus: Flurry, else no damage).
@@ -8821,6 +8859,8 @@ function saveGame(){
     portalBuilt:portalBuilt,
     godCleared:godCleared.slice(),
     challengesPassed:JSON.parse(JSON.stringify(challengesPassed)),
+    challengeClearTimes:JSON.parse(JSON.stringify(challengeClearTimes)),
+    challengeStartTime:challengeStartTime,
     activeChallenge:activeChallenge,
     challengeProgress:challengeProgress,
     challengeDeadline:challengeDeadline,
@@ -8984,6 +9024,8 @@ function loadGame(){
   if(typeof data.portalBuilt==='boolean') portalBuilt=data.portalBuilt;
   if(data.challengeUpg&&typeof data.challengeUpg==='object') challengeUpg=data.challengeUpg;
   if(data.challengesPassed&&typeof data.challengesPassed==='object') challengesPassed=data.challengesPassed;
+  if(data.challengeClearTimes&&typeof data.challengeClearTimes==='object') challengeClearTimes=data.challengeClearTimes;
+  challengeStartTime=(typeof data.challengeStartTime==='number')?data.challengeStartTime:0;
   activeChallenge=(typeof data.activeChallenge==='string')?data.activeChallenge:null;
   challengeProgress=(typeof data.challengeProgress==='number')?data.challengeProgress:0;
   challengeDeadline=(typeof data.challengeDeadline==='number')?data.challengeDeadline:0;
@@ -11377,7 +11419,7 @@ document.querySelectorAll('.tab-btn').forEach(function(btn){
     btn.classList.add('active');
     document.getElementById('tab-'+tab).classList.add('active');
     if(tab==='honors'){ renderAchievementsTab(); _achievementsTabDirty=false; }
-    if(tab==='stats'){ updateEntityStatsPanel(); }
+    if(tab==='stats'){ updateEntityStatsPanel(); renderChallengeRecords(); }
     if(tab==='portal'){ renderPortalTab(); openPortalTabModal(); }
     // Restore the tab's remembered scroll (Honors always opens at the top).
     if(_tca){ _tca.scrollTop=(tab==='honors')?0:(_tabScrollPos[tab]||0); }
