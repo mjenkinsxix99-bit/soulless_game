@@ -26,9 +26,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #souls-display .num { font-size: 33px; color: #ffffff; font-weight: bold; text-shadow: 0 0 8px rgba(200,180,255,0.9), 0 0 18px rgba(160,120,255,0.5); }
 #souls-display .lbl { font-size: 14px; color: #c0b0f0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 6px rgba(150,120,240,0.4); }
 #stage-desc { font-size: 13px; color: #7766aa; font-style: italic; text-align: center; }
-#main { display: flex; flex: 1; overflow: hidden; position:relative; }
-#left, #right { width: 300px; flex-shrink: 0; padding: 16px 14px; background: #08080e; overflow-y: auto; }
-#left { width: 370px; border-right: 1px solid #1e1845; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 0; background: #000; position: relative; overflow: hidden; }
+#main { display: flex; flex: 1; overflow: hidden; position:relative; z-index:0; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); }
+#right { width: 300px; flex-shrink: 0; padding: 16px 14px; background: #08080e; overflow-y: auto; }
 #right { border-left: 1px solid #1e1845; width: 415px; }
 .ph { font-size: 14px; letter-spacing: 3px; color: #9980dd; text-transform: uppercase; border-bottom: 1px solid #1a1535; padding-bottom: 4px; margin-bottom: 10px; }
 .ph.gap { margin-top: 16px; }
@@ -69,9 +68,13 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .ucard-flex { display: flex; gap: 10px; align-items: flex-start; }
 .ucard-icon { width: 60px; height: 60px; flex-shrink: 0; image-rendering: pixelated; border-radius: 4px; background-image:url('artwork/sprites_upgrades.webp'); background-size:2400px 60px; background-repeat:no-repeat; }
 .ucard-body { flex: 1; min-width: 0; }
-#battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%); overflow: hidden; padding-bottom: 60px; }
+#battlefield { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; position: relative; background: transparent; overflow: hidden; padding-bottom: 60px; }
 #bg-canvas { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;animation:bgSlowRotate 120s linear infinite; }
-#realm-bg-img-left { display:none; position:absolute; top:0; left:0; pointer-events:none; z-index:1; width:auto; height:auto; transform-origin:top left; }
+/* Single shared realm background — hosted on #main, spans the whole stage.
+   z-index:-1 keeps it behind all stage content while #main's radial gradient
+   remains the ultimate backdrop. Anchor (top:0;left:0;transform-origin:top left)
+   and the JS transform are unchanged from the original left-panel image. */
+#realm-bg-img-left { display:none; position:absolute; top:0; left:0; pointer-events:none; z-index:-1; width:auto; height:auto; transform-origin:top left; }
 #realm-bg-img { display:none; position:absolute; top:0; left:0; transform-origin:top left; pointer-events:none; z-index:1; width:auto; height:auto; }
 #combat-wrap { position:absolute; left:50%; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
 /* Update available banner */
@@ -158,7 +161,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #tattered-display .ts-preview { font-size: 10px; color: #cc7700; letter-spacing: 1px; margin-top: 2px; }
 
 /* ── MINION MODAL ──────────────────────────────────────────────────────────── */
-#minion-modal { display:none; position:fixed; top:0; left:370px; right:0; bottom:0; background:#02010e; z-index:900; flex-direction:column; overflow:hidden; }
+#minion-modal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:#02010e; z-index:900; flex-direction:column; overflow:hidden; }
 #minion-modal.open { display:flex; }
 #mm-header { display:grid; grid-template-columns:44px auto 1fr auto; align-items:center; gap:14px; padding:10px 18px; background:#05030e; border-bottom:1px solid #1e1548; flex-shrink:0; }
 #mm-header-left { display:flex; flex-direction:column; align-items:flex-start; gap:7px; }
@@ -888,7 +891,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #3a2e6e; border-radius: 2px; }
-#tab-content-area, #left { -webkit-overflow-scrolling: touch; }
+#tab-content-area { -webkit-overflow-scrolling: touch; }
 
 #upgrade-list { padding-right: 4px; }
 
@@ -932,7 +935,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .spell-tt-status { font-size:11px; color:#55dd88; margin-top:6px; font-style:italic; }
 .spell-tt-stacks { font-size:11px; color:#ffbb44; margin-top:4px; }
 /* ── TATTERED UPGRADES MODAL ─────────────────────────────────────────────── */
-#tattered-modal { display:none; position:fixed; top:0;left:370px;right:0;bottom:0; background:#02010e; z-index:900; flex-direction:column; }
+#tattered-modal { display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:#02010e; z-index:900; flex-direction:column; }
 #tattered-modal.open { display:flex; }
 #tm-header { display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:14px; padding:12px 18px; background:#05030e; border-bottom:1px solid #1e1548; flex-shrink:0; position:relative; z-index:2; }
 #tm-ts-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
@@ -1046,8 +1049,16 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #respec-confirm-no { background:#09071a; border:1px solid #2a1a5a; color:#776699; font-family:Georgia,serif; font-size:12px; letter-spacing:1px; padding:9px 22px; border-radius:5px; cursor:pointer; transition:all 0.2s; }
 #respec-confirm-no:hover { border-color:#7755aa; color:#9980dd; }
 .ubuy { font-size:14px; font-weight:bold; color:#887755; margin-right:5px; }
-/* Entity display in left panel */
-#left-entity { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; position:relative; min-height:560px; }
+/* Entity actor — stands on the left of the shared stage (rehomed from the old left
+   panel). Absolute box inside #battlefield; internal child offsets are unchanged, so
+   the 370px inner width is preserved. No overflow clip here — the sprite/pet are free
+   to render fully now that there is no 370px cage. */
+#left-entity { position:absolute; left:0; top:118px; width:370px; min-height:560px; z-index:3; }
+/* Flavor label sits above the entity; transparent (no more opaque black block). */
+#left-entity #left-header { position:absolute; top:0; left:0; right:0; width:auto; text-align:center; background:transparent; z-index:4; padding-bottom:6px; }
+/* Stage launchers — compact Sacrifice/Minions toolbar, top-left of the stage. */
+#stage-launchers { position:absolute; top:52px; left:14px; display:flex; flex-direction:row; gap:8px; z-index:12; }
+#stage-launchers .left-tab-btn { flex:0 0 auto; padding:4px 6px; }
 
 /* Spirit Slash soul-prompt arrow — floats outside the right panel, pointing at the card */
 #ss-global-arrow { display:none; position:absolute; right:14px; top:88px; z-index:20;
@@ -1110,7 +1121,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 
 /* ── ACHIEVEMENT BANNER ──────────────────────────────────────────────────── */
 #ach-banner {
-  position:fixed; left:370px; top:58px; z-index:200;
+  position:fixed; left:14px; top:58px; z-index:200;
   width:270px; pointer-events:none;
   display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
   padding:12px 18px 12px 16px;
@@ -1186,18 +1197,20 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 @media (pointer: coarse) and (hover: none) and (max-width: 549px) {
   #game { height: 100dvh; }
 
-  /* CSS grid: top row (left+battle) | buy bar | minimap | right panel */
+  /* CSS grid: full-width stage | minimap | buy bar | right panel.
+     The left panel is gone — the stage (entity + enemy) spans the whole top row. */
   #main {
     display: grid;
-    grid-template-columns: 155px 1fr;
+    grid-template-columns: 1fr;
     grid-template-rows: 38vh auto auto 1fr;
     grid-template-areas:
-      "left   battle"
-      "map    map"
-      "buy    buy"
-      "right  right";
+      "battle"
+      "map"
+      "buy"
+      "right";
     position: relative;
     overflow: hidden;
+    background: radial-gradient(ellipse at center, #03020a 0%, #08041a 55%, #100720 100%);
   }
 
   /* Shared realm background (moved to #main via JS) — spans full top row */
@@ -1213,20 +1226,22 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   #realm-bg-img  { display: none !important; }
   #bg-canvas     { display: none !important; }
 
-  /* Left panel: transparent so shared bg shows through */
-  #left {
-    grid-area: left;
-    width: auto;
-    background: transparent !important;
-    padding-top: 4px;
-    border-right: 1px solid rgba(30,24,69,0.6);
-    overflow: hidden;
-    z-index: 1;
+  /* Entity actor — bottom-left of the stage on mobile, scaled down. */
+  #left-entity {
+    top: auto !important; bottom: 4px !important;
+    left: 2px !important; width: 168px !important;
+    min-height: 0 !important; height: 168px !important;
+    z-index: 12 !important;
   }
-  #left-header  { background: transparent !important; padding: 4px 6px 2px; }
-  .left-tab-bar { background: transparent !important; }
-  #entity-canvas { width: 200px !important; height: 200px !important; }
-  #left #left-entity .canvas-wrap { top: -28px !important; }
+  #left-entity #left-header { display: none !important; }  /* flavor label hidden on phones */
+  #entity-canvas { width: 168px !important; height: 168px !important; }
+  #left-entity .canvas-wrap { top: auto !important; bottom: 0 !important; left: 0 !important; right: 0 !important; display: flex; justify-content: center; }
+  #pet-canvas { width: 96px !important; height: 96px !important; top: auto !important; bottom: 20px !important; right: -8px !important; }
+  /* Ascend/Reincarnate stack at the entity's feet (bottom-left), not over its body. */
+  #left-entity #ascend-btn { top: auto !important; bottom: 34px !important; left: 2px !important; right: auto !important; margin: 0 !important; font-size: 10px !important; padding: 4px 8px !important; letter-spacing: 1px !important; }
+  #left-entity #reincarnate-btn { top: auto !important; bottom: 4px !important; left: 2px !important; right: auto !important; margin: 0 !important; font-size: 10px !important; padding: 4px 8px !important; letter-spacing: 1px !important; }
+  /* Stage launchers — pin to the top-left corner of the stage. */
+  #stage-launchers { top: 4px !important; left: 4px !important; z-index: 13 !important; }
 
   /* Battlefield: transparent so shared bg shows through */
   #battlefield {
@@ -1422,37 +1437,11 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <div class="ach-desc"></div>
   </div>
   <div id="main">
-    <div id="left">
-      <img id="realm-bg-img-left" src="" alt="" />
-      <div id="left-header">
-        <div id="entity-stage-label" class="cname entity-label">You are Ether.</div>
-        <div id="stage-desc">Shapeless. Hungry.</div>
-      </div>
-      <div class="left-tab-bar">
-        <button class="left-tab-btn active" data-ltab="entity"><span class="ui-icon" style="background-position:0 0"></span><span class="tab-tip">Entity</span></button>
-        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop"><span class="ui-icon" style="background-position:-36px 0"></span><span class="tab-tip">Sacrifice</span></button>
-        <button class="left-tab-btn" id="minion-tab-btn" data-ltab="minions"><span class="ui-icon" style="background-position:-72px 0"></span><span class="tab-tip">Minions</span></button>
-      </div>
-      <div id="left-tab-content">
-        <div id="ltab-entity" class="left-tab-pane active">
-          <div id="left-entity">
-            <div class="canvas-wrap" style="position:absolute;top:42px;left:0;right:0;z-index:1;">
-              <canvas id="entity-canvas" width="330" height="330"></canvas>
-            </div>
-            <canvas id="pet-canvas" width="256" height="256" style="display:none;position:absolute;top:192px;right:-28px;width:180px;height:180px;z-index:2;pointer-events:none;transform:scaleX(-1);"></canvas>
-            <div class="hp-wrap" style="visibility:hidden;position:absolute;bottom:60px;left:0;right:0;display:flex;justify-content:center;">
-              <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
-              <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
-            </div>
-            <button id="ascend-btn">✦ ASCEND ✦</button>
-            <button id="reincarnate-btn">✦ REINCARNATE ✦</button>
-          </div>
-        </div>
-        <div id="ltab-soul-shop" class="left-tab-pane"></div>
-        <div id="ltab-minions" class="left-tab-pane"></div>
-      </div>
-    </div>
-    <!-- Spell panel + mana bar live here so they can span left+battlefield panels -->
+    <!-- Shared realm background — one image spanning the whole stage.
+         (The old left panel and its duplicate background image are retired; this
+         single image is the sole realm backdrop. Transform is unchanged.) -->
+    <img id="realm-bg-img-left" src="" alt="" />
+    <!-- Spell panel + mana bar span the full stage width -->
     <div id="spell-panel"></div>
     <div id="mana-bar-wrap">
       <span id="invoke-label">mana</span>
@@ -1462,6 +1451,29 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <div id="battlefield">
       <canvas id="bg-canvas"></canvas>
       <img id="realm-bg-img" src="" alt="" />
+      <!-- Entity actor — rehomed from the retired left panel. Stands on the left of
+           the stage, facing the centered enemy. Internal offsets unchanged. -->
+      <div id="left-entity">
+        <div id="left-header">
+          <div id="entity-stage-label" class="cname entity-label">You are Ether.</div>
+          <div id="stage-desc">Shapeless. Hungry.</div>
+        </div>
+        <div class="canvas-wrap" style="position:absolute;top:42px;left:0;right:0;z-index:1;">
+          <canvas id="entity-canvas" width="330" height="330"></canvas>
+        </div>
+        <canvas id="pet-canvas" width="256" height="256" style="display:none;position:absolute;top:192px;right:-28px;width:180px;height:180px;z-index:2;pointer-events:none;transform:scaleX(-1);"></canvas>
+        <div class="hp-wrap" style="visibility:hidden;position:absolute;bottom:60px;left:0;right:0;display:flex;justify-content:center;">
+          <div class="hp-track"><div class="hp-fill entity-hp" style="width:100%"></div></div>
+          <div class="hp-numbers"><span>&nbsp;</span><span>&nbsp;</span></div>
+        </div>
+        <button id="ascend-btn">✦ ASCEND ✦</button>
+        <button id="reincarnate-btn">✦ REINCARNATE ✦</button>
+      </div>
+      <!-- Stage launchers — Sacrifice & Minions open their respective modals. -->
+      <div id="stage-launchers">
+        <button class="left-tab-btn" id="tattered-upgrades-btn" data-ltab="soul-shop"><span class="ui-icon" style="background-position:-36px 0"></span><span class="tab-tip">Sacrifice</span></button>
+        <button class="left-tab-btn" id="minion-tab-btn" data-ltab="minions"><span class="ui-icon" style="background-position:-72px 0"></span><span class="tab-tip">Minions</span></button>
+      </div>
       <div id="update-banner">✦ Update Available — Click to Refresh ✦</div>
       <div id="challenge-timer"></div>
       <div id="combat-wrap">
@@ -12210,35 +12222,24 @@ document.getElementById('mm-auto').addEventListener('click',function(){
         9:0,
         10:0
       };
+      // Single shared realm background: #realm-bg-img-left (hosted on #main) spans the
+      // whole stage. The old middle image (#realm-bg-img) is retired — kept hidden.
+      // The left image's transform is unchanged (translateX(0) translateY(-400) scale).
       var bgImg=document.getElementById('realm-bg-img');
-      if(bgImg){
+      if(bgImg){ bgImg.style.display='none'; bgImg.src=''; }
+      var bgImgLeft=document.getElementById('realm-bg-img-left');
+      if(bgImgLeft){
         var imgSrc=REALM_BG_IMAGES[realm]||'';
-        var bgImgLeft=document.getElementById('realm-bg-img-left');
         if(imgSrc){
-          var scale=REALM_BG_SCALE[realm]||0.60;
-          var offset=REALM_BG_OFFSET[realm]||0;
-          bgImg.src=imgSrc;
-          bgImg.style.transform='translateX(-370px) translateY(-400px) scale('+scale+')';
-          bgImg.style.display='block';
+          var leftScale=REALM_BG_LEFT_SCALE[realm]||0.60;
+          bgImgLeft.src=imgSrc;
+          bgImgLeft.style.transform='translateX(0px) translateY(-400px) scale('+leftScale+')';
+          bgImgLeft.style.display='block';
           c.style.display='none';
-          // Left panel bg — all realms (independent scale/offset)
-          if(bgImgLeft){
-            if(imgSrc){
-              var leftScale=REALM_BG_LEFT_SCALE[realm]||0.60;
-              var leftOffset=REALM_BG_LEFT_OFFSET[realm]||0;
-              bgImgLeft.src=imgSrc;
-              bgImgLeft.style.transform='translateX(0px) translateY(-400px) scale('+leftScale+')';
-              bgImgLeft.style.display='block';
-            } else {
-              bgImgLeft.style.display='none';
-              bgImgLeft.src='';
-            }
-          }
         } else {
-          bgImg.style.display='none';
-          bgImg.src='';
+          bgImgLeft.style.display='none';
+          bgImgLeft.src='';
           c.style.display='';
-          if(bgImgLeft){ bgImgLeft.style.display='none'; bgImgLeft.src=''; }
         }
       }
 
