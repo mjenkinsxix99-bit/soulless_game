@@ -298,7 +298,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .cu-label { text-align:left; min-width:0; }
 .cu-name { color:#ffd76a; font-weight:bold; font-size:17px; letter-spacing:0.4px; text-shadow:0 0 5px rgba(0,0,0,0.95); }
 .cu-desc { color:#e6cf94; font-size:14px; font-style:italic; text-shadow:0 0 5px rgba(0,0,0,0.95); line-height:1.3; }
-.cu-buy-btn { flex-shrink:0; background:#b18cff; border:1px solid #cbb0ff; color:#1a0f30; font-family:Georgia,serif; font-weight:bold; font-size:14px; line-height:1.1; padding:7px 12px; border-radius:5px; cursor:pointer; text-align:center; box-shadow:0 0 8px rgba(160,120,255,0.4); }
+.cu-buy-btn { flex-shrink:0; width:100px; box-sizing:border-box; background:#b18cff; border:1px solid #cbb0ff; color:#1a0f30; font-family:Georgia,serif; font-weight:bold; font-size:14px; line-height:1.1; padding:7px 8px; border-radius:5px; cursor:pointer; text-align:center; box-shadow:0 0 8px rgba(160,120,255,0.4); }
 .cu-buy-btn:hover { background:#c4a4ff; }
 .cu-buy-btn .cu-cost { display:block; font-size:12px; color:#3a1f5e; }
 .cu-toggle { flex-shrink:0; background:#1a1030; border:1px solid #6644aa; color:#9980cc; font-family:Georgia,serif; font-size:14px; font-weight:bold; letter-spacing:1px; padding:7px 14px; border-radius:5px; cursor:pointer; min-width:58px; }
@@ -336,6 +336,15 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #fm-close-btn:hover { background:#3a1560; box-shadow:0 0 14px rgba(120,70,180,0.5); }
 .cu-val { flex-shrink:0; width:68px; background:#0a0518; border:1px solid #55447a; color:#ffe9b0; font-family:Georgia,serif; font-size:14px; text-align:center; padding:6px 4px; border-radius:5px; }
 .cu-ctl { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.cu-ctl.cu-ctl-stack { flex-direction:column; align-items:stretch; gap:5px; width:100px; }
+.cu-ctl-stack .cu-val, .cu-ctl-stack .cu-toggle, .cu-ctl-stack .cu-buy-btn { width:100%; min-width:0; box-sizing:border-box; }
+/* Immortal/Phoenix: mode dropdown + value input side by side, ON/OFF below */
+.cu-ctl.cu-ctl-mv { flex-direction:column; align-items:stretch; gap:5px; width:148px; }
+.cu-ctl-mv .cu-toggle { width:100%; min-width:0; box-sizing:border-box; }
+.cu-mode-row { display:flex; gap:4px; }
+.cu-mode-row .cu-select { flex:1 1 auto; min-width:0; }
+.cu-mode-row .cu-val { flex:0 0 50px; width:50px; padding:6px 2px; }
+.cu-select { min-width:0; background:#0a0518; border:1px solid #55447a; color:#ffe9b0; font-family:Georgia,serif; font-size:12px; padding:6px 2px; border-radius:5px; cursor:pointer; }
 #godmap-overlay { display:none; position:fixed; inset:0; background:rgba(2,1,10,0.94); z-index:10002; align-items:center; justify-content:center; padding:16px; }
 #godmap-overlay.open { display:flex; }
 #godmap-box { position:relative; }
@@ -3644,31 +3653,29 @@ function renderPortalTab(){
 // ── Challenge upgrades (the 13 hero powers) ──────────────────────────────────
 // type: 'buy' = Burning-Souls upgrade button; 'toggleval' = on/off + number box;
 // 'toggle' = plain on/off. Costs and effects are wired later, per power.
+// Array order IS the Portal display order (earnedChallengeUpgrades iterates this).
+// The visible description is built live by cuDescription(); the desc here is a fallback.
 var CHALLENGE_UPGRADES=[
-  { id:'str_heracles',   hero:'Heracles',    name:'Strength of Heracles', desc:'DPS boost',                       type:'buy', costScale:'linear' },
-  { id:'spoils_war',     hero:'Hippolyta',   name:'Spoils of War',        desc:'Increase TS from bounties',       type:'buy', costScale:'doubling' },
-  { id:'soul_catcher',   hero:'Britomartis', name:'Soul Catcher',         desc:'Souls gain boost',                type:'buy', costScale:'linear' },
-  { id:'glory_sacrifice',hero:'Penthesilea', name:'Glory in Sacrifice',   desc:'Increase Burning Souls',          type:'buy', costScale:'doubling' },
-  { id:'shapeshifter',   hero:'Maui',        name:'Shapeshifter',         desc:'Save and re-apply full ascension forms (Form Master)', type:'shapeshifter', costScale:'doubling', maxLevel:8 },
-  { id:'golden_apple',   hero:'Atalanta',    name:'Treasures Abound',     desc:'Chance for ×7 souls',        type:'buy', costScale:'linear' },
-  { id:'treasures',      hero:'Perseus',     name:'Contained Spirits',    desc:'Increased soul-urn chance',       type:'buy', costScale:'linear' },
-  { id:'auto_ascend',    hero:'Aeneas',      name:'Immortal',             desc:'Ascend at Set Floor',             type:'toggleval', ph:'floor' },
-  { id:'auto_reinc',     hero:'Gilgamesh',   name:'Phoenix',              desc:'Reincarnate at set Tattered Souls',type:'toggleval', ph:'TS' },
-  { id:'auto_sacrifice', hero:'Jason',       name:'Willing Sacrifice',    desc:'Auto-immolate up to N marked minions on Elite (set in the Compendium)', type:'buy', costScale:'linear', maxLevel:100 },
-  { id:'elite_rush',     hero:'Achilles',    name:'Elite-Rush',           desc:'Rush to each Elite — each level covers one realm, auto-off at floor level×100', type:'toggle', costScale:'doubling', maxLevel:10 },
-  { id:'auto_upgrade',   hero:'Sigurd',      name:'SMART Clickers',       desc:'Assigned auto-clickers advance to the next upgrade at your set level', type:'buytoggle', costScale:'doubling', maxLevel:6 },
-  { id:'elite_100',      hero:'Karna',       name:'Elite Capture',        desc:'Elite enemies become minions (+20%/lvl catch, must have MP)', type:'buy', costScale:'doubling', maxLevel:5 }
+  { id:'str_heracles',   hero:'Heracles',    name:'Strength of Heracles', desc:'Boosts DPS',                      type:'buy', costScale:'linear' },
+  { id:'soul_catcher',   hero:'Britomartis', name:'Soul Catcher',         desc:'Souls gained',                    type:'buy', costScale:'linear' },
+  { id:'spoils_war',     hero:'Hippolyta',   name:'Spoils of War',        desc:'Bounty TS',                       type:'buy', costScale:'doubling' },
+  { id:'glory_sacrifice',hero:'Penthesilea', name:'Glory in Sacrifice',   desc:'Burning Souls',                   type:'buy', costScale:'doubling' },
+  { id:'elite_rush',     hero:'Achilles',    name:'Elite-Rush',           desc:'Elites only, up to a floor cap',  type:'toggle', costScale:'doubling', maxLevel:10 },
+  { id:'auto_upgrade',   hero:'Sigurd',      name:'SMART Clickers',       desc:'Automate Minion Clickers',        type:'buytoggle', costScale:'doubling', maxLevel:6 },
+  { id:'shapeshifter',   hero:'Maui',        name:'Shapeshifter',         desc:'Form Presets',                    type:'shapeshifter', costScale:'doubling', maxLevel:8 },
+  { id:'elite_100',      hero:'Karna',       name:'Elite Capture',        desc:'Capture Elites as Minions',       type:'buy', costScale:'doubling', maxLevel:5 },
+  { id:'auto_sacrifice', hero:'Jason',       name:'Willing Sacrifice',    desc:'Auto Immolate marked minions',    type:'buy', costScale:'linear', maxLevel:100 },
+  { id:'auto_ascend',    hero:'Aeneas',      name:'Immortal',             desc:'Auto Ascend',                     type:'toggleval', ph:'floor' },
+  { id:'auto_reinc',     hero:'Gilgamesh',   name:'Phoenix',              desc:'Auto Reincarnate',                type:'toggleval', ph:'TS' },
+  { id:'treasures',      hero:'Perseus',     name:'Contained Spirits',    desc:'Soul Urn chance',                 type:'buy', costScale:'linear' },
+  { id:'golden_apple',   hero:'Atalanta',    name:'Treasures Abound',     desc:'Polished Enemy chance',           type:'buy', costScale:'linear' }
 ];
 // The powers the player has actually earned (hero defeated), in hero-node order —
 // so the list fills gap-free from the top and a newly-won power slots into place.
 function earnedChallengeUpgrades(){
-  var byHero={}; CHALLENGE_UPGRADES.forEach(function(u){ byHero[u.hero]=u; });
-  var out=[];
-  GOD_NODES.forEach(function(nd){
-    if(nd.god) return;
-    if(isGodCleared(nd.key) && byHero[nd.key]) out.push(byHero[nd.key]);
-  });
-  return out;
+  // Follow CHALLENGE_UPGRADES array order (the intended Portal display order),
+  // filtered to powers whose hero has been defeated.
+  return CHALLENGE_UPGRADES.filter(function(u){ return isGodCleared(u.hero); });
 }
 var challengeUpg={}; // id -> { level, on, val }
 function cuState(id){ if(!challengeUpg[id]) challengeUpg[id]={ level:0, on:false, val:'' }; return challengeUpg[id]; }
@@ -3689,8 +3696,7 @@ function cuVal(id){ return activeChallenge ? '' : cuState(id).val; }
 // Additive-with-decay multiplier: +base per level, the increment dropping 0.01
 // each decade but never below floorInc. Once at the floor it stays there forever.
 // (Heracles/Soul Catcher: base .20 floor .10; Spoils: base .06 floor .01.)
-function cuAdditiveMult(id, base, floorInc){
-  var L=cuLevel(id);
+function additiveMultAt(base, floorInc, L){
   if(L<=0) return 1;
   var floorLevel=Math.round((base-floorInc)*100)*10;   // last level before the floor locks in
   var mult=1, lim=Math.min(L, floorLevel);
@@ -3698,6 +3704,7 @@ function cuAdditiveMult(id, base, floorInc){
   if(L>floorLevel) mult+=(L-floorLevel)*floorInc;       // beyond that: +floorInc each, forever
   return mult;
 }
+function cuAdditiveMult(id, base, floorInc){ return additiveMultAt(base, floorInc, cuLevel(id)); }
 function heraclesDpsMult(){ return cuAdditiveMult('str_heracles', 0.20, 0.10); }  // ×DPS
 function soulCatcherMult(){ return cuAdditiveMult('soul_catcher', 0.20, 0.10); }  // ×Souls
 function spoilsMult(){ return cuAdditiveMult('spoils_war', 0.06, 0.01); }         // ×Elite-bounty TS
@@ -4077,12 +4084,24 @@ function autoAscendTrigger(){
   var b=document.getElementById('rebirth-ascend-now');
   if(b) b.click();
 }
-// Immortal: when the set floor is reached, auto-open the ascend flow (once per
-// climb — disarms until you drop back below the floor, e.g. after ascending).
+// Immortal: auto-ascend on a player-chosen trigger — a set Floor, a number of
+// Minutes since the current ascension, or the next failed Elite timer.
 var _immortalArmed=true;
+var _lastImmortalTick=0;             // throttle the time-based Minutes check
+var ascensionStartTime=Date.now();   // reset each ascension/reincarnation (Minutes mode)
 function checkImmortal(){
   if(activeChallenge) return;                       // suppressed during challenges
   if(!cuOn('auto_ascend')) return;                  // toggle off / suppressed
+  var mode=cuState('auto_ascend').mode||'floor';
+  if(mode==='elitefail') return;                    // handled in onEliteDpsCheckFail
+  if(mode==='minutes'){
+    var mins=parseFloat(cuVal('auto_ascend'));
+    if(!mins||mins<=0) return;
+    if(anyAscendModalOpen()) return;
+    if(Date.now()-ascensionStartTime >= mins*60000) autoAscendTrigger();
+    return;
+  }
+  // Floor mode (default): arm below the floor, fire once on reaching it.
   var target=parseInt(cuVal('auto_ascend'),10);
   if(!target||target<1) return;
   var gf=absGlobalFloor(curRealm,curLevel,curFloor);
@@ -4091,8 +4110,11 @@ function checkImmortal(){
   _immortalArmed=false;
   autoAscendTrigger();
 }
-// Phoenix: when banked TS exceeds the set value and you're in Ultimate form,
-// auto-reincarnate (no confirm). Bypasses Doom; Ultimate form still required.
+// Phoenix: auto-reincarnate when the chosen resource, gained this reincarnation,
+// reaches the set value (Ultimate form required). TS = banked (resets each
+// reincarnation); MP = the payout you'd receive by reincarnating now; BS = earned
+// since the last reincarnation (banked BS persists, so track the delta).
+var _bsBaseAtReinc=0;
 function tickPhoenix(){
   if(activeChallenge) return;
   if(!cuOn('auto_reinc')) return;
@@ -4100,7 +4122,12 @@ function tickPhoenix(){
   if(anyAscendModalOpen()) return;                  // don't reincarnate mid-ascension
   var target=parseInt(cuVal('auto_reinc'),10);
   if(!target||target<1) return;
-  if(tatteredSouls>target) doReincarnate();
+  var mode=cuState('auto_reinc').mode||'ts';
+  var val;
+  if(mode==='mp') val=calcReincarnateMP();
+  else if(mode==='bs') val=(burningSouls||0)-_bsBaseAtReinc;
+  else val=tatteredSouls;                           // ts (banked)
+  if(val>=target) doReincarnate();
 }
 // Credit Burning Souls with Glory's multiplier, carrying the fraction so none is lost.
 var _bsCarry=0;
@@ -4128,6 +4155,29 @@ function cuCost(id){
   if(u&&u.costScale==='doubling') return Math.pow(2,lv+1); // cost to reach level L = 2^L
   return 5*(lv+1);
 }
+// Live Portal description for a power — shows the current multiplier / value,
+// computed from the real level so it stays accurate.
+function _cuMult(n){ return '×'+(n>=100 ? fmt(D(n)) : n.toFixed(2)); }
+function _cuPct(n){ return (Math.round(n*10000)/100)+'%'; }   // fraction → trimmed percent
+function cuDescription(u){
+  var L=cuState(u.id).level;
+  switch(u.id){
+    case 'str_heracles':    return 'Boosts DPS '+_cuMult(additiveMultAt(0.20,0.10,L));
+    case 'soul_catcher':    return 'Souls gained '+_cuMult(additiveMultAt(0.20,0.10,L));
+    case 'spoils_war':      return 'Bounty TS '+_cuMult(additiveMultAt(0.06,0.01,L));
+    case 'glory_sacrifice': return 'Burning Souls '+_cuMult(L>0?1+0.25*L:1);
+    case 'elite_rush':      return 'Elites only to Floor '+(L*100);
+    case 'auto_upgrade':    return 'Automate Minion Clickers';
+    case 'shapeshifter':    return 'Form Presets: '+L;
+    case 'elite_100':       return 'Capture Elites as Minions '+Math.round(Math.min(1,0.20*L)*100)+'%';
+    case 'auto_sacrifice':  return 'Auto Immolate up to '+L+' minions';
+    case 'auto_ascend':     return 'Auto Ascend';
+    case 'auto_reinc':      return 'Auto Reincarnate';
+    case 'treasures':       return 'Soul Urn chance +'+_cuPct(Math.min(0.25,0.0025*L));
+    case 'golden_apple':    return 'Polished Enemy chance +'+_cuPct(L>0?(0.01+Math.min(0.99,0.002*L)):0);
+  }
+  return u.desc;
+}
 function renderChallengeUpgrades(){
   var list=document.getElementById('challenge-upg-list');
   if(!list) return;
@@ -4143,12 +4193,12 @@ function renderChallengeUpgrades(){
     var st=cuState(u.id);
     var row=document.createElement('div'); row.className='cu-row';
     var lbl=document.createElement('div'); lbl.className='cu-label';
-    lbl.innerHTML='<div class="cu-name">'+u.name+(((u.type==='buy'||u.type==='buytoggle'||u.id==='elite_rush')&&st.level>0)?' <span style="color:#e6cf94">Lv '+st.level+'</span>':'')+'</div><div class="cu-desc">'+u.desc+'</div>';
+    lbl.innerHTML='<div class="cu-name">'+u.name+'</div><div class="cu-desc">'+cuDescription(u)+'</div>';
     row.appendChild(lbl);
     if(u.type==='buy'){
       var btn=document.createElement('button'); btn.className='cu-buy-btn';
       var atMax=u.maxLevel&&st.level>=u.maxLevel;
-      btn.innerHTML=atMax?'<span class="cu-cost">MAX</span>':('Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>');
+      btn.innerHTML=atMax?'<span class="cu-cost">MAX</span>':('Level '+st.level+'<span class="cu-cost">🔥 '+fmt(D(cuCost(u.id)))+'</span>');
       if(atMax) btn.disabled=true;
       (function(id,mx){ btn.addEventListener('click',function(){
         if(mx&&cuState(id).level>=mx) return;
@@ -4163,16 +4213,34 @@ function renderChallengeUpgrades(){
       }); })(u.id,u.maxLevel);
       row.appendChild(btn);
     } else if(u.type==='toggleval'){
-      var ctl=document.createElement('div'); ctl.className='cu-ctl';
-      var inp=document.createElement('input'); inp.className='cu-val'; inp.type='number'; inp.min='0'; inp.placeholder=u.ph; inp.value=st.val;
+      // Row 1: mode dropdown (left) + number input (right). Row 2: ON/OFF.
+      var ctl=document.createElement('div'); ctl.className='cu-ctl cu-ctl-mv';
+      var modeRow=document.createElement('div'); modeRow.className='cu-mode-row';
+      var isImmortal=(u.id==='auto_ascend');
+      var opts=isImmortal ? [['floor','Floor'],['minutes','Minutes'],['elitefail','Elite Fail']]
+                          : [['ts','Tattered Souls'],['mp','Minion Points'],['bs','Burning Souls']];
+      var defMode=isImmortal?'floor':'ts';
+      var curMode=st.mode||defMode;
+      var sel=document.createElement('select'); sel.className='cu-select';
+      opts.forEach(function(o){ var op=document.createElement('option'); op.value=o[0]; op.textContent=o[1]; if(o[0]===curMode) op.selected=true; sel.appendChild(op); });
+      var inp=document.createElement('input'); inp.className='cu-val'; inp.type='number'; inp.min='0'; inp.value=st.val;
+      function syncInput(){
+        var noInput = isImmortal && sel.value==='elitefail';   // Elite Fail needs no number
+        inp.style.visibility = noInput ? 'hidden' : 'visible';
+        inp.placeholder = isImmortal ? (sel.value==='minutes'?'min':'floor') : '#';
+      }
+      (function(id){ sel.addEventListener('change',function(){ cuState(id).mode=this.value; syncInput(); saveGame(); }); })(u.id);
       (function(id){ inp.addEventListener('input',function(){ cuState(id).val=this.value; saveGame(); }); })(u.id);
+      syncInput();
+      modeRow.appendChild(sel); modeRow.appendChild(inp);
       var tg=document.createElement('button'); tg.className='cu-toggle'+(st.on?' on':''); tg.textContent=st.on?'ON':'OFF';
       (function(id,b){ tg.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tg);
-      ctl.appendChild(inp); ctl.appendChild(tg); row.appendChild(ctl);
+      ctl.appendChild(modeRow); ctl.appendChild(tg); row.appendChild(ctl);
     } else if(u.type==='buytoggle'){
       // A buyable level (how many clickers are smart) plus an ON/OFF switch, and —
       // for SMART Clickers — a single target-level input shared by every clicker.
-      var ctlB=document.createElement('div'); ctlB.className='cu-ctl';
+      // Stacked: target box over Upgrade over ON/OFF.
+      var ctlB=document.createElement('div'); ctlB.className='cu-ctl cu-ctl-stack';
       if(u.id==='auto_upgrade'){
         var tgtInp=document.createElement('input'); tgtInp.className='cu-val'; tgtInp.type='number'; tgtInp.min='1'; tgtInp.placeholder='Lv'; tgtInp.title='Advance to the next upgrade at this level'; tgtInp.value=smartClickerTarget;
         tgtInp.addEventListener('input',function(){ smartClickerTarget=this.value; saveGame(); });
@@ -4180,7 +4248,7 @@ function renderChallengeUpgrades(){
       }
       var atMaxB=u.maxLevel&&st.level>=u.maxLevel;
       var buyB=document.createElement('button'); buyB.className='cu-buy-btn';
-      buyB.innerHTML=atMaxB?'<span class="cu-cost">MAX</span>':('Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>');
+      buyB.innerHTML=atMaxB?'<span class="cu-cost">MAX</span>':('Level '+st.level+'<span class="cu-cost">🔥 '+fmt(D(cuCost(u.id)))+'</span>');
       if(atMaxB) buyB.disabled=true;
       (function(id,mx){ buyB.addEventListener('click',function(){
         if(mx&&cuState(id).level>=mx) return;
@@ -4197,14 +4265,14 @@ function renderChallengeUpgrades(){
       (function(id,b){ tgB.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tgB);
       ctlB.appendChild(buyB); ctlB.appendChild(tgB); row.appendChild(ctlB);
     } else if(u.type==='shapeshifter'){
-      // Open Presets opens the Form Master screen as a sandbox; Upgrade buys another
-      // preset box (gated behind Form Master past level 1).
-      var ctlS=document.createElement('div'); ctlS.className='cu-ctl';
-      var openS=document.createElement('button'); openS.className='cu-buy-btn cu-presets-btn'; openS.textContent='Open Presets';
+      // Stacked: Upgrade over Presets. Presets opens the Form Master sandbox;
+      // Upgrade buys another preset box (gated behind Form Master past level 1).
+      var ctlS=document.createElement('div'); ctlS.className='cu-ctl cu-ctl-stack';
+      var openS=document.createElement('button'); openS.className='cu-buy-btn cu-presets-btn'; openS.textContent='Presets';
       openS.addEventListener('click', openPresetSandbox);
       var atMaxS=u.maxLevel&&st.level>=u.maxLevel;
       var buyS=document.createElement('button'); buyS.className='cu-buy-btn';
-      buyS.innerHTML=atMaxS?'<span class="cu-cost">MAX</span>':('Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>');
+      buyS.innerHTML=atMaxS?'<span class="cu-cost">MAX</span>':('Level '+st.level+'<span class="cu-cost">🔥 '+fmt(D(cuCost(u.id)))+'</span>');
       if(atMaxS) buyS.disabled=true;
       (function(id,mx){ buyS.addEventListener('click',function(){
         if(mx&&cuState(id).level>=mx) return;
@@ -4218,15 +4286,13 @@ function renderChallengeUpgrades(){
         renderChallengeUpgrades();
         saveGame();
       }); })(u.id,u.maxLevel);
-      ctlS.appendChild(openS); ctlS.appendChild(buyS); row.appendChild(ctlS);
+      ctlS.appendChild(buyS); ctlS.appendChild(openS); row.appendChild(ctlS);   // Upgrade on top, Presets below
     } else if(u.id==='elite_rush'){
       // Buyable levels (doubling) here; the ON/OFF toggle lives on the battlefield.
       var ctlE=document.createElement('div'); ctlE.className='cu-ctl';
-      var hintE=document.createElement('div'); hintE.className='cu-hint'; hintE.textContent='Toggle on the battlefield';
-      ctlE.appendChild(hintE);
       var atMaxE=u.maxLevel&&st.level>=u.maxLevel;
       var buyE=document.createElement('button'); buyE.className='cu-buy-btn';
-      buyE.innerHTML=atMaxE?'<span class="cu-cost">MAX</span>':('Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>');
+      buyE.innerHTML=atMaxE?'<span class="cu-cost">MAX</span>':('Level '+st.level+'<span class="cu-cost">🔥 '+fmt(D(cuCost(u.id)))+'</span>');
       if(atMaxE) buyE.disabled=true;
       (function(id,mx){ buyE.addEventListener('click',function(){
         if(mx&&cuState(id).level>=mx) return;
@@ -6401,6 +6467,10 @@ function onEliteDpsCheckFail(){
   curFloor=FLOORS_PER_LEVEL; floorWins=WINS_PER_FLOOR;
   if(autoProgressEnabled){ autoProgressEnabled=false; saveGame(); }
   if(cuState('elite_rush').on){ cuState('elite_rush').on=false; updateEliteRushBtn(); saveGame(); }  // Elite-Rush ends on a failed timer
+  // Immortal "Elite Fail" mode: a missed Elite timer triggers the auto-ascend.
+  if(!activeChallenge && cuOn('auto_ascend') && (cuState('auto_ascend').mode||'floor')==='elitefail' && !anyAscendModalOpen()){
+    autoAscendTrigger();
+  }
   buildMinimap();
   if(!_tutShown.eliteFail){ _tutShown.eliteFail=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You are not strong enough to Proceed. You must grow stronger. More souls. Feed the hunger.',document.getElementById('enemy-canvas'),null); },700); } }
   setTimeout(spawnEnemy,600);
@@ -8580,6 +8650,8 @@ function doReincarnate(){
   immolateMode=false; immolateTargets=[];
   resetSmartClickersToTop();   // SMART Clickers restart from the top upgrades
   removeSoulUrn();             // any active Soul Urn is abandoned on reincarnation
+  ascensionStartTime=Date.now();    // Immortal Minutes timer restarts this life
+  _bsBaseAtReinc=(burningSouls||0);  // Phoenix Burning-Souls delta baseline
 
   recalcStats();
   mana=manaMax; // start each run with a full mana bar (recalcStats set the cap)
@@ -8735,6 +8807,7 @@ function doRebirthReset(chosenForm){
   _rebirthEntityOverride=chosenForm;
   resetSmartClickersToTop();   // SMART Clickers restart from the top upgrades
   removeSoulUrn();             // any active Soul Urn is abandoned on ascension
+  ascensionStartTime=Date.now();    // Immortal Minutes timer restarts each ascension
 
   recalcStats();
   mana=manaMax; // start each run with a full mana bar (recalcStats set the cap)
@@ -8861,6 +8934,8 @@ function saveGame(){
     challengesPassed:JSON.parse(JSON.stringify(challengesPassed)),
     challengeClearTimes:JSON.parse(JSON.stringify(challengeClearTimes)),
     challengeStartTime:challengeStartTime,
+    ascensionStartTime:ascensionStartTime,
+    bsBaseAtReinc:_bsBaseAtReinc,
     activeChallenge:activeChallenge,
     challengeProgress:challengeProgress,
     challengeDeadline:challengeDeadline,
@@ -9026,6 +9101,8 @@ function loadGame(){
   if(data.challengesPassed&&typeof data.challengesPassed==='object') challengesPassed=data.challengesPassed;
   if(data.challengeClearTimes&&typeof data.challengeClearTimes==='object') challengeClearTimes=data.challengeClearTimes;
   challengeStartTime=(typeof data.challengeStartTime==='number')?data.challengeStartTime:0;
+  ascensionStartTime=(typeof data.ascensionStartTime==='number')?data.ascensionStartTime:Date.now();
+  _bsBaseAtReinc=(typeof data.bsBaseAtReinc==='number')?data.bsBaseAtReinc:(burningSouls||0);
   activeChallenge=(typeof data.activeChallenge==='string')?data.activeChallenge:null;
   challengeProgress=(typeof data.challengeProgress==='number')?data.challengeProgress:0;
   challengeDeadline=(typeof data.challengeDeadline==='number')?data.challengeDeadline:0;
@@ -10596,7 +10673,8 @@ function gameLoop(){
 
   tickChallengeTimer(now);
   tickChallengeSouls(now);
-  tickPhoenix();          // Phoenix: auto-reincarnate at set TS (Ultimate form)
+  if(now-_lastImmortalTick>=1000){ _lastImmortalTick=now; checkImmortal(); }   // Immortal Minutes mode (time-based)
+  tickPhoenix();          // Phoenix: auto-reincarnate at chosen resource (Ultimate form)
   tickElementProduction(now);
   updatePortalCardBars();
   if(now-_lastPortalUiRefresh>=500){ _lastPortalUiRefresh=now; refreshPortalMaterialValues(); }
