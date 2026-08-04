@@ -3648,12 +3648,12 @@ var CHALLENGE_UPGRADES=[
   { id:'soul_catcher',   hero:'Britomartis', name:'Soul Catcher',         desc:'Souls gain boost',                type:'buy', costScale:'linear' },
   { id:'glory_sacrifice',hero:'Penthesilea', name:'Glory in Sacrifice',   desc:'Increase Burning Souls',          type:'buy', costScale:'doubling' },
   { id:'shapeshifter',   hero:'Maui',        name:'Shapeshifter',         desc:'Save and re-apply full ascension forms (Form Master)', type:'shapeshifter', costScale:'doubling', maxLevel:8 },
-  { id:'golden_apple',   hero:'Atalanta',    name:'Treasures Abound',     desc:'Chance for ×7 souls',        type:'buy' },
-  { id:'treasures',      hero:'Perseus',     name:'Contained Spirits',    desc:'Increased soul-urn chance',       type:'buy' },
+  { id:'golden_apple',   hero:'Atalanta',    name:'Treasures Abound',     desc:'Chance for ×7 souls',        type:'buy', costScale:'linear' },
+  { id:'treasures',      hero:'Perseus',     name:'Contained Spirits',    desc:'Increased soul-urn chance',       type:'buy', costScale:'linear' },
   { id:'auto_ascend',    hero:'Aeneas',      name:'Immortal',             desc:'Ascend at Set Floor',             type:'toggleval', ph:'floor' },
   { id:'auto_reinc',     hero:'Gilgamesh',   name:'Phoenix',              desc:'Reincarnate at set Tattered Souls',type:'toggleval', ph:'TS' },
   { id:'auto_sacrifice', hero:'Jason',       name:'Willing Sacrifice',    desc:'Auto-immolate up to N marked minions on Elite (set in the Compendium)', type:'buy', costScale:'linear', maxLevel:100 },
-  { id:'elite_rush',     hero:'Achilles',    name:'Elite-Rush',           desc:'Fight Elites only until Fail',    type:'toggle' },
+  { id:'elite_rush',     hero:'Achilles',    name:'Elite-Rush',           desc:'Rush to each Elite — each level covers one realm, auto-off at floor level×100', type:'toggle', costScale:'doubling', maxLevel:10 },
   { id:'auto_upgrade',   hero:'Sigurd',      name:'SMART Clickers',       desc:'Assigned auto-clickers advance to the next upgrade at your set level', type:'buytoggle', costScale:'doubling', maxLevel:6 },
   { id:'elite_100',      hero:'Karna',       name:'Elite Capture',        desc:'Elite enemies become minions (+20%/lvl catch, must have MP)', type:'buy', costScale:'doubling', maxLevel:5 }
 ];
@@ -3736,7 +3736,7 @@ function spawnSoulUrn(reward){
   if(!wrap) return;
   var pos=URN_POSITIONS[Math.floor(Math.random()*URN_POSITIONS.length)];
   var sprite=Math.floor(Math.random()*4)+1;   // urn_1..urn_4
-  var size=76;
+  var size=152;   // doubled from 76
   var el=document.createElement('div');
   el.className='soul-urn';
   el.style.left=(165+pos.dx-size/2)+'px';
@@ -3917,16 +3917,31 @@ function openPresetSandbox(){
 
 // ── Elite-Rush (Achilles) ────────────────────────────────────────────────────
 // A battlefield toggle. While ON, the game skips straight to each level's Elite
-// (skipped normal floors count as cleared) until an Elite timer is failed, which
-// switches it off. Off during Hero Challenges. Pure toggle — levels do nothing.
+// (skipped normal floors count as cleared) until an Elite timer is failed OR the
+// level's floor cap is passed, which switches it off. Each level covers one realm:
+// it auto-offs once past global floor level×100 (max level 10 → floor 1000). Off
+// during Hero Challenges.
 function eliteRushOwned(){ return cuState('elite_rush').level>0; }
 function eliteRushActive(){ return !activeChallenge && !inHeroFight && eliteRushOwned() && cuState('elite_rush').on; }
+function eliteRushCapFloor(){ return cuState('elite_rush').level * 100; }   // one realm per level
 function updateEliteRushBtn(){
   var b=document.getElementById('elite-rush-btn');
   if(!b) return;
   b.style.display=(!activeChallenge && eliteRushOwned()) ? 'block' : 'none';
   b.classList.toggle('on', cuState('elite_rush').on);
   updateMinionClickerDock();   // dock container must show even with no minion clickers
+}
+// Turn Elite-Rush off once past the level's floor cap. Returns true if it just did.
+function eliteRushCheckCap(){
+  if(!eliteRushActive()) return false;
+  if(absGlobalFloor(curRealm,curLevel,curFloor) > eliteRushCapFloor()){
+    cuState('elite_rush').on=false;
+    updateEliteRushBtn();
+    showGameToast('Elite-Rush ran out at floor '+eliteRushCapFloor()+'.');
+    saveGame();
+    return true;
+  }
+  return false;
 }
 // Jump to the current level's Elite, unlocking it at the frontier (skipped floors
 // count as cleared). navigateTo respawns as the Elite.
@@ -3938,9 +3953,11 @@ function eliteRushJumpToElite(){
   navigateTo(curLevel, FLOORS_PER_LEVEL+1);
 }
 // Called at the end of every spawn: if Elite-Rush is on and we're on a normal
-// floor, bounce straight to the Elite.
+// floor, bounce straight to the Elite (unless the floor cap ends the rush first).
 function eliteRushMaybeSkip(){
-  if(!eliteRushActive() || isEliteFight()) return;
+  if(!eliteRushActive()) return;
+  if(eliteRushCheckCap()) return;        // past the level's cap → turned off
+  if(isEliteFight()) return;             // on an Elite → fight it
   eliteRushJumpToElite();
 }
 
@@ -4124,7 +4141,7 @@ function renderChallengeUpgrades(){
     var st=cuState(u.id);
     var row=document.createElement('div'); row.className='cu-row';
     var lbl=document.createElement('div'); lbl.className='cu-label';
-    lbl.innerHTML='<div class="cu-name">'+u.name+(((u.type==='buy'||u.type==='buytoggle')&&st.level>0)?' <span style="color:#e6cf94">Lv '+st.level+'</span>':'')+'</div><div class="cu-desc">'+u.desc+'</div>';
+    lbl.innerHTML='<div class="cu-name">'+u.name+(((u.type==='buy'||u.type==='buytoggle'||u.id==='elite_rush')&&st.level>0)?' <span style="color:#e6cf94">Lv '+st.level+'</span>':'')+'</div><div class="cu-desc">'+u.desc+'</div>';
     row.appendChild(lbl);
     if(u.type==='buy'){
       var btn=document.createElement('button'); btn.className='cu-buy-btn';
@@ -4201,9 +4218,27 @@ function renderChallengeUpgrades(){
       }); })(u.id,u.maxLevel);
       ctlS.appendChild(openS); ctlS.appendChild(buyS); row.appendChild(ctlS);
     } else if(u.id==='elite_rush'){
-      // Control lives on the battlefield (the laurel-wreath toggle by the clicker dock).
-      var hint=document.createElement('div'); hint.className='cu-hint'; hint.textContent='Toggle on the battlefield';
-      row.appendChild(hint);
+      // Buyable levels (doubling) here; the ON/OFF toggle lives on the battlefield.
+      var ctlE=document.createElement('div'); ctlE.className='cu-ctl';
+      var hintE=document.createElement('div'); hintE.className='cu-hint'; hintE.textContent='Toggle on the battlefield';
+      ctlE.appendChild(hintE);
+      var atMaxE=u.maxLevel&&st.level>=u.maxLevel;
+      var buyE=document.createElement('button'); buyE.className='cu-buy-btn';
+      buyE.innerHTML=atMaxE?'<span class="cu-cost">MAX</span>':('Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>');
+      if(atMaxE) buyE.disabled=true;
+      (function(id,mx){ buyE.addEventListener('click',function(){
+        if(mx&&cuState(id).level>=mx) return;
+        var cost=cuCost(id);
+        if((burningSouls||0) < cost){ showGameToast('Not enough Burning Souls.'); return; }
+        burningSouls-=cost;
+        cuState(id).level++;
+        recalcStats(); dirtyU=true;
+        updateBurningSoulDisplay();
+        renderChallengeUpgrades();
+        updateEliteRushBtn();
+        saveGame();
+      }); })(u.id,u.maxLevel);
+      ctlE.appendChild(buyE); row.appendChild(ctlE);
     } else {
       var tg2=document.createElement('button'); tg2.className='cu-toggle'+(st.on?' on':''); tg2.textContent=st.on?'ON':'OFF';
       (function(id,b){ tg2.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tg2);
@@ -10143,6 +10178,10 @@ document.getElementById('reform-btn').addEventListener('click',reform);
 document.getElementById('elite-rush-btn').addEventListener('click',function(){
   if(activeChallenge || !eliteRushOwned()) return;
   var s=cuState('elite_rush');
+  if(!s.on && absGlobalFloor(curRealm,curLevel,curFloor) > eliteRushCapFloor()){
+    showGameToast('Elite-Rush Lv '+s.level+' only reaches floor '+eliteRushCapFloor()+'. Level it up.');
+    return;
+  }
   s.on=!s.on;
   updateEliteRushBtn();
   saveGame();
