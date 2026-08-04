@@ -304,24 +304,34 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .cu-toggle { flex-shrink:0; background:#1a1030; border:1px solid #6644aa; color:#9980cc; font-family:Georgia,serif; font-size:11px; font-weight:bold; letter-spacing:1px; padding:5px 12px; border-radius:5px; cursor:pointer; min-width:52px; }
 .cu-toggle.on { background:#e8c24a; border-color:#ffe27a; color:#1a1000; box-shadow:0 0 8px rgba(255,210,80,0.6); }
 .cu-hint { flex-shrink:0; color:#c9b57e; font-size:10px; font-style:italic; text-align:right; max-width:96px; line-height:1.25; text-shadow:0 0 5px rgba(0,0,0,0.95); }
-/* Shapeshifter — preset boxes */
-.cu-row-shapeshifter { flex-wrap:wrap; }
-.ss-preset-grid { flex-basis:100%; width:100%; display:grid; grid-template-columns:repeat(2,1fr); gap:7px; margin-top:9px; }
-.ss-preset { background:#140a26; border:1px solid #5a3f8f; border-radius:6px; padding:7px 8px; display:flex; flex-direction:column; gap:5px; position:relative; }
-.ss-preset.filled { border-color:#b18cff; box-shadow:0 0 7px rgba(160,120,255,0.35); }
-.ss-preset.active { border-color:#ffe27a; box-shadow:0 0 10px rgba(255,210,80,0.6); }
-.ss-preset-num { position:absolute; top:5px; right:8px; font-size:10px; font-weight:bold; color:#8a74c0; font-family:Georgia,serif; }
-.ss-preset-label { color:#e9dcff; font-family:Georgia,serif; font-size:11px; font-weight:bold; text-transform:capitalize; line-height:1.2; padding-right:14px; min-height:26px; }
-.ss-preset:not(.filled) .ss-preset-label { color:#6b5a94; font-style:italic; font-weight:normal; }
-.ss-preset-btns { display:flex; gap:4px; }
-.ss-preset-btns button { flex:1; font-family:Georgia,serif; font-weight:bold; font-size:10px; letter-spacing:0.5px; padding:4px 0; border-radius:4px; cursor:pointer; border:1px solid; }
-.ss-preset-btns button:disabled { opacity:0.4; cursor:default; }
-.ss-use { background:#1f9e2f; border-color:#46d456; color:#04160a; }
-.ss-use:not(:disabled):hover { background:#28b23a; }
-.ss-save { background:#2f7a45; border-color:#4fd07a; color:#eafff0; }
-.ss-save:hover { background:#379152; }
-.ss-clear { background:#7a1414; border-color:#cc3333; color:#ffe0e0; }
-.ss-clear:not(:disabled):hover { background:#8f1a1a; }
+/* Shapeshifter — "Open Presets" button in the Portal row */
+.cu-presets-btn { background:#7a4bd0; border-color:#a986f0; color:#f3ecff; }
+.cu-presets-btn:hover { background:#8a5be0; }
+/* Shapeshifter — preset boxes inside the Form Master / preset-builder modal */
+#fm-presets-panel { flex:0 0 210px; align-self:stretch; display:flex; flex-direction:column; border-right:1px solid #2a2150; padding-right:16px; }
+#fm-presets-title { font-size:12px; letter-spacing:3px; text-transform:uppercase; color:#9977cc; margin-bottom:10px; text-align:center; }
+#fm-presets { flex:1; display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(4,1fr); gap:8px; }
+.fp-slot { position:relative; background:#0d0d1e; border:2px solid #1e1845; border-radius:7px; padding:6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:5px; overflow:hidden; }
+.fp-slot.filled { border-color:#6f57b0; }
+.fp-slot.active { border-color:#ffd700; box-shadow:0 0 10px rgba(212,168,67,0.4); }
+.fp-slot.locked { align-items:center; justify-content:center; opacity:0.55; }
+.fp-lock { font-size:26px; opacity:0.6; filter:grayscale(1); }
+.fp-canvas { width:52px; height:52px; border-radius:4px; image-rendering:pixelated; background:#05040d; }
+.fp-namerow { display:flex; align-items:center; gap:4px; width:100%; }
+.fp-check { flex:0 0 auto; width:14px; height:14px; accent-color:#ffd700; cursor:pointer; }
+.fp-name { flex:1; min-width:0; background:#05040d; border:1px solid #35306a; color:#e9dcff; font-family:Georgia,serif; font-size:11px; padding:2px 4px; border-radius:3px; text-align:center; }
+.fp-btns { display:flex; gap:4px; width:100%; }
+.fp-btns button { flex:1; font-family:Georgia,serif; font-weight:bold; font-size:10px; letter-spacing:0.5px; padding:4px 0; border-radius:4px; cursor:pointer; border:1px solid; }
+.fp-btns button:disabled { opacity:0.4; cursor:default; }
+.fp-save { background:#1f9e2f; border-color:#46d456; color:#04160a; }
+.fp-save:hover { background:#28b23a; }
+.fp-clear { background:#7a1414; border-color:#cc3333; color:#ffe0e0; }
+.fp-clear:not(:disabled):hover { background:#8f1a1a; }
+/* Form Master box becomes a two-column layout (presets | form selector) */
+#form-master-box { display:flex; gap:18px; align-items:stretch; max-width:920px; text-align:left; }
+#fm-main { flex:1; min-width:0; text-align:center; }
+#fm-close-btn { flex:1; max-width:160px; padding:12px 16px; background:#2a0a4a; border:2px solid #6a3aa0; color:#e9dcff; font-family:Georgia,serif; font-size:14px; letter-spacing:2px; cursor:pointer; border-radius:6px; transition:background 0.2s, box-shadow 0.2s; }
+#fm-close-btn:hover { background:#3a1560; box-shadow:0 0 14px rgba(120,70,180,0.5); }
 .cu-val { flex-shrink:0; width:64px; background:#0a0518; border:1px solid #55447a; color:#ffe9b0; font-family:Georgia,serif; font-size:12px; text-align:center; padding:5px 4px; border-radius:5px; }
 .cu-ctl { display:flex; align-items:center; gap:6px; flex-shrink:0; }
 #godmap-overlay { display:none; position:fixed; inset:0; background:rgba(2,1,10,0.94); z-index:10002; align-items:center; justify-content:center; padding:16px; }
@@ -1923,6 +1933,11 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
 <!-- Form Master Modal (unlocked after earning all 6 form ultimates) -->
 <div id="form-master-modal">
   <div id="form-master-box">
+    <div id="fm-presets-panel">
+      <div id="fm-presets-title">Presets</div>
+      <div id="fm-presets"></div>
+    </div>
+    <div id="fm-main">
     <div id="form-master-title">Form Master</div>
     <div id="form-master-subtitle">You may choose all your forms now, or choose to start as Ether again.</div>
 
@@ -2054,7 +2069,9 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <div id="fm-buttons">
       <button id="fm-ether-btn">Play from Ether</button>
       <button id="fm-begin-btn">Begin</button>
+      <button id="fm-close-btn" style="display:none;">Close</button>
     </div>
+    </div><!-- /fm-main -->
   </div>
 </div>
 
@@ -3767,34 +3784,18 @@ function expireSoulUrn(){
 }
 
 // ── Shapeshifter (form presets) ──────────────────────────────────────────────
-// Maui's power. Each level (Doubling cost, max 8) unlocks one preset box that can
-// store a full ascension configuration — form + the three path choices + weapon.
-// USE re-applies a preset in one shot (a Form-Master ascension) and marks it as the
-// preset Immortal/Phoenix auto-ascend will reuse. Buying extra boxes and USE both
-// require Form Master (all six form ultimates). Untouched by Hero Challenges: these
-// read cuState directly (not the suppressing cuLevel) so boxes persist during a trial.
-var formPresets=[];       // up to 8 saved configs: {form,p3,p4,p5,p6} or null
-var activePresetIdx=-1;   // preset Immortal/Phoenix reuses; -1 = none
+// Maui's power. Each level (Doubling cost, max 8) unlocks one preset box on the
+// Form Master screen. A preset stores a full ascension form (form + the three path
+// choices + weapon) and a name. The CHECKED preset is what auto-ascend
+// (Immortal/Phoenix) fills in. The Portal's "Open Presets" button opens the same
+// Form Master screen as a sandbox that never changes the current run — presets saved
+// there are the same ones offered during a real ascension. Buying boxes requires
+// Form Master. Reads cuState directly so boxes persist through Hero Challenges.
+var formPresets=[];        // up to 8: {form,p3,p4,p5,p6,name} or null
+var activePresetIdx=-1;    // the checked preset (auto-ascend fills it in); -1 = none
+var _fmSandbox=false;      // Form Master modal opened as a non-destructive preset builder
 function shapeshifterBoxes(){ return cuState('shapeshifter').level; }   // one box per level
 function presetComplete(p){ return !!(p && p.form && p.p3 && p.p4 && p.p5 && p.p6); }
-function currentFormConfig(){ return { form:rebirthForm, p3:ascension3Path, p4:ascension4Path, p5:ascension5Path, p6:ascension6Path }; }
-function presetLabel(p){
-  if(!presetComplete(p)) return 'Empty';
-  var np=FORM_NAMEPLATES[p.form];
-  var fn=(np&&np.label?np.label:p.form).replace(/\.$/,'');
-  return fn+' · '+p.p3+'/'+p.p4+'/'+p.p5+'/'+p.p6;
-}
-function saveFormPreset(idx){
-  var cfg=currentFormConfig();
-  if(!presetComplete(cfg)){ showGameToast('Reach a full form (a Form Master) before saving a preset.'); return; }
-  formPresets[idx]=cfg;
-  renderChallengeUpgrades(); saveGame();
-}
-function clearFormPreset(idx){
-  formPresets[idx]=null;
-  if(activePresetIdx===idx) activePresetIdx=-1;
-  renderChallengeUpgrades(); saveGame();
-}
 // Apply a stored config in one shot — mirrors the Form Master modal's Begin button.
 function applyFormPreset(p){
   ascension3Path=p.p3; ascension4Path=p.p4; ascension5Path=p.p5; ascension6Path=p.p6;
@@ -3804,34 +3805,114 @@ function applyFormPreset(p){
   hasEverHadAutoProgress=true;
   doRebirthReset(p.form);
 }
-function useFormPreset(idx){
-  var p=formPresets[idx];
-  if(!presetComplete(p)){ showGameToast('That preset is empty.'); return; }
-  activePresetIdx=idx;                              // Immortal/Phoenix reuse this one
-  var doomUpgrade=REP_UPGRADES.find(function(u){return u.id==='dm';});
-  var canAscend=doomUpgrade&&doomUpgrade.level>=1&&!challengeForbidsAscend();
-  if(!canAscend){ showGameToast('Reach Doom to ascend.'); renderChallengeUpgrades(); saveGame(); return; }
-  if(!hasAllFormUlts()){ showGameToast('You must master all 6 forms to use a preset.'); renderChallengeUpgrades(); saveGame(); return; }
-  if(anyAscendModalOpen()){ return; }
-  applyFormPreset(p);
-  renderChallengeUpgrades(); saveGame();
+// Draw a fully-evolved form portrait for a config into a canvas (used by the boxes).
+function drawFormPreview(canvas,form,p3,p4,p5,p6){
+  if(!canvas) return;
+  var ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!form) return;
+  var sheet=_FM_SHEETS[form]&&_FM_SHEETS[form]();
+  var getPos=_FM_GRID_FNS[form];
+  if(!sheet||!getPos||!sheet.naturalWidth) return;
+  var gpos=getPos(6,p3,p4,p5,p6);
+  var gcol=gpos%MALE_ASC_COLS, grow=Math.floor(gpos/MALE_ASC_COLS);
+  ctx.drawImage(sheet,gcol*MALE_ASC_CELL,grow*MALE_ASC_CELL,MALE_ASC_CELL,MALE_ASC_CELL,0,0,canvas.width,canvas.height);
 }
-function buildPresetBox(idx){
-  var p=formPresets[idx];
-  var complete=presetComplete(p);
+// Sync the Form Master form/path cards to the current _fm* selection.
+function _fmSyncCards(){
+  document.querySelectorAll('#fm-form-grid .fm-form-card').forEach(function(c){ c.classList.toggle('picked', c.getAttribute('data-form')===_fmForm); });
+  document.querySelectorAll('.fm-path-card[data-path3]').forEach(function(c){ c.classList.toggle('picked', c.getAttribute('data-path3')===_fmPath3); });
+  document.querySelectorAll('.fm-path-card[data-path4]').forEach(function(c){ c.classList.toggle('picked', c.getAttribute('data-path4')===_fmPath4); });
+  document.querySelectorAll('.fm-path-card[data-path5]').forEach(function(c){ c.classList.toggle('picked', c.getAttribute('data-path5')===_fmPath5); });
+  document.querySelectorAll('.fm-path-card[data-path6]').forEach(function(c){ c.classList.toggle('picked', c.getAttribute('data-path6')===_fmPath6); });
+}
+// Render the 8 preset boxes into the Form Master modal's left panel.
+// Layout is two columns of four; unlock order fills the right column first, then
+// the left:  5|1  6|2  7|3  8|4  (grid fills row by row, so left cell then right).
+var _FP_ORDER=[4,0, 5,1, 6,2, 7,3];
+function renderFormMasterPresets(){
+  var wrap=document.getElementById('fm-presets');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  var unlocked=shapeshifterBoxes();
+  for(var k=0;k<_FP_ORDER.length;k++){ var i=_FP_ORDER[k]; wrap.appendChild(_buildPresetSlot(i, i<unlocked)); }
+}
+function _buildPresetSlot(i, unlocked){
+  var p=formPresets[i];
+  var filled=presetComplete(p);
   var box=document.createElement('div');
-  box.className='ss-preset'+(activePresetIdx===idx?' active':'')+(complete?' filled':'');
-  box.innerHTML='<div class="ss-preset-num">'+(idx+1)+'</div><div class="ss-preset-label">'+presetLabel(p)+'</div>';
-  var btns=document.createElement('div'); btns.className='ss-preset-btns';
-  var useB=document.createElement('button'); useB.className='ss-use'; useB.textContent='USE'; useB.disabled=!complete;
-  var saveB=document.createElement('button'); saveB.className='ss-save'; saveB.textContent='SAVE';
-  var clrB=document.createElement('button'); clrB.className='ss-clear'; clrB.textContent='CLEAR'; clrB.disabled=!complete;
-  (function(i){ useB.addEventListener('click',function(){ useFormPreset(i); }); })(idx);
-  (function(i){ saveB.addEventListener('click',function(){ saveFormPreset(i); }); })(idx);
-  (function(i){ clrB.addEventListener('click',function(){ clearFormPreset(i); }); })(idx);
-  btns.appendChild(useB); btns.appendChild(saveB); btns.appendChild(clrB);
+  box.className='fp-slot'+(filled?' filled':'')+(activePresetIdx===i?' active':'')+(unlocked?'':' locked');
+  if(!unlocked){ box.innerHTML='<div class="fp-lock">🔒</div>'; return box; }
+  var cv=document.createElement('canvas'); cv.className='fp-canvas'; cv.width=64; cv.height=64;
+  box.appendChild(cv);
+  if(filled) drawFormPreview(cv,p.form,p.p3,p.p4,p.p5,p.p6);
+  var nameRow=document.createElement('div'); nameRow.className='fp-namerow';
+  var chk=document.createElement('input'); chk.type='checkbox'; chk.className='fp-check'; chk.checked=(activePresetIdx===i); chk.disabled=!filled; chk.title='Use this preset on auto-ascend';
+  var nameInp=document.createElement('input'); nameInp.type='text'; nameInp.className='fp-name'; nameInp.placeholder='Name'; nameInp.value=(p&&p.name)||''; nameInp.maxLength=16;
+  nameRow.appendChild(chk); nameRow.appendChild(nameInp);
+  box.appendChild(nameRow);
+  var btns=document.createElement('div'); btns.className='fp-btns';
+  var saveB=document.createElement('button'); saveB.className='fp-save'; saveB.textContent='SAVE';
+  var clrB=document.createElement('button'); clrB.className='fp-clear'; clrB.textContent='CLEAR'; clrB.disabled=!filled;
+  btns.appendChild(saveB); btns.appendChild(clrB);
   box.appendChild(btns);
+  (function(idx){
+    saveB.addEventListener('click',function(e){ e.stopPropagation(); savePresetToSlot(idx); });
+    clrB.addEventListener('click',function(e){ e.stopPropagation(); clearPresetSlot(idx); });
+    chk.addEventListener('change',function(e){ e.stopPropagation(); selectPreset(idx,this.checked); });
+    nameInp.addEventListener('click',function(e){ e.stopPropagation(); });
+    nameInp.addEventListener('input',function(){ if(formPresets[idx]){ formPresets[idx].name=this.value; saveGame(); } });
+    if(filled){ box.style.cursor='pointer'; box.addEventListener('click',function(){ loadPresetIntoPicks(idx); }); }
+  })(i);
   return box;
+}
+// SAVE — capture the current form/path picks into a box and auto-check it.
+function savePresetToSlot(i){
+  if(i>=shapeshifterBoxes()) return;
+  if(!(_fmForm&&_fmPath3&&_fmPath4&&_fmPath5&&_fmPath6)){ showGameToast('Pick a form and all four paths first.'); return; }
+  var existingName=(formPresets[i]&&formPresets[i].name)||'';
+  formPresets[i]={ form:_fmForm, p3:_fmPath3, p4:_fmPath4, p5:_fmPath5, p6:_fmPath6, name:existingName };
+  activePresetIdx=i;   // auto-check the last saved preset
+  renderFormMasterPresets();
+  saveGame();
+}
+function clearPresetSlot(i){
+  formPresets[i]=null;
+  if(activePresetIdx===i) activePresetIdx=-1;
+  renderFormMasterPresets();
+  saveGame();
+}
+// Checkbox — only one preset active at a time; it's the one auto-ascend fills in.
+function selectPreset(i, checked){
+  if(checked){ if(!presetComplete(formPresets[i])) return; activePresetIdx=i; }
+  else if(activePresetIdx===i){ activePresetIdx=-1; }
+  renderFormMasterPresets();
+  saveGame();
+}
+// Clicking a filled box loads it into the current picks (fills the form + all paths).
+function loadPresetIntoPicks(i){
+  var p=formPresets[i];
+  if(!presetComplete(p)) return;
+  _fmForm=p.form; _fmPath3=p.p3; _fmPath4=p.p4; _fmPath5=p.p5; _fmPath6=p.p6;
+  _fmSyncCards(); _fmDrawPreview(); _fmCheckReady();
+}
+// Portal "Open Presets" — open the Form Master screen as a non-destructive sandbox.
+function openPresetSandbox(){
+  _fmSandbox=true;
+  _fmForm=null; _fmPath3=null; _fmPath4=null; _fmPath5=null; _fmPath6=null;
+  if(activePresetIdx>=0 && presetComplete(formPresets[activePresetIdx])){
+    var p=formPresets[activePresetIdx];
+    _fmForm=p.form; _fmPath3=p.p3; _fmPath4=p.p4; _fmPath5=p.p5; _fmPath6=p.p6;
+  }
+  document.querySelectorAll('.fm-form-card').forEach(function(c){ c.classList.remove('form-locked'); }); // sandbox ignores trial form locks
+  _fmSyncCards();
+  renderFormMasterPresets();
+  document.getElementById('fm-begin-btn').style.display='none';
+  document.getElementById('fm-ether-btn').style.display='none';
+  document.getElementById('fm-close-btn').style.display='';
+  document.getElementById('form-master-subtitle').textContent='Build and save form presets. The checked preset fills in on auto-ascend. Nothing here changes your current run.';
+  document.getElementById('form-master-modal').classList.add('open');
+  _fmDrawPreview();
 }
 
 // ── Elite-Rush (Achilles) ────────────────────────────────────────────────────
@@ -4083,9 +4164,11 @@ function renderChallengeUpgrades(){
       (function(id,b){ tgB.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; updateSmartTargetBoxes(); saveGame(); }); })(u.id,tgB);
       ctlB.appendChild(buyB); ctlB.appendChild(tgB); row.appendChild(ctlB);
     } else if(u.type==='shapeshifter'){
-      row.classList.add('cu-row-shapeshifter');
-      // Upgrade button buys another preset box (gated behind Form Master past L1).
+      // Open Presets opens the Form Master screen as a sandbox; Upgrade buys another
+      // preset box (gated behind Form Master past level 1).
       var ctlS=document.createElement('div'); ctlS.className='cu-ctl';
+      var openS=document.createElement('button'); openS.className='cu-buy-btn cu-presets-btn'; openS.textContent='Open Presets';
+      openS.addEventListener('click', openPresetSandbox);
       var atMaxS=u.maxLevel&&st.level>=u.maxLevel;
       var buyS=document.createElement('button'); buyS.className='cu-buy-btn';
       buyS.innerHTML=atMaxS?'<span class="cu-cost">MAX</span>':('Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>');
@@ -4102,12 +4185,7 @@ function renderChallengeUpgrades(){
         renderChallengeUpgrades();
         saveGame();
       }); })(u.id,u.maxLevel);
-      ctlS.appendChild(buyS); row.appendChild(ctlS);
-      // One preset box per level.
-      var grid=document.createElement('div'); grid.className='ss-preset-grid';
-      var boxes=shapeshifterBoxes();
-      for(var _bi=0; _bi<boxes; _bi++){ grid.appendChild(buildPresetBox(_bi)); }
-      row.appendChild(grid);
+      ctlS.appendChild(openS); ctlS.appendChild(buyS); row.appendChild(ctlS);
     } else if(u.id==='elite_rush'){
       // Control lives on the battlefield (the laurel-wreath toggle by the clicker dock).
       var hint=document.createElement('div'); hint.className='cu-hint'; hint.textContent='Toggle on the battlefield';
@@ -9953,10 +10031,16 @@ function _fmDrawPreview(){
 }
 
 function openFormMasterModal(){
+  _fmSandbox=false;
   _fmForm=null; _fmPath3=null; _fmPath4=null; _fmPath5=null; _fmPath6=null;
   document.querySelectorAll('.fm-form-card,.fm-path-card').forEach(function(c){c.classList.remove('picked');});
   document.getElementById('fm-begin-btn').classList.remove('ready');
+  document.getElementById('fm-begin-btn').style.display='';
+  document.getElementById('fm-ether-btn').style.display='';
+  document.getElementById('fm-close-btn').style.display='none';
+  document.getElementById('form-master-subtitle').textContent='You may choose all your forms now, or choose to start as Ether again.';
   applyFormLockUI();
+  renderFormMasterPresets();   // saved presets are available here too
   document.getElementById('form-master-modal').classList.add('open');
   _fmDrawPreview();
 }
@@ -10015,7 +10099,14 @@ document.querySelectorAll('.fm-path-card[data-path6]').forEach(function(card){
   });
 });
 
+// Close — only shown in the Portal sandbox; leaves the current run untouched.
+document.getElementById('fm-close-btn').addEventListener('click',function(){
+  document.getElementById('form-master-modal').classList.remove('open');
+  _fmSandbox=false;
+});
+
 document.getElementById('fm-ether-btn').addEventListener('click',function(){
+  if(_fmSandbox) return;
   document.getElementById('form-master-modal').classList.remove('open');
   document.querySelectorAll('.form-card').forEach(function(c){c.classList.remove('picked');});
   document.getElementById('form-confirm-btn').classList.remove('show');
@@ -10024,6 +10115,7 @@ document.getElementById('fm-ether-btn').addEventListener('click',function(){
 });
 
 document.getElementById('fm-begin-btn').addEventListener('click',function(){
+  if(_fmSandbox) return;                              // sandbox never ascends
   if(!_fmForm||!_fmPath3||!_fmPath4||!_fmPath5||!_fmPath6) return;
   document.getElementById('form-master-modal').classList.remove('open');
   ascension3Path=_fmPath3;
