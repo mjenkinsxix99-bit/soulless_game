@@ -303,6 +303,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .cu-buy-btn .cu-cost { display:block; font-size:10px; color:#3a1f5e; }
 .cu-toggle { flex-shrink:0; background:#1a1030; border:1px solid #6644aa; color:#9980cc; font-family:Georgia,serif; font-size:11px; font-weight:bold; letter-spacing:1px; padding:5px 12px; border-radius:5px; cursor:pointer; min-width:52px; }
 .cu-toggle.on { background:#e8c24a; border-color:#ffe27a; color:#1a1000; box-shadow:0 0 8px rgba(255,210,80,0.6); }
+.cu-hint { flex-shrink:0; color:#c9b57e; font-size:10px; font-style:italic; text-align:right; max-width:96px; line-height:1.25; text-shadow:0 0 5px rgba(0,0,0,0.95); }
 /* Shapeshifter — preset boxes */
 .cu-row-shapeshifter { flex-wrap:wrap; }
 .ss-preset-grid { flex-basis:100%; width:100%; display:grid; grid-template-columns:repeat(2,1fr); gap:7px; margin-top:9px; }
@@ -1345,6 +1346,11 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #mc-dock-counter { font-family:Georgia,serif; font-size:11px; color:#cc99ff; text-align:center; line-height:1.3; }
 #mc-dock-recall { background:#330000; border:1px solid #cc2222; color:#ff4444; border-radius:4px; font-size:10px; padding:2px 6px; cursor:pointer; font-family:Georgia,serif; line-height:1.4; }
 #mc-dock-recall:hover { background:#550000; }
+/* Elite-Rush toggle — Demigods laurel-wreath icon (sprites_ui cell 10), dim off / bright on */
+#elite-rush-btn { position:absolute; bottom:8px; left:64px; z-index:50; width:48px; height:48px; background-image:url('artwork/sprites_ui.webp'); background-size:672px 48px; background-position:-480px 0; image-rendering:pixelated; border:2px solid #7a6a2a; border-radius:6px; background-color:rgba(30,22,6,0.8); cursor:pointer; opacity:0.4; filter:grayscale(0.6); transition:opacity 0.2s, box-shadow 0.2s, filter 0.2s; }
+#elite-rush-btn.on { opacity:1; filter:none; border-color:#ffe27a; box-shadow:0 0 12px rgba(255,210,80,0.75); }
+#elite-rush-btn:hover { opacity:0.85; }
+#elite-rush-btn.on:hover { opacity:1; }
 #mc-drag-ghost { position:fixed; width:36px; height:36px; background-image:url('artwork/sprites_ui.webp'); background-size:504px 36px; background-position:-468px 0; pointer-events:none; z-index:9999; display:none; border:2px solid #9966ff; border-radius:4px; background-color:rgba(20,10,40,0.85); opacity:0.9; image-rendering:pixelated; }
 .mc-drop-hl { position:absolute; inset:0; background:rgba(130,50,255,0.15); border:2px dashed #9966ff; border-radius:4px; pointer-events:none; z-index:15; display:none; }
 /* SMART Clickers: per-upgrade target-level box (top-right of the card) */
@@ -1484,6 +1490,8 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
         <div id="mc-dock-counter">0 / 0</div>
         <button id="mc-dock-recall">✕ Recall All</button>
       </div>
+      <!-- Elite-Rush toggle (Achilles) — sits by the minion clicker dock -->
+      <div id="elite-rush-btn" title="Elite-Rush: skip straight to each Elite" style="display:none;"></div>
     </div>
     <div id="buy-selector">
       <div class="buy-label">BUY</div>
@@ -3823,6 +3831,34 @@ function buildPresetBox(idx){
   return box;
 }
 
+// ── Elite-Rush (Achilles) ────────────────────────────────────────────────────
+// A battlefield toggle. While ON, the game skips straight to each level's Elite
+// (skipped normal floors count as cleared) until an Elite timer is failed, which
+// switches it off. Off during Hero Challenges. Pure toggle — levels do nothing.
+function eliteRushOwned(){ return cuState('elite_rush').level>0; }
+function eliteRushActive(){ return !activeChallenge && !inHeroFight && eliteRushOwned() && cuState('elite_rush').on; }
+function updateEliteRushBtn(){
+  var b=document.getElementById('elite-rush-btn');
+  if(!b) return;
+  b.style.display=(!activeChallenge && eliteRushOwned()) ? 'block' : 'none';
+  b.classList.toggle('on', cuState('elite_rush').on);
+}
+// Jump to the current level's Elite, unlocking it at the frontier (skipped floors
+// count as cleared). navigateTo respawns as the Elite.
+function eliteRushJumpToElite(){
+  if(curRealm===highestRealm && curLevel===highestLevel && highestFloor<FLOORS_PER_LEVEL+1){
+    highestFloor=FLOORS_PER_LEVEL+1; _frontierWins=0; minimapNewFloor=true;
+    updateHighestFloor();
+  }
+  navigateTo(curLevel, FLOORS_PER_LEVEL+1);
+}
+// Called at the end of every spawn: if Elite-Rush is on and we're on a normal
+// floor, bounce straight to the Elite.
+function eliteRushMaybeSkip(){
+  if(!eliteRushActive() || isEliteFight()) return;
+  eliteRushJumpToElite();
+}
+
 // ── Willing Sacrifice (auto-immolate) ───────────────────────────────────────
 function willingSacrificeMax(){ return cuLevel('auto_sacrifice'); }   // markable count; 0 = off/suppressed
 function updateAutoImmolateBtn(){
@@ -4068,6 +4104,10 @@ function renderChallengeUpgrades(){
       var boxes=shapeshifterBoxes();
       for(var _bi=0; _bi<boxes; _bi++){ grid.appendChild(buildPresetBox(_bi)); }
       row.appendChild(grid);
+    } else if(u.id==='elite_rush'){
+      // Control lives on the battlefield (the laurel-wreath toggle by the clicker dock).
+      var hint=document.createElement('div'); hint.className='cu-hint'; hint.textContent='Toggle on the battlefield';
+      row.appendChild(hint);
     } else {
       var tg2=document.createElement('button'); tg2.className='cu-toggle'+(st.on?' on':''); tg2.textContent=st.on?'ON':'OFF';
       (function(id,b){ tg2.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tg2);
@@ -5931,6 +5971,8 @@ function spawnEnemy(){
   updateProgressLabel();
   updateHpBars();
   buildMinimap();
+  updateEliteRushBtn();     // keep the Elite-Rush toggle's visibility in sync
+  eliteRushMaybeSkip();     // if Elite-Rush is on and this is a normal floor, jump to the Elite
 }
 
 function updateProgressLabel(){
@@ -6127,10 +6169,11 @@ function onEnemyDeath(){
       }, 0);
       return;
     }
-    // Stay on elite floor — respawn for farming; click minimap to advance
-    if(autoProgressEnabled&&curLevel<LEVELS_PER_REALM){
+    // Stay on elite floor — respawn for farming; click minimap to advance.
+    // Elite-Rush advances level-to-level on its own (spawnEnemy then jumps to the Elite).
+    if((autoProgressEnabled||eliteRushActive())&&curLevel<LEVELS_PER_REALM){
       (function(nl){ setTimeout(function(){ navigateTo(nl,1); },400); })(curLevel+1);
-    } else if(autoProgressEnabled&&curLevel>=LEVELS_PER_REALM&&curRealm<highestRealm){
+    } else if((autoProgressEnabled||eliteRushActive())&&curLevel>=LEVELS_PER_REALM&&curRealm<highestRealm){
       // Re-cleared the final elite of an already-completed realm — cross the
       // realm barrier into the next realm without disturbing frontier progress.
       (function(nr){ setTimeout(function(){ navigateTo(1,1,nr); },400); })(curRealm+1);
@@ -6187,6 +6230,7 @@ function onEliteDpsCheckFail(){
   }
   curFloor=FLOORS_PER_LEVEL; floorWins=WINS_PER_FLOOR;
   if(autoProgressEnabled){ autoProgressEnabled=false; saveGame(); }
+  if(cuState('elite_rush').on){ cuState('elite_rush').on=false; updateEliteRushBtn(); saveGame(); }  // Elite-Rush ends on a failed timer
   buildMinimap();
   if(!_tutShown.eliteFail){ _tutShown.eliteFail=true; if(showTutorial){ setTimeout(function(){ showTutorialTip('You are not strong enough to Proceed. You must grow stronger. More souls. Feed the hunger.',document.getElementById('enemy-canvas'),null); },700); } }
   setTimeout(spawnEnemy,600);
@@ -10000,6 +10044,16 @@ document.getElementById('enemy-canvas').addEventListener('touchstart',function(e
   entityAttack(false);
 },{passive:false});
 document.getElementById('reform-btn').addEventListener('click',reform);
+
+// Elite-Rush toggle (Achilles) — flip the power on/off from the battlefield.
+document.getElementById('elite-rush-btn').addEventListener('click',function(){
+  if(activeChallenge || !eliteRushOwned()) return;
+  var s=cuState('elite_rush');
+  s.on=!s.on;
+  updateEliteRushBtn();
+  saveGame();
+  if(s.on) eliteRushMaybeSkip();   // start rushing to the Elite immediately
+});
 
 // ── MINION CLICKER SYSTEM ─────────────────────────────────────────────────────
 var minionClickerAssignments = [];
