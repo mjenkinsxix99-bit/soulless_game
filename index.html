@@ -1366,9 +1366,6 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #elite-rush-btn.on:hover { opacity:1; }
 #mc-drag-ghost { position:fixed; width:36px; height:36px; background-image:url('artwork/sprites_ui.webp'); background-size:504px 36px; background-position:-468px 0; pointer-events:none; z-index:9999; display:none; border:2px solid #9966ff; border-radius:4px; background-color:rgba(20,10,40,0.85); opacity:0.9; image-rendering:pixelated; }
 .mc-drop-hl { position:absolute; inset:0; background:rgba(130,50,255,0.15); border:2px dashed #9966ff; border-radius:4px; pointer-events:none; z-index:15; display:none; }
-/* SMART Clickers: per-upgrade target-level box (top-right of the card) */
-.smart-target { position:absolute; top:5px; right:6px; width:44px; z-index:16; background:#1a0f30; border:1px solid #b18cff; color:#e9dcff; font-family:Georgia,serif; font-size:12px; font-weight:bold; text-align:center; padding:2px 3px; border-radius:4px; box-shadow:0 0 7px rgba(160,120,255,0.55); }
-.smart-target::-webkit-inner-spin-button { opacity:0.5; }
 body.mc-dragging .mc-drop-hl { display:block; }
 body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
 #enemy-mc-zone { position:absolute; right:-44px; top:50%; transform:translateY(-50%); width:40px; display:flex; flex-direction:column; gap:4px; align-items:center; }
@@ -3983,12 +3980,14 @@ function processAutoImmolate(){
 
 // ── SMART Clickers (auto_upgrade) ────────────────────────────────────────────
 // Sigurd's power. When ON, the first N assigned upgrade-clickers (N = level) are
-// "smart": once the upgrade a smart clicker sits on reaches its set target level,
-// the clicker leapfrogs to the next available upgrade below it (never back up).
-// On ascend/reincarnate every upgrade-clicker resets to the top upgrades.
-var upgradeTargetLevels={};   // upgrade id -> raw target-level string ('' = default 1)
+// "smart": once the upgrade a smart clicker sits on reaches the single target
+// level (set once in the Portal), the clicker leapfrogs to the next available
+// upgrade below it (never back up). Purchases are capped at the target so an
+// upgrade lands EXACTLY on it before the clicker moves on. On ascend/reincarnate
+// every upgrade-clicker resets to the top upgrades.
+var smartClickerTarget='';   // one target level for all smart clickers ('' = default 1)
 function smartClickersActive(){ return !activeChallenge && cuOn('auto_upgrade') && cuLevel('auto_upgrade')>0; }
-function getUpgradeTarget(uid){ var v=parseInt(upgradeTargetLevels[uid],10); return (v&&v>0)?v:1; }
+function smartTarget(){ var v=parseInt(smartClickerTarget,10); return (v&&v>0)?v:1; }
 function nextAvailableUpgradeAfter(uid){
   var idx=REP_UPGRADES.findIndex(function(x){return x.id===uid;});
   if(idx<0) return null;
@@ -3998,18 +3997,37 @@ function nextAvailableUpgradeAfter(uid){
   }
   return null;   // bottom of the list — the clicker stops on its last upgrade
 }
-// If the smart clicker's current upgrade has hit its target, walk it down to the
-// next upgrade still short of target (cascading past any already-satisfied ones).
+// Only advance once the current upgrade has actually reached the target level,
+// then cascade past any following upgrades already at/over it.
 function smartAdvanceIfReached(a){
   var u=REP_UPGRADES.find(function(x){return x.id===a.upgradeId;});
   if(!u) return false;
-  var moved=false, guard=0;
-  while(u && u.level>=getUpgradeTarget(u.id) && guard++<200){
+  var tgt=smartTarget(), moved=false, guard=0;
+  while(u && u.level>=tgt && guard++<200){
     var nxt=nextAvailableUpgradeAfter(u.id);
     if(!nxt) break;
     a.upgradeId=nxt.id; u=nxt; moved=true;
   }
   return moved;
+}
+// Buy toward the target, never past it — so the upgrade lands exactly on the
+// target level (no overshoot) and the clicker never leaves before reaching it.
+function smartBuyTowardTarget(a){
+  if(challengeNoMinions()) return false;
+  var u=REP_UPGRADES.find(function(x){return x.id===a.upgradeId;});
+  if(!u||!u.vis()||!upgradeAllowedNow(u)) return false;
+  var room=smartTarget()-u.level;
+  if(room<=0) return false;                         // at/over target — advance handles it
+  var n=(buyQty==='max')?maxAffordableN(u):buyQty;
+  if(n>room) n=room;                                // cap so we never exceed the target
+  if(n<1) return false;
+  var total=calcCostN(u,n);
+  if(!souls.gte(total)) return false;               // can't afford this step yet — wait, don't leave
+  souls=souls.sub(total);
+  var c=u.cost;
+  for(var i=0;i<n;i++){ c=c.mul(u.costScale).ceil(); }
+  u.cost=c; u.level+=n; totalUpgradePurchases+=n;
+  return true;
 }
 // Ascend/reincarnate: send every upgrade-clicker back to the top upgrades in order.
 function resetSmartClickersToTop(){
@@ -4019,18 +4037,6 @@ function resetSmartClickersToTop(){
   var k=0;
   minionClickerAssignments.forEach(function(a){
     if(a.target==='upgrade'){ a.upgradeId=order[Math.min(k,order.length-1)].id; k++; }
-  });
-}
-// Show/sync the per-upgrade target-level box (only while SMART Clickers is active).
-function updateSmartTargetBoxes(){
-  var show=smartClickersActive();
-  document.querySelectorAll('.ucard[data-uid]').forEach(function(card){
-    var box=card.querySelector('.smart-target');
-    if(!box) return;
-    box.style.display=show?'':'none';
-    if(show && document.activeElement!==box){
-      box.value=upgradeTargetLevels[card.getAttribute('data-uid')]||'';
-    }
   });
 }
 
@@ -4145,8 +4151,14 @@ function renderChallengeUpgrades(){
       (function(id,b){ tg.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tg);
       ctl.appendChild(inp); ctl.appendChild(tg); row.appendChild(ctl);
     } else if(u.type==='buytoggle'){
-      // A buyable level (how many clickers are smart) plus an ON/OFF switch.
+      // A buyable level (how many clickers are smart) plus an ON/OFF switch, and —
+      // for SMART Clickers — a single target-level input shared by every clicker.
       var ctlB=document.createElement('div'); ctlB.className='cu-ctl';
+      if(u.id==='auto_upgrade'){
+        var tgtInp=document.createElement('input'); tgtInp.className='cu-val'; tgtInp.type='number'; tgtInp.min='1'; tgtInp.placeholder='Lv'; tgtInp.title='Advance to the next upgrade at this level'; tgtInp.value=smartClickerTarget;
+        tgtInp.addEventListener('input',function(){ smartClickerTarget=this.value; saveGame(); });
+        ctlB.appendChild(tgtInp);
+      }
       var atMaxB=u.maxLevel&&st.level>=u.maxLevel;
       var buyB=document.createElement('button'); buyB.className='cu-buy-btn';
       buyB.innerHTML=atMaxB?'<span class="cu-cost">MAX</span>':('Upgrade<span class="cu-cost">🔥 '+cuCost(u.id)+'</span>');
@@ -4160,11 +4172,10 @@ function renderChallengeUpgrades(){
         recalcStats(); dirtyU=true;
         updateBurningSoulDisplay();
         renderChallengeUpgrades();
-        updateSmartTargetBoxes();
         saveGame();
       }); })(u.id,u.maxLevel);
       var tgB=document.createElement('button'); tgB.className='cu-toggle'+(st.on?' on':''); tgB.textContent=st.on?'ON':'OFF';
-      (function(id,b){ tgB.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; updateSmartTargetBoxes(); saveGame(); }); })(u.id,tgB);
+      (function(id,b){ tgB.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tgB);
       ctlB.appendChild(buyB); ctlB.appendChild(tgB); row.appendChild(ctlB);
     } else if(u.type==='shapeshifter'){
       // Open Presets opens the Form Master screen as a sandbox; Upgrade buys another
@@ -8769,7 +8780,7 @@ function saveGame(){
     devBsGranted:_devBsGranted,
     autoImmolateOn:autoImmolateOn,
     autoImmolateTargets:autoImmolateTargets.slice(),
-    upgradeTargetLevels:JSON.parse(JSON.stringify(upgradeTargetLevels)),
+    smartClickerTarget:smartClickerTarget,
     formPresets:JSON.parse(JSON.stringify(formPresets)),
     activePresetIdx:activePresetIdx,
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
@@ -8932,7 +8943,7 @@ function loadGame(){
   _devBsGranted=!!data.devBsGranted;
   autoImmolateOn=!!data.autoImmolateOn;
   if(Array.isArray(data.autoImmolateTargets)) autoImmolateTargets=data.autoImmolateTargets;
-  if(data.upgradeTargetLevels&&typeof data.upgradeTargetLevels==='object') upgradeTargetLevels=data.upgradeTargetLevels;
+  if(data.smartClickerTarget!==undefined&&data.smartClickerTarget!==null) smartClickerTarget=String(data.smartClickerTarget);
   if(Array.isArray(data.formPresets)) formPresets=data.formPresets;
   if(typeof data.activePresetIdx==='number') activePresetIdx=data.activePresetIdx;
   _challengeSoulsBaseline=totalSouls;   // resume the tally from the current total (already loaded above)
@@ -9212,21 +9223,6 @@ function createUpgradeCard(u, can, bought, actualN, cost){
   var iconHtml = '<div class="ucard-icon" style="background-position:'+iconOffset+'px 0;"></div>';
   d.innerHTML='<div class="ucard-flex">'+iconHtml+'<div class="ucard-body">'+nameHtml+descHtml+costHtml+'</div></div>'+msRowHtml+'<div class="mc-drop-hl"></div>';
 
-  // SMART Clickers: per-upgrade target-level box (hidden unless the power is active).
-  var stBox=document.createElement('input');
-  stBox.className='smart-target'; stBox.type='number'; stBox.min='1';
-  stBox.title='SMART Clickers: advance to the next upgrade at this level';
-  stBox.value=upgradeTargetLevels[u.id]||'';
-  stBox.style.display=smartClickersActive()?'':'none';
-  stBox.addEventListener('mousedown',function(e){ e.stopPropagation(); });
-  stBox.addEventListener('click',function(e){ e.stopPropagation(); });
-  (function(uid){ stBox.addEventListener('input',function(){
-    var v=this.value.trim();
-    if(v==='') delete upgradeTargetLevels[uid]; else upgradeTargetLevels[uid]=v;
-    saveGame();
-  }); })(u.id);
-  d.appendChild(stBox);
-
   // Milestone box events — listeners live for the lifetime of the card element
   d.querySelectorAll('.ms-box').forEach(function(box){
     var mi=parseInt(box.getAttribute('data-mi'),10);
@@ -9396,7 +9392,6 @@ function buildUpgrades(){
       el.appendChild(createUpgradeCard(u, can, bought, actualN, cost));
     }
   });
-  updateSmartTargetBoxes();   // SMART Clickers: sync/toggle per-upgrade target boxes
 }
 
 var FORM_BONUSES={
@@ -10272,9 +10267,13 @@ function tickMinionClickers(now){
   minionClickerAssignments.forEach(function(a){
     if(a.target==='enemy') minionClickerAttackEnemy();
     else if(a.target==='upgrade'){
-      if(upgSeen<smartN && smartAdvanceIfReached(a)) moved=true;   // leapfrog before buying
+      if(upgSeen<smartN){                                     // smart: leapfrog + capped buy
+        if(smartAdvanceIfReached(a)) moved=true;
+        if(smartBuyTowardTarget(a)) bought=true;
+      } else {
+        if(minionClickerBuyUpgrade(a.upgradeId)) bought=true; // plain upgrade clicker
+      }
       upgSeen++;
-      if(minionClickerBuyUpgrade(a.upgradeId)) bought=true;
     }
     else if(a.target==='buyall') buyAllAffordable(true);
   });
