@@ -308,16 +308,17 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .cu-presets-btn { background:#7a4bd0; border-color:#a986f0; color:#f3ecff; }
 .cu-presets-btn:hover { background:#8a5be0; }
 /* Shapeshifter — preset boxes inside the Form Master / preset-builder modal */
-#fm-presets-panel { flex:0 0 210px; align-self:stretch; display:flex; flex-direction:column; border-right:1px solid #2a2150; padding-right:16px; }
+#fm-presets-panel { flex:0 0 315px; align-self:stretch; display:flex; flex-direction:column; border-right:1px solid #2a2150; padding-right:16px; }
+#fm-right-panel { flex:0 0 315px; align-self:stretch; border-left:1px solid #2a2150; padding-left:16px; }
 #fm-presets-title { font-size:12px; letter-spacing:3px; text-transform:uppercase; color:#9977cc; margin-bottom:10px; text-align:center; }
 #fm-presets { flex:1; display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(4,1fr); gap:8px; }
-.fp-slot { position:relative; background:#0d0d1e; border:2px solid #1e1845; border-radius:7px; padding:6px; display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:5px; overflow:hidden; }
+.fp-slot { position:relative; background:#0d0d1e; border:2px solid #1e1845; border-radius:7px; padding:8px; display:flex; flex-direction:column; align-items:stretch; gap:5px; overflow:hidden; }
 .fp-slot.filled { border-color:#6f57b0; }
 .fp-slot.active { border-color:#ffd700; box-shadow:0 0 10px rgba(212,168,67,0.4); }
 .fp-slot.locked { align-items:center; justify-content:center; opacity:0.55; }
 .fp-lock { font-size:26px; opacity:0.6; filter:grayscale(1); }
-.fp-canvas { width:52px; height:52px; border-radius:4px; image-rendering:pixelated; background:#05040d; }
-.fp-namerow { display:flex; align-items:center; gap:4px; width:100%; }
+.fp-canvas { width:118px; height:118px; align-self:center; image-rendering:pixelated; background:transparent; }
+.fp-namerow { margin-top:auto; display:flex; align-items:center; gap:5px; width:100%; }
 .fp-check { flex:0 0 auto; width:14px; height:14px; accent-color:#ffd700; cursor:pointer; }
 .fp-name { flex:1; min-width:0; background:#05040d; border:1px solid #35306a; color:#e9dcff; font-family:Georgia,serif; font-size:11px; padding:2px 4px; border-radius:3px; text-align:center; }
 .fp-btns { display:flex; gap:4px; width:100%; }
@@ -327,8 +328,9 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .fp-save:hover { background:#28b23a; }
 .fp-clear { background:#7a1414; border-color:#cc3333; color:#ffe0e0; }
 .fp-clear:not(:disabled):hover { background:#8f1a1a; }
-/* Form Master box becomes a two-column layout (presets | form selector) */
-#form-master-box { display:flex; gap:18px; align-items:stretch; max-width:920px; text-align:left; }
+/* Form Master box becomes a two-column layout (presets | form selector).
+   Higher specificity so it wins over the base #form-master-box rule below. */
+#form-master-modal #form-master-box { display:flex; gap:18px; align-items:stretch; max-width:1340px; width:96%; text-align:left; }
 #fm-main { flex:1; min-width:0; text-align:center; }
 #fm-close-btn { flex:1; max-width:160px; padding:12px 16px; background:#2a0a4a; border:2px solid #6a3aa0; color:#e9dcff; font-family:Georgia,serif; font-size:14px; letter-spacing:2px; cursor:pointer; border-radius:6px; transition:background 0.2s, box-shadow 0.2s; }
 #fm-close-btn:hover { background:#3a1560; box-shadow:0 0 14px rgba(120,70,180,0.5); }
@@ -2072,6 +2074,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       <button id="fm-close-btn" style="display:none;">Close</button>
     </div>
     </div><!-- /fm-main -->
+    <div id="fm-right-panel"></div>
   </div>
 </div>
 
