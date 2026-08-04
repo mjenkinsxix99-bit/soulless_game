@@ -4945,6 +4945,7 @@ function claimHeroVictory(){
   var key=GOD_NODES[heroFightIdx]?GOD_NODES[heroFightIdx].key:null;
   if(key && !isGodCleared(key)) godCleared.push(key);   // node → cleared; power unlocks in the Portal
   ensureEarnedPowerLevels(); recalcStats();             // grant the new power's level 1
+  checkAchievements();                                  // award this hero's Challenge Hero honor
   saveGame();
   document.getElementById('hero-victory').classList.remove('open');
   var fightMs=Math.max(0, Date.now()-heroFightStart);
@@ -4974,7 +4975,7 @@ function exitHeroFight(){
 function devClearGodNode(){
   if(_pendingGodNode>=0){
     var nd=GOD_NODES[_pendingGodNode];
-    if(nodeState(_pendingGodNode)==='avail' && !isGodCleared(nd.key)){ godCleared.push(nd.key); ensureEarnedPowerLevels(); recalcStats(); saveGame(); }
+    if(nodeState(_pendingGodNode)==='avail' && !isGodCleared(nd.key)){ godCleared.push(nd.key); ensureEarnedPowerLevels(); recalcStats(); checkAchievements(); saveGame(); }
   }
   closeHeroEncounter();
   renderGodMap();
@@ -7263,6 +7264,20 @@ var ACHIEVEMENTS=[
   {id:'minion-sacrificed-25',  cat:'Minion Sacrifice', name:'Bloodletting',      desc:'Sacrifice 25 minions',      check:function(){return minionsSacrificedTotal>=25;}},
   {id:'minion-sacrificed-50',  cat:'Minion Sacrifice', name:'Rite of Ruin',      desc:'Sacrifice 50 minions',      check:function(){return minionsSacrificedTotal>=50;}},
   {id:'minion-sacrificed-100', cat:'Minion Sacrifice', name:'Hundred Souls Given',desc:'Sacrifice 100 minions',     check:function(){return minionsSacrificedTotal>=100;}},
+  // Challenge Hero — one per God-Realm hero, awarded on defeating them.
+  {id:'hero-heracles',    cat:'Challenge Hero', name:'The Mighty have Fallen',        desc:'Defeat Heracles',    check:function(){return isGodCleared('Heracles');}},
+  {id:'hero-achilles',    cat:'Challenge Hero', name:'What was that Pop?',            desc:'Defeat Achilles',    check:function(){return isGodCleared('Achilles');}},
+  {id:'hero-sigurd',      cat:'Challenge Hero', name:'Hardest Clicker',               desc:'Defeat Sigurd',      check:function(){return isGodCleared('Sigurd');}},
+  {id:'hero-hippolyta',   cat:'Challenge Hero', name:'Spoils of Victory!',            desc:'Defeat Hippolyta',   check:function(){return isGodCleared('Hippolyta');}},
+  {id:'hero-perseus',     cat:'Challenge Hero', name:'Stoned to Life',                desc:'Defeat Perseus',     check:function(){return isGodCleared('Perseus');}},
+  {id:'hero-karna',       cat:'Challenge Hero', name:"It's a sure thing!",            desc:'Defeat Karna',       check:function(){return isGodCleared('Karna');}},
+  {id:'hero-maui',        cat:'Challenge Hero', name:"It's ok, You're Welcome!",      desc:'Defeat Maui',        check:function(){return isGodCleared('Maui');}},
+  {id:'hero-penthesilea', cat:'Challenge Hero', name:'Full Steam Ahead',              desc:'Defeat Penthesilea', check:function(){return isGodCleared('Penthesilea');}},
+  {id:'hero-atalanta',    cat:'Challenge Hero', name:'The golden-apple jackpot',      desc:'Defeat Atalanta',    check:function(){return isGodCleared('Atalanta');}},
+  {id:'hero-britomartis', cat:'Challenge Hero', name:'Gotta Catch em all!',           desc:'Defeat Britomartis', check:function(){return isGodCleared('Britomartis');}},
+  {id:'hero-aeneas',      cat:'Challenge Hero', name:'The Rundown',                   desc:'Defeat Aeneas',      check:function(){return isGodCleared('Aeneas');}},
+  {id:'hero-jason',       cat:'Challenge Hero', name:'Part of the Ship, Part of the Crew', desc:'Defeat Jason',  check:function(){return isGodCleared('Jason');}},
+  {id:'hero-gilgamesh',   cat:'Challenge Hero', name:'12 Tablets',                    desc:'Defeat Gilgamesh',   check:function(){return isGodCleared('Gilgamesh');}},
 ];
 
 function allSixFormsComplete(){
