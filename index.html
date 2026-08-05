@@ -4345,8 +4345,12 @@ function renderChallengeUpgrades(){
       }); })(u.id,u.maxLevel);
       ctlS.appendChild(buyS); ctlS.appendChild(openS); row.appendChild(ctlS);   // Upgrade on top, Presets below
     } else if(u.id==='elite_rush'){
-      // Buyable levels (doubling) here; the ON/OFF toggle lives on the battlefield.
-      var ctlE=document.createElement('div'); ctlE.className='cu-ctl';
+      // Buyable levels (doubling) over an ON/OFF enable toggle — same layout as
+      // SMART Clickers. The toggle is the persistent intent (eliteRushWanted): it
+      // survives the automatic offs (floor cap / failed Elite timer) so every
+      // ascend/reincarnate re-arms the rush. The battlefield button is the live
+      // per-run control that mirrors this state.
+      var ctlE=document.createElement('div'); ctlE.className='cu-ctl cu-ctl-stack';
       var atMaxE=u.maxLevel&&st.level>=u.maxLevel;
       var buyE=document.createElement('button'); buyE.className='cu-buy-btn';
       buyE.innerHTML=atMaxE?'<span class="cu-cost">MAX</span>':('Level '+st.level+'<span class="cu-cost">🔥 '+fmt(D(cuCost(u.id)))+'</span>');
@@ -4363,7 +4367,21 @@ function renderChallengeUpgrades(){
         updateEliteRushBtn();
         saveGame();
       }); })(u.id,u.maxLevel);
-      ctlE.appendChild(buyE); row.appendChild(ctlE);
+      var tgE=document.createElement('button'); tgE.className='cu-toggle'+(eliteRushWanted?' on':''); tgE.textContent=eliteRushWanted?'ON':'OFF';
+      tgE.addEventListener('click',function(){
+        eliteRushWanted=!eliteRushWanted;
+        if(eliteRushWanted){
+          // Enable: start rushing this run too, if we're still within the cap.
+          if(absGlobalFloor(curRealm,curLevel,curFloor) <= eliteRushCapFloor()) cuState('elite_rush').on=true;
+        } else {
+          cuState('elite_rush').on=false;   // disable: stop the current run as well
+        }
+        tgE.classList.toggle('on',eliteRushWanted); tgE.textContent=eliteRushWanted?'ON':'OFF';
+        updateEliteRushBtn();
+        saveGame();
+        if(cuState('elite_rush').on) eliteRushMaybeSkip();
+      });
+      ctlE.appendChild(buyE); ctlE.appendChild(tgE); row.appendChild(ctlE);
     } else {
       var tg2=document.createElement('button'); tg2.className='cu-toggle'+(st.on?' on':''); tg2.textContent=st.on?'ON':'OFF';
       (function(id,b){ tg2.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tg2);
