@@ -4094,14 +4094,26 @@ function anyAscendModalOpen(){
 // Trigger the ascend flow directly, bypassing the Doom gate (openRebirthModal
 // doesn't check it). If a Shapeshifter preset is active and the player is a Form
 // Master, apply it in one shot (no modal); otherwise open the stage modal.
+// Immortal/Phoenix are "set and forget" automation — the run has to keep
+// advancing on its own after they fire, so force Auto Progress back ON. It can be
+// left OFF by a failed Elite timer (onEliteDpsCheckFail turns it off) or simply
+// never have been turned on. Only flips it when Auto Progress is actually unlocked.
+function ensureAutoProgressOn(){
+  if(!soulShopOwned['auto-progress']) return;
+  if(autoProgressEnabled) return;
+  autoProgressEnabled=true;
+  updateAutoProgressBtn();
+  saveGame();
+}
 function autoAscendTrigger(){
   if(activePresetIdx>=0 && hasAllFormUlts()){
     var p=formPresets[activePresetIdx];
-    if(presetComplete(p)){ applyFormPreset(p); return; }
+    if(presetComplete(p)){ applyFormPreset(p); ensureAutoProgressOn(); return; }
   }
   openRebirthModal();
   var b=document.getElementById('rebirth-ascend-now');
   if(b) b.click();
+  ensureAutoProgressOn();
 }
 // Immortal: auto-ascend on a player-chosen trigger — a set Floor, a number of
 // Minutes since the current ascension, or the next failed Elite timer.
@@ -4146,7 +4158,7 @@ function tickPhoenix(){
   if(mode==='mp') val=calcReincarnateMP();
   else if(mode==='bs') val=(burningSouls||0)-_bsBaseAtReinc;
   else val=tatteredSouls;                           // ts (banked)
-  if(val>=target) doReincarnate();
+  if(val>=target){ doReincarnate(); ensureAutoProgressOn(); }
 }
 // Credit Burning Souls with Glory's multiplier, carrying the fraction so none is lost.
 var _bsCarry=0;
