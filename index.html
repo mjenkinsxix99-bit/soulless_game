@@ -3697,6 +3697,10 @@ function earnedChallengeUpgrades(){
   return CHALLENGE_UPGRADES.filter(function(u){ return isGodCleared(u.hero); });
 }
 var challengeUpg={}; // id -> { level, on, val }
+// Sticky player intent for Elite-Rush. The battlefield toggle sets it; the
+// automatic offs (floor cap, failed Elite timer) do NOT clear it. That lets an
+// ascend/reincarnate re-activate Elite-Rush for the fresh run.
+var eliteRushWanted=false;
 function cuState(id){ if(!challengeUpg[id]) challengeUpg[id]={ level:0, on:false, val:'' }; return challengeUpg[id]; }
 // Portal-upgrade (hero-power) EFFECTS must be read through these accessors, never
 // cuState() directly: during an active challenge they report level 0 / off / no
@@ -3987,6 +3991,13 @@ function eliteRushMaybeSkip(){
   if(eliteRushCheckCap()) return;        // past the level's cap → turned off
   if(isEliteFight()) return;             // on an Elite → fight it
   eliteRushJumpToElite();
+}
+// After an ascend/reincarnate drops us back to floor 1, restore Elite-Rush if the
+// player still wants it — i.e. they toggled it on and never toggled it off (an
+// auto-off at the cap or a failed Elite timer doesn't count). The reset's own
+// spawnEnemy() then starts the rush from the new run's first floor.
+function reactivateEliteRushIfWanted(){
+  if(eliteRushOwned() && eliteRushWanted) cuState('elite_rush').on=true;
 }
 
 // ── Willing Sacrifice (auto-immolate) ───────────────────────────────────────
@@ -8714,6 +8725,7 @@ function doReincarnate(){
   updateHighestFloor();
   updateAutoProgressBtn();
   renderMinionModal();
+  reactivateEliteRushIfWanted();   // fresh run: re-arm Elite-Rush if the player wants it
   saveGame();
   spawnEnemy();
 }
@@ -8872,6 +8884,7 @@ function doRebirthReset(chosenForm){
   updateProgressLabel();
   updateHighestFloor();
   updateAutoProgressBtn();
+  reactivateEliteRushIfWanted();   // fresh run: re-arm Elite-Rush if the player wants it
   saveGame();
   spawnEnemy();
 }
@@ -8995,6 +9008,7 @@ function saveGame(){
     formPresets:JSON.parse(JSON.stringify(formPresets)),
     activePresetIdx:activePresetIdx,
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
+    eliteRushWanted:eliteRushWanted,
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
     minionClickerAssignments:minionClickerAssignments.slice(),
@@ -9144,6 +9158,10 @@ function loadGame(){
   else if(typeof data.witheredSouls==='number') burningSouls=data.witheredSouls; // legacy field name
   if(typeof data.portalBuilt==='boolean') portalBuilt=data.portalBuilt;
   if(data.challengeUpg&&typeof data.challengeUpg==='object') challengeUpg=data.challengeUpg;
+  // Sticky Elite-Rush intent. Older saves lack the field — infer it from whether
+  // Elite-Rush was left on, so a mid-rush save keeps re-arming across resets.
+  if(data.eliteRushWanted!==undefined) eliteRushWanted=data.eliteRushWanted;
+  else eliteRushWanted=!!(challengeUpg.elite_rush&&challengeUpg.elite_rush.on);
   if(data.challengesPassed&&typeof data.challengesPassed==='object') challengesPassed=data.challengesPassed;
   if(data.challengeClearTimes&&typeof data.challengeClearTimes==='object') challengeClearTimes=data.challengeClearTimes;
   challengeStartTime=(typeof data.challengeStartTime==='number')?data.challengeStartTime:0;
@@ -10363,6 +10381,7 @@ document.getElementById('elite-rush-btn').addEventListener('click',function(){
     return;
   }
   s.on=!s.on;
+  eliteRushWanted=s.on;            // remember the player's intent (auto-offs won't clear it)
   updateEliteRushBtn();
   saveGame();
   if(s.on) eliteRushMaybeSkip();   // start rushing to the Elite immediately
