@@ -144,6 +144,41 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #ascend-btn:hover { background: #ee0000; box-shadow: 0 0 14px rgba(212,168,67,0.6); }
 #reincarnate-btn { display: none; position: absolute; top: 502px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #1a5c1a; border: 2px solid #44cc44; color: #ccffcc; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
 #reincarnate-btn:hover { background: #226622; box-shadow: 0 0 14px rgba(68,204,68,0.6); }
+
+/* ── ENTITY HUD FRAME (entity_UI2) ─────────────────────────────────────────────
+   One shared container that houses the spell bar, mana bar, Ascend/Reincarnate,
+   and the minion dock so they lock together. --hud-left / --hud-top place it and
+   --hud-scale sizes it; every zone is positioned in the art's native 768x512
+   space and scales with the frame. Tune the three vars to place the whole HUD. */
+#entity-hud {
+  position: absolute;
+  left: var(--hud-left, 0px);
+  top: var(--hud-top, 440px);
+  width: 768px; height: 512px;
+  transform: scale(var(--hud-scale, 0.6));
+  transform-origin: top left;
+  background: url('artwork/entity_UI2.webp') 0 0 / 768px 512px no-repeat;
+  z-index: 2;                 /* under the entity (z:3), above the stage bg */
+  pointer-events: none;       /* the frame art is inert; zones re-enable below */
+}
+#entity-hud > * { pointer-events: auto; }
+/* Spell bar → top slot row */
+#entity-hud #spell-panel { top: 104px; left: 92px; }
+/* Mana bar → the art already prints "MANA", so hide our label and sit the bar in the trough */
+#entity-hud #mana-bar-wrap { top: 178px; left: 150px; }
+#entity-hud #invoke-label { display: none; }
+/* Ascend / Reincarnate → transparent click plates over the buttons drawn in the art */
+#entity-hud #ascend-btn,
+#entity-hud #reincarnate-btn {
+  left: 95px; right: auto; width: 325px; height: 57px; margin: 0; padding: 0;
+  background: transparent; border: none; box-shadow: none; color: transparent; text-shadow: none;
+}
+#entity-hud #ascend-btn { top: 228px; }
+#entity-hud #reincarnate-btn { top: 293px; }
+#entity-hud #ascend-btn:hover,
+#entity-hud #reincarnate-btn:hover { background: rgba(255,255,255,0.08); box-shadow: none; }
+/* Minion dock → right box */
+#entity-hud #mc-dock { position: absolute; top: 230px; left: 485px; }
 #reincarnate-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; align-items: center; justify-content: center; }
 #reincarnate-modal.open { display: flex; }
 #reincarnate-box { background: linear-gradient(160deg,#020d04,#051205); border: 2px solid #44cc44; border-radius: 14px; padding: 38px 44px; max-width: 480px; width: 90%; text-align: center; box-shadow: 0 0 60px rgba(68,204,68,0.25); }
@@ -1465,6 +1500,11 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <div id="battlefield">
       <canvas id="bg-canvas"></canvas>
       <img id="realm-bg-img" src="" alt="" />
+      <!-- Entity HUD frame (entity_UI2). One shared container holding the spell bar,
+           mana bar, Ascend/Reincarnate, and the minion dock, so they lock together
+           under a single position/scale. The elements are moved in at load by
+           consolidateEntityHud(). Sits under the entity (entity paints on top). -->
+      <div id="entity-hud"></div>
       <!-- Entity actor — rehomed from the retired left panel. Stands on the left of
            the stage, facing the centered enemy. Internal offsets unchanged. -->
       <div id="left-entity">
@@ -11552,6 +11592,19 @@ requestAnimationFrame(gameLoop);
 initMinionClickerDrag();
 updateMinionClickerDock();
 renderMinionClickerPlaced();
+
+// ── HUD consolidation ─────────────────────────────────────────────────────────
+// Move the entity-side HUD elements into the single #entity-hud frame so the
+// spell bar, mana bar, Ascend/Reincarnate, and minion dock lock together under one
+// position/scale. Moving keeps their IDs, so all existing JS still finds them.
+(function consolidateEntityHud(){
+  var hud=document.getElementById('entity-hud');
+  if(!hud) return;
+  ['spell-panel','mana-bar-wrap','ascend-btn','reincarnate-btn','mc-dock'].forEach(function(id){
+    var e=document.getElementById(id);
+    if(e) hud.appendChild(e);
+  });
+})();
 
 // Apply offline progress when tab comes back into view after being hidden
 (function(){
