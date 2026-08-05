@@ -309,6 +309,13 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .cu-buy-btn .cu-cost { display:block; font-size:12px; color:#3a1f5e; }
 .cu-toggle { flex-shrink:0; background:#1a1030; border:1px solid #6644aa; color:#9980cc; font-family:Georgia,serif; font-size:14px; font-weight:bold; letter-spacing:1px; padding:7px 14px; border-radius:5px; cursor:pointer; min-width:58px; }
 .cu-toggle.on { background:#e8c24a; border-color:#ffe27a; color:#1a1000; box-shadow:0 0 8px rgba(255,210,80,0.6); }
+/* Powers whose next level the player can't afford: dim the name/desc and buy
+   button, but leave any ON/OFF toggle or input fully lit so active powers still
+   read as usable. */
+.cu-row.cu-dim .cu-label, .cu-row.cu-dim .cu-buy-btn { opacity:0.4; }
+/* Burning Souls counter sitting in the blank portal art above the first power. */
+#portal-bs-counter { position:absolute; top:58px; left:0; right:0; text-align:center; font-family:Georgia,serif; font-weight:bold; font-size:18px; letter-spacing:1px; color:#ffb84a; text-shadow:0 0 8px rgba(0,0,0,0.95), 0 0 16px rgba(255,140,40,0.55); pointer-events:none; z-index:3; }
+#portal-bs-counter #portal-bs-val { color:#ffd76a; }
 .cu-hint { flex-shrink:0; color:#c9b57e; font-size:13px; font-style:italic; text-align:right; max-width:120px; line-height:1.25; text-shadow:0 0 5px rgba(0,0,0,0.95); }
 /* Shapeshifter — "Open Presets" button in the Portal row */
 .cu-presets-btn { background:#7a4bd0; border-color:#a986f0; color:#f3ecff; }
@@ -4239,6 +4246,11 @@ function renderChallengeUpgrades(){
   var list=document.getElementById('challenge-upg-list');
   if(!list) return;
   list.innerHTML='';
+  // Burning Souls counter in the blank portal art above the first power.
+  var bsCounter=document.createElement('div');
+  bsCounter.id='portal-bs-counter';
+  bsCounter.innerHTML='🔥 Burning Souls: <span id="portal-bs-val">'+Math.floor(burningSouls||0).toLocaleString()+'</span>';
+  list.appendChild(bsCounter);
   var earned=earnedChallengeUpgrades();
   if(!earned.length){
     var empty=document.createElement('div'); empty.className='cu-empty';
@@ -4252,6 +4264,9 @@ function renderChallengeUpgrades(){
     var lbl=document.createElement('div'); lbl.className='cu-label';
     lbl.innerHTML='<div class="cu-name">'+u.name+'</div><div class="cu-desc">'+cuDescription(u)+'</div>';
     row.appendChild(lbl);
+    // Dim powers whose next level the player can't afford (maxed rows aren't dimmed).
+    var _atMax=u.maxLevel&&st.level>=u.maxLevel;
+    if(!_atMax && (burningSouls||0) < cuCost(u.id)) row.classList.add('cu-dim');
     if(u.type==='buy'){
       var btn=document.createElement('button'); btn.className='cu-buy-btn';
       var atMax=u.maxLevel&&st.level>=u.maxLevel;
@@ -5306,8 +5321,11 @@ function requestReleaseMinion(typeIdx){
 
 // ── Immolation: sacrifice Elite minions by fire for Burning Souls ────────────
 function updateBurningSoulDisplay(){
+  var v=Math.floor(burningSouls||0).toLocaleString();
   var el=document.getElementById('mm-bs-val');
-  if(el) el.textContent=Math.floor(burningSouls||0).toLocaleString();
+  if(el) el.textContent=v;
+  var pel=document.getElementById('portal-bs-val');
+  if(pel) pel.textContent=v;
 }
 function showImmolateInfoModal(){
   var chk=document.getElementById('immolate-dns-chk'); if(chk) chk.checked=false;
