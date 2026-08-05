@@ -5404,7 +5404,7 @@ function addMinionXp(){
       if(m.level>=MINION_ELITE_LEVEL){ m.isElite=true; m.xp=0; noteEliteTrained(); break; }
     }
   });
-  processAutoImmolate();   // Willing Sacrifice: immolate any marked minion that just hit Elite
+  // Auto-immolate no longer fires per-kill — it runs only on ascension/reincarnation.
 }
 
 function showMinionCaptureNotif(typeIdx){
@@ -8741,6 +8741,11 @@ function doReincarnate(){
   rebirthCount=0;
   captureTargets=[]; releaseMode=false; // clear any pending capture selection on reincarnation
   immolateMode=false; immolateTargets=[];
+  // Willing Sacrifice: immolate selected Elite minions now (only fires on
+  // ascension/reincarnation). Runs after the capture reset so re-targets stick,
+  // and before the Phoenix baseline so its Burning Souls don't count toward the
+  // next auto-reincarnate trigger.
+  processAutoImmolate();
   resetSmartClickersToTop();   // SMART Clickers restart from the top upgrades
   removeSoulUrn();             // any active Soul Urn is abandoned on reincarnation
   ascensionStartTime=Date.now();    // Immortal Minutes timer restarts this life
@@ -8920,6 +8925,7 @@ function doRebirthReset(chosenForm){
   updateProgressLabel();
   updateHighestFloor();
   updateAutoProgressBtn();
+  processAutoImmolate();           // Willing Sacrifice: immolate selected Elite minions on ascension
   reactivateEliteRushIfWanted();   // fresh run: re-arm Elite-Rush if the player wants it
   saveGame();
   spawnEnemy();
