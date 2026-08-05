@@ -4033,24 +4033,39 @@ function processAutoImmolate(){
 var smartClickerTarget='';   // one target level for all smart clickers ('' = default 1)
 function smartClickersActive(){ return !activeChallenge && cuOn('auto_upgrade') && cuLevel('auto_upgrade')>0; }
 function smartTarget(){ var v=parseInt(smartClickerTarget,10); return (v&&v>0)?v:1; }
-function nextAvailableUpgradeAfter(uid){
+// Next visible/allowed upgrade below `uid` that NO other clicker already holds —
+// the per-upgrade lock. `occupied` maps upgradeId -> how many clickers sit on it,
+// so a smart clicker leapfrogs OVER an occupied upgrade to the next free one
+// instead of merging onto it.
+function nextFreeUpgradeAfter(uid, occupied){
   var idx=REP_UPGRADES.findIndex(function(x){return x.id===uid;});
   if(idx<0) return null;
   for(var i=idx+1;i<REP_UPGRADES.length;i++){
     var u=REP_UPGRADES[i];
-    if((u.vis()||_shownUpgrades[u.id]) && upgradeAllowedNow(u)) return u;
+    if(!((u.vis()||_shownUpgrades[u.id]) && upgradeAllowedNow(u))) continue;
+    if((occupied[u.id]||0)>0) continue;   // held by another clicker — leapfrog past it
+    return u;
   }
-  return null;   // bottom of the list — the clicker stops on its last upgrade
+  return null;   // nothing free below — the clicker stays on its last upgrade
 }
-// Only advance once the current upgrade has actually reached the target level,
-// then cascade past any following upgrades already at/over it.
-function smartAdvanceIfReached(a){
+// Advance a smart clicker when it has finished its current upgrade (reached the
+// target level) OR is sharing a seat with another clicker (resolve a merge). It
+// then cascades past any following upgrades already at/over target or occupied,
+// landing on the first free, unfinished upgrade below. `occupied` is kept in sync
+// as the clicker vacates one seat and claims another, so the 1-per-upgrade lock
+// holds across every clicker processed this tick.
+function smartAdvanceIfReached(a, occupied){
   var u=REP_UPGRADES.find(function(x){return x.id===a.upgradeId;});
   if(!u) return false;
   var tgt=smartTarget(), moved=false, guard=0;
-  while(u && u.level>=tgt && guard++<200){
-    var nxt=nextAvailableUpgradeAfter(u.id);
-    if(!nxt) break;
+  while(u && guard++<400){
+    var sharedSeat=(occupied[u.id]||0)>1;   // another clicker also holds this seat
+    var doneHere=u.level>=tgt;              // finished buying this upgrade to target
+    if(!doneHere && !sharedSeat) break;     // still working a seat we hold alone — stay
+    var nxt=nextFreeUpgradeAfter(u.id, occupied);
+    if(!nxt) break;                         // nothing free below — stay put
+    occupied[u.id]=(occupied[u.id]||1)-1;   // vacate current seat
+    occupied[nxt.id]=(occupied[nxt.id]||0)+1; // claim the new seat
     a.upgradeId=nxt.id; u=nxt; moved=true;
   }
   return moved;
@@ -10467,12 +10482,19 @@ function tickMinionClickers(now){
   _lastMinionClickTick=now;
   var bought=false, moved=false;
   var smartN=smartClickersActive()?cuLevel('auto_upgrade'):0;   // first N upgrade-clickers are smart
+  // Per-upgrade lock: tally where every upgrade-clicker currently sits so smart
+  // clickers leapfrog over occupied upgrades instead of merging onto them. Kept in
+  // sync inside smartAdvanceIfReached as clickers move during this tick.
+  var occupied={};
+  minionClickerAssignments.forEach(function(a){
+    if(a.target==='upgrade' && a.upgradeId) occupied[a.upgradeId]=(occupied[a.upgradeId]||0)+1;
+  });
   var upgSeen=0;
   minionClickerAssignments.forEach(function(a){
     if(a.target==='enemy') minionClickerAttackEnemy();
     else if(a.target==='upgrade'){
       if(upgSeen<smartN){                                     // smart: leapfrog + capped buy
-        if(smartAdvanceIfReached(a)) moved=true;
+        if(smartAdvanceIfReached(a, occupied)) moved=true;
         if(smartBuyTowardTarget(a)) bought=true;
       } else {
         if(minionClickerBuyUpgrade(a.upgradeId)) bought=true; // plain upgrade clicker
