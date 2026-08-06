@@ -12495,7 +12495,8 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     {sel:'#left-header',       name:'form-descriptor'},
     {sel:'#topbar .title',     name:'title'},
     {sel:'#realm-label',       name:'realm-label'},
-    {sel:'#stage-launchers',   name:'sacrifice+minion'}
+    {sel:'#stage-launchers',   name:'sacrifice+minion'},
+    {sel:'#mc-dock',           name:'minion+elite dock', show:'flex'}
   ];
   var UI_FRAMES=[
     {key:'entity_UI2', w:520}, {key:'enemy_UI', w:420},
@@ -12645,6 +12646,10 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     '#ed-panel button{flex:1;font:12px system-ui;color:#d7cff0;background:#1c1730;border:1px solid #3a3159;border-radius:6px;padding:6px;cursor:pointer}'+
     '#ed-panel button:hover{border-color:#a274ff;color:#c9a8ff}'+
     '#ed-out{width:100%;height:150px;resize:vertical;font:10px/1.45 ui-monospace,Menlo,monospace;color:#4fd48a;background:#07050e;border:1px solid #3a3159;border-radius:6px;padding:7px}';
+    // Force-show elements the game hides dynamically (stylesheet !important beats the
+    // game's inline display toggles, which plain inline styles could not).
+    st.textContent += TARGETS.filter(function(t){return t.show;}).map(function(t){ return t.sel+'{display:'+t.show+'!important}'; }).join('');
+    st.textContent += '#mc-dock-sprite,#mc-dock-counter,#mc-dock-recall,#elite-rush-btn{display:block!important}';
     document.head.appendChild(st);
   }
 })();
