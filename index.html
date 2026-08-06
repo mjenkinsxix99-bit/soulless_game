@@ -87,6 +87,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 @keyframes bannerFadeIn { from{opacity:0;top:4px;} to{opacity:1;top:12px;} }
 #enemy-zone { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
 #enemy-zone .canvas-wrap { overflow: visible; }
+/* Entity sprite must not be clipped to the old left-panel box (remnant removed). */
+#left-entity .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cname { font-size: 19px; font-weight: bold; letter-spacing: 2px; color: #9988cc; text-transform: uppercase; }
 .cname.entity-label { color: #b8aaee; text-shadow: 0 0 8px rgba(180,160,255,0.5); }
@@ -12496,7 +12498,8 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     {sel:'#topbar .title',     name:'title'},
     {sel:'#realm-label',       name:'realm-label'},
     {sel:'#stage-launchers',   name:'sacrifice+minion'},
-    {sel:'#mc-dock',           name:'minion+elite dock', show:'flex'}
+    {sel:'#mc-dock',           name:'minion+elite dock', show:'flex'},
+    {sel:'#pet-canvas',        name:'minion pet', show:'block'}
   ];
   var UI_FRAMES=[
     {key:'entity_UI2', w:520}, {key:'enemy_UI', w:420},
@@ -12532,8 +12535,8 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   function tagIt(it){
     var tag=document.createElement('div'); tag.className='ed-tag'; tag.textContent=it.name;
     it.tag=tag;
-    // <img> can't hold children — attach the label as a sibling overlay.
-    if(it.el.tagName==='IMG'){
+    // <img>/<canvas> can't hold children — attach the label as a sibling overlay.
+    if(it.el.tagName==='IMG'||it.el.tagName==='CANVAS'){
       it.el.parentNode.appendChild(tag); tag.classList.add('ed-tag-float');
       if(it.bg){
         // The background is pointer-events:none, z-index:-1 and offset off-screen,
@@ -12552,7 +12555,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   function applyTransform(it){ it.el.style.transform=(it.base?it.base+' ':'')+'translate('+it.tx+'px,'+it.ty+'px) scale('+it.s+')'; }
   function applyBg(it){ it.el.style.transform='translateX('+it.bgx+'px) translateY('+it.bgy+'px) scale('+it.bgs+')'; }
   function applyUI(it){ it.el.style.transform='translate('+it.tx+'px,'+it.ty+'px) scale('+it.s+')'; syncFloatTag(it); }
-  function apply(it){ it.bg?applyBg(it):(it.uiframe?applyUI(it):applyTransform(it)); }
+  function apply(it){ it.bg?applyBg(it):(it.uiframe?applyUI(it):applyTransform(it)); syncFloatTag(it); }
 
   function wire(it){
     function down(e){
@@ -12650,6 +12653,8 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     // game's inline display toggles, which plain inline styles could not).
     st.textContent += TARGETS.filter(function(t){return t.show;}).map(function(t){ return t.sel+'{display:'+t.show+'!important}'; }).join('');
     st.textContent += '#mc-dock-sprite,#mc-dock-counter,#mc-dock-recall,#elite-rush-btn{display:block!important}';
+    // The pet canvas is pointer-events:none and often transparent — make it grabbable and give it a faint fill so its box is visible.
+    st.textContent += '#pet-canvas{pointer-events:auto!important;background:rgba(162,116,255,.14)!important}';
     document.head.appendChild(st);
   }
 })();
