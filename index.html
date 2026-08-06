@@ -21,7 +21,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #realm-toast.show { opacity: 1; }
 #topbar { display: flex; align-items: center; gap: 20px; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; position: relative; }
 .title { font-size: 27px; letter-spacing: 4px; color: #d0c4ff; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
-#souls-display { text-align: center; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
+#souls-display { text-align: center; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); pointer-events: none; z-index: 5; }
+/* Title / souls / tattered — rehomed from the removed top panel onto the stage. */
+#game-title { position: absolute; top: 8px; left: 14px; z-index: 5; }
+#tattered-display { position: absolute; top: 8px; right: 14px; z-index: 5; }
 #tattered-display { margin-left: auto; }
 #souls-display .num { font-size: 33px; color: #ffffff; font-weight: bold; text-shadow: 0 0 8px rgba(200,180,255,0.9), 0 0 18px rgba(160,120,255,0.5); }
 #souls-display .lbl { font-size: 14px; color: #c0b0f0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 6px rgba(150,120,240,0.4); }
@@ -1440,18 +1443,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
 <div id="touch-hint-toast">Long-press nodes &amp; icons to view details</div>
 <div id="realm-toast"></div>
 <div id="game">
-  <div id="topbar">
-    <div class="title">SOULLESS</div>
-    <div id="souls-display">
-      <div class="num" id="soul-count">0</div>
-      <div class="lbl">souls collected</div>
-    </div>
-    <div id="tattered-display" style="cursor:pointer;">
-      <div class="num" id="tattered-count">0</div>
-      <div class="lbl">tattered souls</div>
-      <div class="ts-preview" id="ts-ascend-preview"></div>
-    </div>
-  </div>
+  <!-- Top panel removed — title / souls / tattered moved onto the stage (inside #battlefield). -->
   <div id="ach-banner">
     <div class="ach-label">Achievement Unlocked</div>
     <div class="ach-name"></div>
@@ -1531,6 +1523,17 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
       </div>
       <div id="ss-global-arrow">⮞</div>
       <div id="realm-label">Realm: Void</div>
+      <!-- HUD counters — moved out of the old top panel onto the stage; positioned via edit mode. -->
+      <div id="game-title" class="title">SOULLESS</div>
+      <div id="souls-display">
+        <div class="num" id="soul-count">0</div>
+        <div class="lbl">souls collected</div>
+      </div>
+      <div id="tattered-display" style="cursor:pointer;">
+        <div class="num" id="tattered-count">0</div>
+        <div class="lbl">tattered souls</div>
+        <div class="ts-preview" id="ts-ascend-preview"></div>
+      </div>
 
       <div id="reform-msg">
         <div class="rm-title">Oh No! Get stronger uwu!</div>
@@ -12495,7 +12498,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     {sel:'#souls-display',     name:'souls'},
     {sel:'#tattered-display',  name:'tattered',     show:'block'},
     {sel:'#left-header',       name:'form-descriptor'},
-    {sel:'#topbar .title',     name:'title'},
+    {sel:'#game-title',        name:'title'},
     {sel:'#realm-label',       name:'realm-label'},
     {sel:'#stage-launchers',   name:'sacrifice+minion'},
     {sel:'#mc-dock',           name:'minion+elite dock', show:'flex'},
