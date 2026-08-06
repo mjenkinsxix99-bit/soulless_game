@@ -1497,7 +1497,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
           <div id="enemy-mc-zone"><div class="mc-drop-hl"></div></div>
         </div>
         <div class="cname enemy-label" id="enemy-name-label">Wisper</div>
-        <div class="hp-wrap">
+        <div class="hp-wrap" id="enemy-hp-wrap">
           <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
           <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
         </div>
@@ -12489,7 +12489,10 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   var TARGETS=[
     {sel:'#realm-bg-img-left', name:'background', bg:true},
     {sel:'#entity-canvas',     name:'entity'},
-    {sel:'#combat-wrap',       name:'enemy+name+hp'},
+    {sel:'#enemy-canvas',      name:'enemy sprite'},
+    {sel:'#enemy-name-label',  name:'enemy name'},
+    {sel:'#enemy-hp-wrap',     name:'enemy HP bar'},
+    {sel:'#elite-timer-wrap',  name:'elite timer', show:'block'},
     {sel:'#minimap-panel',     name:'minimap'},
     {sel:'#spell-panel',       name:'spells'},
     {sel:'#mana-bar-wrap',     name:'mana'},
@@ -12658,6 +12661,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     st.textContent += '#mc-dock-sprite,#mc-dock-counter,#mc-dock-recall,#elite-rush-btn{display:block!important}';
     // The pet canvas is pointer-events:none and often transparent — make it grabbable and give it a faint fill so its box is visible.
     st.textContent += '#pet-canvas{pointer-events:auto!important;background:rgba(162,116,255,.14)!important}';
+    st.textContent += '#elite-timer-wrap{visibility:visible!important}';   // elite timer is visibility:hidden until an elite fight
     document.head.appendChild(st);
   }
 })();
