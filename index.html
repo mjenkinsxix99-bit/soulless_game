@@ -100,6 +100,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .hp-fill.enemy-hp.elite { background: #aa8833; }
 .hp-fill.timer-fill { background: #33aa33; }
 .hp-numbers { display: flex; justify-content: space-between; font-size: 14px; color: #8877aa; margin-top: 2px; }
+/* Enemy HP: numbers sit to the RIGHT of the bar, not below it */
+#enemy-zone > .hp-wrap { display: flex; align-items: center; gap: 8px; width: auto; }
+#enemy-zone > .hp-wrap > .hp-track { width: 220px; flex: none; }
+#enemy-zone > .hp-wrap > .hp-numbers { margin-top: 0; justify-content: flex-start; gap: 4px; white-space: nowrap; }
 .canvas-wrap { position: relative; overflow: hidden; }
 #enemy-canvas { display: block; background: transparent; }
 #entity-canvas { cursor: default; display: block; background: transparent; }
@@ -1125,7 +1129,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 @keyframes mm-rise { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(4px)} }
 
 /* Minimap panel repositioned inside battlefield */
-#minimap-panel { flex-shrink:0; padding:2px 14px; background:transparent; position:relative; }
+#minimap-panel { padding:2px 14px; background:transparent; position:absolute; left:594px; top:622px; z-index:2; }
 #minimap-inner { display:flex;gap:8px;align-items:center;justify-content:center;padding:6px 0; }
 #mm-cells { display:flex; gap:8px; align-items:center; min-height:46px; }
 
@@ -1331,6 +1335,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     flex-shrink: 0;
     display: block !important;
     position: relative;
+    left: auto !important; top: auto !important;   /* neutralize desktop absolute coords on mobile */
     width: 100%;
     box-sizing: border-box;
     margin-top: -9px;
@@ -1503,23 +1508,25 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
           <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
         </div>
         <div id="elite-timer-wrap" style="visibility:hidden;">
-          <div class="hp-wrap" style="position:relative;">
-            <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
-            <div id="elite-timer-label" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:1px;pointer-events:none;color:#fff;text-shadow:0 0 3px rgba(0,0,0,0.9);white-space:nowrap;overflow:hidden;">Time to Defeat: 20s</div>
+          <div class="hp-wrap" style="display:flex;align-items:center;gap:8px;width:auto;">
+            <div class="hp-track" style="width:220px;flex:none;"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
+            <div id="elite-timer-label" style="font-size:10px;letter-spacing:1px;pointer-events:none;color:#fff;text-shadow:0 0 3px rgba(0,0,0,0.9);white-space:nowrap;">Time to Defeat: 20s</div>
           </div>
         </div>
-        <div id="minimap-panel">
-          <div id="minimap-inner">
-            <button class="mm-nav" id="mm-prev"><span class="ui-icon" style="background-position:-216px 0"></span><span class="tab-tip">Scroll Left</span></button>
-            <div id="mm-cells"></div>
-            <button class="mm-nav" id="mm-next"><span class="ui-icon" style="background-position:-252px 0"></span><span class="tab-tip">Scroll Right</span></button>
-            <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
-          </div>
-          <div id="mm-new-arrow">&#9660;</div>
-        </div>
+        <!-- minimap moved out to #battlefield so it's uncoupled from the enemy sprite -->
         <div id="click-hint">0 / 10</div>
       </div>
       </div><!-- /combat-wrap -->
+      <!-- Minimap — uncoupled from the enemy; positioned independently on the stage. -->
+      <div id="minimap-panel">
+        <div id="minimap-inner">
+          <button class="mm-nav" id="mm-prev"><span class="ui-icon" style="background-position:-216px 0"></span><span class="tab-tip">Scroll Left</span></button>
+          <div id="mm-cells"></div>
+          <button class="mm-nav" id="mm-next"><span class="ui-icon" style="background-position:-252px 0"></span><span class="tab-tip">Scroll Right</span></button>
+          <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
+        </div>
+        <div id="mm-new-arrow">&#9660;</div>
+      </div>
       <div id="ss-global-arrow">⮞</div>
       <div id="realm-label">Realm: Void</div>
 
@@ -12487,6 +12494,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     {sel:'#tattered-display',  name:'tattered',     show:'block'},
     {sel:'#left-header',       name:'form-descriptor'},
     {sel:'#topbar .title',     name:'title'},
+    {sel:'#realm-label',       name:'realm-label'},
     {sel:'#stage-launchers',   name:'sacrifice+minion'}
   ];
   var UI_FRAMES=[
@@ -12501,6 +12509,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       var el=document.querySelector(t.sel); if(!el) return;
       if(t.show) el.style.setProperty('display', t.show, 'important');
       var it={el:el, name:t.name, tx:0, ty:0, s:1, bg:!!t.bg};
+      it.z=parseInt(getComputedStyle(el).zIndex,10); if(isNaN(it.z)) it.z=0;
       if(t.bg){ it.bgx=0; it.bgy=-400; it.bgs=1.15; applyBg(it); }
       else { var b=getComputedStyle(el).transform; it.base=(b&&b!=='none')?b:''; }
       el.classList.add('ed-t'); tagIt(it); wire(it); items.push(it);
@@ -12511,7 +12520,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       img.className='ed-t ed-uiframe';
       img.style.cssText='position:absolute;left:'+(30+i*26)+'px;top:'+(150+i*26)+'px;width:'+u.w+'px;height:auto;z-index:60';
       host.appendChild(img);
-      var it={el:img, name:'UI:'+u.key, tx:0, ty:0, s:1, base:'', uiframe:true};
+      var it={el:img, name:'UI:'+u.key, tx:0, ty:0, s:1, z:60, base:'', uiframe:true};
       img.onload=function(){ syncFloatTag(it); render(); };
       tagIt(it); wire(it); items.push(it);
     });
@@ -12573,6 +12582,8 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     else if(e.key==='ArrowUp') mvy(-step); else if(e.key==='ArrowDown') mvy(step);
     else if(e.key==='+'||e.key==='=') { if(sel.bg) sel.bgs*=1.03; else sel.s*=1.03; }
     else if(e.key==='-'||e.key==='_') { if(sel.bg) sel.bgs/=1.03; else sel.s/=1.03; }
+    else if(e.key==='[') { sel.z=(sel.z||0)-1; sel.el.style.zIndex=sel.z; }
+    else if(e.key===']') { sel.z=(sel.z||0)+1; sel.el.style.zIndex=sel.z; }
     else h=false;
     if(h){ e.preventDefault(); apply(sel); render(); }
   }
@@ -12584,7 +12595,7 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     var p=document.createElement('div'); p.id='ed-panel';
     p.innerHTML=
       '<div class="ed-h">LAYOUT EDIT MODE</div>'+
-      '<div class="ed-sub">Drag any element · scroll to scale · arrows nudge (Shift ×10) · <b>+ / −</b> scale</div>'+
+      '<div class="ed-sub">Drag · scroll to scale · arrows nudge (Shift ×10) · <b>+ / −</b> scale · <b>[ ]</b> layer (z)</div>'+
       '<table id="ed-tbl"><tbody></tbody></table>'+
       '<div class="ed-row"><button id="ed-copy">Copy for Claude</button><button id="ed-reset">Reset all</button></div>'+
       '<textarea id="ed-out" readonly spellcheck="false"></textarea>';
@@ -12598,17 +12609,17 @@ document.getElementById('mm-auto').addEventListener('click',function(){
   function render(){
     var game=document.getElementById('game'), main=document.getElementById('main');
     var tb=document.querySelector('#ed-tbl tbody'); if(!tb) return;
-    var rows='<tr><th>element</th><th>x</th><th>y</th><th>w</th><th>h</th><th>scale</th></tr>';
+    var rows='<tr><th>element</th><th>x</th><th>y</th><th>w</th><th>h</th><th>scale</th><th>z</th></tr>';
     items.forEach(function(it,i){ var r=rectRel(it.el, main), sc=(it.bg?it.bgs:it.s).toFixed(3);
-      rows+='<tr data-i="'+i+'" class="'+(it===sel?'on':'')+'"><td>'+it.name+'</td><td>'+r.x+'</td><td>'+r.y+'</td><td>'+r.w+'</td><td>'+r.h+'</td><td>'+sc+'</td></tr>'; });
+      rows+='<tr data-i="'+i+'" class="'+(it===sel?'on':'')+'"><td>'+it.name+'</td><td>'+r.x+'</td><td>'+r.y+'</td><td>'+r.w+'</td><td>'+r.h+'</td><td>'+sc+'</td><td>'+(it.z||0)+'</td></tr>'; });
     tb.innerHTML=rows;
     // export text
     var mr=rectRel(main, game);
     var s='LAYOUT EXPORT  window='+window.innerWidth+'x'+window.innerHeight+'  #main@('+mr.x+','+mr.y+') '+mr.w+'x'+mr.h+'\n';
     s+='(x,y,w,h are relative to #main top-left)\n';
     items.forEach(function(it){ var r=rectRel(it.el, main);
-      if(it.bg){ s+=pad('background',18)+'transform: translateX('+it.bgx+'px) translateY('+it.bgy+'px) scale('+it.bgs.toFixed(4)+')   [rect '+r.x+','+r.y+' '+r.w+'x'+r.h+']\n'; }
-      else { s+=pad(it.name,18)+'x='+r.x+' y='+r.y+' w='+r.w+' h='+r.h+'  scale='+it.s.toFixed(3)+'  move='+it.tx+','+it.ty+'\n'; }
+      if(it.bg){ s+=pad('background',18)+'transform: translateX('+it.bgx+'px) translateY('+it.bgy+'px) scale('+it.bgs.toFixed(4)+')  z='+(it.z||0)+'   [rect '+r.x+','+r.y+' '+r.w+'x'+r.h+']\n'; }
+      else { s+=pad(it.name,18)+'x='+r.x+' y='+r.y+' w='+r.w+' h='+r.h+'  scale='+it.s.toFixed(3)+'  z='+(it.z||0)+'  move='+it.tx+','+it.ty+'\n'; }
     });
     document.getElementById('ed-out').value=s;
   }
