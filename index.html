@@ -4258,7 +4258,11 @@ var _bsBaseAtReinc=0;
 function tickPhoenix(){
   if(activeChallenge) return;
   if(!cuOn('auto_reinc')) return;
-  if(rebirthCount<7) return;                        // Ultimate form still required
+  // Ultimate form required — mirror the manual Reincarnate button's condition
+  // (checkRebirthButton). Form Masters (form-ult-all) can reincarnate from a
+  // preset-applied Ultimate form without rebirthCount ever climbing back to 7,
+  // so gating on rebirthCount alone blocked Phoenix for them entirely.
+  if(rebirthCount<7 && achievementsEarned.indexOf('form-ult-all')<0) return;
   if(anyAscendModalOpen()) return;                  // don't reincarnate mid-ascension
   var target=parseInt(cuVal('auto_reinc'),10);
   if(!target||target<1) return;
