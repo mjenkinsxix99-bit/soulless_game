@@ -12430,9 +12430,13 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       if(bgImg){ bgImg.style.display='none'; bgImg.src=''; }
       var bgImgLeft=document.getElementById('realm-bg-img-left');
       if(bgImgLeft){
-        var imgSrc=REALM_BG_IMAGES[realm]||'';
+        // Realms repeat in perpetuity past floor 1000 — wrap the background image
+        // index the same way enemies (realmOffset) and the procedural canvas
+        // backgrounds already do, so realm 11 -> Void, 12 -> Underworld, etc.
+        var bgRealm=((realm-1)%10)+1;
+        var imgSrc=REALM_BG_IMAGES[bgRealm]||'';
         if(imgSrc){
-          var leftScale=REALM_BG_LEFT_SCALE[realm]||0.60;
+          var leftScale=REALM_BG_LEFT_SCALE[bgRealm]||0.60;
           bgImgLeft.src=imgSrc;
           // Baked HUD layout (2026): background nudged down from the old locked
           // translateY(-400px) to translateY(-76px) per the approved 1920×1080 layout.
