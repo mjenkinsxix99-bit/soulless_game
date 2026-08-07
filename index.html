@@ -21,7 +21,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #realm-toast.show { opacity: 1; }
 #topbar { display: flex; align-items: center; gap: 20px; padding: 10px 24px; border-bottom: 1px solid #1e1845; background: #09090f; flex-shrink: 0; position: relative; }
 .title { font-size: 27px; letter-spacing: 4px; color: #d0c4ff; text-shadow: 0 0 10px rgba(180,150,255,0.6); }
-#souls-display { text-align: center; position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
+#souls-display { text-align: center; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); pointer-events: none; z-index: 5; }
+/* Title / souls / tattered — rehomed from the removed top panel onto the stage. */
+#game-title { position: absolute; top: 8px; left: 14px; z-index: 5; }
+#tattered-display { position: absolute; top: 8px; right: 14px; z-index: 5; }
 #tattered-display { margin-left: auto; }
 #souls-display .num { font-size: 33px; color: #ffffff; font-weight: bold; text-shadow: 0 0 8px rgba(200,180,255,0.9), 0 0 18px rgba(160,120,255,0.5); }
 #souls-display .lbl { font-size: 14px; color: #c0b0f0; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 6px rgba(150,120,240,0.4); }
@@ -73,13 +76,14 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 /* Single shared realm background — hosted on #main, spans the whole stage.
    z-index:-1 keeps it behind all stage content while #main's radial gradient
    remains the ultimate backdrop. Anchor (top:0;left:0;transform-origin:top left)
-   and the JS transform are unchanged from the original left-panel image. */
+   is unchanged; the JS translate was rebaked to translateY(-76px) for the
+   approved 1920×1080 HUD layout (see the bg transform in renderRealmBg). */
 #realm-bg-img-left { display:none; position:absolute; top:0; left:0; pointer-events:none; z-index:-1; width:auto; height:auto; transform-origin:top left; }
 #realm-bg-img { display:none; position:absolute; top:0; left:0; transform-origin:top left; pointer-events:none; z-index:1; width:auto; height:auto; }
 /* Enemy/HP/minimap sit at 75.5% of the stage width (was 50% of the old middle
    panel). Pure percentage so the enemy slides proportionally at every resolution,
    the same way the old 50% did — just re-based to the full-width stage. */
-#combat-wrap { position:absolute; left:75.5%; top:calc(36% + 165px); transform:translate(-50%,-50%); z-index:2; }
+#combat-wrap { position:absolute; left:75.5%; top:460px; transform:translate(-50%,-50%); z-index:2; }
 /* Update available banner */
 #update-banner { display:none; position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:50; background:#0a0800; border:1px solid #d4a843; border-radius:6px; padding:7px 18px; font-family:Georgia,serif; font-size:12px; color:#d4a843; letter-spacing:1px; white-space:nowrap; box-shadow:0 0 14px rgba(212,168,67,0.35); cursor:pointer; transition:box-shadow 0.2s; }
 #update-banner:hover { box-shadow:0 0 22px rgba(212,168,67,0.65); }
@@ -87,6 +91,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 @keyframes bannerFadeIn { from{opacity:0;top:4px;} to{opacity:1;top:12px;} }
 #enemy-zone { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; }
 #enemy-zone .canvas-wrap { overflow: visible; }
+/* Entity sprite must not be clipped to the old left-panel box (remnant removed). */
+#left-entity .canvas-wrap { overflow: visible; }
 .combatant { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .cname { font-size: 19px; font-weight: bold; letter-spacing: 2px; color: #9988cc; text-transform: uppercase; }
 .cname.entity-label { color: #b8aaee; text-shadow: 0 0 8px rgba(180,160,255,0.5); }
@@ -100,6 +106,10 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .hp-fill.enemy-hp.elite { background: #aa8833; }
 .hp-fill.timer-fill { background: #33aa33; }
 .hp-numbers { display: flex; justify-content: space-between; font-size: 14px; color: #8877aa; margin-top: 2px; }
+/* Enemy HP: numbers sit to the RIGHT of the bar, not below it */
+#enemy-zone > .hp-wrap { display: flex; align-items: center; gap: 8px; width: auto; }
+#enemy-zone > .hp-wrap > .hp-track { width: 220px; flex: none; }
+#enemy-zone > .hp-wrap > .hp-numbers { margin-top: 0; justify-content: flex-start; gap: 4px; white-space: nowrap; }
 .canvas-wrap { position: relative; overflow: hidden; }
 #enemy-canvas { display: block; background: transparent; }
 #entity-canvas { cursor: default; display: block; background: transparent; }
@@ -140,7 +150,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #reform-btn:hover { background: rgba(102,85,170,0.15); }
 #realm-label { position: absolute; top: 12px; left: 14px; font-size: 18px; font-weight: bold; color: #eeddff; letter-spacing: 3px; text-transform: uppercase; z-index: 3; }
 /* Ascend (Rebirth) button */
-#ascend-btn { display: none; position: absolute; top: 460px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #cc0000; border: 2px solid #d4a843; color: #2a0a4a; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
+#ascend-btn { display: none; position: absolute; top: 460px; left: 0; right: 0; margin: 0 auto; width: 222px; padding: 9px 22px; background: #cc0000; border: 2px solid #d4a843; color: #2a0a4a; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
 #ascend-btn:hover { background: #ee0000; box-shadow: 0 0 14px rgba(212,168,67,0.6); }
 #reincarnate-btn { display: none; position: absolute; top: 502px; left: 0; right: 0; margin: 0 auto; width: fit-content; padding: 9px 22px; background: #1a5c1a; border: 2px solid #44cc44; color: #ccffcc; font-family: Georgia,serif; font-size: 15px; letter-spacing: 2px; cursor: pointer; border-radius: 4px; transition: background 0.2s, box-shadow 0.2s; font-weight: bold; }
 #reincarnate-btn:hover { background: #226622; box-shadow: 0 0 14px rgba(68,204,68,0.6); }
@@ -309,6 +319,13 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 .cu-buy-btn .cu-cost { display:block; font-size:12px; color:#3a1f5e; }
 .cu-toggle { flex-shrink:0; background:#1a1030; border:1px solid #6644aa; color:#9980cc; font-family:Georgia,serif; font-size:14px; font-weight:bold; letter-spacing:1px; padding:7px 14px; border-radius:5px; cursor:pointer; min-width:58px; }
 .cu-toggle.on { background:#e8c24a; border-color:#ffe27a; color:#1a1000; box-shadow:0 0 8px rgba(255,210,80,0.6); }
+/* Powers whose next level the player can't afford: dim the name/desc and buy
+   button, but leave any ON/OFF toggle or input fully lit so active powers still
+   read as usable. */
+.cu-row.cu-dim .cu-label, .cu-row.cu-dim .cu-buy-btn { opacity:0.4; }
+/* Burning Souls counter sitting in the blank portal art above the first power. */
+#portal-bs-counter { position:absolute; top:58px; left:0; right:0; text-align:center; font-family:Georgia,serif; font-weight:bold; font-size:18px; letter-spacing:1px; color:#ffb84a; text-shadow:0 0 8px rgba(0,0,0,0.95), 0 0 16px rgba(255,140,40,0.55); pointer-events:none; z-index:3; }
+#portal-bs-counter #portal-bs-val { color:#ffd76a; }
 .cu-hint { flex-shrink:0; color:#c9b57e; font-size:13px; font-style:italic; text-align:right; max-width:120px; line-height:1.25; text-shadow:0 0 5px rgba(0,0,0,0.95); }
 /* Shapeshifter — "Open Presets" button in the Portal row */
 .cu-presets-btn { background:#7a4bd0; border-color:#a986f0; color:#f3ecff; }
@@ -915,7 +932,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 #invoke-bar-outer { width:180px; height:10px; background:#04030f; border:1px solid #1a1a3a; border-radius:4px; overflow:hidden; position:relative; }
 #invoke-bar-fill { position:absolute; top:0; left:0; bottom:0; width:0%; background:linear-gradient(to right,#1a3399,#66aaff); transition:width 0.3s ease; border-radius:3px; }
 #invoke-bar-fill.invoke-full { background:linear-gradient(to right,#2255cc,#aaccff); box-shadow:0 0 6px rgba(100,170,255,0.6); }
-#invoke-num { font-size:9px; color:#7a99cc; white-space:nowrap; }
+#invoke-num { font-size:9px; color:#ffffff; white-space:nowrap; }
 .spell-btn { width:44px; height:44px; border-radius:7px; border:1px solid #1a1535; background:#05040e; cursor:pointer; position:relative; display:flex; align-items:center; justify-content:center; font-size:19px; line-height:1; flex-shrink:0; transition:border-color 0.2s,box-shadow 0.2s,opacity 0.2s; overflow:visible; }
 /* Owned/unlocked spells use the same cream fill as the upgrade cards */
 .spell-btn:not(.spell-locked) { background:#f0e8b8; }
@@ -1118,7 +1135,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 @keyframes mm-rise { 0%{transform:translateX(-50%) translateY(-6px)} 100%{transform:translateX(-50%) translateY(4px)} }
 
 /* Minimap panel repositioned inside battlefield */
-#minimap-panel { flex-shrink:0; padding:2px 14px; background:transparent; position:relative; }
+#minimap-panel { padding:2px 14px; background:transparent; position:absolute; left:594px; top:622px; z-index:2; }
 #minimap-inner { display:flex;gap:8px;align-items:center;justify-content:center;padding:6px 0; }
 #mm-cells { display:flex; gap:8px; align-items:center; min-height:46px; }
 
@@ -1241,7 +1258,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
   #left-entity .canvas-wrap { top: auto !important; bottom: 0 !important; left: 0 !important; right: 0 !important; display: flex; justify-content: center; }
   #pet-canvas { width: 96px !important; height: 96px !important; top: auto !important; bottom: 20px !important; right: -8px !important; }
   /* Ascend/Reincarnate stack at the entity's feet (bottom-left), not over its body. */
-  #left-entity #ascend-btn { top: auto !important; bottom: 34px !important; left: 2px !important; right: auto !important; margin: 0 !important; font-size: 10px !important; padding: 4px 8px !important; letter-spacing: 1px !important; }
+  #left-entity #ascend-btn { top: auto !important; bottom: 34px !important; left: 2px !important; right: auto !important; margin: 0 !important; width: fit-content !important; font-size: 10px !important; padding: 4px 8px !important; letter-spacing: 1px !important; }
   #left-entity #reincarnate-btn { top: auto !important; bottom: 4px !important; left: 2px !important; right: auto !important; margin: 0 !important; font-size: 10px !important; padding: 4px 8px !important; letter-spacing: 1px !important; }
   /* Stage launchers — pin to the top-left corner of the stage. */
   #stage-launchers { top: 4px !important; left: 4px !important; z-index: 13 !important; }
@@ -1324,6 +1341,7 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
     flex-shrink: 0;
     display: block !important;
     position: relative;
+    left: auto !important; top: auto !important;   /* neutralize desktop absolute coords on mobile */
     width: 100%;
     box-sizing: border-box;
     margin-top: -9px;
@@ -1412,6 +1430,57 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
 .mc-upg-icon.mc-show-x .mc-recall-x { display:flex; }
 #mc-buyall-wrap { position:relative; display:inline-block; }
 </style>
+<style id="hud-baked-css">
+/* ============================================================================
+   BAKED HUD LAYOUT + UNIFORM SCALE  (approved 1920×1080 layout, 2026)
+   The whole game is authored at a fixed 1920×1080 design canvas and scaled as a
+   single unit to fit any viewport (letterboxed at off-ratios). All element
+   positions below are the exact transforms exported from in-game edit mode.
+   Everything is gated behind `#game.hud-baked`, which the scale script adds on
+   desktop only — mobile (the coarse-pointer ≤549px layout) and edit mode
+   (`?edit=1`) never get it, so their raw/native layouts are untouched.
+   ========================================================================== */
+#game.hud-baked{position:absolute!important;top:0!important;left:0!important;width:1920px!important;height:1080px!important;transform-origin:top left!important;}
+html.hud-scaling,body.hud-scaling{background:#000;}
+
+/* — Element positions (transform = editor base + translate(move) scale) — */
+#game.hud-baked #entity-canvas   { transform:translate(108px,211px) scale(1.469)!important; z-index:10!important; }
+/* Enemy group — pinned to EXACT exported #main coordinates. combat-wrap and
+   enemy-zone are flattened to a stable full-battlefield box (no % / center
+   reflow), then each piece is placed absolutely so live content (enemy name
+   length, HP text, elite-timer visibility) can never move it. The sprite is
+   top-left-pinned; name/HP/timer are center-pinned so they stay centered over
+   the enemy regardless of text width. */
+#game.hud-baked #combat-wrap { left:0!important; top:0!important; transform:none!important; width:100%!important; height:100%!important; }
+#game.hud-baked #enemy-zone  { position:absolute!important; left:0!important; top:0!important; width:100%!important; height:100%!important; display:block!important; gap:0!important; }
+#game.hud-baked #enemy-zone > .canvas-wrap { position:absolute!important; left:704px!important; top:423px!important; margin:0!important; transform:scale(1.267)!important; transform-origin:top left!important; z-index:10!important; }
+#game.hud-baked #enemy-name-label{ position:absolute!important; left:912px!important; top:819px!important; margin:0!important; transform:translateX(-50%) scale(1.230)!important; transform-origin:top center!important; z-index:11!important; }
+#game.hud-baked #enemy-hp-wrap   { position:absolute!important; left:736px!important; top:848px!important; margin:0!important; transform:scale(0.971)!important; transform-origin:top left!important; z-index:2!important; }
+#game.hud-baked #elite-timer-wrap{ position:absolute!important; left:736px!important; top:867px!important; margin:0!important; transform:scale(1.000)!important; transform-origin:top left!important; z-index:2!important; }
+/* Enemy HP + elite timer bars 2px taller (1px each way); number text unchanged */
+#game.hud-baked #enemy-hp-wrap .hp-track,
+#game.hud-baked #elite-timer-wrap .hp-track { height:16px; }
+#game.hud-baked #click-hint      { position:absolute!important; left:915px!important; top:902px!important; margin:0!important; transform:translateX(-50%)!important; transform-origin:top center!important; }
+#game.hud-baked #minimap-panel   { transform:translate(76px,319px) scale(0.888)!important; z-index:10!important; }
+#game.hud-baked #spell-panel     { transform:translate(29px,328px) scale(1.000)!important; z-index:8!important; }
+#game.hud-baked #mana-bar-wrap   { left:25px!important; top:876px!important; transform:scale(1.126)!important; transform-origin:top left!important; z-index:2!important; }
+#game.hud-baked #invoke-bar-outer{ height:15px; }  /* blue mana bar 5px taller; number text unchanged */
+#game.hud-baked #invoke-num      { position:relative; top:-1px; }  /* nudge mana numbers up 1px */
+#game.hud-baked #ascend-btn      { transform:translate(-13px,329px) scale(1.126)!important; z-index:2!important; }
+#game.hud-baked #reincarnate-btn { transform:translate(-14px,336px) scale(1.159)!important; z-index:2!important; }
+#game.hud-baked #souls-display   { transform:translateX(-50%) translate(162px,-5px) scale(0.915)!important; z-index:10!important; }
+#game.hud-baked #tattered-display{ transform:translate(-106px,-7px) scale(1.030)!important; z-index:10!important; }
+#game.hud-baked #left-header     { transform:translate(-75px,-55px) scale(1.000)!important; z-index:33!important; }
+#game.hud-baked #game-title      { transform:translate(48px,6px) scale(1.000)!important; z-index:8!important; }
+#game.hud-baked #realm-label     { transform:translate(255px,6px) scale(1.000)!important; z-index:3!important; }
+#game.hud-baked #stage-launchers { transform:translate(194px,6px) scale(1.093)!important; z-index:5!important; }
+#game.hud-baked #mc-dock         { left:348px!important; top:928px!important; bottom:auto!important; transform:scale(1.126)!important; transform-origin:top left!important; z-index:8!important; }
+#game.hud-baked #pet-canvas      { transform:scaleX(-1) translate(-176px,265px) scale(1.344)!important; z-index:2!important; }
+
+/* — Permanent UI-frame artwork (final rects from the export, relative to #main) — */
+.hud-frame{display:none;position:absolute;pointer-events:none;}
+#game.hud-baked .hud-frame{display:block;}
+</style>
 </head>
 <body>
 <div id="rotate-overlay">
@@ -1426,18 +1495,7 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
 <div id="touch-hint-toast">Long-press nodes &amp; icons to view details</div>
 <div id="realm-toast"></div>
 <div id="game">
-  <div id="topbar">
-    <div class="title">SOULLESS</div>
-    <div id="souls-display">
-      <div class="num" id="soul-count">0</div>
-      <div class="lbl">souls collected</div>
-    </div>
-    <div id="tattered-display" style="cursor:pointer;">
-      <div class="num" id="tattered-count">0</div>
-      <div class="lbl">tattered souls</div>
-      <div class="ts-preview" id="ts-ascend-preview"></div>
-    </div>
-  </div>
+  <!-- Top panel removed — title / souls / tattered moved onto the stage (inside #battlefield). -->
   <div id="ach-banner">
     <div class="ach-label">Achievement Unlocked</div>
     <div class="ach-name"></div>
@@ -1448,6 +1506,14 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
          (The old left panel and its duplicate background image are retired; this
          single image is the sole realm backdrop. Transform is unchanged.) -->
     <img id="realm-bg-img-left" src="" alt="" />
+    <!-- Permanent HUD frame artwork — baked from the approved 1920×1080 layout.
+         Shown only under #game.hud-baked (desktop, non-edit). Rects are the exact
+         final positions exported from edit mode, relative to #main's top-left. -->
+    <img class="hud-frame" src="artwork/topleft_UI.webp" alt="" style="left:-38px;top:-84px;width:777px;height:374px;z-index:2;">
+    <img class="hud-frame" src="artwork/counter1.webp"  alt="" style="left:671px;top:-85px;width:386px;height:386px;z-index:5;">
+    <img class="hud-frame" src="artwork/counter2.webp"  alt="" style="left:1098px;top:-85px;width:386px;height:386px;z-index:5;">
+    <img class="hud-frame" src="artwork/entity_UI2.webp" alt="" style="left:-28px;top:735px;width:585px;height:390px;z-index:5;">
+    <img class="hud-frame" src="artwork/enemy_UI.webp"   alt="" style="left:626px;top:737px;width:581px;height:388px;z-index:5;">
     <!-- Spell panel + mana bar span the full stage width -->
     <div id="spell-panel"></div>
     <div id="mana-bar-wrap">
@@ -1491,30 +1557,43 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
           <div id="enemy-mc-zone"><div class="mc-drop-hl"></div></div>
         </div>
         <div class="cname enemy-label" id="enemy-name-label">Wisper</div>
-        <div class="hp-wrap">
+        <div class="hp-wrap" id="enemy-hp-wrap">
           <div class="hp-track"><div class="hp-fill enemy-hp" id="enemy-hp-bar" style="width:100%"></div></div>
           <div class="hp-numbers"><span id="enemy-hp-cur">30</span><span id="enemy-hp-max">/ 30</span></div>
         </div>
         <div id="elite-timer-wrap" style="visibility:hidden;">
-          <div class="hp-wrap" style="position:relative;">
-            <div class="hp-track"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
-            <div id="elite-timer-label" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:1px;pointer-events:none;color:#fff;text-shadow:0 0 3px rgba(0,0,0,0.9);white-space:nowrap;overflow:hidden;">Time to Defeat: 20s</div>
+          <div class="hp-wrap" style="display:flex;align-items:center;gap:8px;width:auto;">
+            <div class="hp-track" style="width:220px;flex:none;"><div class="hp-fill timer-fill" id="elite-timer-bar" style="width:100%"></div></div>
+            <div id="elite-timer-label" style="font-size:10px;letter-spacing:1px;pointer-events:none;color:#fff;text-shadow:0 0 3px rgba(0,0,0,0.9);white-space:nowrap;">Time to Defeat: 20s</div>
           </div>
         </div>
-        <div id="minimap-panel">
-          <div id="minimap-inner">
-            <button class="mm-nav" id="mm-prev"><span class="ui-icon" style="background-position:-216px 0"></span><span class="tab-tip">Scroll Left</span></button>
-            <div id="mm-cells"></div>
-            <button class="mm-nav" id="mm-next"><span class="ui-icon" style="background-position:-252px 0"></span><span class="tab-tip">Scroll Right</span></button>
-            <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
-          </div>
-          <div id="mm-new-arrow">&#9660;</div>
-        </div>
+        <!-- minimap moved out to #battlefield so it's uncoupled from the enemy sprite -->
         <div id="click-hint">0 / 10</div>
       </div>
       </div><!-- /combat-wrap -->
+      <!-- Minimap — uncoupled from the enemy; positioned independently on the stage. -->
+      <div id="minimap-panel">
+        <div id="minimap-inner">
+          <button class="mm-nav" id="mm-prev"><span class="ui-icon" style="background-position:-216px 0"></span><span class="tab-tip">Scroll Left</span></button>
+          <div id="mm-cells"></div>
+          <button class="mm-nav" id="mm-next"><span class="ui-icon" style="background-position:-252px 0"></span><span class="tab-tip">Scroll Right</span></button>
+          <button class="mm-nav" id="mm-auto" title="Toggle auto progress">Auto</button>
+        </div>
+        <div id="mm-new-arrow">&#9660;</div>
+      </div>
       <div id="ss-global-arrow">⮞</div>
       <div id="realm-label">Realm: Void</div>
+      <!-- HUD counters — moved out of the old top panel onto the stage; positioned via edit mode. -->
+      <div id="game-title" class="title">SOULLESS</div>
+      <div id="souls-display">
+        <div class="num" id="soul-count">0</div>
+        <div class="lbl">souls collected</div>
+      </div>
+      <div id="tattered-display" style="cursor:pointer;">
+        <div class="num" id="tattered-count">0</div>
+        <div class="lbl">tattered souls</div>
+        <div class="ts-preview" id="ts-ascend-preview"></div>
+      </div>
 
       <div id="reform-msg">
         <div class="rm-title">Oh No! Get stronger uwu!</div>
@@ -2268,6 +2347,10 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <div class="settings-row">
       <span class="settings-label">Soul Drop</span>
       <button id="soul-drop-toggle">On</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Full Screen Mode</span>
+      <button id="fullscreen-toggle">Off</button>
     </div>
     <div id="hard-reset-confirm">
       <p>This will wipe ALL progress. Are you certain?</p>
@@ -3697,6 +3780,10 @@ function earnedChallengeUpgrades(){
   return CHALLENGE_UPGRADES.filter(function(u){ return isGodCleared(u.hero); });
 }
 var challengeUpg={}; // id -> { level, on, val }
+// Sticky player intent for Elite-Rush. The battlefield toggle sets it; the
+// automatic offs (floor cap, failed Elite timer) do NOT clear it. That lets an
+// ascend/reincarnate re-activate Elite-Rush for the fresh run.
+var eliteRushWanted=false;
 function cuState(id){ if(!challengeUpg[id]) challengeUpg[id]={ level:0, on:false, val:'' }; return challengeUpg[id]; }
 // Portal-upgrade (hero-power) EFFECTS must be read through these accessors, never
 // cuState() directly: during an active challenge they report level 0 / off / no
@@ -3988,6 +4075,13 @@ function eliteRushMaybeSkip(){
   if(isEliteFight()) return;             // on an Elite → fight it
   eliteRushJumpToElite();
 }
+// After an ascend/reincarnate drops us back to floor 1, restore Elite-Rush if the
+// player still wants it — i.e. they toggled it on and never toggled it off (an
+// auto-off at the cap or a failed Elite timer doesn't count). The reset's own
+// spawnEnemy() then starts the rush from the new run's first floor.
+function reactivateEliteRushIfWanted(){
+  if(eliteRushOwned() && eliteRushWanted) cuState('elite_rush').on=true;
+}
 
 // ── Willing Sacrifice (auto-immolate) ───────────────────────────────────────
 function willingSacrificeMax(){ return cuLevel('auto_sacrifice'); }   // markable count; 0 = off/suppressed
@@ -4002,16 +4096,26 @@ function updateAutoImmolateBtn(){
 function processAutoImmolate(){
   if(activeChallenge || !autoImmolateOn || willingSacrificeMax()<=0) return;
   var changed=false;
+  // Immolate any marked minion that has reached Elite (Glory carry applies). MP is
+  // NOT refunded — it is spent to produce the Burning Soul.
   for(var i=minionSlots.length-1;i>=0;i--){
     var m=minionSlots[i];
     if(m.isElite && autoImmolateTargets.indexOf(m.typeIdx)>=0){
-      var t=m.typeIdx;
       minionSlots.splice(i,1);
       creditBurningSouls(1);
-      if(captureTargets.indexOf(t)<0) captureTargets.push(t);   // re-target for recapture
       changed=true;
     }
   }
+  // Keep every auto-immolate-marked type queued for recapture whenever it isn't
+  // currently held — not just the ones burned this pass. This runs on every
+  // ascension/reincarnation, so the re-target survives the capture-list reset on
+  // reincarnation (and slow recaptures): the minion recaptures -> retrains ->
+  // re-immolates on a loop. Capture stays MP-gated in attemptMinionCapture
+  // ("as long as the player has the MP").
+  autoImmolateTargets.forEach(function(ti){
+    var held=minionSlots.some(function(mm){ return mm.typeIdx===ti; });
+    if(!held && captureTargets.indexOf(ti)<0){ captureTargets.push(ti); changed=true; }
+  });
   if(changed){
     var petStillHeld=minionSlots.some(function(mm){return mm.typeIdx===petMinionIdx;});
     if(!petStillHeld){ petMinionIdx=-1; var cv=document.getElementById('pet-canvas'); if(cv) cv.style.display='none'; }
@@ -4033,24 +4137,39 @@ function processAutoImmolate(){
 var smartClickerTarget='';   // one target level for all smart clickers ('' = default 1)
 function smartClickersActive(){ return !activeChallenge && cuOn('auto_upgrade') && cuLevel('auto_upgrade')>0; }
 function smartTarget(){ var v=parseInt(smartClickerTarget,10); return (v&&v>0)?v:1; }
-function nextAvailableUpgradeAfter(uid){
+// Next visible/allowed upgrade below `uid` that NO other clicker already holds —
+// the per-upgrade lock. `occupied` maps upgradeId -> how many clickers sit on it,
+// so a smart clicker leapfrogs OVER an occupied upgrade to the next free one
+// instead of merging onto it.
+function nextFreeUpgradeAfter(uid, occupied){
   var idx=REP_UPGRADES.findIndex(function(x){return x.id===uid;});
   if(idx<0) return null;
   for(var i=idx+1;i<REP_UPGRADES.length;i++){
     var u=REP_UPGRADES[i];
-    if((u.vis()||_shownUpgrades[u.id]) && upgradeAllowedNow(u)) return u;
+    if(!((u.vis()||_shownUpgrades[u.id]) && upgradeAllowedNow(u))) continue;
+    if((occupied[u.id]||0)>0) continue;   // held by another clicker — leapfrog past it
+    return u;
   }
-  return null;   // bottom of the list — the clicker stops on its last upgrade
+  return null;   // nothing free below — the clicker stays on its last upgrade
 }
-// Only advance once the current upgrade has actually reached the target level,
-// then cascade past any following upgrades already at/over it.
-function smartAdvanceIfReached(a){
+// Advance a smart clicker when it has finished its current upgrade (reached the
+// target level) OR is sharing a seat with another clicker (resolve a merge). It
+// then cascades past any following upgrades already at/over target or occupied,
+// landing on the first free, unfinished upgrade below. `occupied` is kept in sync
+// as the clicker vacates one seat and claims another, so the 1-per-upgrade lock
+// holds across every clicker processed this tick.
+function smartAdvanceIfReached(a, occupied){
   var u=REP_UPGRADES.find(function(x){return x.id===a.upgradeId;});
   if(!u) return false;
   var tgt=smartTarget(), moved=false, guard=0;
-  while(u && u.level>=tgt && guard++<200){
-    var nxt=nextAvailableUpgradeAfter(u.id);
-    if(!nxt) break;
+  while(u && guard++<400){
+    var sharedSeat=(occupied[u.id]||0)>1;   // another clicker also holds this seat
+    var doneHere=u.level>=tgt;              // finished buying this upgrade to target
+    if(!doneHere && !sharedSeat) break;     // still working a seat we hold alone — stay
+    var nxt=nextFreeUpgradeAfter(u.id, occupied);
+    if(!nxt) break;                         // nothing free below — stay put
+    occupied[u.id]=(occupied[u.id]||1)-1;   // vacate current seat
+    occupied[nxt.id]=(occupied[nxt.id]||0)+1; // claim the new seat
     a.upgradeId=nxt.id; u=nxt; moved=true;
   }
   return moved;
@@ -4094,14 +4213,26 @@ function anyAscendModalOpen(){
 // Trigger the ascend flow directly, bypassing the Doom gate (openRebirthModal
 // doesn't check it). If a Shapeshifter preset is active and the player is a Form
 // Master, apply it in one shot (no modal); otherwise open the stage modal.
+// Immortal/Phoenix are "set and forget" automation — the run has to keep
+// advancing on its own after they fire, so force Auto Progress back ON. It can be
+// left OFF by a failed Elite timer (onEliteDpsCheckFail turns it off) or simply
+// never have been turned on. Only flips it when Auto Progress is actually unlocked.
+function ensureAutoProgressOn(){
+  if(!soulShopOwned['auto-progress']) return;
+  if(autoProgressEnabled) return;
+  autoProgressEnabled=true;
+  updateAutoProgressBtn();
+  saveGame();
+}
 function autoAscendTrigger(){
   if(activePresetIdx>=0 && hasAllFormUlts()){
     var p=formPresets[activePresetIdx];
-    if(presetComplete(p)){ applyFormPreset(p); return; }
+    if(presetComplete(p)){ applyFormPreset(p); ensureAutoProgressOn(); return; }
   }
   openRebirthModal();
   var b=document.getElementById('rebirth-ascend-now');
   if(b) b.click();
+  ensureAutoProgressOn();
 }
 // Immortal: auto-ascend on a player-chosen trigger — a set Floor, a number of
 // Minutes since the current ascension, or the next failed Elite timer.
@@ -4137,7 +4268,11 @@ var _bsBaseAtReinc=0;
 function tickPhoenix(){
   if(activeChallenge) return;
   if(!cuOn('auto_reinc')) return;
-  if(rebirthCount<7) return;                        // Ultimate form still required
+  // Ultimate form required — mirror the manual Reincarnate button's condition
+  // (checkRebirthButton). Form Masters (form-ult-all) can reincarnate from a
+  // preset-applied Ultimate form without rebirthCount ever climbing back to 7,
+  // so gating on rebirthCount alone blocked Phoenix for them entirely.
+  if(rebirthCount<7 && achievementsEarned.indexOf('form-ult-all')<0) return;
   if(anyAscendModalOpen()) return;                  // don't reincarnate mid-ascension
   var target=parseInt(cuVal('auto_reinc'),10);
   if(!target||target<1) return;
@@ -4146,7 +4281,7 @@ function tickPhoenix(){
   if(mode==='mp') val=calcReincarnateMP();
   else if(mode==='bs') val=(burningSouls||0)-_bsBaseAtReinc;
   else val=tatteredSouls;                           // ts (banked)
-  if(val>=target) doReincarnate();
+  if(val>=target){ doReincarnate(); ensureAutoProgressOn(); }
 }
 // Credit Burning Souls with Glory's multiplier, carrying the fraction so none is lost.
 var _bsCarry=0;
@@ -4201,6 +4336,11 @@ function renderChallengeUpgrades(){
   var list=document.getElementById('challenge-upg-list');
   if(!list) return;
   list.innerHTML='';
+  // Burning Souls counter in the blank portal art above the first power.
+  var bsCounter=document.createElement('div');
+  bsCounter.id='portal-bs-counter';
+  bsCounter.innerHTML='🔥 Burning Souls: <span id="portal-bs-val">'+Math.floor(burningSouls||0).toLocaleString()+'</span>';
+  list.appendChild(bsCounter);
   var earned=earnedChallengeUpgrades();
   if(!earned.length){
     var empty=document.createElement('div'); empty.className='cu-empty';
@@ -4214,6 +4354,9 @@ function renderChallengeUpgrades(){
     var lbl=document.createElement('div'); lbl.className='cu-label';
     lbl.innerHTML='<div class="cu-name">'+u.name+'</div><div class="cu-desc">'+cuDescription(u)+'</div>';
     row.appendChild(lbl);
+    // Dim powers whose next level the player can't afford (maxed rows aren't dimmed).
+    var _atMax=u.maxLevel&&st.level>=u.maxLevel;
+    if(!_atMax && (burningSouls||0) < cuCost(u.id)) row.classList.add('cu-dim');
     if(u.type==='buy'){
       var btn=document.createElement('button'); btn.className='cu-buy-btn';
       var atMax=u.maxLevel&&st.level>=u.maxLevel;
@@ -4307,8 +4450,12 @@ function renderChallengeUpgrades(){
       }); })(u.id,u.maxLevel);
       ctlS.appendChild(buyS); ctlS.appendChild(openS); row.appendChild(ctlS);   // Upgrade on top, Presets below
     } else if(u.id==='elite_rush'){
-      // Buyable levels (doubling) here; the ON/OFF toggle lives on the battlefield.
-      var ctlE=document.createElement('div'); ctlE.className='cu-ctl';
+      // Buyable levels (doubling) over an ON/OFF enable toggle — same layout as
+      // SMART Clickers. The toggle is the persistent intent (eliteRushWanted): it
+      // survives the automatic offs (floor cap / failed Elite timer) so every
+      // ascend/reincarnate re-arms the rush. The battlefield button is the live
+      // per-run control that mirrors this state.
+      var ctlE=document.createElement('div'); ctlE.className='cu-ctl cu-ctl-stack';
       var atMaxE=u.maxLevel&&st.level>=u.maxLevel;
       var buyE=document.createElement('button'); buyE.className='cu-buy-btn';
       buyE.innerHTML=atMaxE?'<span class="cu-cost">MAX</span>':('Level '+st.level+'<span class="cu-cost">🔥 '+fmt(D(cuCost(u.id)))+'</span>');
@@ -4325,7 +4472,21 @@ function renderChallengeUpgrades(){
         updateEliteRushBtn();
         saveGame();
       }); })(u.id,u.maxLevel);
-      ctlE.appendChild(buyE); row.appendChild(ctlE);
+      var tgE=document.createElement('button'); tgE.className='cu-toggle'+(eliteRushWanted?' on':''); tgE.textContent=eliteRushWanted?'ON':'OFF';
+      tgE.addEventListener('click',function(){
+        eliteRushWanted=!eliteRushWanted;
+        if(eliteRushWanted){
+          // Enable: start rushing this run too, if we're still within the cap.
+          if(absGlobalFloor(curRealm,curLevel,curFloor) <= eliteRushCapFloor()) cuState('elite_rush').on=true;
+        } else {
+          cuState('elite_rush').on=false;   // disable: stop the current run as well
+        }
+        tgE.classList.toggle('on',eliteRushWanted); tgE.textContent=eliteRushWanted?'ON':'OFF';
+        updateEliteRushBtn();
+        saveGame();
+        if(cuState('elite_rush').on) eliteRushMaybeSkip();
+      });
+      ctlE.appendChild(buyE); ctlE.appendChild(tgE); row.appendChild(ctlE);
     } else {
       var tg2=document.createElement('button'); tg2.className='cu-toggle'+(st.on?' on':''); tg2.textContent=st.on?'ON':'OFF';
       (function(id,b){ tg2.addEventListener('click',function(){ var s=cuState(id); s.on=!s.on; b.classList.toggle('on',s.on); b.textContent=s.on?'ON':'OFF'; saveGame(); }); })(u.id,tg2);
@@ -5250,8 +5411,11 @@ function requestReleaseMinion(typeIdx){
 
 // ── Immolation: sacrifice Elite minions by fire for Burning Souls ────────────
 function updateBurningSoulDisplay(){
+  var v=Math.floor(burningSouls||0).toLocaleString();
   var el=document.getElementById('mm-bs-val');
-  if(el) el.textContent=Math.floor(burningSouls||0).toLocaleString();
+  if(el) el.textContent=v;
+  var pel=document.getElementById('portal-bs-val');
+  if(pel) pel.textContent=v;
 }
 function showImmolateInfoModal(){
   var chk=document.getElementById('immolate-dns-chk'); if(chk) chk.checked=false;
@@ -5330,7 +5494,7 @@ function addMinionXp(){
       if(m.level>=MINION_ELITE_LEVEL){ m.isElite=true; m.xp=0; noteEliteTrained(); break; }
     }
   });
-  processAutoImmolate();   // Willing Sacrifice: immolate any marked minion that just hit Elite
+  // Auto-immolate no longer fires per-kill — it runs only on ascension/reincarnation.
 }
 
 function showMinionCaptureNotif(typeIdx){
@@ -8667,6 +8831,11 @@ function doReincarnate(){
   rebirthCount=0;
   captureTargets=[]; releaseMode=false; // clear any pending capture selection on reincarnation
   immolateMode=false; immolateTargets=[];
+  // Willing Sacrifice: immolate selected Elite minions now (only fires on
+  // ascension/reincarnation). Runs after the capture reset so re-targets stick,
+  // and before the Phoenix baseline so its Burning Souls don't count toward the
+  // next auto-reincarnate trigger.
+  processAutoImmolate();
   resetSmartClickersToTop();   // SMART Clickers restart from the top upgrades
   removeSoulUrn();             // any active Soul Urn is abandoned on reincarnation
   ascensionStartTime=Date.now();    // Immortal Minutes timer restarts this life
@@ -8687,6 +8856,7 @@ function doReincarnate(){
   updateHighestFloor();
   updateAutoProgressBtn();
   renderMinionModal();
+  reactivateEliteRushIfWanted();   // fresh run: re-arm Elite-Rush if the player wants it
   saveGame();
   spawnEnemy();
 }
@@ -8845,6 +9015,8 @@ function doRebirthReset(chosenForm){
   updateProgressLabel();
   updateHighestFloor();
   updateAutoProgressBtn();
+  processAutoImmolate();           // Willing Sacrifice: immolate selected Elite minions on ascension
+  reactivateEliteRushIfWanted();   // fresh run: re-arm Elite-Rush if the player wants it
   saveGame();
   spawnEnemy();
 }
@@ -8968,6 +9140,7 @@ function saveGame(){
     formPresets:JSON.parse(JSON.stringify(formPresets)),
     activePresetIdx:activePresetIdx,
     challengeUpg:JSON.parse(JSON.stringify(challengeUpg)),
+    eliteRushWanted:eliteRushWanted,
     portalMaterialsV2:true,
     redeemedCodes:redeemedCodes.slice(),
     minionClickerAssignments:minionClickerAssignments.slice(),
@@ -9117,6 +9290,10 @@ function loadGame(){
   else if(typeof data.witheredSouls==='number') burningSouls=data.witheredSouls; // legacy field name
   if(typeof data.portalBuilt==='boolean') portalBuilt=data.portalBuilt;
   if(data.challengeUpg&&typeof data.challengeUpg==='object') challengeUpg=data.challengeUpg;
+  // Sticky Elite-Rush intent. Older saves lack the field — infer it from whether
+  // Elite-Rush was left on, so a mid-rush save keeps re-arming across resets.
+  if(data.eliteRushWanted!==undefined) eliteRushWanted=data.eliteRushWanted;
+  else eliteRushWanted=!!(challengeUpg.elite_rush&&challengeUpg.elite_rush.on);
   if(data.challengesPassed&&typeof data.challengesPassed==='object') challengesPassed=data.challengesPassed;
   if(data.challengeClearTimes&&typeof data.challengeClearTimes==='object') challengeClearTimes=data.challengeClearTimes;
   challengeStartTime=(typeof data.challengeStartTime==='number')?data.challengeStartTime:0;
@@ -10336,6 +10513,7 @@ document.getElementById('elite-rush-btn').addEventListener('click',function(){
     return;
   }
   s.on=!s.on;
+  eliteRushWanted=s.on;            // remember the player's intent (auto-offs won't clear it)
   updateEliteRushBtn();
   saveGame();
   if(s.on) eliteRushMaybeSkip();   // start rushing to the Elite immediately
@@ -10455,12 +10633,19 @@ function tickMinionClickers(now){
   _lastMinionClickTick=now;
   var bought=false, moved=false;
   var smartN=smartClickersActive()?cuLevel('auto_upgrade'):0;   // first N upgrade-clickers are smart
+  // Per-upgrade lock: tally where every upgrade-clicker currently sits so smart
+  // clickers leapfrog over occupied upgrades instead of merging onto them. Kept in
+  // sync inside smartAdvanceIfReached as clickers move during this tick.
+  var occupied={};
+  minionClickerAssignments.forEach(function(a){
+    if(a.target==='upgrade' && a.upgradeId) occupied[a.upgradeId]=(occupied[a.upgradeId]||0)+1;
+  });
   var upgSeen=0;
   minionClickerAssignments.forEach(function(a){
     if(a.target==='enemy') minionClickerAttackEnemy();
     else if(a.target==='upgrade'){
       if(upgSeen<smartN){                                     // smart: leapfrog + capped buy
-        if(smartAdvanceIfReached(a)) moved=true;
+        if(smartAdvanceIfReached(a, occupied)) moved=true;
         if(smartBuyTowardTarget(a)) bought=true;
       } else {
         if(minionClickerBuyUpgrade(a.upgradeId)) bought=true; // plain upgrade clicker
@@ -11376,6 +11561,28 @@ document.getElementById('soul-drop-toggle').addEventListener('click', function()
   saveGame(); saveSettings();
 });
 
+// Full-screen mode — Clicker-Heroes-style toggle. The uniform-scale fitter
+// reacts to the resulting resize/fullscreenchange, so no extra layout work here.
+(function(){
+  var btn=document.getElementById('fullscreen-toggle');
+  if(!btn) return;
+  function sync(){ var on=!!document.fullscreenElement; btn.textContent=on?'On':'Off'; btn.classList.toggle('muted',!on); }
+  btn.addEventListener('click', function(){
+    try{
+      if(!document.fullscreenElement){
+        var el=document.documentElement, req=el.requestFullscreen||el.webkitRequestFullscreen;
+        if(req){ var p=req.call(el); if(p&&p.catch) p.catch(function(){}); }
+      } else {
+        var exit=document.exitFullscreen||document.webkitExitFullscreen;
+        if(exit) exit.call(document);
+      }
+    }catch(e){}
+  });
+  document.addEventListener('fullscreenchange', sync);
+  document.addEventListener('webkitfullscreenchange', sync);
+  sync();
+})();
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
 initMist(28);
@@ -12231,16 +12438,23 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       };
       // Single shared realm background: #realm-bg-img-left (hosted on #main) spans the
       // whole stage. The old middle image (#realm-bg-img) is retired — kept hidden.
-      // The left image's transform is unchanged (translateX(0) translateY(-400) scale).
+      // The left image's transform was rebaked to translateX(-1) translateY(-76) scale
+      // for the approved 1920×1080 HUD layout (was translateY(-400)).
       var bgImg=document.getElementById('realm-bg-img');
       if(bgImg){ bgImg.style.display='none'; bgImg.src=''; }
       var bgImgLeft=document.getElementById('realm-bg-img-left');
       if(bgImgLeft){
-        var imgSrc=REALM_BG_IMAGES[realm]||'';
+        // Realms repeat in perpetuity past floor 1000 — wrap the background image
+        // index the same way enemies (realmOffset) and the procedural canvas
+        // backgrounds already do, so realm 11 -> Void, 12 -> Underworld, etc.
+        var bgRealm=((realm-1)%10)+1;
+        var imgSrc=REALM_BG_IMAGES[bgRealm]||'';
         if(imgSrc){
-          var leftScale=REALM_BG_LEFT_SCALE[realm]||0.60;
+          var leftScale=REALM_BG_LEFT_SCALE[bgRealm]||0.60;
           bgImgLeft.src=imgSrc;
-          bgImgLeft.style.transform='translateX(0px) translateY(-400px) scale('+leftScale+')';
+          // Baked HUD layout (2026): background nudged down from the old locked
+          // translateY(-400px) to translateY(-76px) per the approved 1920×1080 layout.
+          bgImgLeft.style.transform='translateX(-1px) translateY(-76px) scale('+leftScale+')';
           bgImgLeft.style.display='block';
           c.style.display='none';
         } else {
@@ -12368,5 +12582,232 @@ document.getElementById('mm-auto').addEventListener('click',function(){
 <div id="ms-tooltip"><div class="mst-title"></div><div class="mst-req"></div><div class="mst-eff"></div><div class="mst-cost" style="display:none"></div><div class="mst-status"></div><div class="mst-dmg" style="display:none"></div></div>
 <div id="upgrade-tooltip"><div class="utt-dps"></div><div class="utt-mult"></div></div>
 <script defer src="/_vercel/insights/script.js"></script>
+<!-- ══ LAYOUT EDIT MODE (dev tool) ══ Activate with ?edit=1 — makes the real HUD
+     elements drag-to-move / scroll-to-scale and exports their positions. Fully
+     gated: does nothing during normal play. -->
+<script>
+(function(){
+  if(new URLSearchParams(location.search).get('edit')!=='1') return;
+  var started=false;
+  function go(){ if(started) return; started=true; setTimeout(init, 900); }
+  if(document.readyState==='complete') go(); else window.addEventListener('load', go);
+
+  // Real game elements to expose. bg = the locked realm background (translate/scale).
+  var TARGETS=[
+    {sel:'#realm-bg-img-left', name:'background', bg:true},
+    {sel:'#entity-canvas',     name:'entity'},
+    {sel:'#enemy-canvas',      name:'enemy sprite'},
+    {sel:'#enemy-name-label',  name:'enemy name'},
+    {sel:'#enemy-hp-wrap',     name:'enemy HP bar'},
+    {sel:'#elite-timer-wrap',  name:'elite timer', show:'block'},
+    {sel:'#minimap-panel',     name:'minimap'},
+    {sel:'#spell-panel',       name:'spells'},
+    {sel:'#mana-bar-wrap',     name:'mana'},
+    {sel:'#ascend-btn',        name:'ascend',       show:'block'},
+    {sel:'#reincarnate-btn',   name:'reincarnate',  show:'block'},
+    {sel:'#souls-display',     name:'souls'},
+    {sel:'#tattered-display',  name:'tattered',     show:'block'},
+    {sel:'#left-header',       name:'form-descriptor'},
+    {sel:'#game-title',        name:'title'},
+    {sel:'#realm-label',       name:'realm-label'},
+    {sel:'#stage-launchers',   name:'sacrifice+minion'},
+    {sel:'#mc-dock',           name:'minion+elite dock', show:'flex'},
+    {sel:'#pet-canvas',        name:'minion pet', show:'block'}
+  ];
+  var UI_FRAMES=[
+    {key:'entity_UI2', w:520}, {key:'enemy_UI', w:420},
+    {key:'topleft_UI', w:320}, {key:'counter1', w:220}, {key:'counter2', w:220}
+  ];
+  var items=[], sel=null;
+
+  function init(){
+    injectCSS();
+    TARGETS.forEach(function(t){
+      var el=document.querySelector(t.sel); if(!el) return;
+      if(t.show) el.style.setProperty('display', t.show, 'important');
+      var it={el:el, name:t.name, tx:0, ty:0, s:1, bg:!!t.bg};
+      it.z=parseInt(getComputedStyle(el).zIndex,10); if(isNaN(it.z)) it.z=0;
+      if(t.bg){ it.bgx=0; it.bgy=-400; it.bgs=1.15; applyBg(it); }
+      else { var b=getComputedStyle(el).transform; it.base=(b&&b!=='none')?b:''; }
+      el.classList.add('ed-t'); tagIt(it); wire(it); items.push(it);
+    });
+    var host=document.getElementById('main')||document.body;
+    UI_FRAMES.forEach(function(u,i){
+      var img=new Image(); img.src='artwork/'+u.key+'.webp';
+      img.className='ed-t ed-uiframe';
+      img.style.cssText='position:absolute;left:'+(30+i*26)+'px;top:'+(150+i*26)+'px;width:'+u.w+'px;height:auto;z-index:60';
+      host.appendChild(img);
+      var it={el:img, name:'UI:'+u.key, tx:0, ty:0, s:1, z:60, base:'', uiframe:true};
+      img.onload=function(){ syncFloatTag(it); render(); };
+      tagIt(it); wire(it); items.push(it);
+    });
+    buildPanel(); render();
+    window.addEventListener('keydown', onKey);
+  }
+
+  function tagIt(it){
+    var tag=document.createElement('div'); tag.className='ed-tag'; tag.textContent=it.name;
+    it.tag=tag;
+    // <img>/<canvas> can't hold children — attach the label as a sibling overlay.
+    if(it.el.tagName==='IMG'||it.el.tagName==='CANVAS'){
+      it.el.parentNode.appendChild(tag); tag.classList.add('ed-tag-float');
+      if(it.bg){
+        // The background is pointer-events:none, z-index:-1 and offset off-screen,
+        // so it can't be grabbed directly — pin a visible drag chip for it.
+        tag.classList.add('ed-tag-pin'); tag.textContent='◆ background — drag / scroll';
+        tag.style.left='8px'; tag.style.top='8px';
+      } else { syncFloatTag(it); }
+    } else { it.el.appendChild(tag); }
+  }
+  function syncFloatTag(it){
+    if(!it.tag||!it.tag.classList.contains('ed-tag-float')||it.tag.classList.contains('ed-tag-pin')) return;
+    var r=it.el.getBoundingClientRect(), p=it.el.offsetParent||document.body, pr=p.getBoundingClientRect();
+    it.tag.style.left=(r.left-pr.left)+'px'; it.tag.style.top=(r.top-pr.top-16)+'px';
+  }
+
+  function applyTransform(it){ it.el.style.transform=(it.base?it.base+' ':'')+'translate('+it.tx+'px,'+it.ty+'px) scale('+it.s+')'; }
+  function applyBg(it){ it.el.style.transform='translateX('+it.bgx+'px) translateY('+it.bgy+'px) scale('+it.bgs+')'; }
+  function applyUI(it){ it.el.style.transform='translate('+it.tx+'px,'+it.ty+'px) scale('+it.s+')'; syncFloatTag(it); }
+  function apply(it){ it.bg?applyBg(it):(it.uiframe?applyUI(it):applyTransform(it)); syncFloatTag(it); }
+
+  function wire(it){
+    function down(e){
+      e.preventDefault(); e.stopPropagation(); select(it);
+      var sx=e.clientX, sy=e.clientY, x0=it.bg?it.bgx:it.tx, y0=it.bg?it.bgy:it.ty;
+      function mv(ev){ var dx=ev.clientX-sx, dy=ev.clientY-sy;
+        if(it.bg){ it.bgx=Math.round(x0+dx); it.bgy=Math.round(y0+dy); } else { it.tx=Math.round(x0+dx); it.ty=Math.round(y0+dy); }
+        apply(it); render(); }
+      function up(){ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',up); }
+      window.addEventListener('pointermove',mv); window.addEventListener('pointerup',up);
+    }
+    function whl(e){ e.preventDefault(); e.stopPropagation(); select(it);
+      var f=e.deltaY<0?1.03:1/1.03;
+      if(it.bg) it.bgs=Math.max(.2,it.bgs*f); else it.s=Math.max(.2,it.s*f);
+      apply(it); render(); }
+    it.el.addEventListener('pointerdown', down, true);
+    it.el.addEventListener('wheel', whl, {capture:true, passive:false});
+    it.el.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); }, true);
+    if(it.tag){ it.tag.addEventListener('pointerdown', down, true); it.tag.addEventListener('wheel', whl, {capture:true, passive:false}); }
+  }
+
+  function select(it){ if(sel) sel.el.classList.remove('ed-sel'); sel=it; it.el.classList.add('ed-sel'); render(); }
+  function onKey(e){
+    if(!sel) return; var t=(e.target.tagName||'').toLowerCase(); if(t==='textarea'||t==='input') return;
+    var step=e.shiftKey?10:1, h=true;
+    var mvx=function(d){ if(sel.bg) sel.bgx+=d; else sel.tx+=d; }, mvy=function(d){ if(sel.bg) sel.bgy+=d; else sel.ty+=d; };
+    if(e.key==='ArrowLeft') mvx(-step); else if(e.key==='ArrowRight') mvx(step);
+    else if(e.key==='ArrowUp') mvy(-step); else if(e.key==='ArrowDown') mvy(step);
+    else if(e.key==='+'||e.key==='=') { if(sel.bg) sel.bgs*=1.03; else sel.s*=1.03; }
+    else if(e.key==='-'||e.key==='_') { if(sel.bg) sel.bgs/=1.03; else sel.s/=1.03; }
+    else if(e.key==='[') { sel.z=(sel.z||0)-1; sel.el.style.zIndex=sel.z; }
+    else if(e.key===']') { sel.z=(sel.z||0)+1; sel.el.style.zIndex=sel.z; }
+    else h=false;
+    if(h){ e.preventDefault(); apply(sel); render(); }
+  }
+
+  function rectRel(el, root){ var r=el.getBoundingClientRect(), b=root.getBoundingClientRect();
+    return {x:Math.round(r.left-b.left), y:Math.round(r.top-b.top), w:Math.round(r.width), h:Math.round(r.height)}; }
+
+  function buildPanel(){
+    var p=document.createElement('div'); p.id='ed-panel';
+    p.innerHTML=
+      '<div class="ed-h">LAYOUT EDIT MODE</div>'+
+      '<div class="ed-sub">Drag · scroll to scale · arrows nudge (Shift ×10) · <b>+ / −</b> scale · <b>[ ]</b> layer (z)</div>'+
+      '<table id="ed-tbl"><tbody></tbody></table>'+
+      '<div class="ed-row"><button id="ed-copy">Copy for Claude</button><button id="ed-reset">Reset all</button></div>'+
+      '<textarea id="ed-out" readonly spellcheck="false"></textarea>';
+    document.body.appendChild(p);
+    document.getElementById('ed-copy').onclick=function(){ var t=document.getElementById('ed-out').value;
+      navigator.clipboard&&navigator.clipboard.writeText(t); this.textContent='Copied ✓'; var b=this; setTimeout(function(){b.textContent='Copy for Claude';},1400); };
+    document.getElementById('ed-reset').onclick=function(){ items.forEach(function(it){ if(it.bg){it.bgx=0;it.bgy=-400;it.bgs=1.15;} else {it.tx=0;it.ty=0;it.s=1;} apply(it); }); render(); };
+    document.getElementById('ed-tbl').addEventListener('click', function(e){ var tr=e.target.closest('tr'), i=tr&&tr.getAttribute('data-i'); if(i!=null&&items[+i]) select(items[+i]); });
+  }
+
+  function render(){
+    var game=document.getElementById('game'), main=document.getElementById('main');
+    var tb=document.querySelector('#ed-tbl tbody'); if(!tb) return;
+    var rows='<tr><th>element</th><th>x</th><th>y</th><th>w</th><th>h</th><th>scale</th><th>z</th></tr>';
+    items.forEach(function(it,i){ var r=rectRel(it.el, main), sc=(it.bg?it.bgs:it.s).toFixed(3);
+      rows+='<tr data-i="'+i+'" class="'+(it===sel?'on':'')+'"><td>'+it.name+'</td><td>'+r.x+'</td><td>'+r.y+'</td><td>'+r.w+'</td><td>'+r.h+'</td><td>'+sc+'</td><td>'+(it.z||0)+'</td></tr>'; });
+    tb.innerHTML=rows;
+    // export text
+    var mr=rectRel(main, game);
+    var s='LAYOUT EXPORT  window='+window.innerWidth+'x'+window.innerHeight+'  #main@('+mr.x+','+mr.y+') '+mr.w+'x'+mr.h+'\n';
+    s+='(x,y,w,h are relative to #main top-left)\n';
+    items.forEach(function(it){ var r=rectRel(it.el, main);
+      if(it.bg){ s+=pad('background',18)+'transform: translateX('+it.bgx+'px) translateY('+it.bgy+'px) scale('+it.bgs.toFixed(4)+')  z='+(it.z||0)+'   [rect '+r.x+','+r.y+' '+r.w+'x'+r.h+']\n'; }
+      else { s+=pad(it.name,18)+'x='+r.x+' y='+r.y+' w='+r.w+' h='+r.h+'  scale='+it.s.toFixed(3)+'  z='+(it.z||0)+'  move='+it.tx+','+it.ty+'\n'; }
+    });
+    document.getElementById('ed-out').value=s;
+  }
+  function pad(s,n){ s=String(s); while(s.length<n) s+=' '; return s; }
+
+  function injectCSS(){
+    var st=document.createElement('style'); st.textContent=
+    '.ed-t{outline:1px dashed rgba(162,116,255,.55)!important; cursor:grab!important}'+
+    '.ed-t:hover{outline:1.5px solid rgba(162,116,255,.9)!important}'+
+    '.ed-sel{outline:2px solid #ffd447!important}'+
+    '.ed-tag{position:absolute;left:0;top:-16px;font:10px/1.4 ui-monospace,Menlo,monospace;color:#0b0715;background:#a274ff;padding:0 4px;border-radius:3px;white-space:nowrap;pointer-events:auto;cursor:grab;z-index:9998}'+
+    '.ed-tag-float{position:absolute;z-index:9998}'+
+    '.ed-tag-pin{background:#ffd447!important;color:#1a1000!important;font-weight:700;padding:2px 7px!important;z-index:99999!important;box-shadow:0 2px 8px #0008}'+
+    '#ed-tbl tr[data-i]{cursor:pointer}#ed-tbl tr[data-i]:hover td{color:#c9a8ff}'+
+    '#ed-panel{position:fixed;top:10px;right:10px;width:340px;max-height:94vh;overflow:auto;z-index:99999;background:#120e22ee;border:1px solid #3a3159;border-radius:10px;padding:12px;color:#d7cff0;font:12px/1.4 system-ui,sans-serif;box-shadow:0 12px 40px #000a;backdrop-filter:blur(4px)}'+
+    '#ed-panel .ed-h{font-weight:700;letter-spacing:1px;color:#c9a8ff;margin-bottom:2px}'+
+    '#ed-panel .ed-sub{font-size:11px;color:#8f86ad;margin-bottom:8px}'+
+    '#ed-tbl{width:100%;border-collapse:collapse;font:11px/1.3 ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}'+
+    '#ed-tbl th{color:#5f577a;text-align:right;padding:2px 4px;font-weight:500}#ed-tbl th:first-child{text-align:left}'+
+    '#ed-tbl td{text-align:right;padding:2px 4px;border-top:1px solid #2b2444;color:#8f86ad}#ed-tbl td:first-child{text-align:left;color:#d7cff0}'+
+    '#ed-tbl tr.on td{color:#ffd447}'+
+    '#ed-panel .ed-row{display:flex;gap:6px;margin:8px 0}'+
+    '#ed-panel button{flex:1;font:12px system-ui;color:#d7cff0;background:#1c1730;border:1px solid #3a3159;border-radius:6px;padding:6px;cursor:pointer}'+
+    '#ed-panel button:hover{border-color:#a274ff;color:#c9a8ff}'+
+    '#ed-out{width:100%;height:150px;resize:vertical;font:10px/1.45 ui-monospace,Menlo,monospace;color:#4fd48a;background:#07050e;border:1px solid #3a3159;border-radius:6px;padding:7px}';
+    // Force-show elements the game hides dynamically (stylesheet !important beats the
+    // game's inline display toggles, which plain inline styles could not).
+    st.textContent += TARGETS.filter(function(t){return t.show;}).map(function(t){ return t.sel+'{display:'+t.show+'!important}'; }).join('');
+    st.textContent += '#mc-dock-sprite,#mc-dock-counter,#mc-dock-recall,#elite-rush-btn{display:block!important}';
+    // The pet canvas is pointer-events:none and often transparent — make it grabbable and give it a faint fill so its box is visible.
+    st.textContent += '#pet-canvas{pointer-events:auto!important;background:rgba(162,116,255,.14)!important}';
+    st.textContent += '#elite-timer-wrap{visibility:visible!important}';   // elite timer is visibility:hidden until an elite fight
+    document.head.appendChild(st);
+  }
+})();
+</script>
+<script>
+/* ── Uniform "fullscreen" scale ────────────────────────────────────────────────
+   Author at a fixed 1920×1080 design canvas, then scale #game as one unit to fit
+   the viewport (letterboxed). Adds #game.hud-baked (which activates the baked HUD
+   layout + frame art) on desktop only. Skipped entirely under ?edit=1 so the
+   layout editor keeps working in real, unscaled pixels; and disabled on the
+   native mobile layout (coarse pointer ≤549px). */
+(function(){
+  if(new URLSearchParams(location.search).get('edit')==='1') return; // editor = raw layout
+  var DW=1920, DH=1080;
+  var game=document.getElementById('game');
+  if(!game) return;
+  var mq=window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 549px)');
+  function fit(){
+    if(mq.matches){ // native mobile layout — no baked HUD, no scaling
+      document.documentElement.classList.remove('hud-scaling');
+      document.body.classList.remove('hud-scaling');
+      game.classList.remove('hud-baked');
+      game.style.transform='';
+      return;
+    }
+    document.documentElement.classList.add('hud-scaling');
+    document.body.classList.add('hud-scaling');
+    game.classList.add('hud-baked');
+    var s=Math.min(window.innerWidth/DW, window.innerHeight/DH);
+    var ox=Math.round((window.innerWidth - DW*s)/2);
+    var oy=Math.round((window.innerHeight - DH*s)/2);
+    game.style.transform='translate('+ox+'px,'+oy+'px) scale('+s+')';
+  }
+  window.addEventListener('resize', fit);
+  if(mq.addEventListener) mq.addEventListener('change', fit); else if(mq.addListener) mq.addListener(fit);
+  document.addEventListener('fullscreenchange', fit);
+  document.addEventListener('webkitfullscreenchange', fit);
+  fit();
+})();
+</script>
 </body>
 </html>
