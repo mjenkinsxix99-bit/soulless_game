@@ -76,7 +76,8 @@ html, body { height: 100%; margin: 0; padding: 0; background: #07070f; color: #e
 /* Single shared realm background — hosted on #main, spans the whole stage.
    z-index:-1 keeps it behind all stage content while #main's radial gradient
    remains the ultimate backdrop. Anchor (top:0;left:0;transform-origin:top left)
-   and the JS transform are unchanged from the original left-panel image. */
+   is unchanged; the JS translate was rebaked to translateY(-76px) for the
+   approved 1920×1080 HUD layout (see the bg transform in renderRealmBg). */
 #realm-bg-img-left { display:none; position:absolute; top:0; left:0; pointer-events:none; z-index:-1; width:auto; height:auto; transform-origin:top left; }
 #realm-bg-img { display:none; position:absolute; top:0; left:0; transform-origin:top left; pointer-events:none; z-index:1; width:auto; height:auto; }
 /* Enemy/HP/minimap sit at 75.5% of the stage width (was 50% of the old middle
@@ -1429,6 +1430,43 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
 .mc-upg-icon.mc-show-x .mc-recall-x { display:flex; }
 #mc-buyall-wrap { position:relative; display:inline-block; }
 </style>
+<style id="hud-baked-css">
+/* ============================================================================
+   BAKED HUD LAYOUT + UNIFORM SCALE  (approved 1920×1080 layout, 2026)
+   The whole game is authored at a fixed 1920×1080 design canvas and scaled as a
+   single unit to fit any viewport (letterboxed at off-ratios). All element
+   positions below are the exact transforms exported from in-game edit mode.
+   Everything is gated behind `#game.hud-baked`, which the scale script adds on
+   desktop only — mobile (the coarse-pointer ≤549px layout) and edit mode
+   (`?edit=1`) never get it, so their raw/native layouts are untouched.
+   ========================================================================== */
+#game.hud-baked{position:absolute;top:0;left:0;width:1920px;height:1080px;transform-origin:top left;}
+html.hud-scaling,body.hud-scaling{background:#000;}
+
+/* — Element positions (transform = editor base + translate(move) scale) — */
+#game.hud-baked #entity-canvas   { transform:translate(108px,211px) scale(1.469)!important; z-index:10!important; }
+#game.hud-baked #enemy-canvas    { transform:translate(-179px,138px) scale(1.267)!important; z-index:10!important; }
+#game.hud-baked #enemy-name-label{ transform:translate(-180px,154px) scale(1.230)!important; z-index:11!important; }
+#game.hud-baked #enemy-hp-wrap   { transform:translate(-194px,151px) scale(0.971)!important; z-index:2!important; }
+#game.hud-baked #elite-timer-wrap{ transform:translate(-190px,147px) scale(1.000)!important; z-index:2!important; }
+#game.hud-baked #minimap-panel   { transform:translate(76px,319px) scale(0.888)!important; z-index:10!important; }
+#game.hud-baked #spell-panel     { transform:translate(29px,329px) scale(1.000)!important; z-index:8!important; }
+#game.hud-baked #mana-bar-wrap   { transform:translate(13px,326px) scale(1.126)!important; z-index:2!important; }
+#game.hud-baked #ascend-btn      { transform:translate(-13px,329px) scale(1.126)!important; z-index:2!important; }
+#game.hud-baked #reincarnate-btn { transform:translate(-14px,336px) scale(1.159)!important; z-index:2!important; }
+#game.hud-baked #souls-display   { transform:translateX(-50%) translate(162px,-5px) scale(0.915)!important; z-index:10!important; }
+#game.hud-baked #tattered-display{ transform:translate(-106px,-7px) scale(1.030)!important; z-index:10!important; }
+#game.hud-baked #left-header     { transform:translate(-75px,-55px) scale(1.000)!important; z-index:33!important; }
+#game.hud-baked #game-title      { transform:translate(48px,6px) scale(1.000)!important; z-index:8!important; }
+#game.hud-baked #realm-label     { transform:translate(255px,6px) scale(1.000)!important; z-index:3!important; }
+#game.hud-baked #stage-launchers { transform:translate(194px,6px) scale(1.093)!important; z-index:5!important; }
+#game.hud-baked #mc-dock         { transform:translate(-24px,-50px) scale(1.126)!important; z-index:8!important; }
+#game.hud-baked #pet-canvas      { transform:scaleX(-1) translate(-176px,265px) scale(1.344)!important; z-index:2!important; }
+
+/* — Permanent UI-frame artwork (final rects from the export, relative to #main) — */
+.hud-frame{display:none;position:absolute;pointer-events:none;}
+#game.hud-baked .hud-frame{display:block;}
+</style>
 </head>
 <body>
 <div id="rotate-overlay">
@@ -1454,6 +1492,14 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
          (The old left panel and its duplicate background image are retired; this
          single image is the sole realm backdrop. Transform is unchanged.) -->
     <img id="realm-bg-img-left" src="" alt="" />
+    <!-- Permanent HUD frame artwork — baked from the approved 1920×1080 layout.
+         Shown only under #game.hud-baked (desktop, non-edit). Rects are the exact
+         final positions exported from edit mode, relative to #main's top-left. -->
+    <img class="hud-frame" src="artwork/topleft_UI.webp" alt="" style="left:-38px;top:-84px;width:777px;height:374px;z-index:2;">
+    <img class="hud-frame" src="artwork/counter1.webp"  alt="" style="left:671px;top:-85px;width:386px;height:386px;z-index:5;">
+    <img class="hud-frame" src="artwork/counter2.webp"  alt="" style="left:1098px;top:-85px;width:386px;height:386px;z-index:5;">
+    <img class="hud-frame" src="artwork/entity_UI2.webp" alt="" style="left:-28px;top:735px;width:585px;height:390px;z-index:5;">
+    <img class="hud-frame" src="artwork/enemy_UI.webp"   alt="" style="left:626px;top:737px;width:581px;height:388px;z-index:5;">
     <!-- Spell panel + mana bar span the full stage width -->
     <div id="spell-panel"></div>
     <div id="mana-bar-wrap">
@@ -2287,6 +2333,10 @@ body.mc-dragging #enemy-mc-zone .mc-drop-hl { display:block; }
     <div class="settings-row">
       <span class="settings-label">Soul Drop</span>
       <button id="soul-drop-toggle">On</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">Full Screen Mode</span>
+      <button id="fullscreen-toggle">Off</button>
     </div>
     <div id="hard-reset-confirm">
       <p>This will wipe ALL progress. Are you certain?</p>
@@ -11483,6 +11533,28 @@ document.getElementById('soul-drop-toggle').addEventListener('click', function()
   saveGame(); saveSettings();
 });
 
+// Full-screen mode — Clicker-Heroes-style toggle. The uniform-scale fitter
+// reacts to the resulting resize/fullscreenchange, so no extra layout work here.
+(function(){
+  var btn=document.getElementById('fullscreen-toggle');
+  if(!btn) return;
+  function sync(){ var on=!!document.fullscreenElement; btn.textContent=on?'On':'Off'; btn.classList.toggle('muted',!on); }
+  btn.addEventListener('click', function(){
+    try{
+      if(!document.fullscreenElement){
+        var el=document.documentElement, req=el.requestFullscreen||el.webkitRequestFullscreen;
+        if(req){ var p=req.call(el); if(p&&p.catch) p.catch(function(){}); }
+      } else {
+        var exit=document.exitFullscreen||document.webkitExitFullscreen;
+        if(exit) exit.call(document);
+      }
+    }catch(e){}
+  });
+  document.addEventListener('fullscreenchange', sync);
+  document.addEventListener('webkitfullscreenchange', sync);
+  sync();
+})();
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initUpgradeIcons();
 initMist(28);
@@ -12338,7 +12410,8 @@ document.getElementById('mm-auto').addEventListener('click',function(){
       };
       // Single shared realm background: #realm-bg-img-left (hosted on #main) spans the
       // whole stage. The old middle image (#realm-bg-img) is retired — kept hidden.
-      // The left image's transform is unchanged (translateX(0) translateY(-400) scale).
+      // The left image's transform was rebaked to translateX(-1) translateY(-76) scale
+      // for the approved 1920×1080 HUD layout (was translateY(-400)).
       var bgImg=document.getElementById('realm-bg-img');
       if(bgImg){ bgImg.style.display='none'; bgImg.src=''; }
       var bgImgLeft=document.getElementById('realm-bg-img-left');
@@ -12347,7 +12420,9 @@ document.getElementById('mm-auto').addEventListener('click',function(){
         if(imgSrc){
           var leftScale=REALM_BG_LEFT_SCALE[realm]||0.60;
           bgImgLeft.src=imgSrc;
-          bgImgLeft.style.transform='translateX(0px) translateY(-400px) scale('+leftScale+')';
+          // Baked HUD layout (2026): background nudged down from the old locked
+          // translateY(-400px) to translateY(-76px) per the approved 1920×1080 layout.
+          bgImgLeft.style.transform='translateX(-1px) translateY(-76px) scale('+leftScale+')';
           bgImgLeft.style.display='block';
           c.style.display='none';
         } else {
@@ -12664,6 +12739,42 @@ document.getElementById('mm-auto').addEventListener('click',function(){
     st.textContent += '#elite-timer-wrap{visibility:visible!important}';   // elite timer is visibility:hidden until an elite fight
     document.head.appendChild(st);
   }
+})();
+</script>
+<script>
+/* ── Uniform "fullscreen" scale ────────────────────────────────────────────────
+   Author at a fixed 1920×1080 design canvas, then scale #game as one unit to fit
+   the viewport (letterboxed). Adds #game.hud-baked (which activates the baked HUD
+   layout + frame art) on desktop only. Skipped entirely under ?edit=1 so the
+   layout editor keeps working in real, unscaled pixels; and disabled on the
+   native mobile layout (coarse pointer ≤549px). */
+(function(){
+  if(new URLSearchParams(location.search).get('edit')==='1') return; // editor = raw layout
+  var DW=1920, DH=1080;
+  var game=document.getElementById('game');
+  if(!game) return;
+  var mq=window.matchMedia('(pointer: coarse) and (hover: none) and (max-width: 549px)');
+  function fit(){
+    if(mq.matches){ // native mobile layout — no baked HUD, no scaling
+      document.documentElement.classList.remove('hud-scaling');
+      document.body.classList.remove('hud-scaling');
+      game.classList.remove('hud-baked');
+      game.style.transform='';
+      return;
+    }
+    document.documentElement.classList.add('hud-scaling');
+    document.body.classList.add('hud-scaling');
+    game.classList.add('hud-baked');
+    var s=Math.min(window.innerWidth/DW, window.innerHeight/DH);
+    var ox=Math.round((window.innerWidth - DW*s)/2);
+    var oy=Math.round((window.innerHeight - DH*s)/2);
+    game.style.transform='translate('+ox+'px,'+oy+'px) scale('+s+')';
+  }
+  window.addEventListener('resize', fit);
+  if(mq.addEventListener) mq.addEventListener('change', fit); else if(mq.addListener) mq.addListener(fit);
+  document.addEventListener('fullscreenchange', fit);
+  document.addEventListener('webkitfullscreenchange', fit);
+  fit();
 })();
 </script>
 </body>
