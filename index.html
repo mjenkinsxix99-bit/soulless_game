@@ -4096,16 +4096,26 @@ function updateAutoImmolateBtn(){
 function processAutoImmolate(){
   if(activeChallenge || !autoImmolateOn || willingSacrificeMax()<=0) return;
   var changed=false;
+  // Immolate any marked minion that has reached Elite (Glory carry applies). MP is
+  // NOT refunded — it is spent to produce the Burning Soul.
   for(var i=minionSlots.length-1;i>=0;i--){
     var m=minionSlots[i];
     if(m.isElite && autoImmolateTargets.indexOf(m.typeIdx)>=0){
-      var t=m.typeIdx;
       minionSlots.splice(i,1);
       creditBurningSouls(1);
-      if(captureTargets.indexOf(t)<0) captureTargets.push(t);   // re-target for recapture
       changed=true;
     }
   }
+  // Keep every auto-immolate-marked type queued for recapture whenever it isn't
+  // currently held — not just the ones burned this pass. This runs on every
+  // ascension/reincarnation, so the re-target survives the capture-list reset on
+  // reincarnation (and slow recaptures): the minion recaptures -> retrains ->
+  // re-immolates on a loop. Capture stays MP-gated in attemptMinionCapture
+  // ("as long as the player has the MP").
+  autoImmolateTargets.forEach(function(ti){
+    var held=minionSlots.some(function(mm){ return mm.typeIdx===ti; });
+    if(!held && captureTargets.indexOf(ti)<0){ captureTargets.push(ti); changed=true; }
+  });
   if(changed){
     var petStillHeld=minionSlots.some(function(mm){return mm.typeIdx===petMinionIdx;});
     if(!petStillHeld){ petMinionIdx=-1; var cv=document.getElementById('pet-canvas'); if(cv) cv.style.display='none'; }
