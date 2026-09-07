@@ -1,7 +1,8 @@
 # Soulless — God Phase & World Phase Design Notes
 
-> Living brainstorm doc. **LOCKED** = agreed direction, don't relitigate without cause.
-> **OPEN** = still spitballing. Nothing here is implemented yet.
+> Living design doc. **LOCKED** = agreed, don't relitigate without cause.
+> **OPEN / PARKED** = still spitballing or deliberately deferred. Nothing here is implemented yet.
+> Two-phase build: **Phase 1 = the gods & their fights/powers** (ship first). **Phase 2 = the buildable world** (bigger, later).
 
 ---
 
@@ -22,83 +23,202 @@ having swallowed every soul it ever killed. The final act is **letting the hoard
 creation = disbursing stored souls as living worshippers. *Everything you ate becomes
 everyone you make.* Then you raze them — that's the horror, and the whole grind earns it.
 
+**The "shaping" motif (design spine):** the entity *shapes* at two scales — **6 forms**
+(molding its own flesh, existing system) mirrored by **6 blended societies** (molding its
+people's culture, §Covenants). Same verb, bookending the game.
+
 ---
 
 ## LOCKED — The Convergence (every currency cashes out in the World)
 
-The World tab is the sink that finally consumes the **entire** economy. One role each,
-nothing orphaned:
+The World is the sink that finally consumes the **entire** economy. Nothing orphaned:
 
 | Currency | Becomes | Role |
 |---|---|---|
-| **Souls** | Life itself | Spend the hoard to breathe worshippers into being. Hoard → harvest. |
-| **Tattered Souls** | The substrate | Too broken to live — become land, soil, the dead you build *on*. |
-| **Burning Souls** | The divine spark | Fuel for miracles & creation events; the heat/light that powers the world. |
-| **Minions** | The first servants | Turned army = labor/angels tier — assigned to build, tend, teach mortals. |
-| **Elements (compounds)** | The physical world | Terrain, biomes, structures. |
-| **God Souls** | The laws/domains | Shape how the world forms & what events occur (see World Creation). |
-| **Divinity** | The crux | Prestige multiplier — makes the next clawback faster. |
+| **Souls** | Life itself | Spend the hoard to breathe Claykin into being (Clay + Souls = life). |
+| **Tattered Souls** | The substrate | Land, soil, the dead you build *on*. |
+| **Burning Souls** | Divine spark **+ the upgrade currency for hero AND god powers** | Fuel for miracles/creation events; also what you spend to level powers on the map. |
+| **Minions** | The first servants | Turned army = labor/angels tier; also produce base elements & channel counters. |
+| **Elements → Compounds** | God-shield counters (Phase 1) **and** world materials (Phase 2) | See Element Mixing. |
+| **God Souls** | The world seed | Pick **3** at world creation to shape terrain/events (boon+bane each). |
+| **Faith** | The world's output | Farmed from Claith via the Covenant/priesthood. |
+| **Faithful Souls** | The prestige crux (was "Divinity") | Banked at the raze; makes each re-run much faster. |
 
 ---
 
-## LOCKED-ish — Three-Act Structure
+## LOCKED — Three-Act Structure
 
-1. **Act I — The Pantheon:** defeat the 13 gods. Challenging enough to feel like a win,
-   **NOT a drawn-out slog.** Beating them yields their power/bonuses + their God Soul.
-2. **Act II — Genesis:** defeat NYX (primordial night) → unlock the power to CREATE →
-   World tab opens.
-3. **Act III — The Cycle:** build a world → run it (living-world loop) → raze it for a
-   **significant bonus** (Divinity) → rebuild differently. Replay is the point.
+1. **Act I — The Pantheon:** defeat the 13 gods. Challenging but **not a slog**. Each yields a power + its God Soul.
+2. **Act II — Genesis:** defeat **NYX** (primordial night) → unlock the power to CREATE → World tab opens.
+3. **Act III — The Cycle:** build a world → run it → **raze it** for Faithful Souls → rebuild differently. Replay is the point.
 
 Prestige nesting: existing **Ascension → Reincarnation**, plus new **World Rebirth** on top.
 
 ---
 
-## OPEN — World Creation: the "Choose 3 God Souls" draft
+# PHASE 1 — THE GODS
 
-- On defeating NYX, before building, the player **chooses 3 God Souls** from the pantheon.
-- Each soul has a **positive AND negative** effect (some combos harder, some easier).
-- The 3 chosen souls **seed the world**: terrain, available biomes, and which **events/
-  petitions** occur. They also add flat bonuses.
-- The other god powers (from beating them) still apply as general bonuses; only the 3
-  chosen ones *shape this particular world*.
-- Replay driver: pick a different 3 next cycle → a different world. (13 choose 3 = 286 combos.)
+## LOCKED — God fight model (two-phase, stockpile-gated)
 
-## OPEN — World representation (grid / map / structures)
+- **Two-phase HP bar.** A **gold immortal shield** (made of the god's element) you cannot damage, then a **red mortal HP bar**.
+- **Stripping the shield is stockpile-gated (simplified — no real-time channel/regen):** each shield is a pool with a counter cost; accumulate **enough of the right counter element or compound** and spend it to wipe the gold bar. Compounds are heavy ammunition (count for more / hit multi-element shields).
+- Then the **mortal HP phase** is beaten with your normal combat build.
+- **Two-fold gate:** combat investment clears the HP; the right element/compound stockpile clears the shield. Miss either → wall.
+- Sequential (gold to zero, *then* red). **Shield resets if you flee** (a single committed assault).
+- Optional **re-shield spice** (god re-armors during mortal phase) — PARKED, use only if too easy.
 
-Candidates (see chat for tradeoffs):
-- **Node/POI map** reusing the existing god-map overlay — lowest lift, tiny saves, consistent UI. Good MVP.
-- **Hex grid** — adjacency puzzles, pretty; save-safe *if* encoded as a compact int array (biome id + structure id per cell), not fat objects.
-- **Square grid / concentric rings / abstract settlement panel** — other points on the spatial↔abstract axis.
-- Save rule (from perf discussion): store the world as **counts/config or compact int arrays**, never big per-object arrays.
+## LOCKED — The Counter Wheel (which element strips which shield)
 
-## OPEN — The Living World loop
+Closed loop over the 10 elements — a **perfect permutation** (every element counters exactly one and is countered by exactly one):
 
-- Everything hinges on **forked, mandatory decisions** about how to help people while they toil.
-- People: collect food → build shelter → learn better structures & shrines.
-- **Two-layer tech tree:**
-  - *Top-down:* the entity's own **element-combination discovery chain** gates what people CAN build/use/learn.
-  - *Bottom-up:* the people's own labor **XP/mastery** at learned tasks.
-  - **Minions bridge them** — assigned to a task, they make the people efficient (XP boost for the people).
-- **Petitions:** Needs (unmet → Belief falls) & Wants (granted → Faith surges) surface on a timer.
-  Grant / Deny / time-out each swing Belief and Faith. **Commandments** (Iron Fist vs Free Will,
-  Industry vs Devotion, etc.) bias how petitions resolve.
-- **Belief** = happiness rating: high → Faith + growth; low → heresy/revolt/loss.
-- **Faith** = the world's output. Peak followers/Faith → minted into **Divinity** at World Rebirth.
-- **Scaling:** the discovery chain is long enough that it **cannot be finished on the first
-  playthrough.** X followers = N Divine Souls → game+ significantly faster; chosen god souls
-  stack further bonuses.
+- **5-cycle (Wu Xing destruction):** Wood breaks Earth · Earth dams Water · Water quenches Fire · Fire melts Metal · Metal chops Wood.
+- **3-cycle (works):** Research carves Stone · Stone smothers Plant · Plant reclaims Research.
+- **2-cycle (the pair):** Holy ↔ Dark.
 
-## OPEN — God fight verb (from earlier, still unsettled)
+Shield element → counter you channel: Earth←Wood · Water←Earth · Fire←Water · Metal←Fire · Wood←Metal · Stone←Research · Plant←Stone · Research←Plant · Holy←Dark · Dark←Holy.
 
-- Not out-DPS'd — **Weaken, then Take.** Weaken via **countering** (opposing elements) and
-  **turning the god's own worshippers/servants** (reuse the minion-capture loop, aimed upward).
-  Strip enough divinity → god drops mortal → kill & take power.
-- Must stay **short and punchy**, not a slog. (Tension to resolve with the "choose 3" model —
-  see chat.)
+**Shield complexity scales with god power:** single-element (early) → layered/peel (mid) → blended/simultaneous (late). **Holy/Dark are the rare counters, saved for the endgame gods**, so the finale gates behind farming your rarest minion elements.
 
-## OPEN — God Souls as regalia (parked, maybe partial)
+## LOCKED-ish — The 13 gods (shields, counters, lore)
 
-- Earlier idea: wear god souls as **regalia/accoutrements** (build the entity's divine body),
-  which later **imbue the world**. Player leaning toward the "choose 3 at creation" model instead;
-  keeping regalia parked in case a hybrid emerges.
+Difficulty order (original), with shield element(s) → counter needed:
+
+| # | God | Pantheon | Shield | Counter(s) | Lore hook |
+|---|---|---|---|---|---|
+| 1 | Morrigan | Celtic | Water | Earth | Washer at the Ford; herald of war/fate |
+| 2 | Amun-Ra | Egyptian | Fire | Water | Waning sun-king; his fall = "first light" |
+| 3 | Thor | Norse | Metal | Fire | Mjölnir; brute, honest wall |
+| 4 | Hades | Greek | Earth | Wood | Grave-soil; roots crack the tomb |
+| 5 | Athena | Greek | Research | Plant | Wisdom undone by wild growth |
+| 6 | Durga | Hindu | Stone | Research | Mountain-daughter; out-think the immovable |
+| 7 | Isis | Egyptian | Water + Wood | Earth, Metal | Nile flood + green life; can re-knit shield |
+| 8 | Brahma | Hindu | Holy + Research | **Dark**, Plant | The Creator; grants element mixing |
+| 9 | Sekhmet | Egyptian | Fire + Metal | Water, Fire | Bloodlust enrage (shield regen ramps) |
+| 10 | Shiva | Hindu | Fire + Dark | Water, **Holy** | The destroyer you become |
+| 11 | Odin | Norse | Research + Dark | Plant, **Holy** | Sacrifices shield HP to buff |
+| 12 | Zeus | Greek | Metal + Fire + Holy | Fire, Water, **Dark** | The king to dethrone |
+| 13 | NYX | Greek | Dark + Holy + Water | **Holy**, **Dark**, Earth | Primordial night; beat her → Creation |
+
+> **NOTE:** These shields were derived for the *original difficulty order*. The **power-unlock order** (below) reorders the gods, so shields/counters must be **re-derived onto the new order** to keep the counter-difficulty ramp (rare counters late). — OPEN task.
+
+## LOCKED — Element Mixing (the tie-in that makes it load-bearing)
+
+Unlocked by **Brahma**. Base elements are minion-produced, capped 2400, and **wipe every reincarnation**. Mixing **transmutes ephemeral base elements into PERMANENT compounds** — the machine that makes farming last. Compounds do three jobs:
+
+1. **God-shield ammunition (Phase 1):** compounds are stronger counters — a compound can strip a band faster or counter *two* bands at once (e.g. **Twilight** `holy+dark` for NYX). The late, multi-element gods **cannot be beaten on base elements alone** — you must refine. This is the phase's hands-on activity.
+2. **Economy engine:** spend a compound to **boost production of the elements/compounds below it on the tree** (the fine-tuning dial).
+3. **World material (Phase 2):** the same hoard is what you build the world (and Claykin) from. Destroyer's tools become creator's tools.
+
+**Recipe tree:** ~45 pairs + chained tiers (3→6 elements) ≈ **90 possible nodes**, curated to ~50–70. Culminates in 6-element **wonders** and **Life** (Clay + Souls). Depth argues for introducing mixing **mid-phase** (Brahma earlier), shallow recipes first, wonders/Life gated late. Full tree layout is in chat history.
+
+## LOCKED — God Powers (de-duplicated; upgraded with Burning Souls)
+
+Full audit confirmed the **multiplier economy is saturated** (DPS/click/souls/TS/crit/mana/cost all touched by 3–11 sources), so every god power sits on **whitespace** (zero/single-source levers) — automation, meta, or new-system, never a plain multiplier. **God powers upgrade with Burning Souls, same as hero powers** (no new currency layer). **God Souls are reserved for the 3-pick world seed.**
+
+**Power-unlock ORDER** (this reorders the gods; accept two lore bends — Odin early, Athena late):
+
+| Order | God | Power | Note |
+|---|---|---|---|
+| 1 | Morrigan | Auto-buy spell nodes | witch masters incantations |
+| 2 | Amun-Ra | Offline earnings ×mult + raise 6h cap | the sun labors while you sleep |
+| 3 | Odin | Auto-buy the sacrifice (tattered) grid | ⚠️ Allfather early = big lore bend |
+| 4 | Hades | TS sink — deposit TS for 7.77% DPS (vs 6.66%) | novel conversion, his idea |
+| 5 | Thor | Extend Elite-Rush *reach* (floor cap) | ⚠️ possible weak link; alt on standby |
+| 6 | Isis | Spell auto-cast (levels = # spells automated) | |
+| 7 | Durga | Boost Flurry hits/sec | her many arms; rate is fixed today |
+| 8 | Shiva | Global ×Burning Souls | destruction fuels the pyres |
+| 9 | Sekhmet | ×Reincarnation reward | replaces cut auto-mark; destruction→renewal |
+| 10 | Athena | Auto-buy select hero powers (managed toggle) | ⚠️ wisdom-goddess late = bend |
+| 11 | Brahma | Unlock element mixing | |
+| 12 | Zeus | ×**some** hero-power effects | the king amplifies his champions |
+| 13 | NYX | Unlock the World tab | the finale |
+
+Cut for redundancy along the way: crit, click damage, enemy-HP reduction, overkill-chaining, elite-*timer* extension, auto-buy base upgrades, auto-collect urns, auto-mark-for-immolation (all already covered by tattered grid / minions / SMART Clickers / Jason).
+
+---
+
+# PHASE 2 — THE WORLD
+
+## LOCKED — Representation: fixed isometric hex board
+
+- **Fixed board, fully on-screen — no scrolling/camera/pathfinding.** Art = pre-drawn iso hex tiles (sprites), stamped at grid positions; redraw only on change (off the hot path).
+- **Procedurally seeded each life by the 3 chosen God Souls** (weighted terrain roll + a guarantee pass for playability).
+- **Tiles = resource / barrier / threat** (grass, forest→wood, mountain→stone/ore, water→fish, lava→threat, sand). **Terraform verbs:** clear, cool, mine, irrigate, replant, build.
+- **Barriers replace fog** — you expand by *taming* obstacles (cool the lava → obsidian ground), not by revealing gray tiles.
+- **Save-safe:** store the board as a **flat array of small ints** (terrain id + structure id per hex), never fat per-object arrays.
+- Two technical wrinkles (both standard): iso **draw order** (back-to-front) and **hex hit-detection** (Red Blob Games reference).
+
+## LOCKED — The Claykin (the created life)
+
+- **Claykin = Clay + Souls.** Clay (a compound) is the body; Souls (the hoard) are the life — closing the convergence loop ("Souls → life").
+- **Belief/happiness = the integrity of the clay:** content = fired & whole; neglected = dry, **crack, crumble to dust** (population loss). Heresy is literal breakage.
+- **The raze = "return to dust":** Claykin crumble back to clay and you **reclaim their souls as Faithful Souls**. *"From clay I formed you; to clay you return."* The reset is an **un-forming**, not a delete.
+- Pottery is **transformation, not leveling** (see Castes).
+
+## LOCKED — Castes (transformation = consecration, not upgrade)
+
+Base **greenware** Claykin do the primal work (food, basic huts). **Firing with a specific compound** transforms a greenware into a **specialist** — dedicated to one job, removed from the general pool (a real allocation cost). Worker castes so far:
+
+- **Masons** — structures & breaking barrier tiles
+- **Firewalkers** — work lava/forges/hostile tiles
+- **Mariners** — sail, cross water, explore/expand
+- **Wardens** — war/defense · **Shaman** — rites · **Teachers/Scribes** — learning
+- (more to define)
+
+Compounds forge castes → **mixing (Phase 1) feeds society (Phase 2).** Same system, three jobs (shields → economy → castes).
+
+## LOCKED — The World Arc (four beats)
+
+1. **The Unseen Hand.** You drop **gifts** (the compounds you refined) anonymously. Claykin don't know a god exists; they advance on their own to a **ceiling**.
+2. **The Kiln.** Breaking the ceiling requires **firing** — which requires *you*. The gate to advancement.
+3. **The Revelation.** You choose **who to speak through** — a worker caste ascends into your **channel** (Warden→**Cleric**, Shaman→**Priest**, Teacher→**Scrivener**). That caste becomes the **sole source of edicts (your will down) and petitions (their needs up)**.
+4. **The Covenant.** That choice **defines the civilization**. Theology of it: the erased god returns as a *mystery*, then reveals itself once its people are ready.
+
+## LOCKED — Covenants & the Six Societies
+
+- **One Covenant per world** (Reformation-at-high-cost PARKED for later).
+- **Dominant + minor** channel. Dominant = full bonuses **and** penalties, owns the main Faith engine + edict/petition voice. Minor = partial influence that **patches the dominant's weakness**, at a **dilution cost** (Claykin diverted from the dominant).
+
+Base archetypes: **Martial** (Clerics) · **Pious** (Priests) · **Enlightened** (Scriveners). Blended (dominant + minor) → **six societies** (mirrors the 6 forms):
+
+| Dominant + Minor | Society | Fantasy |
+|---|---|---|
+| Martial + Pious | **The Crusade** | zealots at war |
+| Martial + Enlightened | **The Legion** | engineered, disciplined warfare |
+| Pious + Martial | **The Inquisition** | militant church |
+| Pious + Enlightened | **The Monastery** | scholar-monks; *preserves knowledge across the raze* |
+| Enlightened + Martial | **The Arsenal** | science forged into might |
+| Enlightened + Pious | **The Mystery School** | sacred knowledge / gnostics |
+
+Rough bonus↔cost sketch:
+- **Martial:** fast expansion, clears barriers/threats, Faith from conflict ↔ weak knowledge, high attrition, Belief hard in peacetime.
+- **Pious:** highest Faith, stable Belief, heresy-resistant, **fastest Faithful Souls** ↔ slow tech/industry, poor expansion, zealotry.
+- **Enlightened:** fastest tech/recipes, best yields, wonders sooner ↔ low Faith, doubt-heresy, fragile vs threats.
+
+## LOCKED — Living-world loop
+
+- **Petitions:** Needs (unmet → Belief falls) & Wants (granted → Faith surges) surface on a timer; **Grant / Deny / time-out** each swing Belief & Faith. Flavored by the Covenant (a Martial world petitions for weapons; Pious for temples; Enlightened for schools).
+- **Commandments:** tradeoff dials (Iron Fist vs Free Will, Industry vs Devotion) that bias how petitions resolve.
+- **Belief** = happiness (= clay integrity). **Faith** = output → minted into **Faithful Souls** at the raze.
+- **Two-layer tech tree:** the entity's element discoveries gate what Claykin *may* learn (top-down); Claykin labor XP gates how *good* they are (bottom-up); minions bridge them.
+- **Scaling:** the discovery/build chain **cannot finish in one playthrough** — Faithful Souls from razing accelerate the next run.
+
+## Replay engine
+Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (society), plus terrain synergies. God-souls (286 combos) × 6 societies × terrain = no two worlds alike.
+
+---
+
+# OPEN QUESTIONS / PARKED
+
+- **Element-mixing pacing:** leaning **mid-phase** (introduce Brahma earlier) so there's hands-on play before the World — confirm.
+- **Re-derive shields/counters** onto the new power-unlock god order (keep rare Holy/Dark counters on the last gods).
+- **Thor** = extend Elite-Rush reach — confirm or swap (alt: 2nd minion-capture source, retain-through-reincarnation).
+- **Covenant minor:** slider vs fixed role — leaning **fixed for v1**.
+- **Friction events** (dominant vs minor priesthoods clash → schism petitions): build for v1, or park?
+- **Unique blend-outputs** (six signature buildings, e.g. Monastery's Great Library keeps recipes through the raze): yes, or stat-blends only?
+- **Prestige currency name:** keep **Faithful Souls**, or re-theme to Claykin/kiln vocabulary (Kiln-Souls, Soul-Ash) for one coherent lexicon.
+- **Reformation** (change Covenant mid-world at high cost) — later.
+- God-fight tuning (HP pools, shield costs), god-power magnitudes/curves/BS costs — all later.
+- Full worker-caste job definitions on the hex board.
+- Hero flavor text — near launch (existing plan).
+- Structural: only **6 god-node slots** are stubbed on the hero map today; plan was 6 on the hero stairway + 7 in a new "worlds" zone.
