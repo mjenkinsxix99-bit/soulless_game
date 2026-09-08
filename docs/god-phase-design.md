@@ -103,13 +103,19 @@ Difficulty order (original), with shield element(s) → counter needed:
 
 ## LOCKED — Element Mixing (the tie-in that makes it load-bearing)
 
-Unlocked by **Brahma**. Base elements are minion-produced, capped 2400, and **wipe every reincarnation**. Mixing **transmutes ephemeral base elements into PERMANENT compounds** — the machine that makes farming last. Compounds do three jobs:
+**Unlocks mid-phase, at the stairway→worlds-zone gate** (after god #6) — because that's exactly when it becomes required. Base elements are minion-produced, capped 2400, and **wipe every reincarnation**. Mixing **transmutes ephemeral base elements into PERMANENT compounds** — the machine that makes farming last. Compounds do three jobs:
 
-1. **God-shield ammunition (Phase 1):** compounds are stronger counters — a compound can strip a band faster or counter *two* bands at once (e.g. **Twilight** `holy+dark` for NYX). The late, multi-element gods **cannot be beaten on base elements alone** — you must refine. This is the phase's hands-on activity.
+1. **God-shield ammunition (Phase 1) — hard gate:** the **first 6 gods (stairway) are stripped by base elements; the final 7 (worlds zone) ONLY by compounds.** Base elements go inert at the zone boundary, forcing full mixing engagement mid-phase (this *is* the mechanical meaning of the 6/7 map split). Compounds are stronger counters — strip a band faster / counter *two* bands at once (e.g. **Twilight** `holy+dark` for NYX).
 2. **Economy engine:** spend a compound to **boost production of the elements/compounds below it on the tree** (the fine-tuning dial).
 3. **World material (Phase 2):** the same hoard is what you build the world (and Claykin) from. Destroyer's tools become creator's tools.
 
-**Recipe tree:** ~45 pairs + chained tiers (3→6 elements) ≈ **90 possible nodes**, curated to ~50–70. Culminates in 6-element **wonders** and **Life** (Clay + Souls). Depth argues for introducing mixing **mid-phase** (Brahma earlier), shallow recipes first, wonders/Life gated late. Full tree layout is in chat history.
+**Discovery bonus (proposed, OPEN):** each discovered compound = a permanent **codex** entry (survives all resets) + a small permanent **element-production** boost; milestones (every N recipes) → a global/Faithful-Souls bump. **Deliberately un-completable run 1** — the deepest (wonder/Life-tier) compounds gate behind Faithful Souls / world progress, so the codex fills across many prestige cycles.
+
+**Recipe tree:** ~45 pairs + chained tiers (3→6 elements) ≈ **90 possible nodes**, curated to ~50–70. Culminates in 6-element **wonders** and **Life** (Clay + Souls). Full tree layout is in chat history.
+
+**Body vs soul split:** the **7 physical elements** build the world's *body* (terrain, materials, Claykin flesh); the **3 abstract elements — Holy, Dark, Research** — define its *soul* (the Covenant axes, below).
+
+**Brahma's power (OPEN):** since mixing now unlocks as a phase gate, Brahma's #11 slot can no longer *be* the unlock — it becomes a mixing **perk** (bonus compound yield / auto-reveal recipes — TBD in the god-writing pass).
 
 ## LOCKED — God Powers (de-duplicated; upgraded with Burning Souls)
 
@@ -177,9 +183,11 @@ Compounds forge castes → **mixing (Phase 1) feeds society (Phase 2).** Same sy
 ## LOCKED — Covenants & the Six Societies
 
 - **One Covenant per world** (Reformation-at-high-cost PARKED for later).
-- **Dominant + minor** channel. Dominant = full bonuses **and** penalties, owns the main Faith engine + edict/petition voice. Minor = partial influence that **patches the dominant's weakness**, at a **dilution cost** (Claykin diverted from the dominant).
+- **Straight choice — no slider.** Pick your **Revenants** (dominant deity-contact caste) + a **supporting** caste; the **third, unchosen caste inflicts a negative** (that faction, neglected). Dominant = full bonuses + penalties + the edict/petition voice; supporting = patches the dominant's weakness.
+- **The three axes are already in the game:** **Holy → piety** (Priests) · **Dark → war** (Clerics) · **Wisdom/Research → knowledge** (Scriveners) — live elements *and* ascension-path themes (holy/shadow/mystic).
+- **"Revenants"** = the chosen deity-contact caste (Cleric/Priest/Scrivener = the flavor of whichever you pick). Thematic: a revenant returns from death, and the deity is a killed god clawed back. **Unique buildings unlock per the Revenants chosen.**
 
-Base archetypes: **Martial** (Clerics) · **Pious** (Priests) · **Enlightened** (Scriveners). Blended (dominant + minor) → **six societies** (mirrors the 6 forms):
+Base archetypes: **Martial** (Clerics) · **Pious** (Priests) · **Enlightened** (Scriveners). Blended (dominant + supporting) → **six societies** (mirrors the 6 forms):
 
 | Dominant + Minor | Society | Fantasy |
 |---|---|---|
@@ -210,15 +218,17 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 
 # OPEN QUESTIONS / PARKED
 
-- **Element-mixing pacing:** leaning **mid-phase** (introduce Brahma earlier) so there's hands-on play before the World — confirm.
-- **Re-derive shields/counters** onto the new power-unlock god order (keep rare Holy/Dark counters on the last gods).
-- **Thor** = extend Elite-Rush reach — confirm or swap (alt: 2nd minion-capture source, retain-through-reincarnation).
-- **Covenant minor:** slider vs fixed role — leaning **fixed for v1**.
-- **Friction events** (dominant vs minor priesthoods clash → schism petitions): build for v1, or park?
-- **Unique blend-outputs** (six signature buildings, e.g. Monastery's Great Library keeps recipes through the raze): yes, or stat-blends only?
-- **Prestige currency name:** keep **Faithful Souls**, or re-theme to Claykin/kiln vocabulary (Kiln-Souls, Soul-Ash) for one coherent lexicon.
-- **Reformation** (change Covenant mid-world at high cost) — later.
+- **Mixing pacing — RESOLVED:** unlocks at the stairway→worlds-zone gate; final 7 gods are compound-only. (Consequence: Brahma's power slot, below.)
+- **Brahma's power** — mixing unlock is now a phase gate, so Brahma's #11 slot becomes a mixing perk (bonus compound yield / auto-reveal recipes — TBD).
+- **Compound-discovery bonus** — proposed (codex + element-production boost + milestones; deep compounds prestige-gated). Confirm/tune.
+- **The gods** — next task when we start writing: re-derive shields/counters onto the new power-unlock order (rare Holy/Dark counters stay on the last gods), plus Thor's power (tentative: extend Elite-Rush reach — the weakest of the set) and general god tuning.
+- **Covenant minor — RESOLVED:** no slider, straight choice; unchosen third caste = a negative.
+- **Unique blend-buildings — YES** (per Revenants chosen). Six signature buildings to design (e.g. Monastery's Great Library keeps recipes through the raze).
+- **Friction events** (dominant vs supporting priesthoods clash → schism petitions): still open — build for v1, or park?
+- **Reformation** (change Covenant mid-world at high cost) — PARKED for later.
 - God-fight tuning (HP pools, shield costs), god-power magnitudes/curves/BS costs — all later.
 - Full worker-caste job definitions on the hex board.
 - Hero flavor text — near launch (existing plan).
-- Structural: only **6 god-node slots** are stubbed on the hero map today; plan was 6 on the hero stairway + 7 in a new "worlds" zone.
+- Structural: only **6 god-node slots** are stubbed on the hero map today; plan is 6 on the hero stairway + 7 in a new "worlds" zone.
+
+**Settled since consolidation:** Faithful Souls name (kept); Covenant = straight choice with neglected-third penalty; Revenants = channel-caste name; unique blend-buildings; mixing = phase-gated with compound-only final 7.
