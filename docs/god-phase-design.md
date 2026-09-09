@@ -105,7 +105,7 @@ Difficulty order (original), with shield element(s) → counter needed:
 
 **Unlocks mid-phase, at the stairway→worlds-zone gate** (after god #6) — because that's exactly when it becomes required. Base elements are minion-produced, capped 2400, and **wipe every reincarnation**. Mixing **transmutes ephemeral base elements into PERMANENT compounds** — the machine that makes farming last. Compounds do three jobs:
 
-1. **God-shield ammunition (Phase 1) — hard gate:** the **first 6 gods (stairway) are stripped by base elements; the final 7 (worlds zone) ONLY by compounds.** Base elements go inert at the zone boundary, forcing full mixing engagement mid-phase (this *is* the mechanical meaning of the 6/7 map split). Compounds are stronger counters — strip a band faster / counter *two* bands at once (e.g. **Twilight** `holy+dark` for NYX).
+1. **God-shield ammunition (Phase 1) — hard gate:** the **5 Stairway gods are stripped by base elements; the 8 Worlds gods (Hades + the 7 creation days) ONLY by compounds.** Base elements go inert at the map boundary (Hades = the first, gentlest compound fight), forcing full mixing engagement mid-phase. Compounds are stronger counters — strip a band faster / counter *two* bands at once (e.g. **Twilight** `holy+dark` for NYX).
 2. **Economy engine:** spend a compound to **boost production of the elements/compounds below it on the tree** (the fine-tuning dial).
 3. **World material (Phase 2):** the same hoard is what you build the world (and Claykin) from. Destroyer's tools become creator's tools.
 
@@ -113,7 +113,7 @@ Difficulty order (original), with shield element(s) → counter needed:
 
 **Recipe tree (LOCKED shape):** simple **item + item (+ item) = new item** combinatorial system (Little-Alchemy style). ~45 pairs + chained tiers ≈ **90 nodes**, curated to ~50–70, culminating in 6-element **wonders** and **Life** (Clay + Souls). **Deliberately un-completable run 1:** the **3rd and 4th tiers lock behind restarts** (prestige-gated), so the codex fills across many cycles. Optional **Yggdrasil-tree** visual — presentation only, undecided. Full tree layout in chat history.
 
-**Unlock timing:** **Brahma (#3)** unlocks the mixing system (the Creator's gift; levels grant auto-mixing); it becomes **mandatory at #7** (compound-only worlds zone). Gods #4–6 are base-element practice with mixing available. (Odin at #11 gives the compound-yield *perk*.)
+**Unlock timing:** **Brahma (#3)** unlocks the mixing system (the Creator's gift; levels grant auto-mixing); it becomes **mandatory at #6** (Hades — the Worlds gateway is the first compound fight). Gods #4–5 (Thor, Isis) are base-element practice with mixing available. (Odin at #11 gives the compound-yield *perk*.)
 
 **Body vs soul split:** the **7 physical elements** build the world's *body* (terrain, materials, Claykin flesh); the **3 abstract elements — Holy, Dark, Research** — define its *soul* (the Covenant axes, below).
 
@@ -125,25 +125,29 @@ Full audit confirmed the **multiplier economy is saturated** (DPS/click/souls/TS
 
 **Power-unlock ORDER** (this reorders the gods; accept two lore bends — Odin early, Athena late):
 
-**FINAL board (LOCKED):**
+**FINAL board (LOCKED)** — split across two maps: **Stairway (5, base-element shields)** and **The Worlds (8, compound shields; Death → Creation → Life)**.
 
-| # | God | Power (magnitude) | Beat |
+| # | God | Power (magnitude) | Map / Beat |
 |---|---|---|---|
-| 1 | Morrigan | Auto-buy spell nodes — 9 levels (one per spell node) | — |
-| 2 | Durga | Flurry rate — +1 slash/sec per level, max 7 | — |
-| 3 | Brahma | **Unlock the mixing tree**; levels grant auto-mixing (the Creator's gift) | — |
-| 4 | Hades | Feed-Souls TS sink — 1:1 button; TS fed give **7.77% DPS** each (vs 6.66% unspent) | — |
-| 5 | Thor | Auto-buy the sacrifice (tattered) grid — 20 levels, each pass buys affordable nodes in order | — |
-| 6 | Isis | Spell auto-cast — **10-slot rotation** (levels unlock slots), accepts repeats (queue Power-of-3), **spell 9 excluded**, drag-to-order UI | — |
-| 7 | Amun-Ra | Offline earnings — +2h & +5% eff./level, max 9 → **24h @ 95%** | **Light** |
-| 8 | Shiva | Retain **10% of souls** through reincarnation | **Air** |
-| 9 | Sekhmet | **×Minion XP** — Glory-in-Sacrifice scale (+0.25/lvl) | **Land** |
-| 10 | Athena | Auto-buy hero powers — **Heracles + Soul Catcher** (for now) | **Growing things** |
-| 11 | Odin | Compound-yield perk — Spoils-of-War scale | **Waters** |
-| 12 | Zeus | **×1.10/level (unlimited)** on Heracles, Soul Catcher, Spoils of War, Glory in Sacrifice; Spoils cost scale | **Animals** |
-| 13 | NYX | Unlock **Life** (the World tab) | **Breath of Life** |
+| 1 | Morrigan | Auto-buy spell nodes — 9 levels (one per spell node) | Stairway |
+| 2 | Durga | Flurry rate — +1 slash/sec per level, max 7 | Stairway |
+| 3 | Brahma | **Unlock the mixing tree**; levels grant auto-mixing (the Creator's gift) | Stairway |
+| 4 | Thor | Auto-buy the sacrifice (tattered) grid — 20 levels, each pass buys affordable nodes in order | Stairway |
+| 5 | Isis | Spell auto-cast — **10-slot rotation** (levels unlock slots), accepts repeats (queue Power-of-3), **spell 9 excluded**, drag-to-order UI | Stairway |
+| 6 | **Hades** | **Feed-Souls Bank** — 1:1 button; TS fed give **7.77% DPS** each (vs 6.66% unspent) | Worlds — *gateway, no beat* |
+| 7 | Amun-Ra | Offline earnings — +2h & +5% eff./level, max 9 → **24h @ 95%** | Worlds — **Light** |
+| 8 | Shiva | Retain **10% of souls** through reincarnation | Worlds — **Air** |
+| 9 | Sekhmet | **×Minion XP** — Glory-in-Sacrifice scale (+0.25/lvl) | Worlds — **Land** |
+| 10 | Athena | Auto-buy hero powers — **Heracles + Soul Catcher** (for now) | Worlds — **Growing things** |
+| 11 | Odin | Compound-yield perk — Spoils-of-War scale | Worlds — **Waters** |
+| 12 | Zeus | **×1.10/level (unlimited)** on Heracles, Soul Catcher, Spoils of War, Glory in Sacrifice; Spoils cost scale | Worlds — **Animals** |
+| 13 | NYX | Unlock **Life** (the World tab) | Worlds — **Breath of Life** |
 
-**Deity placement:** deities were moved off the raw difficulty order onto ranks where lore + creation fit best (powers moved with them). Amun-Ra → #7 (sun = "Light", "labors in your absence" = offline); Durga → #2 (keeps Flurry, fine early); Brahma → #3 (the Creator unlocks creation/mixing); Odin → #11 ("Waters" — made the seas from Ymir's blood). Accepted lore bends: Durga early, Amun-Ra into the hard zone, Brahma early; Odin's old bend fixed.
+**Hades as the Worlds gateway:** the lord of the dead guards the threshold — you pass through Death to reach Creation, and the soul-keeper unlocks the Soul Bank as you enter (you're about to spend souls on *life*). No creation beat (none of the 7 days fit death). Unlike every other god (who *teaches* a new power), Hades simply *helps* — he alone knows the entity's grief. Makes Map 2 read as a cosmogony: **Death → the 7 days → Life.**
+
+Placeholder greeting (Hades): *"You are already familiar with death and loss — I have nothing to teach you. But I will help you. Bolster your strength in my soul bank."*
+
+**Deity placement:** deities sit where lore + creation fit best (powers move with them). Amun-Ra → #7 (sun = "Light", "labors in your absence" = offline); Durga → #2 (Flurry, fine early); Brahma → #3 (the Creator unlocks mixing); Hades → #6 (Worlds gateway); Odin → #11 ("Waters" — seas from Ymir's blood). Accepted lore bends: Durga early, Amun-Ra into the hard zone, Brahma early.
 
 Cut for redundancy along the way: crit, click damage, enemy-HP reduction, overkill-chaining, elite-*timer* extension, auto-buy base upgrades, auto-collect urns, auto-mark-for-immolation (all already covered by tattered grid / minions / SMART Clickers / Jason).
 
@@ -247,6 +251,6 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 
 **Later content (design-doc only for now):**
 - God Souls boon/bane (×13) · hex tile types + terraform costs + board size · worker-caste jobs & firing recipes · petition list · Edict + society value tables · unique buildings · Faithful Souls bonus math · hero flavor text.
-- Structural: expand the god map from **6 stubbed nodes** to 13 (6 stairway + 7 worlds zone); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
+- Structural: expand the god map from **6 stubbed nodes** to 13, split **5 Stairway + 8 Worlds** (Hades gateway + 7 creation days); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
 
 **Settled since consolidation:** Faithful Souls (kept) · Revenant = god-voice caste · no schisms · Edicts = Commandments (merged) · Thor = auto-mixing · discovery → base-element production speedup · codex persists · mixing tree = item+item(+item), tiers 3–4 restart-gated · god-map navigation approach.
