@@ -149,10 +149,10 @@ Cut for redundancy along the way: crit, click damage, enemy-HP reduction, overki
 - **3 Odin** — unlock mixing tree; levels grant auto-mixing (speed / parallel batches).
 - **4 Hades** — a **"Feed Souls" button**, 1:1; TS fed to Hades give **7.77% DPS** each (vs 6.66% unspent).
 - **5 Thor** — auto-buy sacrifice grid, **20 levels** (each pass buys affordable nodes in order).
-- **6 Isis** — spell auto-cast, **10 levels**, excludes spell 9 (Invoke Power). Needs a spell-order/priority input UI. *(OPEN: 8 castable spells vs 10 levels — what do the levels do?)*
-- **7 Durga** — +1 slash/sec per level, **max 7**.
-- **8 Shiva** — *(OPEN: global ×BS is dead — overlaps Glory in Sacrifice, which Zeus also multiplies. Candidate: retain-through-reincarnation / hasten reincarnation / ×ascension.)*
-- **9 Sekhmet** — ×**MP gained per reincarnation** (the "reincarnation reward" = TS→MP payout). *(OPEN: confirm MP is worth boosting, or pivot.)*
+- **Isis** — spell auto-cast: a **10-slot rotation** (each level unlocks a slot), slots accept **repeats** (queue Power-of-3 / spell #7 multiple times), **spell 9 excluded**; needs an **order-setting UI** (drag to arrange; caster fires down the list as mana allows).
+- **Flurry rate** (Amun-Ra's rank) — +1 slash/sec per level, **max 7**.
+- **Retain 10% souls** through reincarnation (Shiva's rank). *(replaces the dead ×BS lever)*
+- **×Minion XP**, Glory-in-Sacrifice scale +0.25/lvl (Sekhmet's rank). *(untouched lever; MP already plentiful so pivoted off ×MP)*
 - **10 Athena** — auto-buys **Strength of Heracles + Soul Catcher** (for now).
 - **11 Brahma** — bonus compound yield, **Spoils-of-War scale**.
 - **12 Zeus** — **×1.10/level, unlimited**, on Heracles, Soul Catcher, Spoils of War, Glory in Sacrifice; Spoils cost scale.
@@ -170,7 +170,26 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 | Zeus | "The **Animals** have gathered upon the land." |
 | NYX | "The **Breath of Life** has been gained." |
 
-(Note: Amun-Ra's stairway flavor also touches "first light" — different layer, reword one if the double-light grates.)
+### PROPOSED deity reshuffle (pending green-light — powers stay fixed by rank, deities move for lore/creation fit)
+Two swaps: **Amun-Ra ↔ Durga** (Amun-Ra → #7 = the "Light" beat; Durga → #2) and **Brahma ↔ Odin** (Brahma → #3 unlocks mixing as the Creator's gift; Odin → #11 = "Waters", made the seas from Ymir's blood). Resulting lineup:
+
+| # | God | Power | Beat |
+|---|---|---|---|
+| 1 | Morrigan | auto-buy spell nodes | — |
+| 2 | Durga | offline earnings | — |
+| 3 | Brahma | unlock mixing tree (+auto-mix levels) | — |
+| 4 | Hades | Feed-Souls TS sink (7.77%) | — |
+| 5 | Thor | auto-buy sacrifice grid (20 lvl) | — |
+| 6 | Isis | spell auto-cast (10-slot rotation) | — |
+| 7 | Amun-Ra | Flurry rate (max 7) | Light |
+| 8 | Shiva | retain 10% souls | Air |
+| 9 | Sekhmet | ×Minion XP (Glory scale) | Land |
+| 10 | Athena | auto-buy hero powers (Heracles+Soul Catcher) | Growing things |
+| 11 | Odin | compound-yield perk (Spoils scale) | Waters |
+| 12 | Zeus | ×hero powers (×1.10/lvl) | Animals |
+| 13 | NYX | unlock Life | Breath of Life |
+
+Lore bends accepted for the creation-story payoff: Durga early, Amun-Ra into the hard zone, Brahma early (Odin's old bend is fixed). If confirmed, rewrite the board + creation-story tables above to match.
 
 ---
 
