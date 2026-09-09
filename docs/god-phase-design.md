@@ -113,11 +113,11 @@ Difficulty order (original), with shield element(s) → counter needed:
 
 **Recipe tree (LOCKED shape):** simple **item + item (+ item) = new item** combinatorial system (Little-Alchemy style). ~45 pairs + chained tiers ≈ **90 nodes**, curated to ~50–70, culminating in 6-element **wonders** and **Life** (Clay + Souls). **Deliberately un-completable run 1:** the **3rd and 4th tiers lock behind restarts** (prestige-gated), so the codex fills across many cycles. Optional **Yggdrasil-tree** visual — presentation only, undecided. Full tree layout in chat history.
 
-**Unlock timing:** **Odin (#3)** unlocks the mixing system (and grants auto-mixing via levels); it becomes **mandatory at #7** (compound-only worlds zone). Gods #4–6 are base-element practice with mixing available.
+**Unlock timing:** **Brahma (#3)** unlocks the mixing system (the Creator's gift; levels grant auto-mixing); it becomes **mandatory at #7** (compound-only worlds zone). Gods #4–6 are base-element practice with mixing available. (Odin at #11 gives the compound-yield *perk*.)
 
 **Body vs soul split:** the **7 physical elements** build the world's *body* (terrain, materials, Claykin flesh); the **3 abstract elements — Holy, Dark, Research** — define its *soul* (the Covenant axes, below).
 
-**Brahma's power (OPEN):** since mixing now unlocks as a phase gate, Brahma's #11 slot can no longer *be* the unlock — it becomes a mixing **perk** (bonus compound yield / auto-reveal recipes — TBD in the god-writing pass).
+**Mixing powers (LOCKED):** Brahma (#3) unlocks mixing + auto-mixing; Odin (#11) gives the compound-yield perk (Spoils scale).
 
 ## LOCKED — God Powers (de-duplicated; upgraded with Burning Souls)
 
@@ -125,71 +125,37 @@ Full audit confirmed the **multiplier economy is saturated** (DPS/click/souls/TS
 
 **Power-unlock ORDER** (this reorders the gods; accept two lore bends — Odin early, Athena late):
 
-| Order | God | Power | Note |
+**FINAL board (LOCKED):**
+
+| # | God | Power (magnitude) | Beat |
 |---|---|---|---|
-| 1 | Morrigan | Auto-buy spell nodes | witch masters incantations |
-| 2 | Amun-Ra | Offline earnings ×mult + raise 6h cap | the sun labors while you sleep |
-| 3 | Odin | **Unlock the mixing tree; levels grant auto-mixing** | swapped w/ Thor; also fixes mixing-unlock timing (now live at #3) |
-| 4 | Hades | TS sink — deposit TS for 7.77% DPS (vs 6.66%) | novel conversion, his idea |
-| 5 | Thor | **Auto-buy the sacrifice (tattered) grid** — 20 levels, each pass buys affordable nodes in order | swapped w/ Odin |
-| 6 | Isis | Spell auto-cast (levels = # spells automated) | |
-| 7 | Durga | Boost Flurry hits/sec | her many arms; rate is fixed today |
-| 8 | Shiva | Global ×Burning Souls | destruction fuels the pyres |
-| 9 | Sekhmet | ×Reincarnation reward | replaces cut auto-mark; destruction→renewal |
-| 10 | Athena | Auto-buy select hero powers (managed toggle) | ⚠️ wisdom-goddess late = bend |
-| 11 | Brahma | Mixing perk (bonus compound yield / auto-reveal recipes) | mixing itself is a phase gate, not this power |
-| 12 | Zeus | ×**some** hero-power effects | the king amplifies his champions |
-| 13 | NYX | Unlock the World tab | the finale |
+| 1 | Morrigan | Auto-buy spell nodes — 9 levels (one per spell node) | — |
+| 2 | Durga | Flurry rate — +1 slash/sec per level, max 7 | — |
+| 3 | Brahma | **Unlock the mixing tree**; levels grant auto-mixing (the Creator's gift) | — |
+| 4 | Hades | Feed-Souls TS sink — 1:1 button; TS fed give **7.77% DPS** each (vs 6.66% unspent) | — |
+| 5 | Thor | Auto-buy the sacrifice (tattered) grid — 20 levels, each pass buys affordable nodes in order | — |
+| 6 | Isis | Spell auto-cast — **10-slot rotation** (levels unlock slots), accepts repeats (queue Power-of-3), **spell 9 excluded**, drag-to-order UI | — |
+| 7 | Amun-Ra | Offline earnings — +2h & +5% eff./level, max 9 → **24h @ 95%** | **Light** |
+| 8 | Shiva | Retain **10% of souls** through reincarnation | **Air** |
+| 9 | Sekhmet | **×Minion XP** — Glory-in-Sacrifice scale (+0.25/lvl) | **Land** |
+| 10 | Athena | Auto-buy hero powers — **Heracles + Soul Catcher** (for now) | **Growing things** |
+| 11 | Odin | Compound-yield perk — Spoils-of-War scale | **Waters** |
+| 12 | Zeus | **×1.10/level (unlimited)** on Heracles, Soul Catcher, Spoils of War, Glory in Sacrifice; Spoils cost scale | **Animals** |
+| 13 | NYX | Unlock **Life** (the World tab) | **Breath of Life** |
+
+**Deity placement:** deities were moved off the raw difficulty order onto ranks where lore + creation fit best (powers moved with them). Amun-Ra → #7 (sun = "Light", "labors in your absence" = offline); Durga → #2 (keeps Flurry, fine early); Brahma → #3 (the Creator unlocks creation/mixing); Odin → #11 ("Waters" — made the seas from Ymir's blood). Accepted lore bends: Durga early, Amun-Ra into the hard zone, Brahma early; Odin's old bend fixed.
 
 Cut for redundancy along the way: crit, click damage, enemy-HP reduction, overkill-chaining, elite-*timer* extension, auto-buy base upgrades, auto-collect urns, auto-mark-for-immolation (all already covered by tattered grid / minions / SMART Clickers / Jason).
 
-### Proposed magnitudes (pending green-light)
-- **1 Morrigan** — 9 levels (one per spell node).
-- **2 Amun-Ra** — +2h & +5% efficiency per level, max 9 → **24h @ 95%**.
-- **3 Odin** — unlock mixing tree; levels grant auto-mixing (speed / parallel batches).
-- **4 Hades** — a **"Feed Souls" button**, 1:1; TS fed to Hades give **7.77% DPS** each (vs 6.66% unspent).
-- **5 Thor** — auto-buy sacrifice grid, **20 levels** (each pass buys affordable nodes in order).
-- **Isis** — spell auto-cast: a **10-slot rotation** (each level unlocks a slot), slots accept **repeats** (queue Power-of-3 / spell #7 multiple times), **spell 9 excluded**; needs an **order-setting UI** (drag to arrange; caster fires down the list as mana allows).
-- **Flurry rate** (Amun-Ra's rank) — +1 slash/sec per level, **max 7**.
-- **Retain 10% souls** through reincarnation (Shiva's rank). *(replaces the dead ×BS lever)*
-- **×Minion XP**, Glory-in-Sacrifice scale +0.25/lvl (Sekhmet's rank). *(untouched lever; MP already plentiful so pivoted off ×MP)*
-- **10 Athena** — auto-buys **Strength of Heracles + Soul Catcher** (for now).
-- **11 Brahma** — bonus compound yield, **Spoils-of-War scale**.
-- **12 Zeus** — **×1.10/level, unlimited**, on Heracles, Soul Catcher, Spoils of War, Glory in Sacrifice; Spoils cost scale.
-- **13 NYX** — unlock **Life**.
-
 ### Creation story — final 7 (placeholder post-defeat flavor)
 Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
-| God | On defeat |
-|---|---|
-| Durga | "You have caused **Light** to be formed." |
-| Shiva | "You have caused the **Air** to form." |
-| Sekhmet | "You have gathered the **Land**." |
-| Athena | "You have caused the land to sprout **growing things**." |
-| Brahma | "You have caused the **Waters** to populate." |
-| Zeus | "The **Animals** have gathered upon the land." |
-| NYX | "The **Breath of Life** has been gained." |
-
-### PROPOSED deity reshuffle (pending green-light — powers stay fixed by rank, deities move for lore/creation fit)
-Two swaps: **Amun-Ra ↔ Durga** (Amun-Ra → #7 = the "Light" beat; Durga → #2) and **Brahma ↔ Odin** (Brahma → #3 unlocks mixing as the Creator's gift; Odin → #11 = "Waters", made the seas from Ymir's blood). Resulting lineup:
-
-| # | God | Power | Beat |
-|---|---|---|---|
-| 1 | Morrigan | auto-buy spell nodes | — |
-| 2 | Durga | offline earnings | — |
-| 3 | Brahma | unlock mixing tree (+auto-mix levels) | — |
-| 4 | Hades | Feed-Souls TS sink (7.77%) | — |
-| 5 | Thor | auto-buy sacrifice grid (20 lvl) | — |
-| 6 | Isis | spell auto-cast (10-slot rotation) | — |
-| 7 | Amun-Ra | Flurry rate (max 7) | Light |
-| 8 | Shiva | retain 10% souls | Air |
-| 9 | Sekhmet | ×Minion XP (Glory scale) | Land |
-| 10 | Athena | auto-buy hero powers (Heracles+Soul Catcher) | Growing things |
-| 11 | Odin | compound-yield perk (Spoils scale) | Waters |
-| 12 | Zeus | ×hero powers (×1.10/lvl) | Animals |
-| 13 | NYX | unlock Life | Breath of Life |
-
-Lore bends accepted for the creation-story payoff: Durga early, Amun-Ra into the hard zone, Brahma early (Odin's old bend is fixed). If confirmed, rewrite the board + creation-story tables above to match.
+- **Amun-Ra** — "You have caused **Light** to be formed."
+- **Shiva** — "You have caused the **Air** to form."
+- **Sekhmet** — "You have gathered the **Land**."
+- **Athena** — "You have caused the land to sprout **growing things**."
+- **Odin** — "You have caused the **Waters** to populate."
+- **Zeus** — "The **Animals** have gathered upon the land."
+- **NYX** — "The **Breath of Life** has been gained."
 
 ---
 
