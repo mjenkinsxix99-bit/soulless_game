@@ -113,7 +113,7 @@ Difficulty order (original), with shield element(s) → counter needed:
 
 **Recipe tree (LOCKED shape):** simple **item + item (+ item) = new item** combinatorial system (Little-Alchemy style). ~45 pairs + chained tiers ≈ **90 nodes**, curated to ~50–70, culminating in 6-element **wonders** and **Life** (Clay + Souls). **Deliberately un-completable run 1:** the **3rd and 4th tiers lock behind restarts** (prestige-gated), so the codex fills across many cycles. Optional **Yggdrasil-tree** visual — presentation only, undecided. Full tree layout in chat history.
 
-**Unlock timing:** the mixing *system* goes live **mid-stairway (~god #4–5)** so Thor's #5 auto-mixing has something to act on; it becomes **mandatory at #7** (compound-only worlds zone).
+**Unlock timing:** **Odin (#3)** unlocks the mixing system (and grants auto-mixing via levels); it becomes **mandatory at #7** (compound-only worlds zone). Gods #4–6 are base-element practice with mixing available.
 
 **Body vs soul split:** the **7 physical elements** build the world's *body* (terrain, materials, Claykin flesh); the **3 abstract elements — Holy, Dark, Research** — define its *soul* (the Covenant axes, below).
 
@@ -129,9 +129,9 @@ Full audit confirmed the **multiplier economy is saturated** (DPS/click/souls/TS
 |---|---|---|---|
 | 1 | Morrigan | Auto-buy spell nodes | witch masters incantations |
 | 2 | Amun-Ra | Offline earnings ×mult + raise 6h cap | the sun labors while you sleep |
-| 3 | Odin | Auto-buy the sacrifice (tattered) grid | ⚠️ Allfather early = big lore bend |
+| 3 | Odin | **Unlock the mixing tree; levels grant auto-mixing** | swapped w/ Thor; also fixes mixing-unlock timing (now live at #3) |
 | 4 | Hades | TS sink — deposit TS for 7.77% DPS (vs 6.66%) | novel conversion, his idea |
-| 5 | Thor | **Auto-mixing** — auto-crafts discovered compounds; levels → faster mixing OR more parallel batches | replaces the old weak "elite-rush reach" |
+| 5 | Thor | **Auto-buy the sacrifice (tattered) grid** — 20 levels, each pass buys affordable nodes in order | swapped w/ Odin |
 | 6 | Isis | Spell auto-cast (levels = # spells automated) | |
 | 7 | Durga | Boost Flurry hits/sec | her many arms; rate is fixed today |
 | 8 | Shiva | Global ×Burning Souls | destruction fuels the pyres |
@@ -142,6 +142,35 @@ Full audit confirmed the **multiplier economy is saturated** (DPS/click/souls/TS
 | 13 | NYX | Unlock the World tab | the finale |
 
 Cut for redundancy along the way: crit, click damage, enemy-HP reduction, overkill-chaining, elite-*timer* extension, auto-buy base upgrades, auto-collect urns, auto-mark-for-immolation (all already covered by tattered grid / minions / SMART Clickers / Jason).
+
+### Proposed magnitudes (pending green-light)
+- **1 Morrigan** — 9 levels (one per spell node).
+- **2 Amun-Ra** — +2h & +5% efficiency per level, max 9 → **24h @ 95%**.
+- **3 Odin** — unlock mixing tree; levels grant auto-mixing (speed / parallel batches).
+- **4 Hades** — a **"Feed Souls" button**, 1:1; TS fed to Hades give **7.77% DPS** each (vs 6.66% unspent).
+- **5 Thor** — auto-buy sacrifice grid, **20 levels** (each pass buys affordable nodes in order).
+- **6 Isis** — spell auto-cast, **10 levels**, excludes spell 9 (Invoke Power). Needs a spell-order/priority input UI. *(OPEN: 8 castable spells vs 10 levels — what do the levels do?)*
+- **7 Durga** — +1 slash/sec per level, **max 7**.
+- **8 Shiva** — *(OPEN: global ×BS is dead — overlaps Glory in Sacrifice, which Zeus also multiplies. Candidate: retain-through-reincarnation / hasten reincarnation / ×ascension.)*
+- **9 Sekhmet** — ×**MP gained per reincarnation** (the "reincarnation reward" = TS→MP payout). *(OPEN: confirm MP is worth boosting, or pivot.)*
+- **10 Athena** — auto-buys **Strength of Heracles + Soul Catcher** (for now).
+- **11 Brahma** — bonus compound yield, **Spoils-of-War scale**.
+- **12 Zeus** — **×1.10/level, unlimited**, on Heracles, Soul Catcher, Spoils of War, Glory in Sacrifice; Spoils cost scale.
+- **13 NYX** — unlock **Life**.
+
+### Creation story — final 7 (placeholder post-defeat flavor)
+Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
+| God | On defeat |
+|---|---|
+| Durga | "You have caused **Light** to be formed." |
+| Shiva | "You have caused the **Air** to form." |
+| Sekhmet | "You have gathered the **Land**." |
+| Athena | "You have caused the land to sprout **growing things**." |
+| Brahma | "You have caused the **Waters** to populate." |
+| Zeus | "The **Animals** have gathered upon the land." |
+| NYX | "The **Breath of Life** has been gained." |
+
+(Note: Amun-Ra's stairway flavor also touches "first light" — different layer, reword one if the double-light grates.)
 
 ---
 
