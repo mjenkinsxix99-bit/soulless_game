@@ -109,9 +109,11 @@ Difficulty order (original), with shield element(s) → counter needed:
 2. **Economy engine:** spend a compound to **boost production of the elements/compounds below it on the tree** (the fine-tuning dial).
 3. **World material (Phase 2):** the same hoard is what you build the world (and Claykin) from. Destroyer's tools become creator's tools.
 
-**Discovery bonus (proposed, OPEN):** each discovered compound = a permanent **codex** entry (survives all resets) + a small permanent **element-production** boost; milestones (every N recipes) → a global/Faithful-Souls bump. **Deliberately un-completable run 1** — the deepest (wonder/Life-tier) compounds gate behind Faithful Souls / world progress, so the codex fills across many prestige cycles.
+**Discovery:** each discovered compound stays **known in the codex forever** (survives all resets); each discovery → a small permanent **base-element production speedup**. (No compound-production bonus — production automation is a god power, see Thor.)
 
-**Recipe tree:** ~45 pairs + chained tiers (3→6 elements) ≈ **90 possible nodes**, curated to ~50–70. Culminates in 6-element **wonders** and **Life** (Clay + Souls). Full tree layout is in chat history.
+**Recipe tree (LOCKED shape):** simple **item + item (+ item) = new item** combinatorial system (Little-Alchemy style). ~45 pairs + chained tiers ≈ **90 nodes**, curated to ~50–70, culminating in 6-element **wonders** and **Life** (Clay + Souls). **Deliberately un-completable run 1:** the **3rd and 4th tiers lock behind restarts** (prestige-gated), so the codex fills across many cycles. Optional **Yggdrasil-tree** visual — presentation only, undecided. Full tree layout in chat history.
+
+**Unlock timing:** the mixing *system* goes live **mid-stairway (~god #4–5)** so Thor's #5 auto-mixing has something to act on; it becomes **mandatory at #7** (compound-only worlds zone).
 
 **Body vs soul split:** the **7 physical elements** build the world's *body* (terrain, materials, Claykin flesh); the **3 abstract elements — Holy, Dark, Research** — define its *soul* (the Covenant axes, below).
 
@@ -129,13 +131,13 @@ Full audit confirmed the **multiplier economy is saturated** (DPS/click/souls/TS
 | 2 | Amun-Ra | Offline earnings ×mult + raise 6h cap | the sun labors while you sleep |
 | 3 | Odin | Auto-buy the sacrifice (tattered) grid | ⚠️ Allfather early = big lore bend |
 | 4 | Hades | TS sink — deposit TS for 7.77% DPS (vs 6.66%) | novel conversion, his idea |
-| 5 | Thor | Extend Elite-Rush *reach* (floor cap) | ⚠️ possible weak link; alt on standby |
+| 5 | Thor | **Auto-mixing** — auto-crafts discovered compounds; levels → faster mixing OR more parallel batches | replaces the old weak "elite-rush reach" |
 | 6 | Isis | Spell auto-cast (levels = # spells automated) | |
 | 7 | Durga | Boost Flurry hits/sec | her many arms; rate is fixed today |
 | 8 | Shiva | Global ×Burning Souls | destruction fuels the pyres |
 | 9 | Sekhmet | ×Reincarnation reward | replaces cut auto-mark; destruction→renewal |
 | 10 | Athena | Auto-buy select hero powers (managed toggle) | ⚠️ wisdom-goddess late = bend |
-| 11 | Brahma | Unlock element mixing | |
+| 11 | Brahma | Mixing perk (bonus compound yield / auto-reveal recipes) | mixing itself is a phase gate, not this power |
 | 12 | Zeus | ×**some** hero-power effects | the king amplifies his champions |
 | 13 | NYX | Unlock the World tab | the finale |
 
@@ -206,7 +208,7 @@ Rough bonus↔cost sketch:
 ## LOCKED — Living-world loop
 
 - **Petitions:** Needs (unmet → Belief falls) & Wants (granted → Faith surges) surface on a timer; **Grant / Deny / time-out** each swing Belief & Faith. Flavored by the Covenant (a Martial world petitions for weapons; Pious for temples; Enlightened for schools).
-- **Commandments:** tradeoff dials (Iron Fist vs Free Will, Industry vs Devotion) that bias how petitions resolve.
+- **Edicts** (= the old "commandments" — one system now): the rules you issue **through the Revenant** (Iron Fist vs Free Will, Industry vs Devotion) that bias how petitions resolve.
 - **Belief** = happiness (= clay integrity). **Faith** = output → minted into **Faithful Souls** at the raze.
 - **Two-layer tech tree:** the entity's element discoveries gate what Claykin *may* learn (top-down); Claykin labor XP gates how *good* they are (bottom-up); minions bridge them.
 - **Scaling:** the discovery/build chain **cannot finish in one playthrough** — Faithful Souls from razing accelerate the next run.
@@ -218,17 +220,19 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 
 # OPEN QUESTIONS / PARKED
 
-- **Mixing pacing — RESOLVED:** unlocks at the stairway→worlds-zone gate; final 7 gods are compound-only. (Consequence: Brahma's power slot, below.)
-- **Brahma's power** — mixing unlock is now a phase gate, so Brahma's #11 slot becomes a mixing perk (bonus compound yield / auto-reveal recipes — TBD).
-- **Compound-discovery bonus** — proposed (codex + element-production boost + milestones; deep compounds prestige-gated). Confirm/tune.
-- **The gods** — next task when we start writing: re-derive shields/counters onto the new power-unlock order (rare Holy/Dark counters stay on the last gods), plus Thor's power (tentative: extend Elite-Rush reach — the weakest of the set) and general god tuning.
-- **Covenant minor — RESOLVED:** no slider, straight choice; unchosen third caste = a negative.
-- **Unique blend-buildings — YES** (per Revenants chosen). Six signature buildings to design (e.g. Monastery's Great Library keeps recipes through the raze).
-- **Friction events** (dominant vs supporting priesthoods clash → schism petitions): still open — build for v1, or park?
-- **Reformation** (change Covenant mid-world at high cost) — PARKED for later.
-- God-fight tuning (HP pools, shield costs), god-power magnitudes/curves/BS costs — all later.
-- Full worker-caste job definitions on the hex board.
-- Hero flavor text — near launch (existing plan).
-- Structural: only **6 god-node slots** are stubbed on the hero map today; plan is 6 on the hero stairway + 7 in a new "worlds" zone.
+**Blocks Phase-1 code (must settle first):**
+- **Confirm the god power-unlock order** — user reviewing the 13-god/power list before locking (Odin early, Athena late).
+- **The gods pass** (next task): re-derive each shield + counter onto the locked order (rare Holy/Dark counters stay latest); map which **compound** counters each of the final 7; finalize power magnitudes / BS costs.
+- **Mixing interaction/UI** — how you actually combine (crafting grid vs recipe list). System is item+item(+item); the UI is undecided.
 
-**Settled since consolidation:** Faithful Souls name (kept); Covenant = straight choice with neglected-third penalty; Revenants = channel-caste name; unique blend-buildings; mixing = phase-gated with compound-only final 7.
+**Open decisions (not Phase-1 blockers):**
+- **Covenant: 3 societies or 6?** With supporting = neutral, leaning **3 Revenant-defined societies** (unique buildings each) + a spare-vs-penalize sub-choice for the other two; six names kept as flavor. Confirm.
+- **Covenant caste count** — leaning **keep 3** (Holy/Dark/Research = the "soul" castes; only they can be god-voice). Expanding to more god-voices = later, like Reformation.
+- **Friction events — OUT** (no schisms; the Revenant choice is final). Penalties are static: **Revenant = bonus · supporting = neutral · unchosen = equal negative** (values TBD).
+- **Reformation** (change Covenant mid-world at high cost) — PARKED.
+
+**Later content (design-doc only for now):**
+- God Souls boon/bane (×13) · hex tile types + terraform costs + board size · worker-caste jobs & firing recipes · petition list · Edict + society value tables · unique buildings · Faithful Souls bonus math · hero flavor text.
+- Structural: expand the god map from **6 stubbed nodes** to 13 (6 stairway + 7 worlds zone); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
+
+**Settled since consolidation:** Faithful Souls (kept) · Revenant = god-voice caste · no schisms · Edicts = Commandments (merged) · Thor = auto-mixing · discovery → base-element production speedup · codex persists · mixing tree = item+item(+item), tiers 3–4 restart-gated · god-map navigation approach.
