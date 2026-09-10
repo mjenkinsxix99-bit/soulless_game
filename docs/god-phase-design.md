@@ -61,11 +61,11 @@ Prestige nesting: existing **Ascension → Reincarnation**, plus new **World Reb
 ## LOCKED — God fight model (two-phase, stockpile-gated)
 
 - **Two-phase HP bar.** A **gold immortal shield** (made of the god's element) you cannot damage, then a **red mortal HP bar**.
-- **Stripping the shield is stockpile-gated (simplified — no real-time channel/regen):** each shield is a pool with a counter cost; accumulate **enough of the right counter element or compound** and spend it to wipe the gold bar. Compounds are heavy ammunition (count for more / hit multi-element shields).
-- Then the **mortal HP phase** is beaten with your normal combat build.
-- **Two-fold gate:** combat investment clears the HP; the right element/compound stockpile clears the shield. Miss either → wall.
-- Sequential (gold to zero, *then* red). **Shield resets if you flee** (a single committed assault).
-- Optional **re-shield spice** (god re-armors during mortal phase) — PARKED, use only if too easy.
+- **The shield is a persistent pool you BURN the counter into (no minions assigned — dropped that).** Each shield = a fixed amount of its counter element/compound (e.g. "requires 500 Research"). You **pour your stocked counter into it**; the pool drops and **the reduction is PERMANENT** — never regenerates, **survives reincarnation**. At 0 the shield is **gone for good** → the mortal HP phase begins.
+- **Mortal HP phase is retryable** — once the shield's paid, it stays paid; flee/fail the HP fight and you just retry it (no re-paying). *(Retires the old "shield resets if you flee" rule — that was for the abandoned channel model.)*
+- **Two-fold gate:** combat build clears the HP; the right counter stock clears the shield. Miss either → wall.
+- **Roster still gates it:** base elements come from Elite minions with fixed elements, so you need producers of the counter element. "Do I have the right element?" stays the strategy; the click-work is gone.
+- Sequential (gold to zero, *then* red).
 
 ## LOCKED — The Counter Wheel (which element strips which shield)
 
@@ -79,31 +79,26 @@ Shield element → counter you channel: Earth←Wood · Water←Earth · Fire←
 
 **Shield complexity scales with god power:** single-element (early) → layered/peel (mid) → blended/simultaneous (late). **Holy/Dark are the rare counters, saved for the endgame gods**, so the finale gates behind farming your rarest minion elements.
 
-## LOCKED-ish — The 13 gods (shields, counters, lore)
+## LOCKED — Shields: the Stairway 5 (single base element each)
 
-Difficulty order (original), with shield element(s) → counter needed:
+Single base element, common counter (no Holy/Dark — reserved for the Worlds). Burn amounts anchored to the 5,000 base cap; ramp is a teaching curve. Amounts are tunable placeholders.
 
-| # | God | Pantheon | Shield | Counter(s) | Lore hook |
+| # | God | Shield | Burn (counter) | Amount | Logic |
 |---|---|---|---|---|---|
-| 1 | Morrigan | Celtic | Water | Earth | Washer at the Ford; herald of war/fate |
-| 2 | Amun-Ra | Egyptian | Fire | Water | Waning sun-king; his fall = "first light" |
-| 3 | Thor | Norse | Metal | Fire | Mjölnir; brute, honest wall |
-| 4 | Hades | Greek | Earth | Wood | Grave-soil; roots crack the tomb |
-| 5 | Athena | Greek | Research | Plant | Wisdom undone by wild growth |
-| 6 | Durga | Hindu | Stone | Research | Mountain-daughter; out-think the immovable |
-| 7 | Isis | Egyptian | Water + Wood | Earth, Metal | Nile flood + green life; can re-knit shield |
-| 8 | Brahma | Hindu | Holy + Research | **Dark**, Plant | The Creator; grants element mixing |
-| 9 | Sekhmet | Egyptian | Fire + Metal | Water, Fire | Bloodlust enrage (shield regen ramps) |
-| 10 | Shiva | Hindu | Fire + Dark | Water, **Holy** | The destroyer you become |
-| 11 | Odin | Norse | Research + Dark | Plant, **Holy** | Sacrifices shield HP to buff |
-| 12 | Zeus | Greek | Metal + Fire + Holy | Fire, Water, **Dark** | The king to dethrone |
-| 13 | NYX | Greek | Dark + Holy + Water | **Holy**, **Dark**, Earth | Primordial night; beat her → Creation |
+| 1 | Morrigan | Water | Earth | **200** | Washer at the Ford — the blood-river; the earthen bank dams it |
+| 2 | Durga | Stone | Research | **500** | Daughter of the mountain, immovable — out-*think* it, don't out-muscle it (the one abstract counter — foreshadows Holy/Dark) |
+| 3 | Brahma | Plant | Stone | **800** | Born from the cosmic lotus — barren rock smothers the bloom *(alt: Research/Vedas → Plant)* |
+| 4 | Thor | Metal | Fire | **1,200** | Mjölnir, dwarf-forged iron — the forge unmakes it |
+| 5 | Isis | Wood | Metal | **1,800** | The Nile's green life — the sickle cuts the sacred green |
 
-> **NOTE:** These shields were derived for the *original difficulty order*. The **power-unlock order** (below) reorders the gods, so shields/counters must be **re-derived onto the new order** to keep the counter-difficulty ramp (rare counters late). — OPEN task.
+Counter sequence the player gathers: Earth → Research → Stone → Fire → Metal (five distinct — teaches farming a spread).
+
+## OPEN — Shields: the Worlds 8 (compound shields)
+Next design task. Hades (gateway) = the first, gentlest compound; the 7 creation gods escalate (layered → blended), Holy/Dark counters latest, culminating in Nyx. Pour **compounds** (permanent, so the pool is naturally persistent) into these.
 
 ## LOCKED — Element Mixing (the tie-in that makes it load-bearing)
 
-**Unlocks mid-phase, at the stairway→worlds-zone gate** (after god #6) — because that's exactly when it becomes required. Base elements are minion-produced, capped 2400, and **wipe every reincarnation**. Mixing **transmutes ephemeral base elements into PERMANENT compounds** — the machine that makes farming last. Compounds do three jobs:
+**Unlocks mid-phase, at the stairway→worlds-zone gate** (after god #6) — because that's exactly when it becomes required. Base elements are minion-produced, **capped at 5,000** (raised from 2400 to give the new sinks room; the Portal still requires 2400 — split `ELEMENT_CAP=5000` from `PORTAL_REQ=2400`), and **wipe every reincarnation**. **Compounds are uncapped and permanent.** Mixing **transmutes ephemeral base elements into PERMANENT compounds** — the machine that makes farming last. Compounds do three jobs:
 
 1. **God-shield ammunition (Phase 1) — hard gate:** the **5 Stairway gods are stripped by base elements; the 8 Worlds gods (Hades + the 7 creation days) ONLY by compounds.** Base elements go inert at the map boundary (Hades = the first, gentlest compound fight), forcing full mixing engagement mid-phase. Compounds are stronger counters — strip a band faster / counter *two* bands at once (e.g. **Twilight** `holy+dark` for NYX).
 2. **Economy engine:** spend a compound to **boost production of the elements/compounds below it on the tree** (the fine-tuning dial).
