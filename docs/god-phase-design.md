@@ -77,7 +77,7 @@ Closed loop over the 10 elements — a **perfect permutation** (every element co
 
 Shield element → counter you channel: Earth←Wood · Water←Earth · Fire←Water · Metal←Fire · Wood←Metal · Stone←Research · Plant←Stone · Research←Plant · Holy←Dark · Dark←Holy.
 
-**Shield complexity scales with god power:** single-element (early) → layered/peel (mid) → blended/simultaneous (late). **Holy/Dark are the rare counters, saved for the endgame gods**, so the finale gates behind farming your rarest minion elements.
+**Shield complexity scales:** single (Stairway) → double → triple (the finale). **No element is rare** (10 minions each, one per realm); counters are deliberately **spread across all 10** so no single element is over-demanded (balance).
 
 ## LOCKED — Shields: the Stairway 5 (single base element each)
 
@@ -93,14 +93,28 @@ Single base element, common counter (no Holy/Dark — reserved for the Worlds). 
 
 Counter sequence the player gathers: Earth → Research → Stone → Fire → Metal (five distinct — teaches farming a spread).
 
-## OPEN — Shields: the Worlds 8 (compound shields)
-Next design task. Hades (gateway) = the first, gentlest compound; the 7 creation gods escalate (layered → blended), Holy/Dark counters latest, culminating in Nyx. Pour **compounds** (permanent, so the pool is naturally persistent) into these.
+## LOCKED — Shields: the Worlds 8 (compound shields)
+
+Pour **compounds** (permanent, so the pool persists). **Rule:** a compound strips every band whose counter-element it carries — so a dual-element compound cracks a double shield in *one* pour; a triple shield needs two compounds. Amounts TBD (climb from Hades up); compounds are all 2-element (tier-1) — **no triple/transcension-gated compound is ever a god counter** (would soft-lock).
+
+| # | God | Shield | Counter(s) | Pour | Note |
+|---|---|---|---|---|---|
+| 6 | Hades | Earth | Wood | **Timber** `wood+plant` | gateway — gentlest |
+| 7 | Amun-Ra | Fire | Water | **Mud** `water+earth` | drown the sun |
+| 8 | Shiva | Fire + Dark | Water, Holy | **Holy Water** `water+holy` | quench flame, banish void — one compound, both bands |
+| 9 | Sekhmet | Holy + Metal | Dark, Fire | **Hellfire** `dark+fire` | unmake the Eye's radiance, melt her claws |
+| 10 | Athena | Research + Stone | Plant, Research | **Herbcraft** `plant+research` | the wild overruns her wisdom |
+| 11 | Odin | Research + Water | Plant, Earth | **Loam** `plant+earth` | soil reclaims runes, dams the seas |
+| 12 | Zeus | Metal + Fire + Holy | Fire, Water, Dark | **Steam** `fire+water` + **Hellfire** `fire+dark` | **fire constant**; Dark unmakes the king's divinity |
+| 13 | NYX | Dark + Water | **Holy (Light)**, Earth | **Dawn** `holy+fire` + **Clay** `earth+stone` | **Light** floods primordial Night (callback to Amun-Ra's Light); Clay = the stuff of the Claykin to come |
+
+**Finale mirror:** Zeus = a *Holy* shield unmade by *Dark*; Nyx = a *Dark* shield unmade by *Light*. Light and dark cross at the climax.
 
 ## LOCKED — Element Mixing (the tie-in that makes it load-bearing)
 
 **Unlocks mid-phase, at the stairway→worlds-zone gate** (after god #6) — because that's exactly when it becomes required. Base elements are minion-produced, **capped at 5,000** (raised from 2400 to give the new sinks room; the Portal still requires 2400 — split `ELEMENT_CAP=5000` from `PORTAL_REQ=2400`), and **wipe every reincarnation**. **Compounds are uncapped and permanent.** Mixing **transmutes ephemeral base elements into PERMANENT compounds** — the machine that makes farming last. Compounds do three jobs:
 
-1. **God-shield ammunition (Phase 1) — hard gate:** the **5 Stairway gods are stripped by base elements; the 8 Worlds gods (Hades + the 7 creation days) ONLY by compounds.** Base elements go inert at the map boundary (Hades = the first, gentlest compound fight), forcing full mixing engagement mid-phase. Compounds are stronger counters — strip a band faster / counter *two* bands at once (e.g. **Twilight** `holy+dark` for NYX).
+1. **God-shield ammunition (Phase 1) — hard gate:** the **5 Stairway gods are stripped by base elements; the 8 Worlds gods (Hades + the 7 creation days) ONLY by compounds.** Base elements go inert at the map boundary (Hades = the first, gentlest compound fight), forcing full mixing engagement mid-phase. Compounds counter *two* bands at once when they carry both counter-elements (e.g. **Holy Water** `water+holy` strips both of Shiva's bands). All god-counter compounds are 2-element (tier-1) — triple/transcension-gated compounds are never counters.
 2. **Economy engine:** spend a compound to **boost production of the elements/compounds below it on the tree** (the fine-tuning dial).
 3. **World material (Phase 2):** the same hoard is what you build the world (and Claykin) from. Destroyer's tools become creator's tools.
 
