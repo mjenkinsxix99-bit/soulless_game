@@ -110,6 +110,39 @@ Pour **compounds** (permanent, so the pool persists). **Rule:** a compound strip
 
 **Finale mirror:** Zeus = a *Holy* shield unmade by *Dark*; Nyx = a *Dark* shield unmade by *Light*. Light and dark cross at the climax.
 
+## LOCKED (pending testing) — Mortal HP, timer & signature twists
+
+**Mechanic:** once the shield's paid, the god drops mortal and a **timed DPS check** starts (the Elite-check pattern, boss-sized). **Show only the god's HP — no DPS hint;** the player works it out. **Fail = HP resets, retry anytime** (the shield stays paid; the gate *is* the DPS threshold).
+
+**Tuning principle:** set so **base DPS fails and spell-burst succeeds** — the god fights are the payoff for the whole spell system (Morrigan's nodes, Isis's rotation). Remember the player has stacked DPS boosts, elite-timer extensions, and spells (Twin Blades ×2, Twin Strikes ×2, Power-of-3 ×3, Flurry, crits, Invoke Power).
+
+**Formula:** `God HP = EliteHP(refFloor) × 10` · **Timer = 3× the player's current elite timer** (inherits timer-minion bonuses). Anchor: the game's curve is ×1.166/floor past 130 with Elite ×10.6 at floor 1000 → **floor-1000 Elite HP ≈ 1.06e76**. The ×10 is the fairness knob (base clears ~3× an Elite over the 3×-long window → fails at ×10; ~10× burst clears it).
+
+| # | God | Ref floor | HP ≈ |
+|---|---|---|---|
+| 1 | Morrigan | 1000 | 1e77 |
+| 2 | Durga | 1010 | 5e77 |
+| 3 | Brahma | 1020 | 2e78 |
+| 4 | Thor | 1035 | 2e79 |
+| 5 | Isis | 1050 | 2e80 |
+| 6 | Hades | 1075 | 1e82 (gateway jump) |
+| 7 | Amun-Ra | 1100 | 5e83 |
+| 8 | Shiva | 1125 | 2e85 |
+| 9 | Sekhmet | 1150 | 1e87 |
+| 10 | Athena | 1180 | 1e89 |
+| 11 | Odin | 1210 | 1e91 |
+| 12 | Zeus | 1250 | 5e93 |
+| 13 | NYX | 1300 | 1e97 |
+
+**Pacing assumption:** the player climbs ~floor 1000 → 1300 across the god phase (a 10²⁰ spread, but it's the game's own steepness). Compress the ladder if the phase spans fewer floors, stretch if more. **Adjust after playtesting.**
+
+**Signature twists** (bend only the timer or add regen — cheap):
+- **Isis** — regenerates a sliver/sec: a soft DPS floor (resurrection).
+- **Sekhmet** — shortened timer (bloodlust).
+- **Odin** — lower HP, brutally short timer: a pure burst check (sacrifice — everything, *now*).
+- **Nyx** — long timer, colossal HP: an endurance test ("the night is long").
+- Everyone else standard; **Hades = the honest benchmark** ("welcome to the gods").
+
 ## LOCKED — Element Mixing (the tie-in that makes it load-bearing)
 
 **Unlocks mid-phase, at the stairway→worlds-zone gate** (after god #6) — because that's exactly when it becomes required. Base elements are minion-produced, **capped at 5,000** (raised from 2400 to give the new sinks room; the Portal still requires 2400 — split `ELEMENT_CAP=5000` from `PORTAL_REQ=2400`), and **wipe every reincarnation**. **Compounds are uncapped and permanent.** Mixing **transmutes ephemeral base elements into PERMANENT compounds** — the machine that makes farming last. Compounds do three jobs:
