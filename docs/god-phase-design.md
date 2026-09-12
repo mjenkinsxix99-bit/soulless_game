@@ -143,6 +143,14 @@ Pour **compounds** (permanent, so the pool persists). **Rule:** a compound strip
 - **Nyx** — long timer, colossal HP: an endurance test ("the night is long").
 - Everyone else standard; **Hades = the honest benchmark** ("welcome to the gods").
 
+## LOCKED — UI placement (Phase 1)
+
+- **Dominion** = new **right-side tab**, the god-power shop. Holds your **Blessings** (the god powers — seized, not bestowed). **Reveals when the god Stairway opens**; cards fill as gods fall (locked silhouettes until then). Cards mirror hero-power cards (BS cost · level · Buy) with sub-UIs where needed: **Hades** Feed-Souls button + running tally + DPS readout · **Isis** 10-slot drag-to-order rotation (spell picker per slot, repeats OK, spell 9 excluded) · **Athena / Thor** on-off toggles · **Nyx** one-time *Unlock Life* → opens the World tab. Header flourish: **the 7 days of creation lighting up** as Worlds gods fall.
+- **Map entry stays unified:** Portal → Enter → overlay → forward/back (hero map / Stairway / Worlds). Dominion is the shop, not the door.
+- **Mixing = a LEFT modal** (alongside Sacrifice / Minions / Entity), named **Alchemy** or **Theurgy** (TBD). Reveals at Brahma (#3). *Kiln is reserved for Phase 2 — a World buildable where Claykin are fired into castes.*
+- **The god encounter / pour screen** (not a tab): the gold shield bar, "requires X", a **Pour** button burning stock into the persistent pool, remaining amount; at zero → the mortal HP + timer fight. Slots into the existing hero-encounter flow (pour + timed fight replaces "accept challenge").
+- **Resulting bars:** right = Upgrades · Portal · Honors · Stats · **Dominion** (+ World later); left = Sacrifice · Minions · Entity · **Alchemy/Theurgy**.
+
 ## LOCKED — Element Mixing (the tie-in that makes it load-bearing)
 
 **Unlocks mid-phase, at the stairway→worlds-zone gate** (after god #6) — because that's exactly when it becomes required. Base elements are minion-produced, **capped at 5,000** (raised from 2400 to give the new sinks room; the Portal still requires 2400 — split `ELEMENT_CAP=5000` from `PORTAL_REQ=2400`), and **wipe every reincarnation**. **Compounds are uncapped and permanent.** Mixing **transmutes ephemeral base elements into PERMANENT compounds** — the machine that makes farming last. Compounds do three jobs:
