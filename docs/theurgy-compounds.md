@@ -4,14 +4,13 @@
 > **Tier = depth** (how many base elements a compound contains). The codex grid is sectioned by tier.
 > Base-element cost per unit of compound: TBD (tuning).
 
-## The 10 base elements (top row of the modal)
+## The 10 base elements (the first 10 cells of the codex, pre-discovered)
 earth · stone · metal · wood · plant · water · fire · research · holy · dark
 
-## Modal layout
-- **Top:** one box per base element, amount held beneath.
-- **Middle (the bench):** flask/lab art underlay; **up to 4 input boxes → `???`** until the mix is discovered. 2 boxes at first; the 3rd unlocks with Tier 3, the 4th with Tier 4.
-- **Bottom (the codex):** periodic-table grid, outlines visible, sectioned **Tier 2 / Tier 3 / Tier 4 / Wonders**. Discovered cells show the compound; every cell is **clickable to drop into a flask** (compounds chain as ingredients once Tier 3 is open).
-- Discovery: a valid mix reveals the result and fills its cell. **Tier 2 has no dead ends** — every elemental pair yields a compound. The codex persists across all resets.
+## Modal layout (two sections)
+- **Top — the bench:** flask/lab art underlaid; **up to 4 input boxes → `???`** result until the mix is discovered. 2 boxes at first; the 3rd unlocks with Tier 3, the 4th with Tier 4.
+- **Bottom — the codex:** one periodic-table grid, outlines visible, sectioned **Tier 2 / Tier 3 / Tier 4 / Wonders**. **The 10 base elements are its first 10 cells, already discovered** (each showing the amount held). Every cell — element or compound — is **clickable: click → fills the first open flask box; click the same cell again → removes it.** Compounds chain as ingredients once Tier 3 opens.
+- Discovery: fill the boxes and mix; a valid recipe reveals the result and fills its cell. **Tier 2 has no dead ends** — every elemental pair yields a compound. The codex persists across all resets.
 
 ## Gating
 - **Tier 2 — first run.** All 45 elemental pairs. **Phase 1's entire mixing scope; every god counter is Tier 2.**
