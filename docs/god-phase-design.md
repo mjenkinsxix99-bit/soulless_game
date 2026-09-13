@@ -52,7 +52,7 @@ The World is the sink that finally consumes the **entire** economy. Nothing orph
 2. **Act II — Genesis:** defeat **NYX** (primordial night) → unlock the power to CREATE → World tab opens.
 3. **Act III — The Cycle:** build a world → run it → **raze it** for Faithful Souls → rebuild differently. Replay is the point.
 
-Prestige nesting: existing **Ascension → Reincarnation**, plus new **World Rebirth** on top.
+Prestige nesting: existing **Ascension → Reincarnation**, plus new **Transcension** on top (placeholder name — the raze that claims Faithful Souls; also gates mixing depth, one tier per raze).
 
 ---
 
@@ -147,7 +147,7 @@ Pour **compounds** (permanent, so the pool persists). **Rule:** a compound strip
 
 - **Dominion** = new **right-side tab**, the god-power shop. Holds your **Blessings** (the god powers — seized, not bestowed). **Reveals when the god Stairway opens**; cards fill as gods fall (locked silhouettes until then). Cards mirror hero-power cards (BS cost · level · Buy) with sub-UIs where needed: **Hades** Feed-Souls button + running tally + DPS readout · **Isis** 10-slot drag-to-order rotation (spell picker per slot, repeats OK, spell 9 excluded) · **Athena / Thor** on-off toggles · **Nyx** one-time *Unlock Life* → opens the World tab. Header flourish: **the 7 days of creation lighting up** as Worlds gods fall.
 - **Map entry stays unified:** Portal → Enter → overlay → forward/back (hero map / Stairway / Worlds). Dominion is the shop, not the door.
-- **Mixing = the Theurgy modal** (LEFT side, alongside Sacrifice / Minions / Entity). Reveals at Brahma (#3). Layout + the full compound codex live in **`docs/theurgy-compounds.md`**: two sections — a flask bench on top (up to 4 input boxes → `???` until discovered) and one periodic-table codex below, sectioned by tier (2 / 3 / 4 / Wonders), with **the 10 base elements as its first 10 pre-discovered cells**; click a cell to fill the first open flask, click again to remove. **Tier = depth.** Tier 2 (the 45 elemental pairs) is first-run and Phase 1's whole scope; Tier 3+ unlock with transcensions. *Kiln is reserved for Phase 2 — a World buildable where Claykin are fired into castes.*
+- **Mixing = the Theurgy modal** (LEFT side, alongside Sacrifice / Minions / Entity). Reveals at Brahma (#3). Layout + the full compound codex live in **`docs/theurgy-compounds.md`**: two sections — a flask bench on top (**always two input boxes** → `???` until discovered) and one periodic-table codex below, sectioned by tier (1 / 2 / 3 — nothing past 3), with **the 10 base elements as its first 10 pre-discovered cells**; click a cell to fill the first open flask, click again to remove. **Every recipe is a pair; tier = chain depth.** Tier 1 (the 45 elemental pairs) is the entire first run and Phase 1's whole scope; each **Transcension** (the raze) lets one more tier be dropped into a flask. *Kiln is reserved for Phase 2 — a World buildable where Claykin are fired into castes.*
 - **The god encounter / pour screen** (not a tab): the gold shield bar, "requires X", a **Pour** button burning stock into the persistent pool, remaining amount; at zero → the mortal HP + timer fight. Slots into the existing hero-encounter flow (pour + timed fight replaces "accept challenge").
 - **Resulting bars:** right = Upgrades · Portal · Honors · Stats · **Dominion** (+ World later); left = Sacrifice · Minions · Entity · **Alchemy/Theurgy**.
 
@@ -161,7 +161,7 @@ Pour **compounds** (permanent, so the pool persists). **Rule:** a compound strip
 
 **Discovery:** each discovered compound stays **known in the codex forever** (survives all resets); each discovery → a small permanent **base-element production speedup**. (No compound-production bonus — production automation is a god power, see Thor.)
 
-**Recipe tree (LOCKED shape):** simple **item + item (+ item) = new item** combinatorial system (Little-Alchemy style). ~45 pairs + chained tiers ≈ **90 nodes**, curated to ~50–70, culminating in 6-element **wonders** and **Life** (Clay + Souls). **Deliberately un-completable run 1:** the **3rd and 4th tiers lock behind restarts** (prestige-gated), so the codex fills across many cycles. Optional **Yggdrasil-tree** visual — presentation only, undecided. Full tree layout in chat history.
+**Recipe tree (LOCKED shape):** **every recipe is a pair — `A + B = ??`**; depth comes from chaining a compound as an ingredient, never from more boxes. **Tier = chain depth** (Tier 1 = element + element, the 45; Tier 2 = Tier-1 + element; …), topping out at **Tier 3** (115 cells, tapered 45/40/30 — nothing deeper; Wonders are Phase-2 World buildables, Life is the Nyx unlock). **Tier 2+ recipes are unhinted — a deliberate puzzle.** **Gated one tier per Transcension** (the raze): the whole first run — god phase and world 1 — is Tier 1 only; each raze lets one more tier be dropped into a flask, so each successive world is built from deeper materials. Full codex in `docs/theurgy-compounds.md`. Optional **Yggdrasil-tree** visual — presentation only, undecided.
 
 **Unlock timing:** **Brahma (#3)** unlocks the mixing system (the Creator's gift; levels grant auto-mixing); it becomes **mandatory at #6** (Hades — the Worlds gateway is the first compound fight). Gods #4–5 (Thor, Isis) are base-element practice with mixing available. (Odin at #11 gives the compound-yield *perk*.)
 

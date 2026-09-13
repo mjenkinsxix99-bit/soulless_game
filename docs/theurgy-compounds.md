@@ -1,26 +1,32 @@
 # Theurgy — Compound Codex
 
 > Reference for the **Theurgy** modal (mixing) and its art pass. Companion to `god-phase-design.md`.
-> **Tier = depth** (how many base elements a compound contains). The codex grid is sectioned by tier.
+> **Every recipe is a pair: `A + B = ??`.** Depth comes from **chaining** (using a compound as an ingredient), never from more boxes. **Tier = chain depth** (Tier 1 = element + element; Tier 2 = Tier-1 + element; …). The codex grid is sectioned by tier.
 > Base-element cost per unit of compound: TBD (tuning).
 
 ## The 10 base elements (the first 10 cells of the codex, pre-discovered)
 earth · stone · metal · wood · plant · water · fire · research · holy · dark
 
 ## Modal layout (two sections)
-- **Top — the bench:** flask/lab art underlaid; **up to 4 input boxes → `???`** result until the mix is discovered. 2 boxes at first; the 3rd unlocks with Tier 3, the 4th with Tier 4.
-- **Bottom — the codex:** one periodic-table grid, outlines visible, sectioned **Tier 2 / Tier 3 / Tier 4 / Wonders**. **The 10 base elements are its first 10 cells, already discovered** (each showing the amount held). Every cell — element or compound — is **clickable: click → fills the first open flask box; click the same cell again → removes it.** Compounds chain as ingredients once Tier 3 opens.
-- Discovery: fill the boxes and mix; a valid recipe reveals the result and fills its cell. **Tier 2 has no dead ends** — every elemental pair yields a compound. The codex persists across all resets.
+- **Top — the bench:** flask/lab art underlaid; **always two input boxes → `???`** result until the mix is discovered. No extra chambers ever appear.
+- **Bottom — the codex:** one periodic-table grid, outlines visible, sectioned **Tier 1 / Tier 2 / Tier 3** — nothing past Tier 3. **The 10 base elements are its first 10 cells, already discovered** (each showing the amount held). Every cell — element or compound — is **clickable: click → fills the first open flask box; click the same cell again → removes it.** A cell whose tier isn't yet ingredient-unlocked is greyed (can't be dropped in a flask).
+- Discovery: fill both boxes and mix; a valid recipe reveals the result and fills its cell. **Tier 1 has no dead ends** — every elemental pair yields a compound. **Tier 2+ do:** most pairs yield nothing, and **nothing is hinted** — no layout cues, no recipe-reveal Blessing. It's a puzzle to be solved. The codex persists across all resets.
 
-## Gating
-- **Tier 2 — first run.** All 45 elemental pairs. **Phase 1's entire mixing scope; every god counter is Tier 2.**
-- **Tier 3 — unlocks at the 2nd transcension.** Compound + element (chaining begins). *Never a god counter.*
-- **Tier 4 — later transcension.** Deeper chains.
-- **Wonders (5–6 deep) & Life** — the deepest; World-building content.
+## Gating — one tier of chaining per Transcension
+**Transcension** (placeholder name) = the top prestige layer: **raze the world, claim Faithful Souls.** It gates *which tiers may be dropped into a flask*, not how many boxes exist. Because a transcension requires building and razing a world, **the entire first run — the whole god phase and world 1 — is Tier 1 only.** Chaining is a world-phase reward.
+
+| World | Gate | Unlocked |
+|---|---|---|
+| 1st | — | craft **Tier 1** (element + element) — **Phase 1's entire mixing scope; every god counter is Tier 1** |
+| 2nd | 1st transcension | Tier-1 compounds become ingredients → craft **Tier 2** |
+| 3rd | 2nd transcension | Tier-2 compounds become ingredients → craft **Tier 3** |
+| — | — | the table ends at Tier 3 — nothing deeper |
+
+**Consequence:** each successive world can be built from deeper materials than the last (world 1 = clay & timber; world 2 = glass & ingots; world 3 = steel & concrete — the table's ceiling). Faithful Souls make the next run *faster and deeper*. *Phase-2 note: world 1's buildables and caste-firing recipes must be achievable with Tier-1 materials alone.*
 
 ---
 
-## TIER 2 — the 45 elemental pairs (first-run art batch)
+## TIER 1 — the 45 elemental pairs (world 1 — first-run art batch)
 **Bold = a god-shield counter.**
 
 | Recipe | Compound |
@@ -75,55 +81,37 @@ earth · stone · metal · wood · plant · water · fire · research · holy ·
 
 ---
 
-## TIER 3 — compound + element (2nd transcension) — DRAFT
-| Recipe | Compound |
-|---|---|
-| Sand + fire | Glass |
-| Clay + fire | Ceramic |
-| Ore + fire | Ingot |
-| Loam + water | Farmland |
-| Herbs + fire | Potion |
-| Pulp + research | Paper |
-| Ash + water | Lye |
-| Masonry + water | Cement |
-| Brick + water | Mortar |
-| Molten + stone | Bronze |
-| Obsidian + metal | Obsidian Blade |
-| Gunpowder + stone | Blasting Powder |
-| Herbs + research | Medicine |
-| Timber + research | Cart |
-| Charcoal + research | Pigment |
-| Holy Water + metal | Blessed Blade |
-| Nightshade + metal | Envenomed Blade |
-| Hellfire + metal | Cursed Blade |
-| Reagent + fire | Acid |
-| Ink + research | Tome |
+## TIER 2 — 40 refined materials (world 2 / after the 1st transcension)
+Recipes (which Tier-1 compound + element yields each) are authored at implementation. **Deliberately unhinted in-game — Tier 2+ is a puzzle; most pairs yield nothing.**
 
-## TIER 4 — deeper chains — DRAFT
-| Recipe | Compound |
-|---|---|
-| Ingot + Charcoal | Steel |
-| Paper + research | Book |
-| Glass + metal | Lens |
-| Glass + holy | Stained Glass |
-| Cement + Sand | Concrete |
-| Farmland + fire | Bread |
-| Potion + research | Elixir |
-| Steel + research | Machine |
-| Bronze + Cog | Clockwork |
-| Book + holy | Holy Book |
-| Book + dark | Grimoire Tome |
-| Lens + research | Telescope |
-| Medicine + holy | Panacea |
-| Ceramic + Glass | Porcelain |
-| Concrete + metal | Reinforced Concrete |
+- **Glass & ceramic:** Glass · Ceramic · Terracotta · Tile
+- **Metals:** Ingot · Bronze · Iron · Copper · Silver · Gold
+- **Construction:** Cement · Mortar · Plaster · Marble · Tar
+- **Farming & food:** Farmland · Compost · Grain · Ale · Oil
+- **Medicine:** Potion · Medicine · Salve · Antidote
+- **Knowledge:** Paper · Tome · Pigment · Dye
+- **Industry:** Lye · Acid · Blasting Powder · Soap · Rope · Cloth
+- **Tools & arms:** Cart · Blessed Blade · Cursed Blade
+- **Divine & dark:** Incense · Ward · Hex
 
-## WONDERS (5–6 deep) & LIFE — DRAFT
-| Recipe | Wonder |
-|---|---|
-| Stained Glass + Masonry + Timber | Cathedral |
-| Machine + Steam | Steam Engine |
-| Clockwork + holy | Automaton |
-| Steel + Steam Engine + Pulp | Airship |
-| Grimoire Tome + Grave + Clay | Golem |
-| **Clay + Souls** | **Life (the Claykin)** — gated behind defeating Nyx, not the tree |
+## TIER 3 — 30 advanced materials (world 3 / after the 2nd transcension)
+Recipes authored at implementation; unhinted.
+
+- **Metalwork:** Steel · Alloy · Wire · Gear · Armor
+- **Stone & finish:** Concrete · Porcelain · Enamel · Mosaic
+- **Glass & optics:** Lens · Stained Glass · Lantern · Mirror · Prism · Crystal
+- **Knowledge:** Book · Holy Book · Vellum
+- **Food & drink:** Bread · Cheese · Spirits
+- **Medicine:** Elixir · Panacea
+- **Instruments:** Clockwork · Machine · Compass · Bell
+- **Textiles & arms:** Silk · Cannon
+- **Divine & dark:** Phylactery
+
+---
+
+**That's the whole Theurgy table — 115 cells (45 + 40 + 30), tapered. Nothing exists past Tier 3.**
+- **Wonders** (Cathedral, Steam Engine, Automaton, Airship…) are **not compounds** — they're Phase-2 **World buildables** constructed *from* these materials.
+- **Life (Clay + Souls)** is the **Nyx unlock**, not a recipe on the table.
+
+## Flat list — all 115 names (art reference)
+Clay · Ore · Peat · Loam · Mud · Brick · Map · Hallowed Ground · Grave · Gemstone · Flint · Moss · Sand · Obsidian · Masonry · Altar · Tombstone · Axe · Verdigris · Rust · Molten · Cog · Reliquary · Blacksteel · Timber · Pulp · Charcoal · Wheel · Totem · Deadwood · Herbs · Ash · Herbcraft · Lotus · Nightshade · Steam · Reagent · Holy Water · Ink · Gunpowder · Dawn · Hellfire · Scripture · Grimoire · Twilight · Glass · Ceramic · Terracotta · Tile · Ingot · Bronze · Iron · Copper · Silver · Gold · Cement · Mortar · Plaster · Marble · Tar · Farmland · Compost · Grain · Ale · Oil · Potion · Medicine · Salve · Antidote · Paper · Tome · Pigment · Dye · Lye · Acid · Blasting Powder · Soap · Rope · Cloth · Cart · Blessed Blade · Cursed Blade · Incense · Ward · Hex · Steel · Alloy · Wire · Gear · Armor · Concrete · Porcelain · Enamel · Mosaic · Lens · Stained Glass · Lantern · Mirror · Prism · Crystal · Book · Holy Book · Vellum · Bread · Cheese · Spirits · Elixir · Panacea · Clockwork · Machine · Compass · Bell · Silk · Cannon · Phylactery
