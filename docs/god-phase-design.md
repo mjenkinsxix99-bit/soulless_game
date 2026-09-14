@@ -41,8 +41,8 @@ The World is the sink that finally consumes the **entire** economy. Nothing orph
 | **Minions** | The first servants | Turned army = labor/angels tier; also produce base elements & channel counters. |
 | **Elements → Compounds** | God-shield counters (Phase 1) **and** world materials (Phase 2) | See Element Mixing. |
 | **God Souls** | The world seed | Pick **3** at world creation to shape terrain/events (boon+bane each). |
-| **Faith** | The world's output | Farmed from Claith via the Covenant/priesthood. |
-| **Faithful Souls** | The prestige crux (was "Divinity") | Banked at the raze; makes each re-run much faster. |
+| **The Faithful** | The world's output | Claykin converted by the Revenants (sword / piety / education). |
+| **Faithful Souls** | The prestige crux (was "Divinity") | **Produced by the Faithful at Transcend**; makes each re-run faster *and* deeper. |
 
 ---
 
@@ -215,14 +215,57 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 
 # PHASE 2 — THE WORLD
 
-## LOCKED — Representation: fixed isometric hex board
+## LOCKED — The World board (big, pannable, fogged)
 
-- **Fixed board, fully on-screen — no scrolling/camera/pathfinding.** Art = pre-drawn iso hex tiles (sprites), stamped at grid positions; redraw only on change (off the hot path).
-- **Procedurally seeded each life by the 3 chosen God Souls** (weighted terrain roll + a guarantee pass for playability).
-- **Tiles = resource / barrier / threat** (grass, forest→wood, mountain→stone/ore, water→fish, lava→threat, sand). **Terraform verbs:** clear, cool, mine, irrigate, replant, build.
-- **Barriers replace fog** — you expand by *taming* obstacles (cool the lava → obsidian ground), not by revealing gray tiles.
-- **Save-safe:** store the board as a **flat array of small ints** (terrain id + structure id per hex), never fat per-object arrays.
-- Two technical wrinkles (both standard): iso **draw order** (back-to-front) and **hex hit-detection** (Red Blob Games reference).
+- **A WORLD — big.** The map pans and zooms; tiles sized as needed. (Revises the earlier "fixed, on-screen" call — that was a skill-budget worry; pan/zoom on canvas is a camera transform + drawing only what's in view.) Size TBD. Iso hex sprites, draw back-to-front, hex hit-detection.
+- **Procedurally seeded by the 3 chosen God Souls:** each soul carries **terrain weights**, a **guaranteed minimum** of its key tile, and a **bane** (its calamity). Base weights → apply the 3 souls → roll → **guarantee pass** (Origin is Grassland, center ring claimable, every soul's key-tile minimum met, enough food/wood/stone reachable that the world can't be born unwinnable).
+- **Fog of war, lit by campfires.** *Explored = campfire-lit* = accessible and buildable. A campfire lights **radius 2**; a new one may be placed on any lit tile **or one tile into the fog**; campfires are **permanent** (no relighting); **cost doubles per campfire (×2).** The **Origin** starts with the first fire.
+- **Save-safe:** flat int arrays (terrain / structure / lit) per hex.
+
+**The tile set (11):**
+| Tile | Rule |
+|---|---|
+| Grassland | buildable/farmable; **foragable** |
+| Forest | wood — **needs tools**; bootstrap: bundled foraged grass counts as wood |
+| Mountain | **mine it for ore** *or* **terraform it away** |
+| Coast | fish, water |
+| Deep Water | barrier |
+| Lava | threat + barrier → **Obsidian ground** once cooled (Firewalkers + water, fetched from Coast or supplicated) |
+| Desert | near-nothing; **irrigable only within 2 tiles of water** → Grassland |
+| Marsh | herbs; **foragable** |
+| Blight | **not impassable, but kills Claykin over time**; **static — never purified, worked around** |
+| Hallowed | +Faith to what's built on it; **required for specific buildings** |
+| Origin | the center; starts with a fire |
+
+## LOCKED — Tiles, jobs & the Claykin (the working model)
+
+- **Claykin are never seen** — a count, no walking, no pathfinding, **no distance penalty.**
+- **The player designates what a tile *is*** (housing, farming, woodcutting, mining…). Each purpose has its own **slot count** (per-job, decided as jobs are enumerated — e.g. housing 6 huts × 2 Claykin; farms 6 × 1 farmer). A purpose is available by **what the tile is and what it touches** (woodcutting on/adjacent to Forest, mining on/adjacent to Mountain, fishing beside Coast, farming on Grassland).
+- **A resource tile commits to ONE product** as the tech tree branches — rock *or* gold ore, wheat *or* grapes. Never both.
+- **Jobs are +/− buttons.** Idle Claykin (born idle into huts) are assigned to any slot on an **explored** tile; reassign at will. **XP is a per-task record on the Claykin** (woodcutting XP waits; farming starts at 0).
+- **Resources are stockpiled** (food, lumber, stone, ore…); a food system to develop.
+- **Terraforming is Claykin work, never a god action.** Workers do it; materials they lack are asked for via **supplication**.
+- **Two channels for materials from the deity, both timed:** **Gifting** (proactive, short cooldown) and **Supplication** (reactive — fires on its own timer when a marked building lacks materials: *"The woodcutter Claykin humbly request X wood to complete their building. Grant or deny."*). Set the gift cooldown a little **longer** than the supplication trigger so supplication is the normal channel. **Supplications ≠ Edicts** (edicts = society-level choices).
+- **Penalties:** hazard adjacency (a tile next to Lava/Blight) and **random calamities that kill Claykin — these are the God Souls' banes.** That's the whole penalty layer.
+
+**The jobs (LOCKED). Two material streams:** Claykin jobs produce **mortal goods** (food, wood, stone, ore, fish, herbs) to the stockpile; the deity supplies **divine compounds** (the Theurgy table) by gift or supplication. Buildings consume a mix.
+
+*Resource jobs (any greenware) — slots per tile:*
+| Job | Slots | Does |
+|---|---|---|
+| Chopper | 6 | wood (needs an axe) |
+| Farmtend | 6 | food, one crop per tile |
+| Forager | 6 | food + herbs; bundles grass into proto-wood before axes |
+| Stalker | 2 | hunts |
+| Digger | 6 | stone *or* ore, one per tile |
+| Angler | 2 | fish, water |
+| Bolder | 3 | builder — **wood buildings only** |
+| Learner | 3 | precursor to Teacher; no XP bonus; **gathers Tech** to unlock the low tree |
+| Maker | 3 | crafting hands — tools, combining materials into better materials (not buildings) |
+
+**The tech engine — supplication grows the tree.** *Supplication → gift → study → craft.* ("The Claykin see trees but cannot harvest the wood. They request something sharp to cut." → gift an Axe → Learners study it → Makers learn to craft more.) Not everything comes from the Claykin; the mystery gift is the crux of the tech tree. **The Tech Tome:** part of the Transcension ritual — logs the Claykin's works and passes to the next generation; what's learned is *known* next world and only needs unlocking, not rediscovery.
+
+**PARKED — a hostile world (lean form):** other races may attack, or need conquering and converting (Wardens fight; Mariners ferry Wardens and Stalkers). **Not rendered on the map** — a **randomly seeded direction** that they exist, discovered by expanding that way. Abstract unless procedural generation can place them convincingly. Spec later.
 
 ## LOCKED — The Claykin (the created life)
 
@@ -233,27 +276,47 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 
 ## LOCKED — Castes (transformation = consecration, not upgrade)
 
-Base **greenware** Claykin do the primal work (food, basic huts). **Firing with a specific compound** transforms a greenware into a **specialist** — dedicated to one job, removed from the general pool (a real allocation cost). Worker castes so far:
+Base **greenware** Claykin do the primal work. **Firing in the Kiln** transforms a greenware into a **specialist** — **caste-only work, permanent, cannot take another job** (removed from the idle pool: a real commitment).
 
-- **Masons** — structures & breaking barrier tiles
-- **Firewalkers** — work lava/forges/hostile tiles
-- **Mariners** — sail, cross water, explore/expand
-- **Wardens** — war/defense · **Shaman** — rites · **Teachers/Scribes** — learning
-- (more to define)
+**The Kiln.** The first **2nd-tier building** (buildings have **tiers and footprints**); a **triangular prism spanning 3 tiles**, **one per world**, tech-tree unlock, built from Clay + Charcoal. **Fire and glaze as many Claykin as you want** — a small pool at first, a significant one by world 3. The only place a Claykin can be fired. **The deity is the potter** — firing and glazing are **god-clicks** (shaping the clay is the one act that's the deity's by nature; the Claykin terraform and build). Both open once the Claykin discover and build the Kiln. **No potter job, no cracking.**
+
+**Firing recipes (Tier 1, placeholders — settled with the full job list):**
+| Caste | Fired with | Slots | Job |
+|---|---|---|---|
+| Mason | Masonry | 3/tile | anything built with **stone**, and heavy terraform (removing a Mountain) |
+| Firewalker | Obsidian | 2 per forge | works Lava (cooling → Obsidian ground), forges |
+| Mariner | Timber | 2 per ship; 1 ship/tile, **6 ships per dock** | deep-water fishing, **trading**, transporting Wardens & Stalkers for **conquest** |
+| Warden | Axe | 6/tile | **defense and offense** — a hostile world |
+| Shaman | Lotus | 6/tile | rites (**no** blight purifying — Blight is static) |
+| Teacher | Scripture | 6/tile | XP boost + advances the tech tree |
+
+**Glazing IS the Revelation.** The three Covenant castes can be glazed with their axis compound into the god-voice: **Warden + Hellfire → Cleric** (Dark) · **Shaman + Holy Water → Priest** (Holy) · **Teacher + Scripture → Scrivener** (Wisdom). **One caste-line glazed per world; glaze as many of that caste as you want.** The pottery ladder: **greenware → fired (caste) → glazed (Revenant).** At the Revelation the player answers two questions: **"Which caste is closest to you in this world?"** (holy / dark / wisdom → the **Chosen**, glazed, bonus) and **"Which caste is the farthest from you?"** (of the two remaining → the **Reviled**, negative). The last one left is **supporting** (neutral).
 
 Compounds forge castes → **mixing (Phase 1) feeds society (Phase 2).** Same system, three jobs (shields → economy → castes).
+
+## LOCKED — The Revenants: the push forward
+
+**The Faithful, not Faith, is the prestige.** The Revenants *spread faith* = **convert Claykin into the Faithful**, and **the Faithful produce Faithful Souls at Transcend.** Each Revenant converts a different way. All three hubs are **9-tile buildings**, each surrounding tile holding **6 Revenants**; the push scales with how many you've glazed.
+
+| Revenant | Hub | Spreads faith by | Pushes | If Reviled |
+|---|---|---|---|---|
+| **Cleric** (Warden + Hellfire) | **Citadel** | **the sword** | territory & survival — but **no cheaper campfires; spreading has a cost** | calamities hit harder, threats spread |
+| **Priest** (Shaman + Holy Water) | **Cathedral** | **piety** | boosts the *spread* of faith; can **consecrate ground → Hallowed** — where **holy buildings** go (not an engine) | Faithful grow slowly, Belief fragile |
+| **Scrivener** (Teacher + Scripture) | **College** | **education** | tech & skill — research speed, XP, yields | the tree crawls |
+
+The supporting caste does its job — no bonus, no penalty.
 
 ## LOCKED — The World Arc (four beats)
 
 1. **The Unseen Hand.** You drop **gifts** (the compounds you refined) anonymously. Claykin don't know a god exists; they advance on their own to a **ceiling**.
 2. **The Kiln.** Breaking the ceiling requires **firing** — which requires *you*. The gate to advancement.
-3. **The Revelation.** You choose **who to speak through** — a worker caste ascends into your **channel** (Warden→**Cleric**, Shaman→**Priest**, Teacher→**Scrivener**). That caste becomes the **sole source of edicts (your will down) and petitions (their needs up)**.
+3. **The Revelation.** You choose **who to speak through** — by **glazing** a fired caste in the Kiln (Warden→**Cleric**, Shaman→**Priest**, Teacher→**Scrivener**). That caste becomes the **sole source of edicts (your will down) and petitions (their needs up)**.
 4. **The Covenant.** That choice **defines the civilization**. Theology of it: the erased god returns as a *mystery*, then reveals itself once its people are ready.
 
 ## LOCKED — Covenants & the Six Societies
 
 - **One Covenant per world** (Reformation-at-high-cost PARKED for later).
-- **Straight choice — no slider.** Pick your **Revenants** (dominant deity-contact caste) + a **supporting** caste; the **third, unchosen caste inflicts a negative** (that faction, neglected). Dominant = full bonuses + penalties + the edict/petition voice; supporting = patches the dominant's weakness.
+- **Straight choice — no slider.** Made at glazing with two questions: *"Which caste is closest to you?"* → the **Chosen** (your Revenants — bonus, the edict/petition voice); *"Which is the farthest?"* → the **Reviled** (negative). The remaining caste is **supporting** (neutral). Penalties are static: **bonus / neutral / negative.**
 - **The three axes are already in the game:** **Holy → piety** (Priests) · **Dark → war** (Clerics) · **Wisdom/Research → knowledge** (Scriveners) — live elements *and* ascension-path themes (holy/shadow/mystic).
 - **"Revenants"** = the chosen deity-contact caste (Cleric/Priest/Scrivener = the flavor of whichever you pick). Thematic: a revenant returns from death, and the deity is a killed god clawed back. **Unique buildings unlock per the Revenants chosen.**
 
