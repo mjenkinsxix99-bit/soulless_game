@@ -259,7 +259,7 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 | Farmer | Farm · 6 | **Ambrosia** — the one crop; the tech tree branches what it becomes (food, fibre, brew, paper, soil, fuel) | — |
 | Herbalist | Hearthstone · 3 | food, herbs, **holy** | **Shaman** |
 | Stalker | Lodge · 2 | hunts | — |
-| Digger | X Mine · 3 | stone / iron / gold / algastone — **one mineral per mine** | **Firewalker** |
+| Digger | X Mine · 3 | stone / iron / silver / gold / coal / algastone — **one mineral per mine** | **Firewalker** |
 | Angler | Angler's Hut · 2 | fish (adjacent water with fish) | **Mariner** |
 | Bolder | Bolder's Cabin · 3 | **builder — required for every building** (even stone has a wood frame); places 5 material/sec base | **Mason** |
 | Learner | Study · 3 | **gathers Tech**; no XP bonus; superseded by Teachers once Schooling is learned | **Teacher** |
@@ -354,7 +354,7 @@ The supporting caste does its job — no bonus, no penalty. **Ships serve the Co
 | Chopper Camp | Choppers 6 | ×1.15 | on/adjacent Forest |
 | Farm | Farmers 6 | ×1.15 | one Farm per tile; Ambrosia |
 | Lodge | Stalkers 2 | ×1.10 | hunting returns |
-| X Mine | Diggers 3 | ×1.15 | X = stone / iron / gold / algastone (more later); **Quarry tech upgrades mines** |
+| X Mine | Diggers 3 | ×1.15 | X = stone / iron / silver / gold / coal / algastone (more later); **Quarry tech upgrades mines** |
 | Angler's Hut | Anglers 2 | ×1.10 | adjacent water tile with fish |
 | Maker's Lodge | Makers 3 | ×1.15 | output |
 | Study | Learners 3 | — | the bonus lives in the Tech buildings |
@@ -435,7 +435,135 @@ Modelled on Kittens Game's science tree, trimmed to our ceiling (Tier 3 material
 - **Steel** — Firewalking + Quarrying. Needs Tier 3 material → world 3 at the earliest.
 - **Clockwork** — Steel + Masonry. Machines.
 
-**Still to do on the tree:** the Workshop tree (Maker craftables, gift → study → craft) · Tech as a resource (rates, node costs, Tech Tome carry-over) · the material list and base building costs.
+**Tech as a resource (LOCKED — numbers lean on Kittens Game).**
+- **Tech is a capped stockpile**, produced per second. Amount gained and cap follow Kittens' science model: Learners produce like scholars (Teachers more once Schooling supersedes them; Scriveners most); the **Library** multiplies and **raises the cap**; School and College add on top; Tech Power multiplies again. Late nodes need bigger Tech buildings before they are affordable.
+- **A node costs Tech AND requires its gift.** The gift is the prerequisite, Tech is the price. The Claykin **supplicate for the gift**: *"The Claykin want to learn Tools, but they need a Hammer. Grant or deny."* Once gifted, they refine it themselves (Hammer → Axe & Pick).
+- **Cost ladder follows Kittens' science curve**: Wave 1 ≈ tens–hundreds · Wave 2 ≈ hundreds–low thousands · Wave 3 ≈ low thousands · Wave 4 ≈ 5k–20k · Wave 5 ≈ 20k–60k · Wave 6 ≈ six figures. Workshop nodes follow Kittens' workshop curve, cheaper than the science node they hang on.
+- **The Tech Tome = an automatic gift on a new world.** Everything the Claykin knew in the previous world is **known again: no supplication, no re-gifting — just enough Tech.** Full Tech price (the tree still takes time), but the deity's hand is never needed for old ground; the player's attention goes to *new* nodes.
+
+## LOCKED (pending play) — Materials & base costs (mapped from Kittens Game; their ratios kept)
+
+**Raw world materials:** wood · stone · iron · silver · gold · coal · algastone · Ambrosia · fish · herbs · holy. **Gold is a building material *or* a trade good, as the player sees fit.** **X Mine minerals:** stone / iron / silver / gold / coal / algastone.
+
+**Opening sequence.** The Origin starts with the First Bonfire and the **First Farm (free)**. At **10 Ambrosia** the first supplication fires: *"The Claykin have found trees, but need a way to harvest them. They beg for a tool!"* → grant the **Hammer** → Tools → wood begins. No other starting stockpile.
+
+**Population (LOCKED, ratio pending play).** The world starts with **2 created Claykin** (both farm until 10 Ambrosia trips the Hammer supplication, then one swaps to wood — the first job-swap). After that **births are automatic**: a birth needs **a free bed and a food surplus**, and **draws Souls from the hoard** — Souls → life made literal; no souls, no birth. **No birth timer.** The draw ramps as **base × 1.2 per Claykin alive** (placeholder) so that **~50 Claykin is getting hard, ~70 is a real time sink, ~100 is near impossible** — *population is the push to raze.* Two walls stack: housing cost (Shack 2.5) and the soul draw. Base tuned in play against god-phase soul income.
+
+**Food.** Borrowed from Kittens: each Claykin eats **0.85 Ambrosia/tick**; a Farmer makes **1.0/tick** base (a Farmer feeds itself with a little over; team bonus and XP make the surplus). No seasons, so keeping up is easy by design.
+
+**Components & consumables** (Kittens: beam 175 wood · slab 250 minerals · plate 125 iron · concrete 2500 slab + 25 steel)
+| Item | Cost | Note |
+|---|---|---|
+| Plank | 175 wood | |
+| Block | 250 stone | |
+| Ingot | 125 iron | |
+| **Brick** | **25 Block + 1 Ingot** | **carved from Block — our "concrete"; hangs on Stonework + Ironwork** (not clay) |
+| Charcoal | 100 wood | |
+| Rope | 175 Ambrosia | |
+| Paper | 175 Ambrosia | |
+| Ale | 100 Ambrosia | |
+| Arms | 10 Ingot + 5 Plank | |
+| Wares | 10 Ale + 10 Paper + 5 Rope | trade grade 1 |
+| Fine Wares | 10 Brick + 10 silver + 5 Ale | trade grade 2 |
+| Rich Wares | 10 gold + 10 Ingot + 5 Fine Wares | trade grade 3 — higher grades pay more per hold |
+| Boat | 100 Plank + 25 Rope | |
+| Ship | 150 Ingot + 500 Plank + 50 Rope | |
+
+**Housing** (Hut · Log House · Mansion)
+| Building | Cost | Ratio |
+|---|---|---|
+| Shack | 5 wood | 2.5 |
+| Cabin | 200 wood + 250 stone | 1.15 |
+| Cottage | 25 gold + 185 Brick + 75 Ingot | 1.15 |
+
+**Storage** (Barn · Warehouse) — capacity per level
+| Building | Cost | Ratio | Holds per level |
+|---|---|---|---|
+| Barn | 50 wood | 1.75 | wood 200 · stone 250 · iron 50 |
+| Granary | 100 wood + 50 stone | 1.15 | Ambrosia 5000 · fish 500 · herbs 250 |
+| Warehouse | 2 Plank + 2 Block | 1.15 | each component 100 · coal 100 · silver 50 · gold 50 · holy 100 |
+
+**Tech** (Library · Academy · Observatory)
+| Building | Cost | Ratio |
+|---|---|---|
+| Study | 25 wood | 1.15 |
+| Library | 50 wood + 70 stone + 100 Tech | 1.15 |
+| School | 200 wood + 250 stone + 3 Paper | 1.15 |
+| College | 250 Ingot + 35 Block + 50 Plank + 1000 Tech | 1.10 |
+
+**Greenware workplaces** (Field · Mine · Workshop · Pasture) — ratio 1.15
+| Building | Cost |
+|---|---|
+| Farm | 30 wood |
+| Chopper Camp | 50 wood |
+| Lodge | 100 wood |
+| X Mine | 100 wood |
+| Angler's Hut | 75 wood + 10 Rope |
+| Maker's Lodge | 100 wood + 400 stone |
+| Bolder's Cabin | 40 wood |
+| Hearthstone | 75 wood + 50 stone |
+| Fighter Camp | 150 wood + 100 stone |
+
+**Caste workplaces** (Lumber Mill · Smelter · Harbor · Tradepost · Chapel) — ratio 1.15
+| Building | Cost |
+|---|---|
+| Stoneworks | 100 Plank + 250 Block + 50 Ingot |
+| Forge | 200 Block + 50 Ingot + 100 Charcoal |
+| Dock | 250 Plank + 50 Block + 75 Ingot |
+| Outpost | 200 Plank + 250 Block |
+| Barracks | 500 Plank + 200 Block + 10 gold + 50 Arms |
+| Spirit Lodge | 2000 Block + 250 Paper + 250 holy |
+
+**Revenant hubs** (Temple, scaled for 9 tiles) — plus **9 Hallowed tiles first**
+| Hub | Cost |
+|---|---|
+| Citadel | 500 gold + 250 Block + 150 Ingot + 100 Arms |
+| Cathedral | 500 gold + 250 Block + 150 Ingot + 100 Paper + 500 holy |
+| Laboratory | 500 gold + 250 Block + 150 Ingot + 100 Paper + 1000 Tech |
+
+**Special**
+| Item | Cost |
+|---|---|
+| Kiln | 100 Clay + 50 Charcoal (deity compounds, gifted) |
+| Campfire | 20 wood, ×2 each |
+| **Hallowed Ground** | **77 of the caste's compound per tile** (Dawn / Hallowed Earth / Scripture) — a 9-tile hub = 693 |
+
+## LOCKED — The Workshop tree (what Makers can craft)
+
+**Not job multipliers** (the Claykin already get those from full teams and job XP). Every craft does one of three things: **enables**, **is consumed**, or **is a component**. Each node is a **recipe learned** the same way as science — gift the thing once, Learners study it, Makers can then make it from world materials — and hangs on the science node it needs.
+
+**The Maker tab.** Every learned recipe is a row with **+/− buttons**; assigned Makers convert world materials into that item at a rate. No crafting clicks. **A row stalls when its inputs run dry** — either supply is short or too many Makers are on the demand. Tools never appear as rows (nothing to assign).
+
+**Tools — one-time enables; every Claykin uses the best tool discovered**
+| Tool | Science node | Enables |
+|---|---|---|
+| Stone Axe & Pick | Tools | Chopper Camp, stone mines |
+| Iron Axe & Pick | Ironwork | iron mines, faster clearing |
+| Steel tools | Steel | world 3 |
+
+**Components — Tier 1, the 4-set.** Buildings cost components, not raw logs, past the first wave (Shack, Study, Bolder's Cabin build from raw wood). Bolder and Mason placement rates are measured in components placed.
+| Component | From | Science node | Used by |
+|---|---|---|---|
+| Plank | wood | Carpentry | the frame of every building |
+| Brick | carved from Block (+ Ingot) — our "concrete" | Stonework + Ironwork | Cottage, Fine Wares, late stone buildings |
+| Block | stone | Stonework | hubs, Stoneworks, anything Masons place |
+| Ingot | iron | Ironwork | Forge, Barracks, Dock hardware |
+
+**Consumables — the Maker rows, world 1 order**
+| Row | From | Science node | Spent on |
+|---|---|---|---|
+| Charcoal | wood | Charcoal | fuel — Kiln, Forge (world 1 fuel) |
+| Rope | Ambrosia fibre | Agriculture (fibre studied) | Boats, Docks, Ships |
+| Paper | Ambrosia pulp | Scripture | the Scripture line; feeds Tech |
+| Ale | Ambrosia | Brewing | Belief |
+| Arms | Ingots + Planks | Garrison | equips a raiding party; spent when it sails |
+| Wares (3 grades) | bundles — see Materials | Trade | the trade-goods payload; spent when a trade Boat/Ship sails |
+| Boat | Planks + Rope | Fishing | crew 2 Mariners; **coastal only** — deep-water fishing, Wares along the coast; no troops/missionaries |
+| Ship | Planks + Rope + Ingots, at a Dock | Seafaring | crew 2; crosses deep water; **all three payloads** (troops / missionaries / trade goods) |
+
+**Later worlds:** Cloth, Vellum, Spirits, Silk, and whatever Clockwork yields, as their tiers open.
+
+**Fuel.** Two sources with a reason each: **Charcoal** (from wood, world 1) and **Coal** — **X Mine gains Coal** (and **Silver**, for Fine Wares) as minerals (stone / iron / silver / gold / coal / algastone). Coal burns cleaner; the Forge and the Steel node want Coal, not Charcoal.
 
 ## LOCKED — The World Arc (four beats)
 
@@ -494,8 +622,7 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 - **Reformation** (change Covenant mid-world at high cost) — PARKED.
 
 **Phase-2 still open (in working order):**
-- **Workshop tree** (Maker craftables; gift → study → craft; the Ship's ratio lives here) · **Tech as a resource** (Learner/Teacher rates, node costs, Tech Tome carry-over) · **material list + base building costs** (and what Barn/Granary/Warehouse each hold).
-- Then: God Souls boon/bane (×13) · board size · terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · **raiding parties / War Power numbers** · Faithful Souls math · hostile world (parked) · hero flavor text.
+- God Souls boon/bane (×13) · board size · terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · **raiding parties / War Power numbers** · Faithful Souls math · hostile world (parked) · hero flavor text.
 - Structural: expand the god map from **6 stubbed nodes** to 13, split **5 Stairway + 8 Worlds** (Hades gateway + 7 creation days); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
 
 **Settled since consolidation:** Faithful Souls (kept) · Revenant = god-voice caste · no schisms · Edicts = Commandments (merged) · Thor = auto-mixing · discovery → base-element production speedup · codex persists · mixing tree = item+item(+item), tiers 3–4 restart-gated · god-map navigation approach.
