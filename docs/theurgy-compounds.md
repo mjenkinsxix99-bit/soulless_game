@@ -38,7 +38,7 @@ earth · stone · metal · wood · plant · water · fire · research · holy ·
 | earth + water | **Mud** *(Amun-Ra)* |
 | earth + fire | Brick |
 | earth + research | Map |
-| earth + holy | Hallowed Ground |
+| earth + holy | Hallowed Earth *(Priests' consecration — the tile state is "Hallowed Ground")* |
 | earth + dark | Grave |
 | stone + metal | Gemstone |
 | stone + wood | Flint |
@@ -114,4 +114,4 @@ Recipes authored at implementation; unhinted.
 - **Life (Clay + Souls)** is the **Nyx unlock**, not a recipe on the table.
 
 ## Flat list — all 115 names (art reference)
-Clay · Ore · Peat · Loam · Mud · Brick · Map · Hallowed Ground · Grave · Gemstone · Flint · Moss · Sand · Obsidian · Masonry · Altar · Tombstone · Axe · Verdigris · Rust · Molten · Cog · Reliquary · Blacksteel · Timber · Pulp · Charcoal · Wheel · Totem · Deadwood · Herbs · Ash · Herbcraft · Lotus · Nightshade · Steam · Reagent · Holy Water · Ink · Gunpowder · Dawn · Hellfire · Scripture · Grimoire · Twilight · Glass · Ceramic · Terracotta · Tile · Ingot · Bronze · Iron · Copper · Silver · Gold · Cement · Mortar · Plaster · Marble · Tar · Farmland · Compost · Grain · Ale · Oil · Potion · Medicine · Salve · Antidote · Paper · Tome · Pigment · Dye · Lye · Acid · Blasting Powder · Soap · Rope · Cloth · Cart · Blessed Blade · Cursed Blade · Incense · Ward · Hex · Steel · Alloy · Wire · Gear · Armor · Concrete · Porcelain · Enamel · Mosaic · Lens · Stained Glass · Lantern · Mirror · Prism · Crystal · Book · Holy Book · Vellum · Bread · Cheese · Spirits · Elixir · Panacea · Clockwork · Machine · Compass · Bell · Silk · Cannon · Phylactery
+Clay · Ore · Peat · Loam · Mud · Brick · Map · Hallowed Earth · Grave · Gemstone · Flint · Moss · Sand · Obsidian · Masonry · Altar · Tombstone · Axe · Verdigris · Rust · Molten · Cog · Reliquary · Blacksteel · Timber · Pulp · Charcoal · Wheel · Totem · Deadwood · Herbs · Ash · Herbcraft · Lotus · Nightshade · Steam · Reagent · Holy Water · Ink · Gunpowder · Dawn · Hellfire · Scripture · Grimoire · Twilight · Glass · Ceramic · Terracotta · Tile · Ingot · Bronze · Iron · Copper · Silver · Gold · Cement · Mortar · Plaster · Marble · Tar · Farmland · Compost · Grain · Ale · Oil · Potion · Medicine · Salve · Antidote · Paper · Tome · Pigment · Dye · Lye · Acid · Blasting Powder · Soap · Rope · Cloth · Cart · Blessed Blade · Cursed Blade · Incense · Ward · Hex · Steel · Alloy · Wire · Gear · Armor · Concrete · Porcelain · Enamel · Mosaic · Lens · Stained Glass · Lantern · Mirror · Prism · Crystal · Book · Holy Book · Vellum · Bread · Cheese · Spirits · Elixir · Panacea · Clockwork · Machine · Compass · Bell · Silk · Cannon · Phylactery

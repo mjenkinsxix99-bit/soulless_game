@@ -234,34 +234,39 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 | Desert | near-nothing; **irrigable only within 2 tiles of water** → Grassland |
 | Marsh | herbs; **foragable** |
 | Blight | **not impassable, but kills Claykin over time**; **static — never purified, worked around** |
-| Hallowed | +Faith to what's built on it; **required for specific buildings** |
+| Hallowed Ground | a tile **consecrated by the Revenants** (see Hallowed Ground below); **required under every Revenant-only building** |
 | Origin | the center; starts with a fire |
 
 ## LOCKED — Tiles, jobs & the Claykin (the working model)
 
 - **Claykin are never seen** — a count, no walking, no pathfinding, **no distance penalty.**
-- **The player designates what a tile *is*** (housing, farming, woodcutting, mining…). Each purpose has its own **slot count** (per-job, decided as jobs are enumerated — e.g. housing 6 huts × 2 Claykin; farms 6 × 1 farmer). A purpose is available by **what the tile is and what it touches** (woodcutting on/adjacent to Forest, mining on/adjacent to Mountain, fishing beside Coast, farming on Grassland).
+- **The player designates what a tile *is*** (housing, farming, woodcutting, mining…) by placing buildings on it. Each building has its own **count-per-tile or team cap** (see the Buildings section). A purpose is available by **what the tile is and what it touches** (woodcutting on/adjacent to Forest, mining on/adjacent to Mountain, fishing beside Coast with fish, a Forge beside Lava, farming on Grassland).
 - **A resource tile commits to ONE product** as the tech tree branches — rock *or* gold ore, wheat *or* grapes. Never both.
-- **Jobs are +/− buttons.** Idle Claykin (born idle into huts) are assigned to any slot on an **explored** tile; reassign at will. **XP is a per-task record on the Claykin** (woodcutting XP waits; farming starts at 0).
-- **Resources are stockpiled** (food, lumber, stone, ore…); a food system to develop.
+- **Jobs are +/− buttons.** Idle Claykin (born idle into housing) are assigned to any slot on an **explored** tile; reassign at will. **XP is a per-job record on the Claykin** (chopping XP waits while it farms; farming starts at 0). **A level-50 farmer is a level-0 fighter** — only the level in the target job counts.
+- **Resources are stockpiled** (food, lumber, stone, iron, gold, algastone, fish, herbs, holy…) in the Barn / Granary / Warehouse (and Docks); a food system to develop.
+- **Two ledgers, one name.** What the Claykin dig, chop, farm, fish, or produce is **theirs** (world materials, in their stores). What sits in the Theurgy codex is **the deity's** and does not exist in the world until **gifted**. Iron, gold, holy, axe: the same word can live on both ledgers; **gifting is the only bridge.** Supplication fires only when the Claykin lack something a job needs.
+- **Building is a fill, not a purchase.** A placed building's material cost is *placed* over time by Bolders (wood) and Masons (stone) at their placement rate; **build time = cost ÷ rate.** The player can queue any number of buildings; crews build in placement order, and when stock runs dry the queue stalls until the player supplicates or production catches up.
 - **Terraforming is Claykin work, never a god action.** Workers do it; materials they lack are asked for via **supplication**.
 - **Two channels for materials from the deity, both timed:** **Gifting** (proactive, short cooldown) and **Supplication** (reactive — fires on its own timer when a marked building lacks materials: *"The woodcutter Claykin humbly request X wood to complete their building. Grant or deny."*). Set the gift cooldown a little **longer** than the supplication trigger so supplication is the normal channel. **Supplications ≠ Edicts** (edicts = society-level choices).
 - **Penalties:** hazard adjacency (a tile next to Lava/Blight) and **random calamities that kill Claykin — these are the God Souls' banes.** That's the whole penalty layer.
 
 **The jobs (LOCKED). Two material streams:** Claykin jobs produce **mortal goods** (food, wood, stone, ore, fish, herbs) to the stockpile; the deity supplies **divine compounds** (the Theurgy table) by gift or supplication. Buildings consume a mix.
 
-*Resource jobs (any greenware) — slots per tile:*
-| Job | Slots | Does |
-|---|---|---|
-| Chopper | 6 | wood (needs an axe) |
-| Farmtend | 6 | food, one crop per tile |
-| Forager | 6 | food + herbs; bundles grass into proto-wood before axes |
-| Stalker | 2 | hunts |
-| Digger | 6 | stone *or* ore, one per tile |
-| Angler | 2 | fish, water |
-| Bolder | 3 | builder — **wood buildings only** |
-| Learner | 3 | precursor to Teacher; no XP bonus; **gathers Tech** to unlock the low tree |
-| Maker | 3 | crafting hands — tools, combining materials into better materials (not buildings) |
+*Greenware jobs (any unfired Claykin) — team cap is set by the workplace (see Buildings):*
+| Job | Workplace · cap | Does | Fires into (at level 20) |
+|---|---|---|---|
+| Chopper | Chopper Camp · 6 | wood (needs an axe) | — |
+| Farmer | Farm · 6 | **Ambrosia** — the one crop; the tech tree branches what it becomes (food, fibre, brew, paper, soil, fuel) | — |
+| Herbalist | Hearthstone · 3 | food, herbs, **holy** | **Shaman** |
+| Stalker | Lodge · 2 | hunts | — |
+| Digger | X Mine · 3 | stone / iron / gold / algastone — **one mineral per mine** | **Firewalker** |
+| Angler | Angler's Hut · 2 | fish (adjacent water with fish) | **Mariner** |
+| Bolder | Bolder's Cabin · 3 | **builder — required for every building** (even stone has a wood frame); places 5 material/sec base | **Mason** |
+| Learner | Study · 3 | **gathers Tech**; no XP bonus; superseded by Teachers once Schooling is learned | **Teacher** |
+| Maker | Maker's Lodge · 3 | crafting hands — tools, goods, the Ship (not buildings) | — |
+| Fighter | Fighter Camp · 3 | **War Power** | **Warden** |
+
+**Ambrosia is the only crop.** The First Farm is a gift; the Claykin take it from there. Ambrosia's branches all land on codex names: Grain → Bread · Rope → Cloth → Silk · Ale → Spirits · Pulp → Paper → Vellum → Book · Compost → Farmland · Oil. Farmed Ambrosia is world-side; the codex versions are the deity's.
 
 **The tech engine — supplication grows the tree.** *Supplication → gift → study → craft.* ("The Claykin see trees but cannot harvest the wood. They request something sharp to cut." → gift an Axe → Learners study it → Makers learn to craft more.) Not everything comes from the Claykin; the mystery gift is the crux of the tech tree. **The Tech Tome:** part of the Transcension ritual — logs the Claykin's works and passes to the next generation; what's learned is *known* next world and only needs unlocking, not rediscovery.
 
@@ -280,31 +285,157 @@ Base **greenware** Claykin do the primal work. **Firing in the Kiln** transforms
 
 **The Kiln.** The first **2nd-tier building** (buildings have **tiers and footprints**); a **triangular prism spanning 3 tiles**, **one per world**, tech-tree unlock, built from Clay + Charcoal. **Fire and glaze as many Claykin as you want** — a small pool at first, a significant one by world 3. The only place a Claykin can be fired. **The deity is the potter** — firing and glazing are **god-clicks** (shaping the clay is the one act that's the deity's by nature; the Claykin terraform and build). Both open once the Claykin discover and build the Kiln. **No potter job, no cracking.**
 
-**Firing recipes (Tier 1, placeholders — settled with the full job list):**
-| Caste | Fired with | Slots | Job |
-|---|---|---|---|
-| Mason | Masonry | 3/tile | anything built with **stone**, and heavy terraform (removing a Mountain) |
-| Firewalker | Obsidian | 2 per forge | works Lava (cooling → Obsidian ground), forges |
-| Mariner | Timber | 2 per ship; 1 ship/tile, **6 ships per dock** | deep-water fishing, **trading**, transporting Wardens & Stalkers for **conquest** |
-| Warden | Axe | 6/tile | **defense and offense** — a hostile world |
-| Shaman | Lotus | 6/tile | rites (**no** blight purifying — Blight is static) |
-| Teacher | Scripture | 6/tile | XP boost + advances the tech tree |
+**The level-20 ladder (LOCKED).** *Time in the work is the price, not materials.* A greenware Claykin must reach **level 20 in the precursor job** to be fired into its caste, and a caste Claykin must reach **level 20 in the caste** to be glazed into its Revenant. **Per-job XP, hard gate** — a level-50 farmer is a level-0 fighter. The **firing compound stays, at a flat cost** (no escalation; the player pays in time). **Glazing escalates: ×1.15 per glaze.**
 
-**Glazing IS the Revelation.** The three Covenant castes can be glazed with their axis compound into the god-voice: **Warden + Hellfire → Cleric** (Dark) · **Shaman + Holy Water → Priest** (Holy) · **Teacher + Scripture → Scrivener** (Wisdom). **One caste-line glazed per world; glaze as many of that caste as you want.** The pottery ladder: **greenware → fired (caste) → glazed (Revenant).** At the Revelation the player answers two questions: **"Which caste is closest to you in this world?"** (holy / dark / wisdom → the **Chosen**, glazed, bonus) and **"Which caste is the farthest from you?"** (of the two remaining → the **Reviled**, negative). The last one left is **supporting** (neutral).
+| Precursor (lvl 20) | → Caste | Fired with | Workplace · cap | Job |
+|---|---|---|---|---|
+| Bolder | **Mason** | Masonry | Stoneworks · 3 | places **stone** (same rate/bonus as Bolders); heavy terraform (removing a Mountain) |
+| Digger | **Firewalker** | Obsidian | Forge · 2 (adj. Lava) | works Lava (cooling → Obsidian ground); **makes obsidian** at the Forge |
+| Angler | **Mariner** | Timber | Dock · 6; 2 per Ship, **3 ships berth per Dock**, 1 ship per water tile when out | deep-water fishing, **trade**, ferrying troops / missionaries / trade goods |
+| Fighter | **Warden** | Axe | Outpost · 3 / Barracks · 6 | **defense and offense**; War Power |
+| Herbalist | **Shaman** | Lotus | Spirit Lodge · 6 | rites; produces **holy** (**no** blight purifying — Blight is static) |
+| Learner | **Teacher** | Scripture | School · 3 / College · 6 | the Tech source once Schooling is learned; XP boost |
+
+**Glazing IS the Revelation.** The three Covenant castes can be glazed with their axis compound into the god-voice: **Warden + Hellfire → Cleric** (Dark) · **Shaman + Holy Water → Priest** (Holy) · **Teacher + Scripture → Scrivener** (Wisdom). **One caste-line glazed per world; glaze as many of that caste as you want** (×1.15 per glaze). The pottery ladder: **greenware → fired (caste) → glazed (Revenant).** The full chains: Fighter → Warden → Cleric · Herbalist → Shaman → Priest · Learner → Teacher → Scrivener. At the Revelation the player answers two questions: **"Which caste is closest to you in this world?"** (holy / dark / wisdom → the **Chosen**, glazed, bonus) and **"Which caste is the farthest from you?"** (of the two remaining → the **Reviled**, negative). The last one left is **supporting** (neutral).
 
 Compounds forge castes → **mixing (Phase 1) feeds society (Phase 2).** Same system, three jobs (shields → economy → castes).
 
 ## LOCKED — The Revenants: the push forward
 
-**The Faithful, not Faith, is the prestige.** The Revenants *spread faith* = **convert Claykin into the Faithful**, and **the Faithful produce Faithful Souls at Transcend.** Each Revenant converts a different way. All three hubs are **9-tile buildings**, each surrounding tile holding **6 Revenants**; the push scales with how many you've glazed.
+**The Faithful, not Faith, is the prestige.** (There is **no "Faith" resource** — nixed. The Claykin's holy output is the world material **Holy**.) The Revenants *spread faith* = **convert Claykin into the Faithful**, and **the Faithful produce Faithful Souls at Transcend.** Each Revenant converts a different way. All three hubs are **9-tile buildings on Hallowed Ground**; one per world in practice — **hubs have no price ratio**; instead each grants **×1.10 to its Power per 10 Revenants stationed in the hub** (only the hub counts).
 
-| Revenant | Hub | Spreads faith by | Pushes | If Reviled |
-|---|---|---|---|---|
-| **Cleric** (Warden + Hellfire) | **Citadel** | **the sword** | territory & survival — but **no cheaper campfires; spreading has a cost** | calamities hit harder, threats spread |
-| **Priest** (Shaman + Holy Water) | **Cathedral** | **piety** | boosts the *spread* of faith; can **consecrate ground → Hallowed** — where **holy buildings** go (not an engine) | Faithful grow slowly, Belief fragile |
-| **Scrivener** (Teacher + Scripture) | **College** | **education** | tech & skill — research speed, XP, yields | the tree crawls |
+**Three Powers, one per axis:** **War Power** (Fighters + Wardens + Clerics; enables **raiding parties**) · **Holy Power** (Cathedral) · **Tech Power** (Laboratory). Each rung of a line contributes its own weight; the hub multiplies.
 
-The supporting caste does its job — no bonus, no penalty.
+| Revenant | Hub | Power | Spreads faith by | Pushes | If Reviled |
+|---|---|---|---|---|---|
+| **Cleric** (Warden + Hellfire) | **Citadel** | War | **the sword** | territory & survival — but **no cheaper campfires; spreading has a cost** | calamities hit harder, threats spread |
+| **Priest** (Shaman + Holy Water) | **Cathedral** | Holy | **piety** | boosts the *spread* of faith; produces **holy**; consecrates ground | Faithful grow slowly, Belief fragile |
+| **Scrivener** (Teacher + Scripture) | **Laboratory** | Tech | **education** | tech & skill — research speed, XP, yields | the tree crawls |
+
+The supporting caste does its job — no bonus, no penalty. **Ships serve the Covenant:** troops, missionaries, and trade goods are *all* always available; the Covenant only tilts them (Revenant boosted + extra buildings · supporting normal · Reviled disadvantaged).
+
+## LOCKED — Hallowed Ground (consecration)
+
+**Hallowed Ground is a tile state.** Each Revenant consecrates with its own compound, and all three produce the same state:
+- **Clerics** — **Dawn** (Holy + Fire)
+- **Priests** — **Hallowed Earth** (Holy + Earth) — *the compound was renamed from "Hallowed Ground" to avoid the collision*
+- **Scriveners** — **Scripture** (Holy + Research)
+
+**Any building available only to the Revenant caste must be built on Hallowed Ground** — the three hubs and any unique Revenant buildings. A 9-tile hub means 9 consecrated tiles first: **a deliberate material sink.** Ordinary buildings never need it.
+
+## LOCKED — Buildings (the world 1 set)
+
+**Price ratio = growth per unit owned, counted on the total owned across all tiles** (never resets per tile): `cost = base × ratio^(N−1)`. **Base costs are deferred** until the material list. Steep ratios (Shack 2.5, Barn 1.75) are steep because of the *material bill*, not to punish. Bonuses fire **only on a full team**. Footprints are on the record only where stated (1-tile, 3-tile, 9-tile); everything else is a count-per-tile or a team cap, not a size.
+
+**Housing**
+| Building | Per tile | Claykin each | Ratio |
+|---|---|---|---|
+| Shack | 6 | 1 | 2.5 |
+| Cabin | 4 | 1 | 1.15 |
+| Cottage | 4 | 2 | 1.15 |
+
+**Storage** — each type lives on **one tile for all of them** and **upgrades** (ratio per upgrade level). Lumber and stockpile fold into these; Docks also add storage. *What each holds: TBD with the material list.*
+| Building | Ratio |
+|---|---|
+| Barn | 1.75 |
+| Granary | 1.15 |
+| Warehouse | 1.15 |
+
+**Tech** — 1 tile each, upgraded indefinitely by ratio; both workplace and multiplier.
+| Building | Ratio | Holds | Effect |
+|---|---|---|---|
+| Library | 1.15 | — | Tech multiplier (Learners/Teachers/Scriveners are the source) |
+| School | 1.15 | Teachers 3 | Tech accumulation bonus |
+| College | 1.10 | Teachers 6 | Tech accumulation bonus |
+
+**Greenware workplaces** — ratio 1.15; team cap; full-team bonus in brackets.
+| Building | Team | Bonus | Notes |
+|---|---|---|---|
+| Chopper Camp | Choppers 6 | ×1.15 | on/adjacent Forest |
+| Farm | Farmers 6 | ×1.15 | one Farm per tile; Ambrosia |
+| Lodge | Stalkers 2 | ×1.10 | hunting returns |
+| X Mine | Diggers 3 | ×1.15 | X = stone / iron / gold / algastone (more later); **Quarry tech upgrades mines** |
+| Angler's Hut | Anglers 2 | ×1.10 | adjacent water tile with fish |
+| Maker's Lodge | Makers 3 | ×1.15 | output |
+| Study | Learners 3 | — | the bonus lives in the Tech buildings |
+| Bolder's Cabin | Bolders 3 | ×1.15 to placement rate | **required for any building**; 5 material/sec base (before XP) |
+| Hearthstone | Herbalists 3 | — | food, herbs, holy |
+| Fighter Camp | Fighters 3 | — | War Power |
+
+**Caste workplaces** — ratio 1.15.
+| Building | Team | Bonus | Notes |
+|---|---|---|---|
+| Stoneworks | Masons 3 | ×1.15 to placement rate | same placement mechanic as Bolders, for stone |
+| Forge | Firewalkers 2 | ×1.10 output | adjacent Lava; makes obsidian |
+| Dock | Mariners 6 | — | adds storage; berths 3 Ships |
+| Outpost | Wardens 3 | — | |
+| Barracks | Wardens 6 | — | |
+| Spirit Lodge | Shamans 6 | — | holy |
+
+**Revenant hubs** — 9 tiles, Hallowed Ground, no ratio, ×1.10 Power per 10 stationed.
+| Hub | Holds | Power |
+|---|---|---|
+| Citadel | Clerics | War |
+| Cathedral | Priests | Holy (also produces holy) |
+| Laboratory | Scriveners | Tech |
+
+**Special**
+| Item | Rule |
+|---|---|
+| Kiln | 3 tiles (triangular prism), **one per world**, Clay + Charcoal; tech-tree unlock |
+| Campfire | lights radius 2; placed on a lit tile or one into fog; permanent; **cost ×2 each**; the *second* campfire is a tech (Campfire node) |
+| Ship | built at a Dock (likely a Maker craftable, ratio TBD); crew 2 Mariners, must be full to sail; 3 berth per Dock, 1 per water tile when out; payload = troops / missionaries / trade goods |
+
+*No further buildings for now — unique Revenant buildings beyond the hubs are deferred.*
+
+## LOCKED (pending play) — The Tech Tree (Science tree)
+
+Modelled on Kittens Game's science tree, trimmed to our ceiling (Tier 3 materials — no space, no time travel) and renamed. **Two trees, maybe a third later:** this one (unlocks buildings, jobs, castes) and the **Workshop tree** (what Makers can craft — *not* flat job multipliers; TBD). **Gifts open a domain; tech extends it.** Everything requires **Omens** (learning to learn). Some ordering will only settle in play.
+
+**Wave 0 — gifts:** The First Bonfire · The First Farm (Ambrosia) · The Hammer (Tools: the Claykin shape the Axe and Pick themselves)
+
+**Wave 1 — survival**
+- **Omens** — root. Study, Learners. A **countdown to the next Calamity** (later techs refine *what* is coming; no seasons).
+- **Agriculture** — First Farm. Farm, Farmers, Barn.
+- **Tools** — Hammer. Axe and Pick. Chopper Camp, Maker's Lodge.
+- **Campfire** — Bonfire. The second campfire; expansion begins.
+- **Rites** — Agriculture. Hearthstone, Herbalists; holy trickles.
+
+**Wave 2 — industry**
+- **Hunting** — Agriculture. Lodge, Stalkers.
+- **Mining** — Tools. X Mine (stone), Diggers.
+- **Carpentry** — Tools + Agriculture. Bolder's Cabin, Cabin, Warehouse.
+- **Charcoal** — Campfire + Tools. Makers burn wood to Charcoal.
+- **Edicts** — Omens + Agriculture. The commandments layer opens.
+
+**Wave 3 — the Kiln**
+- **Kilncraft** — Charcoal + Mining. **The Kiln; firing begins. The choke point — every caste hangs off it.**
+- **Fishing** — Carpentry. Angler's Hut.
+- **Warcraft** — Hunting + Tools. Fighter Camp, Fighters.
+- **Scripture** — Edicts. Paper branch, Library. The law written down.
+- **Ironwork** — Mining + Kilncraft. Iron mine; better Axe and Pick.
+
+**Wave 4 — castes**
+- **Stonework** — Kilncraft + Carpentry. Stoneworks, Masons, Granary.
+- **Shamanism** — Kilncraft + Rites. Spirit Lodge, Shamans.
+- **Garrison** — Kilncraft + Warcraft + Stonework. Outpost, Barracks, Wardens.
+- **Seafaring** — Kilncraft + Fishing + Carpentry. Dock, Ships, Mariners.
+- **Firewalking** — Kilncraft + Ironwork. Forge, Firewalkers, obsidian.
+- **Schooling** — Kilncraft + Scripture. School; **Teachers supersede Learners.**
+- **Trade** — Edicts + Carpentry. Trade-goods payload.
+- **Brewing** — Agriculture + Kilncraft + Edicts. **Ale raises Belief** (the one consumable Belief lever); Spirits = Tier 3 version and premium trade good. Kept small.
+
+**Wave 5 — the world matures**
+- **Masonry** — Stonework + Schooling. Cottage, College.
+- **Quarrying** — Stonework + Ironwork. Quarry upgrades mines.
+- **Alchemy** — Firewalking + Scripture. Algastone mine (fuel/"oil").
+- **Revelation** — Scripture + Shamanism + Garrison + Schooling. **Glazing, consecration, all three hubs. The Covenant is chosen here.** (Replaces a separate Theology node — one moment, not three.)
+
+**Wave 6 — later worlds**
+- **Steel** — Firewalking + Quarrying. Needs Tier 3 material → world 3 at the earliest.
+- **Clockwork** — Steel + Masonry. Machines.
+
+**Still to do on the tree:** the Workshop tree (Maker craftables, gift → study → craft) · Tech as a resource (rates, node costs, Tech Tome carry-over) · the material list and base building costs.
 
 ## LOCKED — The World Arc (four beats)
 
@@ -332,15 +463,15 @@ Base archetypes: **Martial** (Clerics) · **Pious** (Priests) · **Enlightened**
 | Enlightened + Pious | **The Mystery School** | sacred knowledge / gnostics |
 
 Rough bonus↔cost sketch:
-- **Martial:** fast expansion, clears barriers/threats, Faith from conflict ↔ weak knowledge, high attrition, Belief hard in peacetime.
-- **Pious:** highest Faith, stable Belief, heresy-resistant, **fastest Faithful Souls** ↔ slow tech/industry, poor expansion, zealotry.
-- **Enlightened:** fastest tech/recipes, best yields, wonders sooner ↔ low Faith, doubt-heresy, fragile vs threats.
+- **Martial:** fast expansion, clears barriers/threats, Faithful won by conflict ↔ weak knowledge, high attrition, Belief hard in peacetime.
+- **Pious:** most Faithful, stable Belief, heresy-resistant, **fastest Faithful Souls** ↔ slow tech/industry, poor expansion, zealotry.
+- **Enlightened:** fastest tech/recipes, best yields, wonders sooner ↔ few Faithful, doubt-heresy, fragile vs threats.
 
 ## LOCKED — Living-world loop
 
-- **Petitions:** Needs (unmet → Belief falls) & Wants (granted → Faith surges) surface on a timer; **Grant / Deny / time-out** each swing Belief & Faith. Flavored by the Covenant (a Martial world petitions for weapons; Pious for temples; Enlightened for schools).
+- **Petitions:** Needs (unmet → Belief falls) & Wants (granted → the Faithful grow) surface on a timer; **Grant / Deny / time-out** each swing Belief and the Faithful. Flavored by the Covenant (a Martial world petitions for weapons; Pious for temples; Enlightened for schools).
 - **Edicts** (= the old "commandments" — one system now): the rules you issue **through the Revenant** (Iron Fist vs Free Will, Industry vs Devotion) that bias how petitions resolve.
-- **Belief** = happiness (= clay integrity). **Faith** = output → minted into **Faithful Souls** at the raze.
+- **Belief** = happiness (= clay integrity); **Ale** is its one consumable lever. **The Faithful** = output → minted into **Faithful Souls** at the raze. (No "Faith" resource.)
 - **Two-layer tech tree:** the entity's element discoveries gate what Claykin *may* learn (top-down); Claykin labor XP gates how *good* they are (bottom-up); minions bridge them.
 - **Scaling:** the discovery/build chain **cannot finish in one playthrough** — Faithful Souls from razing accelerate the next run.
 
@@ -362,8 +493,9 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 - **Friction events — OUT** (no schisms; the Revenant choice is final). Penalties are static: **Revenant = bonus · supporting = neutral · unchosen = equal negative** (values TBD).
 - **Reformation** (change Covenant mid-world at high cost) — PARKED.
 
-**Later content (design-doc only for now):**
-- God Souls boon/bane (×13) · hex tile types + terraform costs + board size · worker-caste jobs & firing recipes · petition list · Edict + society value tables · unique buildings · Faithful Souls bonus math · hero flavor text.
+**Phase-2 still open (in working order):**
+- **Workshop tree** (Maker craftables; gift → study → craft; the Ship's ratio lives here) · **Tech as a resource** (Learner/Teacher rates, node costs, Tech Tome carry-over) · **material list + base building costs** (and what Barn/Granary/Warehouse each hold).
+- Then: God Souls boon/bane (×13) · board size · terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · **raiding parties / War Power numbers** · Faithful Souls math · hostile world (parked) · hero flavor text.
 - Structural: expand the god map from **6 stubbed nodes** to 13, split **5 Stairway + 8 Worlds** (Hades gateway + 7 creation days); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
 
 **Settled since consolidation:** Faithful Souls (kept) · Revenant = god-voice caste · no schisms · Edicts = Commandments (merged) · Thor = auto-mixing · discovery → base-element production speedup · codex persists · mixing tree = item+item(+item), tiers 3–4 restart-gated · god-map navigation approach.
