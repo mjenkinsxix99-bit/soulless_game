@@ -218,7 +218,7 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 ## LOCKED — The World board (big, pannable, fogged)
 
 - **A WORLD — big.** The map pans and zooms; tiles sized as needed. (Revises the earlier "fixed, on-screen" call — that was a skill-budget worry; pan/zoom on canvas is a camera transform + drawing only what's in view.) Size TBD. Iso hex sprites, draw back-to-front, hex hit-detection.
-- **Procedurally seeded by the 3 chosen God Souls:** each soul carries **terrain weights**, a **guaranteed minimum** of its key tile, and a **bane** (its calamity). Base weights → apply the 3 souls → roll → **guarantee pass** (Origin is Grassland, center ring claimable, every soul's key-tile minimum met, enough food/wood/stone reachable that the world can't be born unwinnable).
+- **Procedurally seeded by the 3 chosen God Souls:** each soul carries a **favoured tile guaranteed at 13% of the map** (two souls sharing a tile stack to 26%), a **boon** (a rule change or terrain, never a percent), and a **bane** (its calamity, the thing the Omens clock counts down to). Base weights → apply the 3 souls → roll → **guarantee pass** (Origin is Grassland, center ring claimable, every soul's 13% met, enough food/wood/stone reachable that the world can't be born unwinnable). Full table in the God Souls section below.
 - **Fog of war, lit by campfires.** *Explored = campfire-lit* = accessible and buildable. A campfire lights **radius 2**; a new one may be placed on any lit tile **or one tile into the fog**; campfires are **permanent** (no relighting); **cost doubles per campfire (×2).** The **Origin** starts with the first fire.
 - **Save-safe:** flat int arrays (terrain / structure / lit) per hex.
 
@@ -603,6 +603,28 @@ Rough bonus↔cost sketch:
 - **Two-layer tech tree:** the entity's element discoveries gate what Claykin *may* learn (top-down); Claykin labor XP gates how *good* they are (bottom-up); minions bridge them.
 - **Scaling:** the discovery/build chain **cannot finish in one playthrough** — Faithful Souls from razing accelerate the next run.
 
+## LOCKED — The God Souls (pick 3 at world creation)
+
+Each god defeated leaves a God Soul; 13 to collect. At world creation the player picks 3. Each carries a **favoured tile (13% of the map guaranteed; repeats stack)**, a **boon**, and a **bane**. The 13 banes are the **calamity list**. Player-facing lines are written for someone who has never seen the World tab; the rules column is what the code does.
+
+| # | God | Tile (13%) | Player line: tile | Boon (player line) | Boon (rule) | Bane (player line) | Bane (rule) |
+|---|---|---|---|---|---|---|---|
+| 1 | Morrigan | Marsh | A share of your world will be wetland. | The crow remembers. When one of your people dies, what they learned passes to the next born. | a dead Claykin's per-job XP transfers to the next birth | The river rises. Flood takes what is stored near the water. | **Flood**: Coast-adjacent tiles lose their stock |
+| 2 | Durga | Mountain | A share of your world will be high rock. | The mountain gives freely. Your first mine in the high rock yields iron from the start. | first Mountain mine is an iron mine without Ironwork | The ground shakes. A building falls to pieces. | **Earthquake**: a random building collapses to its components |
+| 3 | Brahma | Grassland | A share of your world will be open field. | The lotus opens. Your crop will grow in the wetlands as well as the fields. | Farms may be placed on Marsh | A swarm comes. The food stores are eaten bare. | **Locusts**: the Granary is emptied |
+| 4 | Thor | Forest | A share of your world will be deep wood. | Fire answers the hammer. Your people may work hot metal anywhere, not only beside the burning land. | Forge needs no Lava adjacency | The sky breaks. Any vessel at sea is lost. | **Storm**: Boats and Ships at sea are lost |
+| 5 | Isis | Coast | A share of your world will be shoreline. | The river reaches farther. Dry land near water can be made to grow. | Desert irrigable within 3 tiles of water, not 2 | The rains fail. The fields stand idle until the omens turn. | **Drought**: Farms halt until the Omens clock resets |
+| 6 | Hades | Mountain | A share of your world will be high rock. | The toll is returned. When one of your people dies, the soul you spent comes back to you. | a dead Claykin refunds its soul draw | One is taken. A soul goes below, and does not return. | **The Taking**: one Claykin vanishes; no death, no refund |
+| 7 | Amun-Ra | Desert | A share of your world will be sand. | The sun rules the fire. Burning land cools to black stone on its own. | Lava cools to Obsidian ground without Firewalkers | The sun burns. A green field turns to sand. | **Scorch**: a Grassland tile becomes Desert |
+| 8 | Shiva | Lava | A share of your world will be burning land. | Change comes early. Your people are ready to be transformed sooner than others. | firing gate is level 15, not 20 (*strongest boon; may need 17 or one caste line*) | The fire spreads. The burning land grows by one step. | **Eruption**: Lava spreads one tile |
+| 9 | Sekhmet | Desert | A share of your world will be sand. | The lioness hunts with you. Your hunters lend their strength to your armies. | Stalkers count toward War Power | Sickness spreads. Some of your people will not survive it. | **Plague**: a share of the population dies |
+| 10 | Athena | Grassland | A share of your world will be open field. | The owl sees. You will know what the omens bring, not only when. | Omens shows the calamity type from the start | The people grow restless. Their belief in you drops hard. | **Unrest**: Belief drops sharply |
+| 11 | Odin | Forest | A share of your world will be deep wood. | Two ravens watch. Every fire you light reveals more of the dark around it. | campfires light radius 3 | The cold comes. Nothing grows for a time. | **Frost**: all food production halts for a spell |
+| 12 | Zeus | Mountain | A share of your world will be high rock. | The king favours you. Holy ground is easier to make. | Hallowed tiles cost 55, not 77 | Lightning falls. One building is destroyed outright. | **Smiting**: one building destroyed |
+| 13 | Nyx | Blight | A share of your world will be poisoned land. | Night claims her children. Your people can walk the poisoned land unharmed. | Blight does not kill Claykin | The long night. Every fire's light draws in, until it passes. | **The Long Night**: campfire light radius shrinks by 1 until it passes |
+
+Notable pairs players will find: **Nyx alone** = 13% poisoned land only you can use · **Shiva + Thor** = the industrial world · **Hades + Sekhmet** = death refunded and death dealt.
+
 ## Replay engine
 Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (society), plus terrain synergies. God-souls (286 combos) × 6 societies × terrain = no two worlds alike.
 
@@ -622,7 +644,7 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 - **Reformation** (change Covenant mid-world at high cost) — PARKED.
 
 **Phase-2 still open (in working order):**
-- God Souls boon/bane (×13) · board size · terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · **raiding parties / War Power numbers** · Faithful Souls math · hostile world (parked) · hero flavor text.
+- board size · terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · **raiding parties / War Power numbers** · Faithful Souls math · hostile world (parked) · hero flavor text.
 - Structural: expand the god map from **6 stubbed nodes** to 13, split **5 Stairway + 8 Worlds** (Hades gateway + 7 creation days); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
 
 **Settled since consolidation:** Faithful Souls (kept) · Revenant = god-voice caste · no schisms · Edicts = Commandments (merged) · Thor = auto-mixing · discovery → base-element production speedup · codex persists · mixing tree = item+item(+item), tiers 3–4 restart-gated · god-map navigation approach.
