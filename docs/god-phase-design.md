@@ -217,9 +217,9 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 
 ## LOCKED — The World board (big, pannable, fogged)
 
-- **A WORLD — big.** The map pans and zooms; tiles sized as needed. (Revises the earlier "fixed, on-screen" call — that was a skill-budget worry; pan/zoom on canvas is a camera transform + drawing only what's in view.) Size TBD. Iso hex sprites, draw back-to-front, hex hit-detection.
+- **A WORLD — big.** The map pans and zooms; tiles sized as needed. (Revises the earlier "fixed, on-screen" call — that was a skill-budget worry; pan/zoom on canvas is a camera transform + drawing only what's in view.) **Size: hex radius 15 (721 tiles) for world 1** — a dozen campfires light roughly a quarter of it, so the fog never runs out. **Sizing rule:** the map is as big as what the player knows is out there — each race discovered in a previous world adds a ring next time; 15 is the floor. Iso hex sprites, draw back-to-front, hex hit-detection.
 - **Procedurally seeded by the 3 chosen God Souls:** each soul carries a **favoured tile guaranteed at 13% of the map** (two souls sharing a tile stack to 26%), a **boon** (a rule change or terrain, never a percent), and a **bane** (its calamity, the thing the Omens clock counts down to). Base weights → apply the 3 souls → roll → **guarantee pass** (Origin is Grassland, center ring claimable, every soul's 13% met, enough food/wood/stone reachable that the world can't be born unwinnable). Full table in the God Souls section below.
-- **Fog of war, lit by campfires.** *Explored = campfire-lit* = accessible and buildable. A campfire lights **radius 2**; a new one may be placed on any lit tile **or one tile into the fog**; campfires are **permanent** (no relighting); **cost doubles per campfire (×2).** The **Origin** starts with the first fire.
+- **Fog of war in three states.** **Dark** = unknown, nothing shown. **Scouted** = greyed: terrain visible, nothing buildable; **Stalkers set to scouting** push it outward from the lit edge, one tile at a time per Stalker. **Lit** = a campfire's **radius 2**: accessible and buildable. **A campfire may only be placed on a scouted tile** (the player sees the terrain before spending on it); campfires are **permanent** (no relighting); **cost doubles per campfire (×2).** The **Origin** starts with the first fire. **Scouts make contact** with a race when they reach its border (see The Six Races).
 - **Save-safe:** flat int arrays (terrain / structure / lit) per hex.
 
 **The tile set (11):**
@@ -258,7 +258,8 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 | Chopper | Chopper Camp · 6 | wood (needs an axe) | — |
 | Farmer | Farm · 6 | **Ambrosia** — the one crop; the tech tree branches what it becomes (food, fibre, brew, paper, soil, fuel) | — |
 | Herbalist | Hearthstone · 3 | food, herbs, **holy** | **Shaman** |
-| Stalker | Lodge · 2 | hunts | — |
+| Stalker | Lodge · 2 | **toggle: hunt or scout** (same XP either way; idle Stalkers hunt) — scouting greys the fog outward and makes contact with races | — |
+| Peddler | Trading Post · 3 | **land trade** — carries one load of Wares overland along scouted tiles to a race's flag and returns with its exclusive (Mariners do the same by sea, bigger hold; a flag across deep water is Ship-only) | — |
 | Digger | X Mine · 3 | stone / iron / silver / gold / coal / algastone — **one mineral per mine** | **Firewalker** |
 | Angler | Angler's Hut · 2 | fish (adjacent water with fish) | **Mariner** |
 | Bolder | Bolder's Cabin · 3 | **builder — required for every building** (even stone has a wood frame); places 5 material/sec base | **Mason** |
@@ -270,7 +271,7 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 
 **The tech engine — supplication grows the tree.** *Supplication → gift → study → craft.* ("The Claykin see trees but cannot harvest the wood. They request something sharp to cut." → gift an Axe → Learners study it → Makers learn to craft more.) Not everything comes from the Claykin; the mystery gift is the crux of the tech tree. **The Tech Tome:** part of the Transcension ritual — logs the Claykin's works and passes to the next generation; what's learned is *known* next world and only needs unlocking, not rediscovery.
 
-**PARKED — a hostile world (lean form):** other races may attack, or need conquering and converting (Wardens fight; Mariners ferry Wardens and Stalkers). **Not rendered on the map** — a **randomly seeded direction** that they exist, discovered by expanding that way. Abstract unless procedural generation can place them convincingly. Spec later.
+**The other races:** see *The Six Races* section (unparked — flags in the fog, one race per society, won by battle / mission / envoy).
 
 ## LOCKED — The Claykin (the created life)
 
@@ -361,6 +362,7 @@ The supporting caste does its job — no bonus, no penalty. **Ships serve the Co
 | Bolder's Cabin | Bolders 3 | ×1.15 to placement rate | **required for any building**; 5 material/sec base (before XP) |
 | Hearthstone | Herbalists 3 | — | food, herbs, holy |
 | Fighter Camp | Fighters 3 | — | War Power |
+| Trading Post | Peddlers 3 | — | land trade; unlocked by Trade alongside Wares |
 
 **Caste workplaces** — ratio 1.15.
 | Building | Team | Bonus | Notes |
@@ -422,7 +424,7 @@ Modelled on Kittens Game's science tree, trimmed to our ceiling (Tier 3 material
 - **Seafaring** — Kilncraft + Fishing + Carpentry. Dock, Ships, Mariners.
 - **Firewalking** — Kilncraft + Ironwork. Forge, Firewalkers, obsidian.
 - **Schooling** — Kilncraft + Scripture. School; **Teachers supersede Learners.**
-- **Trade** — Edicts + Carpentry. Trade-goods payload.
+- **Trade** — Edicts + Carpentry. Trading Post, Peddlers, Wares.
 - **Brewing** — Agriculture + Kilncraft + Edicts. **Ale raises Belief** (the one consumable Belief lever); Spirits = Tier 3 version and premium trade good. Kept small.
 
 **Wave 5 — the world matures**
@@ -503,6 +505,7 @@ Modelled on Kittens Game's science tree, trimmed to our ceiling (Tier 3 material
 | Bolder's Cabin | 40 wood |
 | Hearthstone | 75 wood + 50 stone |
 | Fighter Camp | 150 wood + 100 stone |
+| Trading Post | 500 wood + 200 stone + 10 gold *(Kittens' Tradepost)* |
 
 **Caste workplaces** (Lumber Mill · Smelter · Harbor · Tradepost · Chapel) — ratio 1.15
 | Building | Cost |
@@ -625,6 +628,68 @@ Each god defeated leaves a God Soul; 13 to collect. At world creation the player
 
 Notable pairs players will find: **Nyx alone** = 13% poisoned land only you can use · **Shiva + Thor** = the industrial world · **Hades + Sekhmet** = death refunded and death dealt.
 
+## LOCKED — The Six Races (the other peoples of the world)
+
+**All six races are in every world.** Their **strength is random per seed; their alignment is fixed forever.** Each race has its own Covenant — the same three-axis choice the player makes — and therefore **exactly one Revenant type**, which is both its strength number and how it resists.
+
+**On the map: a marker in the fog.** Each race has **one home hex with a coloured flag**. Around it, a **border whose radius is set by the race's strength in that seed**; inside the border nothing can be lit or built — it is theirs. **Contact** is made when a **scouting Stalker** reaches the border; that opens trade while the border is still out in the grey. Nothing is drawn but the flag; everything after contact happens in a panel.
+
+**Trade UI:** two buttons, **Send Caravan** (Peddlers, by land) and **Send Tradeship** (Mariners, by water), each with a **drop-down of the six races**. A trade takes **30 seconds** to return. Standing sets the rate; Hostile = no trade. Distance from the Origin doubles as difficulty.
+
+| Race | Society | Axes (dominant + supporting) | Their Revenant | Exclusive resource |
+|---|---|---|---|---|
+| Wolfkin | The Legion | war + tech | Clerics | Pelts |
+| Bullkin | The Crusade | war + faith | Clerics | Platinum |
+| Lambkin | The Inquisition | faith + war | Priests | Wool |
+| Owlkin | The Monastery | faith + tech | Priests | Ink |
+| Slitherkin | The Arsenal | tech + war | Scriveners | Venom |
+| Drackin | The Mystery School | tech + faith | Scriveners | Sulfur |
+
+Rivalries (same two axes, opposite order): Wolfkin ↔ Slitherkin · Bullkin ↔ Lambkin · Owlkin ↔ Drackin. The race that mirrors the player's own Covenant is the hardest on the board and wants to trade the same things.
+
+**Winning a race — battle (Clerics), mission (Priests), or envoy (Scriveners).** One rule, three exchange rates, read against where the player's axis sits in the *race's* Covenant:
+- **Their dominant axis: 1:1.** You need their number + 1.
+- **Their supporting axis: 1:2.** Half their number + 1.
+- **Their reviled axis: 1:3.** A third of their number + 1.
+
+"One of yours equals this many of theirs":
+| Race | vs Clerics | vs Priests | vs Scriveners |
+|---|---|---|---|
+| Wolfkin | 1 | 3 | 2 |
+| Bullkin | 1 | 2 | 3 |
+| Lambkin | 2 | 1 | 3 |
+| Owlkin | 3 | 1 | 2 |
+| Slitherkin | 2 | 3 | 1 |
+| Drackin | 3 | 2 | 1 |
+
+Every Covenant gets one mirror-match race, two at half price, three at a third. No path is dead against any race. **No standing/friendliness gate** — the model is pure numbers; standing, if any, is a trade-rate matter only (TBD).
+
+**Every win is the same event:**
+- The race's **Revenant is wiped out, never regained, never re-fought.**
+- Their laborers **join the tribe minus the defectors: defection = half the exchange rate** (1:1 → half refuse · 1:2 → a quarter · 1:3 → a sixth). The cleaner the win, the more you keep.
+- **The joined are frozen:** no births, never fired, never glazed, never changed. A fixed tally of workers.
+- **They count in the Faithful** → Faithful Souls at the raze, same as your own.
+- **Their land opens:** the border becomes yours to light.
+- **They contribute their exclusive resource** — first by **trade** at contact (pay Wares for a trickle), then as **free production** once joined, forever, at their frozen population. That's the reason to finish a race rather than farm the trade. Exclusives are things the Claykin cannot make: Pelts (cloth/armour without Ambrosia fibre) · Platinum (the top-shelf metal; Rich Wares, Tier 3 lines) · Wool (the cheap fibre) · Ink (Paper → Books) · Venom (the Potion line) · Sulfur (gunpowder, Alchemy).
+
+**Races never attack.** Standing only sets trade rates, and it is decided by the Revelation:
+- **Before the Revelation every race is Wary** (the Claykin have no voice yet).
+- **After it, each race reads the player's Revenant against its own Covenant:** same axis as their dominant → **Open** (best rates) · their supporting axis → **Wary** (ordinary rates) · their reviled axis → **Hostile (no trade at all)**. The inverse of the fight table: the race you can crush at a third won't trade with you; the one that needs a full army trades gladly.
+
+**Strength (LOCKED, pending play).** Six fixed values shuffled among the six races each seed; **Drackin always draws from the top three.** Strength = their Revenant count = border size.
+| Tier | Strength | Border radius | Tiles | Ring |
+|---|---|---|---|---|
+| 1 | 7 | 1 | 7 | inner |
+| 2 | 14 | 2 | 19 | inner |
+| 3 | 21 | 2 | 19 | inner |
+| 4 | 35 | 3 | 37 | outer |
+| 5 | 49 | 3 | 37 | outer |
+| 6 | 70 | 4 | 61 | outer |
+
+**Placement (LOCKED).** The **Origin is always the centre, beside water** (the guarantee pass puts a lake or inlet within 2 tiles). Races sit on **two clock rings**: **inner ring (~radius 7) at 12, 4, and 7 o'clock; outer ring (~radius 12) at 2, 6, and 10 o'clock**, nudged to the nearest legal hex if the terrain forbids the exact spot. The three weakest tiers take the inner ring, the three strongest the outer, shuffled within each ring. All six borders take about a quarter of a radius-15 map, and every direction outward finds a race. The numbers pace themselves: a tier 1 race at 1:3 falls to 4 Revenants (a world 1 job); a tier 6 at 1:1 needs 71 (past the population wall — only the right path or a later world).
+
+**Still open on races:** what a trade pays and at what rate.
+
 ## Replay engine
 Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (society), plus terrain synergies. God-souls (286 combos) × 6 societies × terrain = no two worlds alike.
 
@@ -644,7 +709,7 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 - **Reformation** (change Covenant mid-world at high cost) — PARKED.
 
 **Phase-2 still open (in working order):**
-- board size · terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · **raiding parties / War Power numbers** · Faithful Souls math · hostile world (parked) · hero flavor text.
+- terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · **race trade rates** · Faithful Souls math · hero flavor text.
 - Structural: expand the god map from **6 stubbed nodes** to 13, split **5 Stairway + 8 Worlds** (Hades gateway + 7 creation days); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
 
 **Settled since consolidation:** Faithful Souls (kept) · Revenant = god-voice caste · no schisms · Edicts = Commandments (merged) · Thor = auto-mixing · discovery → base-element production speedup · codex persists · mixing tree = item+item(+item), tiers 3–4 restart-gated · god-map navigation approach.
