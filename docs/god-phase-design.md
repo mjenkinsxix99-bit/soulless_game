@@ -293,7 +293,7 @@ Base **greenware** Claykin do the primal work. **Firing in the Kiln** transforms
 | Bolder | **Mason** | Masonry | Stoneworks · 3 | places **stone** (same rate/bonus as Bolders); heavy terraform (removing a Mountain) |
 | Digger | **Firewalker** | Obsidian | Forge · 2 (adj. Lava) | works Lava (cooling → Obsidian ground); **makes obsidian** at the Forge |
 | Angler | **Mariner** | Timber | Dock · 6; 2 per Ship, **3 ships berth per Dock**, 1 ship per water tile when out | deep-water fishing, **trade**, ferrying troops / missionaries / trade goods |
-| Fighter | **Warden** | Axe | Outpost · 3 / Barracks · 6 | **defense and offense**; War Power |
+| Fighter | **Warden** | Axe (+ Arms, world-side) | Outpost · 3 / Barracks · 6 | **defense and offense**; War Power |
 | Herbalist | **Shaman** | Lotus | Spirit Lodge · 6 | rites; produces **holy** (**no** blight purifying — Blight is static) |
 | Learner | **Teacher** | Scripture | School · 3 / College · 6 | the Tech source once Schooling is learned; XP boost |
 
@@ -634,7 +634,26 @@ Notable pairs players will find: **Nyx alone** = 13% poisoned land only you can 
 
 **On the map: a marker in the fog.** Each race has **one home hex with a coloured flag**. Around it, a **border whose radius is set by the race's strength in that seed**; inside the border nothing can be lit or built — it is theirs. **Contact** is made when a **scouting Stalker** reaches the border; that opens trade while the border is still out in the grey. Nothing is drawn but the flag; everything after contact happens in a panel.
 
-**Trade UI:** two buttons, **Send Caravan** (Peddlers, by land) and **Send Tradeship** (Mariners, by water), each with a **drop-down of the six races**. A trade takes **30 seconds** to return. Standing sets the rate; Hostile = no trade. Distance from the Origin doubles as difficulty.
+**Trade UI:** two buttons, **Send Caravan** (Peddlers, by land) and **Send Tradeship** (Mariners, by water), each with a **drop-down of the six races**. A trade takes **30 seconds** to return. Standing sets the rate; Hostile = no trade.
+
+**Trade values (LOCKED, pending play).** One Peddler carries one load per run; a Boat carries 1 load, a Ship 3. The **everyday return is a workshop item** the Claykin could craft but buy instead; the **exclusive is the lottery win**. No probabilistic standing — flat multipliers, and Hostile is a closed door.
+| Load sent | Everyday item returned at Wary | at Open |
+|---|---|---|
+| Wares | 7 | 14 |
+| Fine Wares | 21 | 42 |
+| Rich Wares | 70 | 140 |
+
+Each race has a **preferred grade that pays double** (stacks with Open). **Lottery: 10% per load** the run also brings a lump of the race's exclusive on the same scale as the load sent (a Rich Wares hit = 70 Platinum). Joined races stop trading and produce their exclusive outright.
+| Race | Everyday return | Preferred grade | Lottery (exclusive) |
+|---|---|---|---|
+| Wolfkin | Arms | Rich Wares | Pelts |
+| Bullkin | Ingots | Rich Wares | Platinum |
+| Lambkin | Rope | Wares | Wool |
+| Owlkin | Paper | Wares | Ink |
+| Slitherkin | Bricks | Fine Wares | Venom |
+| Drackin | Charcoal | Fine Wares | Sulfur |
+
+*Note: Wardens need Arms in every world — firing a Warden consumes Arms alongside the Axe compound — so Wolfkin trade matters even to a non-martial Covenant.* Distance from the Origin doubles as difficulty.
 
 | Race | Society | Axes (dominant + supporting) | Their Revenant | Exclusive resource |
 |---|---|---|---|---|
@@ -688,7 +707,6 @@ Every Covenant gets one mirror-match race, two at half price, three at a third. 
 
 **Placement (LOCKED).** The **Origin is always the centre, beside water** (the guarantee pass puts a lake or inlet within 2 tiles). Races sit on **two clock rings**: **inner ring (~radius 7) at 12, 4, and 7 o'clock; outer ring (~radius 12) at 2, 6, and 10 o'clock**, nudged to the nearest legal hex if the terrain forbids the exact spot. The three weakest tiers take the inner ring, the three strongest the outer, shuffled within each ring. All six borders take about a quarter of a radius-15 map, and every direction outward finds a race. The numbers pace themselves: a tier 1 race at 1:3 falls to 4 Revenants (a world 1 job); a tier 6 at 1:1 needs 71 (past the population wall — only the right path or a later world).
 
-**Still open on races:** what a trade pays and at what rate.
 
 ## Replay engine
 Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (society), plus terrain synergies. God-souls (286 combos) × 6 societies × terrain = no two worlds alike.
@@ -709,7 +727,7 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 - **Reformation** (change Covenant mid-world at high cost) — PARKED.
 
 **Phase-2 still open (in working order):**
-- terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · **race trade rates** · Faithful Souls math · hero flavor text.
+- terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · Faithful Souls math · hero flavor text.
 - Structural: expand the god map from **6 stubbed nodes** to 13, split **5 Stairway + 8 Worlds** (Hades gateway + 7 creation days); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
 
 **Settled since consolidation:** Faithful Souls (kept) · Revenant = god-voice caste · no schisms · Edicts = Commandments (merged) · Thor = auto-mixing · discovery → base-element production speedup · codex persists · mixing tree = item+item(+item), tiers 3–4 restart-gated · god-map navigation approach.
