@@ -246,8 +246,18 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 - **Resources are stockpiled** (food, lumber, stone, iron, gold, algastone, fish, herbs, holy…) in the Barn / Granary / Warehouse (and Docks); a food system to develop.
 - **Two ledgers, one name.** What the Claykin dig, chop, farm, fish, or produce is **theirs** (world materials, in their stores). What sits in the Theurgy codex is **the deity's** and does not exist in the world until **gifted**. Iron, gold, holy, axe: the same word can live on both ledgers; **gifting is the only bridge.** Supplication fires only when the Claykin lack something a job needs.
 - **Building is a fill, not a purchase.** A placed building's material cost is *placed* over time by Bolders (wood) and Masons (stone) at their placement rate; **build time = cost ÷ rate.** The player can queue any number of buildings; crews build in placement order, and when stock runs dry the queue stalls until the player supplicates or production catches up.
-- **Terraforming is Claykin work, never a god action.** Workers do it; materials they lack are asked for via **supplication**.
-- **Two channels for materials from the deity, both timed:** **Gifting** (proactive, short cooldown) and **Supplication** (reactive — fires on its own timer when a marked building lacks materials: *"The woodcutter Claykin humbly request X wood to complete their building. Grant or deny."*). Set the gift cooldown a little **longer** than the supplication trigger so supplication is the normal channel. **Supplications ≠ Edicts** (edicts = society-level choices).
+- **Terraforming is Claykin work, never a god action**, and it is **instant on payment: materials only, no clock.** Materials they lack are asked for via **supplication**. **Tiles never run dry** (a Forest gives wood forever, a Mountain ore forever) — clearing or removing is a choice of land over yield, never forced. Costs pending play; the gate node stands in for "the Claykin know how":
+
+| Change | Gate | Cost |
+|---|---|---|
+| Forest → Grassland (clear) | Tools | 50 Plank |
+| Grassland → Forest (plant) | Agriculture | 100 Ambrosia + 50 wood |
+| Marsh → Grassland (drain) | Carpentry | 200 Plank |
+| Desert → Grassland (irrigate) | Agriculture; within 2 tiles of water (3 with Isis) | 200 Plank |
+| Mountain → Grassland (remove) | Stonework | 500 Block + 50 Ingot |
+| Lava → Obsidian ground (cool) | Firewalking (free with Amun-Ra) | 200 Block |
+| Blight | never | — |
+- **One channel for materials from the deity: Supplication** (reactive — fires on its own timer when a job lacks something: *"The woodcutter Claykin humbly request X wood to complete their building. Grant or deny."*). **Timers (LOCKED): supplication = one request every 3 minutes, any item, and any specific item only once per hour** (wood at minute 0, stone at minute 3, wood again not before the hour). **Gifting is set aside as the god gift, not a materials channel:** a **triggered bridge** over holes in the tree that the Claykin cannot cross on their own (the First Bonfire, the First Farm, the Hammer, the mystery gifts). Triggered by the tree, no cooldown, never for materials. Materials move only by supplication — a bridge, not a faucet: the Claykin are meant to take over. The list needs no authoring — it is whatever is short: a material for a queued building, a terraform bill, a Maker row with dry inputs, a tech gift; one sentence template per case. **Supplications ≠ Edicts** (edicts = society-level choices).
 - **Penalties:** hazard adjacency (a tile next to Lava/Blight) and **random calamities that kill Claykin — these are the God Souls' banes.** That's the whole penalty layer.
 
 **The jobs (LOCKED). Two material streams:** Claykin jobs produce **mortal goods** (food, wood, stone, ore, fish, herbs) to the stockpile; the deity supplies **divine compounds** (the Theurgy table) by gift or supplication. Buildings consume a mix.
@@ -276,7 +286,7 @@ Each of the final 7 enacts a day of creation, culminating in Life at Nyx:
 ## LOCKED — The Claykin (the created life)
 
 - **Claykin = Clay + Souls.** Clay (a compound) is the body; Souls (the hoard) are the life — closing the convergence loop ("Souls → life").
-- **Belief/happiness = the integrity of the clay:** content = fired & whole; neglected = dry, **crack, crumble to dust** (population loss). Heresy is literal breakage.
+- **Faith = happiness = the integrity of the clay** (formerly "Belief" — renamed): content = fired & whole; neglected = dry, **crack, crumble to dust** (population loss). Heresy is literal breakage. **High Faith carries a production bonus; low Faith drags** (Kittens' happiness model).
 - **The raze = "return to dust":** Claykin crumble back to clay and you **reclaim their souls as Faithful Souls**. *"From clay I formed you; to clay you return."* The reset is an **un-forming**, not a delete.
 - Pottery is **transformation, not leveling** (see Castes).
 
@@ -310,7 +320,7 @@ Compounds forge castes → **mixing (Phase 1) feeds society (Phase 2).** Same sy
 | Revenant | Hub | Power | Spreads faith by | Pushes | If Reviled |
 |---|---|---|---|---|---|
 | **Cleric** (Warden + Hellfire) | **Citadel** | War | **the sword** | territory & survival — but **no cheaper campfires; spreading has a cost** | calamities hit harder, threats spread |
-| **Priest** (Shaman + Holy Water) | **Cathedral** | Holy | **piety** | boosts the *spread* of faith; produces **holy**; consecrates ground | Faithful grow slowly, Belief fragile |
+| **Priest** (Shaman + Holy Water) | **Cathedral** | Holy | **piety** | boosts the *spread* of faith; produces **holy**; consecrates ground | Faith grows slowly and stays fragile |
 | **Scrivener** (Teacher + Scripture) | **Laboratory** | Tech | **education** | tech & skill — research speed, XP, yields | the tree crawls |
 
 The supporting caste does its job — no bonus, no penalty. **Ships serve the Covenant:** troops, missionaries, and trade goods are *all* always available; the Covenant only tilts them (Revenant boosted + extra buildings · supporting normal · Reviled disadvantaged).
@@ -425,7 +435,7 @@ Modelled on Kittens Game's science tree, trimmed to our ceiling (Tier 3 material
 - **Firewalking** — Kilncraft + Ironwork. Forge, Firewalkers, obsidian.
 - **Schooling** — Kilncraft + Scripture. School; **Teachers supersede Learners.**
 - **Trade** — Edicts + Carpentry. Trading Post, Peddlers, Wares.
-- **Brewing** — Agriculture + Kilncraft + Edicts. **Ale raises Belief** (the one consumable Belief lever); Spirits = Tier 3 version and premium trade good. Kept small.
+- **Brewing** — Agriculture + Kilncraft + Edicts. **Ale lifts Faith** (one lever among several, and the smallest); Spirits = Tier 3 version and premium trade good. Kept small.
 
 **Wave 5 — the world matures**
 - **Masonry** — Stonework + Schooling. Cottage, College.
@@ -558,7 +568,7 @@ Modelled on Kittens Game's science tree, trimmed to our ceiling (Tier 3 material
 | Charcoal | wood | Charcoal | fuel — Kiln, Forge (world 1 fuel) |
 | Rope | Ambrosia fibre | Agriculture (fibre studied) | Boats, Docks, Ships |
 | Paper | Ambrosia pulp | Scripture | the Scripture line; feeds Tech |
-| Ale | Ambrosia | Brewing | Belief |
+| Ale | Ambrosia | Brewing | Faith (a modest lift) |
 | Arms | Ingots + Planks | Garrison | equips a raiding party; spent when it sails |
 | Wares (3 grades) | bundles — see Materials | Trade | the trade-goods payload; spent when a trade Boat/Ship sails |
 | Boat | Planks + Rope | Fishing | crew 2 Mariners; **coastal only** — deep-water fishing, Wares along the coast; no troops/missionaries |
@@ -594,15 +604,29 @@ Base archetypes: **Martial** (Clerics) · **Pious** (Priests) · **Enlightened**
 | Enlightened + Pious | **The Mystery School** | sacred knowledge / gnostics |
 
 Rough bonus↔cost sketch:
-- **Martial:** fast expansion, clears barriers/threats, Faithful won by conflict ↔ weak knowledge, high attrition, Belief hard in peacetime.
-- **Pious:** most Faithful, stable Belief, heresy-resistant, **fastest Faithful Souls** ↔ slow tech/industry, poor expansion, zealotry.
+- **Martial:** fast expansion, clears barriers/threats, Faithful won by conflict ↔ weak knowledge, high attrition, Faith hard in peacetime.
+- **Pious:** most Faithful, stable Faith, heresy-resistant, **fastest Faithful Souls** ↔ slow tech/industry, poor expansion, zealotry.
 - **Enlightened:** fastest tech/recipes, best yields, wonders sooner ↔ few Faithful, doubt-heresy, fragile vs threats.
 
 ## LOCKED — Living-world loop
 
-- **Petitions:** Needs (unmet → Belief falls) & Wants (granted → the Faithful grow) surface on a timer; **Grant / Deny / time-out** each swing Belief and the Faithful. Flavored by the Covenant (a Martial world petitions for weapons; Pious for temples; Enlightened for schools).
-- **Edicts** (= the old "commandments" — one system now): the rules you issue **through the Revenant** (Iron Fist vs Free Will, Industry vs Devotion) that bias how petitions resolve.
-- **Belief** = happiness (= clay integrity); **Ale** is its one consumable lever. **The Faithful** = output → minted into **Faithful Souls** at the raze. (No "Faith" resource.)
+- **Petitions:** Needs (unmet → Faith falls) & Wants (granted → Faith rises) surface on a timer; **Grant / Deny / time-out** each swing Faith. Flavored by the Covenant (a Martial world petitions for weapons; Pious for temples; Enlightened for schools).
+- **Edicts** (= the old "commandments" — one system now): the rules you issue **through the Revenant**. Modelled on Kittens' policies (a fork = mutually exclusive choices, one opening the next), minus the percents: **every answer is a rule change.** **Permanent for the world; reset at the raze.** Three layers: **(1) common forks — light**, gated by population, **one every 13 Claykin** (13 · 26 · 39 · 52 · 65 · 78 · 91), **three answers each, one leaning each axis** (a small Covenant question each time; flavour-of-society, never economy-bending); **(2) one Revenant chain per axis — heavy**, opened at the Revelation and at milestones after it, for the Chosen caste only (TBD; this is where a martial world becomes *martial*); **(3) one fork per won race — specific**, opened when its Revenant falls (TBD).
+
+**Common forks (pending play):**
+| Pop | Fork | Martial | Pious | Enlightened |
+|---|---|---|---|---|
+| 13 | The First Law | Iron Fist: denied petitions cost no Faith | Free Will: granted petitions lift Faith twice over | Open Ear: petitions arrive twice as often |
+| 26 | The Second Fire | Frontier: scouts reveal two tiles a step | Vigil: each lit campfire adds a little Faith | Survey: scouting also gathers Tech |
+| 39 | The Work | Forge: Arms need half the Planks | Altar: "Your people may hallow ground by their own devotion, though it costs them dearly" (*rule: Claykin-made Holy can consecrate a tile at 7:1 against the compound, i.e. 539 per tile*) | Workshop: a fourth Maker at every lodge |
+| 52 | The Stranger | Escort: caravans return in 25 seconds | Open Hand: one Wary race of your choice trades as Open | Fair Market: "Rare goods come back from trade more often" (*rule: exclusive chance 1 in 9 instead of 1 in 10*) |
+| 65 | The Table | Ration: Claykin survive on 10% less food | Feast: Ale lifts Faith 10% more | Temperance: luxuries lift Faith 10% more, Ale not at all |
+| 78 | The Naming | Drill: Fighter Camp holds 4 | Tending: Hearthstone holds 4 | Tutelage: Study holds 4 |
+| 91 | The Memory | Conquest: defection reduced by a fifth (a 1:1 race loses 40%, not 50%) | Ascendance: *placeholder until the Faithful Souls math* | Legacy: the next world starts with four Claykin |
+
+**Heavy pool, parked for the Revenant chains** (to be placed per axis): the soul draw ramping at 1.18 · every race border shrinking one ring · a caste line firing at level 10 · a hub's bonus per **9** stationed instead of 10.
+- **Faith** = happiness (= clay integrity), a meter with a production bonus, not a resource. **Its levers:** Ale (modest) · the **race exclusives held as luxuries** (Pelts, Wool, Ink, Venom, Sulfur, Platinum each lift Faith — the reason to trade beyond need) · **holy buildings** (Hearthstone, Spirit Lodge, Cathedral lift it) · **petitions** (granted lift, denied drop) · **calamities** drop it (Unrest hardest) · **overcrowding** (Claykin without a bed) drags it.
+- **The Faithful** = **a headcount: every Claykin plus everyone they have converted** (joined races). Prestige at the raze is the size of the world you built: the Faithful are minted into **Faithful Souls**.
 - **Two-layer tech tree:** the entity's element discoveries gate what Claykin *may* learn (top-down); Claykin labor XP gates how *good* they are (bottom-up); minions bridge them.
 - **Scaling:** the discovery/build chain **cannot finish in one playthrough** — Faithful Souls from razing accelerate the next run.
 
@@ -621,7 +645,7 @@ Each god defeated leaves a God Soul; 13 to collect. At world creation the player
 | 7 | Amun-Ra | Desert | A share of your world will be sand. | The sun rules the fire. Burning land cools to black stone on its own. | Lava cools to Obsidian ground without Firewalkers | The sun burns. A green field turns to sand. | **Scorch**: a Grassland tile becomes Desert |
 | 8 | Shiva | Lava | A share of your world will be burning land. | Change comes early. Your people are ready to be transformed sooner than others. | firing gate is level 15, not 20 (*strongest boon; may need 17 or one caste line*) | The fire spreads. The burning land grows by one step. | **Eruption**: Lava spreads one tile |
 | 9 | Sekhmet | Desert | A share of your world will be sand. | The lioness hunts with you. Your hunters lend their strength to your armies. | Stalkers count toward War Power | Sickness spreads. Some of your people will not survive it. | **Plague**: a share of the population dies |
-| 10 | Athena | Grassland | A share of your world will be open field. | The owl sees. You will know what the omens bring, not only when. | Omens shows the calamity type from the start | The people grow restless. Their belief in you drops hard. | **Unrest**: Belief drops sharply |
+| 10 | Athena | Grassland | A share of your world will be open field. | The owl sees. You will know what the omens bring, not only when. | Omens shows the calamity type from the start | The people grow restless. Their belief in you drops hard. | **Unrest**: Faith drops sharply |
 | 11 | Odin | Forest | A share of your world will be deep wood. | Two ravens watch. Every fire you light reveals more of the dark around it. | campfires light radius 3 | The cold comes. Nothing grows for a time. | **Frost**: all food production halts for a spell |
 | 12 | Zeus | Mountain | A share of your world will be high rock. | The king favours you. Holy ground is easier to make. | Hallowed tiles cost 55, not 77 | Lightning falls. One building is destroyed outright. | **Smiting**: one building destroyed |
 | 13 | Nyx | Blight | A share of your world will be poisoned land. | Night claims her children. Your people can walk the poisoned land unharmed. | Blight does not kill Claykin | The long night. Every fire's light draws in, until it passes. | **The Long Night**: campfire light radius shrinks by 1 until it passes |
@@ -727,7 +751,7 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 - **Reformation** (change Covenant mid-world at high cost) — PARKED.
 
 **Phase-2 still open (in working order):**
-- terraform costs · petition/supplication list · Edict + Covenant value tables · unique Revenant buildings · Faithful Souls math · hero flavor text.
+- petition list · Revenant edict chains + per-race forks · Covenant value tables · unique Revenant buildings · Faithful Souls math · hero flavor text.
 - Structural: expand the god map from **6 stubbed nodes** to 13, split **5 Stairway + 8 Worlds** (Hades gateway + 7 creation days); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
 
 **Settled since consolidation:** Faithful Souls (kept) · Revenant = god-voice caste · no schisms · Edicts = Commandments (merged) · Thor = auto-mixing · discovery → base-element production speedup · codex persists · mixing tree = item+item(+item), tiers 3–4 restart-gated · god-map navigation approach.
