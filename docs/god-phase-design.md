@@ -589,6 +589,15 @@ Modelled on Kittens Game's science tree, trimmed to our ceiling (Tier 3 material
 
 - **One Covenant per world** (Reformation-at-high-cost PARKED for later).
 - **Straight choice — no slider.** Made at glazing with two questions: *"Which caste is closest to you?"* → the **Chosen** (your Revenants — bonus, the edict/petition voice); *"Which is the farthest?"* → the **Reviled** (negative). The remaining caste is **supporting** (neutral). Penalties are static: **bonus / neutral / negative.**
+
+**Covenant values (LOCKED, pending play).** Most of the Chosen bonus is delivered by the hub, the Power, the chain, and the petitions; the static tilt is small and mirrors across the axes:
+| | Chosen | Supporting | Reviled |
+|---|---|---|---|
+| Its Power | +10% | 0 | −10% |
+| Its caste line fires and glazes at | level 20 | level 20 | **level 25** |
+| Its flavour | the chain, the petitions, the hub | nothing at all | one penalty, equal weight |
+
+Reviled flavour: **War reviled → calamities take 20% more** (more stock lost, more dead, the building *and* its neighbour's queue). **Faith reviled → every Faith lever is 20% weaker** (Ale, luxuries, holy buildings, granted petitions). **Tech reviled → every tech node costs 20% more** (the tree crawls). Supporting is a true zero.
 - **The three axes are already in the game:** **Holy → piety** (Priests) · **Dark → war** (Clerics) · **Wisdom/Research → knowledge** (Scriveners) — live elements *and* ascension-path themes (holy/shadow/mystic).
 - **"Revenants"** = the chosen deity-contact caste (Cleric/Priest/Scrivener = the flavor of whichever you pick). Thematic: a revenant returns from death, and the deity is a killed god clawed back. **Unique buildings unlock per the Revenants chosen.**
 
@@ -610,8 +619,23 @@ Rough bonus↔cost sketch:
 
 ## LOCKED — Living-world loop
 
-- **Petitions:** Needs (unmet → Faith falls) & Wants (granted → Faith rises) surface on a timer; **Grant / Deny / time-out** each swing Faith. Flavored by the Covenant (a Martial world petitions for weapons; Pious for temples; Enlightened for schools).
-- **Edicts** (= the old "commandments" — one system now): the rules you issue **through the Revenant**. Modelled on Kittens' policies (a fork = mutually exclusive choices, one opening the next), minus the percents: **every answer is a rule change.** **Permanent for the world; reset at the raze.** Three layers: **(1) common forks — light**, gated by population, **one every 13 Claykin** (13 · 26 · 39 · 52 · 65 · 78 · 91), **three answers each, one leaning each axis** (a small Covenant question each time; flavour-of-society, never economy-bending); **(2) one Revenant chain per axis — heavy**, opened at the Revelation and at milestones after it, for the Chosen caste only (TBD; this is where a martial world becomes *martial*); **(3) one fork per won race — specific**, opened when its Revenant falls (TBD).
+- **Petitions (LOCKED):** **only the Chosen caste petitions**, and only at moments that matter: **setting out** against a race, or **recovering** from a calamity. **The ask is always a Tier 2 or Tier 3 compound** — the codex talking back. If it's discovered, the petition names it: **Grant** (spends the compound, helps the moment) or **Deny / time-out** (costs nothing but the help). If it isn't: *"The Clerics wish for something to help, but they don't know what it is."* World 1 shows only that line (no Tier 2 yet) — the hook that says something lies past the raze. Every named compound becomes a recipe worth hunting next world.
+
+| Moment | Caste / calamity | Asks for | Grant does |
+|---|---|---|---|
+| Setting out | Clerics, before a raid | Blessed Blade · Armor (T3) | Clerics count one rung better in the exchange |
+| Setting out | Priests, before a mission | Incense · Holy Book (T3) | same, for Priests |
+| Setting out | Scriveners, before an envoy | Tome · Compass (T3) | same, for Scriveners |
+| Recovering | Flood, Storm | Ward | the lost stock or vessels return |
+| Recovering | Drought, Frost, Scorch | Farmland | the fields recover at once |
+| Recovering | Locusts | Grain | the Granary is refilled |
+| Recovering | Earthquake, Smiting | Mortar · Cement | the building stands again |
+| Recovering | Plague | Medicine · Panacea (T3) | the dead are halved |
+| Recovering | Unrest | Bell (T3) | Faith restored |
+| Recovering | Eruption | Tar | the spread tile cools to Obsidian ground |
+| Recovering | The Long Night | Lantern (T3) | the light returns early |
+| Recovering | The Taking | Phylactery (T3) | the taken one returns |
+- **Edicts** (= the old "commandments" — one system now): the rules you issue **through the Revenant**. Modelled on Kittens' policies (a fork = mutually exclusive choices, one opening the next), minus the percents: **every answer is a rule change.** **Permanent for the world; reset at the raze.** Three layers: **(1) common forks — light**, gated by population, **one every 13 Claykin** (13 · 26 · 39 · 52 · 65 · 78 · 91), **three answers each, one leaning each axis** (a small Covenant question each time; flavour-of-society, never economy-bending); **(2) one Revenant chain per axis — heavy**, opened at the 1st, 9th, and 27th glaze, for the Chosen caste only (this is where a martial world becomes *martial*); **(3) the convert fork**, asked once per race converted: Tribute or Assimilate.
 
 **Common forks (pending play):**
 | Pop | Fork | Martial | Pious | Enlightened |
@@ -624,9 +648,32 @@ Rough bonus↔cost sketch:
 | 78 | The Naming | Drill: Fighter Camp holds 4 | Tending: Hearthstone holds 4 | Tutelage: Study holds 4 |
 | 91 | The Memory | Conquest: defection reduced by a fifth (a 1:1 race loses 40%, not 50%) | Ascendance: *placeholder until the Faithful Souls math* | Legacy: the next world starts with four Claykin |
 
-**Heavy pool, parked for the Revenant chains** (to be placed per axis): the soul draw ramping at 1.18 · every race border shrinking one ring · a caste line firing at level 10 · a hub's bonus per **9** stationed instead of 10.
+**Revenant chains (pending play).** Pairs, not triplets — a heavy choice reads as one-or-the-other. Opened at the **1st, 9th, and 27th glazed Revenant**, Chosen path only. (The heavy pool landed here: border shrink → The March; hub bonus per 9 → the three 27th forks; firing at level 10 → the three 1st forks; soul draw 1.18 → The Vow.)
+
+*Cleric chain*
+| At | Fork | Left | Right |
+|---|---|---|---|
+| 1st | The Oath | Conscription: Fighters become Wardens at level 10 | Veterans: Wardens become Clerics at level 15 |
+| 9th | The March | Closed Gate: every race's border shrinks a ring | Plunder: a convert yields a lump of its exclusive, seven per point of strength |
+| 27th | The Throne | Garrison: Citadel bonus per 9 stationed | Dominion: a convert's land counts as lit, no campfires needed |
+
+*Priest chain*
+| At | Fork | Left | Right |
+|---|---|---|---|
+| 1st | The Vow | Vocation: Herbalists become Shamans at level 10 | Hearth: the soul draw ramps at 1.18 |
+| 9th | The Pilgrimage | Absolution: calamities drop Faith half as much | Tithe: converts also produce Holy |
+| 27th | The Cathedral | Congregation: Cathedral bonus per 9 stationed | Relic: **once per world**, one Holy Water may answer a petition in place of the Tier 2/3 ask |
+
+*Scrivener chain*
+| At | Fork | Left | Right |
+|---|---|---|---|
+| 1st | The Lesson | Guild: Learners become Teachers at level 10 | Archive: the Tech cap rises 50% |
+| 9th | The Press | Cartography: every race's flag is shown from the start | Printing: the School holds 6 |
+| 27th | The Laboratory | Academy: Laboratory bonus per 9 stationed | Enlightenment: converts count toward Tech Power |
+
+**The convert fork (LOCKED).** Every race converted asks one question of the player, once: **Tribute** — they stay at their craft and produce their exclusive at **+30%**, and **they count as Faithful**; or **Assimilate** — the player may assign them to any greenware job, and **they do not count as Faithful.** A flock or a workforce, never both. Either way they stay unfired and unglazed.
 - **Faith** = happiness (= clay integrity), a meter with a production bonus, not a resource. **Its levers:** Ale (modest) · the **race exclusives held as luxuries** (Pelts, Wool, Ink, Venom, Sulfur, Platinum each lift Faith — the reason to trade beyond need) · **holy buildings** (Hearthstone, Spirit Lodge, Cathedral lift it) · **petitions** (granted lift, denied drop) · **calamities** drop it (Unrest hardest) · **overcrowding** (Claykin without a bed) drags it.
-- **The Faithful** = **a headcount: every Claykin plus everyone they have converted** (joined races). Prestige at the raze is the size of the world you built: the Faithful are minted into **Faithful Souls**.
+- **The Faithful** = **a headcount: every Claykin plus everyone they have converted** (converts under Tribute; Assimilated converts do not count). Prestige at the raze is the size of the world you built: the Faithful are minted into **Faithful Souls**.
 - **Two-layer tech tree:** the entity's element discoveries gate what Claykin *may* learn (top-down); Claykin labor XP gates how *good* they are (bottom-up); minions bridge them.
 - **Scaling:** the discovery/build chain **cannot finish in one playthrough** — Faithful Souls from razing accelerate the next run.
 
@@ -667,7 +714,7 @@ Notable pairs players will find: **Nyx alone** = 13% poisoned land only you can 
 | Fine Wares | 21 | 42 |
 | Rich Wares | 70 | 140 |
 
-Each race has a **preferred grade that pays double** (stacks with Open). **Lottery: 10% per load** the run also brings a lump of the race's exclusive on the same scale as the load sent (a Rich Wares hit = 70 Platinum). Joined races stop trading and produce their exclusive outright.
+Each race has a **preferred grade that pays double** (stacks with Open). **Lottery: 10% per load** the run also brings a lump of the race's exclusive on the same scale as the load sent (a Rich Wares hit = 70 Platinum). Converts stop trading and produce their exclusive outright.
 | Race | Everyday return | Preferred grade | Lottery (exclusive) |
 |---|---|---|---|
 | Wolfkin | Arms | Rich Wares | Pelts |
@@ -707,13 +754,13 @@ Rivalries (same two axes, opposite order): Wolfkin ↔ Slitherkin · Bullkin ↔
 
 Every Covenant gets one mirror-match race, two at half price, three at a third. No path is dead against any race. **No standing/friendliness gate** — the model is pure numbers; standing, if any, is a trade-rate matter only (TBD).
 
-**Every win is the same event:**
+**Every conversion is the same event** (a converted race = a **convert**):
 - The race's **Revenant is wiped out, never regained, never re-fought.**
 - Their laborers **join the tribe minus the defectors: defection = half the exchange rate** (1:1 → half refuse · 1:2 → a quarter · 1:3 → a sixth). The cleaner the win, the more you keep.
-- **The joined are frozen:** no births, never fired, never glazed, never changed. A fixed tally of workers.
-- **They count in the Faithful** → Faithful Souls at the raze, same as your own.
+- **Converts are frozen:** no births, never fired, never glazed, never changed. A fixed tally.
+- **The convert fork is asked once** (see Edicts): **Tribute** → they stay at their craft, +30% exclusive, **and count in the Faithful**; **Assimilate** → assignable to any greenware job, **not Faithful.**
 - **Their land opens:** the border becomes yours to light.
-- **They contribute their exclusive resource** — first by **trade** at contact (pay Wares for a trickle), then as **free production** once joined, forever, at their frozen population. That's the reason to finish a race rather than farm the trade. Exclusives are things the Claykin cannot make: Pelts (cloth/armour without Ambrosia fibre) · Platinum (the top-shelf metal; Rich Wares, Tier 3 lines) · Wool (the cheap fibre) · Ink (Paper → Books) · Venom (the Potion line) · Sulfur (gunpowder, Alchemy).
+- **They contribute their exclusive resource** — first by **trade** at contact (pay Wares for a trickle), then as **free production** once converted, forever, at their frozen population. That's the reason to finish a race rather than farm the trade. Exclusives are things the Claykin cannot make: Pelts (cloth/armour without Ambrosia fibre) · Platinum (the top-shelf metal; Rich Wares, Tier 3 lines) · Wool (the cheap fibre) · Ink (Paper → Books) · Venom (the Potion line) · Sulfur (gunpowder, Alchemy).
 
 **Races never attack.** Standing only sets trade rates, and it is decided by the Revelation:
 - **Before the Revelation every race is Wary** (the Claykin have no voice yet).
@@ -751,7 +798,7 @@ Two independent build axes: **3 God Souls** (terrain/events) × **Covenant** (so
 - **Reformation** (change Covenant mid-world at high cost) — PARKED.
 
 **Phase-2 still open (in working order):**
-- petition list · Revenant edict chains + per-race forks · Covenant value tables · unique Revenant buildings · Faithful Souls math · hero flavor text.
+- Faithful Souls math · unique Revenant buildings · hero flavor text.
 - Structural: expand the god map from **6 stubbed nodes** to 13, split **5 Stairway + 8 Worlds** (Hades gateway + 7 creation days); reuse `#godmap-overlay` with final-node-unlocks-next-map + forward/back navigation (LOCKED approach).
 
 **Settled since consolidation:** Faithful Souls (kept) · Revenant = god-voice caste · no schisms · Edicts = Commandments (merged) · Thor = auto-mixing · discovery → base-element production speedup · codex persists · mixing tree = item+item(+item), tiers 3–4 restart-gated · god-map navigation approach.
